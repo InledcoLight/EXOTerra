@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:id="@+id/light_mode_ll"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/shape_round_rect_white"
+        android:gravity="center"
+        android:orientation="horizontal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <android.support.design.widget.CheckableImageButton
+            android:id="@+id/light_cib_manual"
+            android:layout_width="64dp"
+            android:layout_height="wrap_content"
+            android:background="@drawable/selector_mode_bg"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:scaleType="center"
+            android:tint="@color/selector_mode_fg"
+            app:srcCompat="@drawable/ic_slider_white_32dp"/>
+
+        <android.support.design.widget.CheckableImageButton
+            android:id="@+id/light_cib_auto"
+            android:layout_width="64dp"
+            android:layout_height="wrap_content"
+            android:background="@drawable/selector_mode_bg"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:tint="@color/selector_mode_fg"
+            app:srcCompat="@drawable/ic_timer_white_32dp"/>
+
+        <CheckedTextView
+            android:id="@+id/light_ctv_pro"
+            android:layout_width="64dp"
+            android:layout_height="match_parent"
+            android:background="@drawable/selector_mode_bg"
+            android:gravity="center"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:text="Pro"
+            android:textColor="@color/selector_mode_fg"
+            android:textSize="18sp"/>
+    </LinearLayout>
+
+    <FrameLayout
+        android:id="@+id/light_fl_show"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/light_mode_ll">
+
+    </FrameLayout>
+</android.support.constraint.ConstraintLayout>

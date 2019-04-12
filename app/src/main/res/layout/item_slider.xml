@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:app="http://schemas.android.com/apk/res-auto"
+              android:orientation="horizontal"
+              android:gravity="center_vertical"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content">
+
+    <ImageView
+        android:id="@+id/item_slider_color"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="8dp"
+        android:scaleType="centerCrop"
+        android:visibility="gone"
+        app:srcCompat="@drawable/ic_square_white"/>
+
+    <SeekBar
+        android:id="@+id/item_slider_progress"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="9"
+        android:paddingTop="16dp"
+        android:paddingBottom="16dp"
+        android:layout_margin="4dp"
+        android:maxHeight="6dp"
+        android:max="1000"
+        android:progress="0"
+        android:progressDrawable="@drawable/custom_seekbar_white"
+        android:thumb="@drawable/custom_thumb_white"/>
+
+    <TextView
+        android:id="@+id/item_slider_percent"
+        android:gravity="right"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:textSize="12sp"
+        android:layout_marginRight="8dp"
+        android:text="xx%"/>
+
+</LinearLayout>

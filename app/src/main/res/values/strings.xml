@@ -1,0 +1,98 @@
+<resources>
+    <string name="app_name">EXOTerra</string>
+
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
+    <string name="close">Close</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+
+    <string name="signin">Sign in</string>
+    <string name="forget_password">Forget password?</string>
+    <string name="signup">Sign up</string>
+    <string name="skip">Skip</string>
+    <string name="start">Start</string>
+    <string name="stop">Stop</string>
+
+    <string name="hint_email">Email</string>
+    <string name="hint_password">Password</string>
+    <string name="error_email">Invalid email</string>
+    <string name="error_password">Password length 6 ~ 16</string>
+    <string name="error_nickname">Nickname can not be empty</string>
+    <string name="error_verifycode">Verify code is 6 digits</string>
+    <string name="hint_nickname">Nickname</string>
+    <string name="has_account_signin">Already has account? Back to signin</string>
+    <string name="new_password">New password</string>
+    <string name="hint_verifycode">Verify code</string>
+    <string name="send_verifycode">Send Verifycode</string>
+    <string name="foundback_password">Foundback Password</string>
+
+    <string name="title_register_success">Register success</string>
+    <string name="msg_active_account">An activate email has been send to your email, please active your account before signin by click the link in the email.</string>
+    <string name="title_foundback_success">Success</string>
+    <string name="msg_foundback_success">Password has been reset.</string>
+
+    <string name="router">Router</string>
+
+    <string name="title_smartconfig_failed">SmartConfig Failed</string>
+    <string name="title_smartconfig_completed">SmartConfig Completed</string>
+    <string name="placeholder_ssid">${ssid}</string>
+    <string name="placeholder_mac">${mac}</string>
+    <string name="placeholder_ip">${ip}</string>
+    <string name="msg_smartconfig_failed">SmartConfig failed.</string>
+    <string name="msg_smartconfig_nodevice_connected">No device connected to ${ssid}.</string>
+    <string name="msg_smartconfig_device_connect_router">Device (mac: ${mac}) connected to ${ssid}, IP: ${ip}. Do you want to subscribe device?</string>
+    <string name="warn_device_donot_support_5g">Device does not support 5G!</string>
+    <string name="msg_subscribe_success">Subscribed success</string>
+    <string name="msg_subscribe_fail">Subscribed failed: </string>
+    <string name="subscribe">Subscribe</string>
+    <string name="unsubscribe">Unsubscribe</string>
+
+    <string name="timezone">TimeZone</string>
+    <string name="longitude">Longitude</string>
+    <string name="latitude">Latitude</string>
+    <string name="save">Save</string>
+
+    <string name="error_longitude">-180.0 ~ 180.0</string>
+    <string name="error_latitude">-60.0 ~ 60.0</string>
+    <string name="week_sun">Sun</string>
+    <string name="week_mon">Mon</string>
+    <string name="week_tue">Tue</string>
+    <string name="week_wed">Wed</string>
+    <string name="week_thu">Thu</string>
+    <string name="week_fri">Fri</string>
+    <string name="week_sat">Sat</string>
+    <string name="remove">Remove</string>
+    <string name="title_set_timer">Set Timer</string>
+    <string name="sunrise">Sunrise</string>
+    <string name="day_light">Daylight</string>
+    <string name="sunset">Sunset</string>
+    <string name="night">Night</string>
+    <string name="turnoff">Turnoff</string>
+    <string name="disabled">Disabled</string>
+    <string name="ramp">Ramp</string>
+    <string name="device_datetime">Device datetime</string>
+    <string name="device_datetime_not_correct">Devie datetime not correct? Set timezone.</string>
+    <string name="set_timezone">Set timezone</string>
+    <string name="location">Location</string>
+    <string name="choose">Choose</string>
+    <string name="rename">Rename</string>
+    <string name="device_name">Device name</string>
+    <string name="rename_device">Rename device</string>
+    <string name="input_empty">Input can not be empty.</string>
+    <string name="select_profile">Select Profile</string>
+    <string name="timezone_and_location"><![CDATA[Timezone & Location]]></string>
+    <string name="choose_timezone">Choose Timezone</string>
+    <string name="profiles">Profiles</string>
+    <string name="profile">Profile</string>
+    <string name="msg_timepoints_min">Timepoints count min 4.</string>
+    <string name="title_delete_timepoint">Delete #{index} Set Time</string>
+    <string name="msg_timepoints_max">Timepoints count max 10.</string>
+    <string name="title_add_time">Add Time</string>
+    <string name="current_profile">Current Profile:</string>
+    <string name="smartconfig">SmartConfig</string>
+    <string name="remove_timer">Remove Timer</string>
+    <string name="poweron">Turnon</string>
+    <string name="poweroff">Turnoff</string>
+    <string name="timer_count_over">Timers count max 24.</string>
+</resources>

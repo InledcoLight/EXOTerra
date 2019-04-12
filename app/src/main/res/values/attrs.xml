@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="MultiCircleProgress">
+        <attr name="circleCount" format="integer"/>
+        <attr name="startAngle" format="integer"/>
+        <attr name="sweepAngle" format="integer"/>
+        <attr name="progress" format="integer"/>
+        <attr name="max" format="integer"/>
+        <attr name="circleBackgroundColor" format="color|reference"/>
+        <attr name="circleWidth" format="dimension|reference"/>
+        <attr name="dividerWidth" format="dimension|reference"/>
+        <attr name="circleColor" format="color"/>
+        <attr name="dividerColor" format="color|reference"/>
+        <attr name="centerText" format="string|reference"/>
+        <attr name="centerTextColor" format="color|reference"/>
+        <attr name="centerTextSize" format="dimension|reference"/>
+    </declare-styleable>
+
+    <declare-styleable name="MultiPointSeekbar">
+        <attr name="pointCount" format="integer"/>
+        <attr name="lineColor" format="color|reference"/>
+        <attr name="thumbDrawable" format="reference"/>
+        <attr name="selectedThumDrawable" format="reference"/>
+        <attr name="thumbDrawableTint" format="integer"/>
+        <attr name="thumbDrawableTintMode" format="integer"/>
+        <attr name="thumbColor" format="color|reference"/>
+        <attr name="selectedThumbColor" format="color|reference"/>
+        <attr name="maximum" format="integer"/>
+        <attr name="minimum" format="integer"/>
+        <attr name="showHint" format="boolean"/>
+        <attr name="hintBackgroundColor" format="color|reference"/>
+        <attr name="maxLengthHint" format="string|reference"/>
+        <attr name="hintSize" format="dimension"/>
+        <attr name="hintColor" format="color|reference"/>
+        <attr name="hintPadding" format="dimension"/>
+    </declare-styleable>
+
+    <declare-styleable name="CustomTimePicker">
+        <attr name="interval" format="integer"/>
+        <attr name="is24Hour" format="boolean"/>
+    </declare-styleable>
+</resources>

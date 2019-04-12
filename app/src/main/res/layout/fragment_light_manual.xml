@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <android.support.constraint.Guideline
+        android:id="@+id/light_manual_gl1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_begin="20dp"
+        app:layout_constraintGuide_percent="0.6"/>
+
+    <android.support.design.widget.CheckableImageButton
+        android:id="@+id/light_manual_power"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:layout_marginEnd="32dp"
+        android:layout_marginBottom="32dp"
+        android:background="?attr/selectableItemBackground"
+        android:padding="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:srcCompat="@drawable/selector_power"/>
+
+    <LinearLayout
+        android:id="@+id/linearLayout"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:padding="8dp"
+        app:layout_constraintBottom_toTopOf="@+id/light_manual_power"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/light_manual_desc">
+
+        <com.liruya.exoterra.view.MultiCircleProgress
+            android:id="@+id/light_manual_custom1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            android:layout_weight="1"
+            app:centerText="P1"
+            app:centerTextSize="14sp"
+            app:circleWidth="2dp"
+            app:dividerWidth="0dp"
+            app:max="100"
+            app:progress="0"
+            app:startAngle="-225"
+            app:sweepAngle="270"/>
+
+        <com.liruya.exoterra.view.MultiCircleProgress
+            android:id="@+id/light_manual_custom2"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            android:layout_weight="1"
+            app:centerText="P2"
+            app:centerTextSize="14sp"
+            app:circleWidth="2dp"
+            app:dividerWidth="0dp"
+            app:max="100"
+            app:progress="0"
+            app:startAngle="-225"
+            app:sweepAngle="270"/>
+
+        <com.liruya.exoterra.view.MultiCircleProgress
+            android:id="@+id/light_manual_custom3"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            android:layout_weight="1"
+            app:centerText="P3"
+            app:centerTextSize="14sp"
+            app:circleWidth="2dp"
+            app:dividerWidth="0dp"
+            app:max="100"
+            app:progress="0"
+            app:startAngle="-225"
+            app:sweepAngle="270"/>
+
+        <com.liruya.exoterra.view.MultiCircleProgress
+            android:id="@+id/light_manual_custom4"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            android:layout_weight="1"
+            app:centerText="P4"
+            app:centerTextSize="14sp"
+            app:circleWidth="2dp"
+            app:dividerWidth="0dp"
+            app:max="100"
+            app:progress="0"
+            app:startAngle="-225"
+            app:sweepAngle="270"/>
+    </LinearLayout>
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/light_manual_rv"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:orientation="vertical"
+        app:layoutManager="android.support.v7.widget.LinearLayoutManager"
+        app:layout_constraintBottom_toTopOf="@+id/light_manual_desc"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <TextView
+        android:id="@+id/light_manual_desc"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
+        android:gravity="center"
+        android:text=""
+        app:layout_constraintBottom_toTopOf="@+id/light_manual_gl1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"/>
+
+</android.support.constraint.ConstraintLayout>

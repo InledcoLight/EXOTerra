@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+          package="com.liruya.exoterra">
+    <!-- 存储权限为日志文件需要,如果不需要提供日志的文件存储功能,也可以不提供此权限 -->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/> <!-- wIFI权限用于本地及云端状态切换及网络状态的检测需要 -->
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE"/>
+    <uses-permission android:name="android.permission.CHANGE_WIFI_MULTICAST_STATE"/> <!-- 网络权限用于云端连接的需要 -->
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.INTERNET"/>
+
+    <application
+        android:name=".EXOTerraApplication"
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme">
+        <activity android:name=".splash.SplashActivity"
+                  android:screenOrientation="portrait">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+        </activity>
+        <activity android:name=".login.LoginActivity"
+                  android:screenOrientation="portrait"/>
+        <activity android:name=".main.MainActivity"
+                  android:screenOrientation="portrait"/>
+        <activity android:name=".register.RegisterActivity"
+                  android:screenOrientation="portrait"/>
+        <activity android:name=".foundback.FoundbackActivity"
+                  android:screenOrientation="portrait"/>
+        <activity android:name=".smartconfig.SmartconfigActivity"
+                  android:screenOrientation="portrait"/>
+        <activity android:name=".scan.ScanActivity"
+                  android:screenOrientation="portrait"/>
+        <activity android:name=".device.DeviceActivity"
+                  android:screenOrientation="portrait"
+                  android:windowSoftInputMode="adjustPan"/>
+    </application>
+
+</manifest>
