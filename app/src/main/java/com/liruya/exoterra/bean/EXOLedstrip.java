@@ -6,8 +6,6 @@ import android.text.TextUtils;
 import java.util.ArrayList;
 import java.util.List;
 
-import cn.xlink.restful.api.app.DeviceApi;
-import cn.xlink.sdk.common.ByteUtil;
 import cn.xlink.sdk.core.model.XLinkDataPoint;
 
 public class EXOLedstrip extends Device {
@@ -199,19 +197,7 @@ public class EXOLedstrip extends Device {
         return getByteArray(INDEX_CUSTOM1_BRIGHTS + idx);
     }
 
-//    public XLinkDataPoint setCustomBrights(int idx, byte[] brights) {
-//        if (idx < 0 || idx >= CUSTOM_COUNT_MAX || brights == null || brights.length != getChannelCount()){
-//            return null;
-//        }
-//        for (int i = 0; i < brights.length; i++) {
-//            if (brights[i] < 0 || brights[i] > 100) {
-//                brights[i] = 100;
-//            }
-//        }
-//        return setByteArray(INDEX_CUSTOM1_BRIGHTS + idx, brights);
-//    }
-
-    public DeviceApi.DeviceDataPointRequest.Command setCustomBrights(int idx, byte[] brights) {
+    public XLinkDataPoint setCustomBrights(int idx, byte[] brights) {
         if (idx < 0 || idx >= CUSTOM_COUNT_MAX || brights == null || brights.length != getChannelCount()){
             return null;
         }
@@ -220,11 +206,23 @@ public class EXOLedstrip extends Device {
                 brights[i] = 100;
             }
         }
-        DeviceApi.DeviceDataPointRequest.Command cmd = new DeviceApi.DeviceDataPointRequest.Command<>();
-        cmd.index = INDEX_CUSTOM1_BRIGHTS+idx;
-        cmd.value = ByteUtil.bytesToHex(brights);            //字节数组需要转换为字符串
-        return cmd;
+        return setByteArray(INDEX_CUSTOM1_BRIGHTS + idx, brights);
     }
+
+//    public DeviceApi.DeviceDataPointRequest.Command setCustomBrights(int idx, byte[] brights) {
+//        if (idx < 0 || idx >= CUSTOM_COUNT_MAX || brights == null || brights.length != getChannelCount()){
+//            return null;
+//        }
+//        for (int i = 0; i < brights.length; i++) {
+//            if (brights[i] < 0 || brights[i] > 100) {
+//                brights[i] = 100;
+//            }
+//        }
+//        DeviceApi.DeviceDataPointRequest.Command cmd = new DeviceApi.DeviceDataPointRequest.Command<>();
+//        cmd.index = INDEX_CUSTOM1_BRIGHTS+idx;
+//        cmd.value = ByteUtil.bytesToHex(brights);            //字节数组需要转换为字符串
+//        return cmd;
+//    }
 
     public boolean getGisEnable() {
         return getBoolean(INDEX_GIS_ENABLE);

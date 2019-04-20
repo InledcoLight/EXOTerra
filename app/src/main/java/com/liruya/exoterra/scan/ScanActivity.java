@@ -14,6 +14,7 @@ import android.widget.ToggleButton;
 import com.liruya.base.BaseActivity;
 import com.liruya.exoterra.R;
 import com.liruya.exoterra.manager.DeviceManager;
+import com.liruya.exoterra.xlink.XlinkCloudManager;
 import com.liruya.exoterra.xlink.XlinkConstants;
 
 import java.util.ArrayList;
@@ -24,7 +25,6 @@ import cn.xlink.sdk.core.XLinkCoreException;
 import cn.xlink.sdk.v5.listener.XLinkScanDeviceListener;
 import cn.xlink.sdk.v5.model.XDevice;
 import cn.xlink.sdk.v5.module.connection.XLinkScanDeviceTask;
-import cn.xlink.sdk.v5.module.main.XLinkSDK;
 
 public class ScanActivity extends BaseActivity {
     private final int SCAN_DEVICE_TIMEOUT = 30000;
@@ -158,13 +158,7 @@ public class ScanActivity extends BaseActivity {
         pids.add(XlinkConstants.PRODUCT_ID_LEDSTRIP);
         pids.add(XlinkConstants.PRODUCT_ID_MONSOON);
         pids.add(XlinkConstants.PRODUCT_ID_SOCKET);
-        mScanDeviceTask = XLinkScanDeviceTask.newBuilder()
-                                             .setProductIds(pids)
-                                             .setTotalTimeout(SCAN_DEVICE_TIMEOUT)
-                                             .setRetryInterval(SCAN_RETRY_INTERVAL)
-                                             .setScanDeviceListener(mScanDeviceListener)
-                                             .build();
-        XLinkSDK.startTask(mScanDeviceTask);
+        XlinkCloudManager.getInstance().scanDevice(pids, SCAN_DEVICE_TIMEOUT, SCAN_RETRY_INTERVAL, mScanDeviceListener);
     }
 
     private void stopScan() {

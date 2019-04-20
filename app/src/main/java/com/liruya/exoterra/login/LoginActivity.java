@@ -82,7 +82,8 @@ public class LoginActivity extends BaseActivity {
         }
         mLoadDialog = new LoadDialog(this);
         mProgressDialog = new ProgressDialog(this);
-        mProgressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+        mProgressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        mProgressDialog.setIndeterminate(true);
     }
 
     @Override
@@ -102,7 +103,7 @@ public class LoginActivity extends BaseActivity {
                     login_et_password.requestFocus();
                     return;
                 }
-                XlinkCloudManager.getInstance().login(email, password, 2000, new XLinkTaskListener<UserAuthApi.UserAuthResponse>() {
+                XlinkCloudManager.getInstance().login(email, password, 5000, new XLinkTaskListener<UserAuthApi.UserAuthResponse>() {
                     @Override
                     public void onError(XLinkCoreException e) {
                         Toast.makeText(LoginActivity.this, e.getErrorName(), Toast.LENGTH_SHORT)

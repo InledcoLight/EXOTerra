@@ -2,21 +2,21 @@ package com.liruya.exoterra.xlink;
 
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
+import android.util.Base64;
+import android.util.Log;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
+import cn.xlink.restful.XLinkCallback;
 import cn.xlink.restful.XLinkRestful;
 import cn.xlink.restful.XLinkRestfulEnum;
+import cn.xlink.restful.XLinkRestfulError;
 import cn.xlink.restful.api.app.DeviceApi;
 import cn.xlink.restful.api.app.UserApi;
 import cn.xlink.restful.api.app.UserAuthApi;
+import cn.xlink.sdk.common.ByteUtil;
 import cn.xlink.sdk.core.error.XLinkErrorCodeHelper;
 import cn.xlink.sdk.core.error.XLinkErrorCodes;
 import cn.xlink.sdk.core.model.XLinkDataPoint;
@@ -39,11 +39,6 @@ import cn.xlink.sdk.v5.module.notify.EventNotifyHelper;
 import cn.xlink.sdk.v5.module.share.XLinkHandleShareDeviceTask;
 import cn.xlink.sdk.v5.module.share.XLinkShareDeviceTask;
 import cn.xlink.sdk.v5.module.subscription.XLinkAddDeviceTask;
-import okhttp3.Callback;
-import okhttp3.MediaType;
-import okhttp3.Request;
-import okhttp3.RequestBody;
-import okhttp3.Response;
 import retrofit2.Call;
 
 public class XlinkCloudManager {
@@ -135,106 +130,50 @@ public class XlinkCloudManager {
         }
     }
 
-//    public void registerDevice(XDevice device, String name, final IXlinkRequestCallback<DeviceApi.RegisterDeviceResponse> callback) {
-//        DeviceApi.RegisterDeviceRequest request = new DeviceApi.RegisterDeviceRequest();
-//        request.accessKey = XLinkUserManager.getInstance().getAccessToken();
-//        request.productId = device.getProductId();
-//        request.mac = device.getMacAddress();
-//        if (!TextUtils.isEmpty(name)) {
-//            request.name = name;
-//        }
-//        Call<DeviceApi.RegisterDeviceResponse> call = XLinkRestful.getApplicationApi()
-//                                                                  .userRegisterDevice(XLinkUserManager.getInstance().getUid(), request);
-//        call.enqueue(new XLinkCallback<DeviceApi.RegisterDeviceResponse>() {
-//            @Override
-//            public void onHttpError(Throwable throwable) {
-//                if (callback != null) {
-//                    callback.onError(throwable.getMessage());
-//                }
-//            }
-//
-//            @Override
-//            public void onApiError(XLinkRestfulError.ErrorWrapper.Error error) {
-//                if (callback != null) {
-//                    if (error.code == XLinkErrorCodes.ERROR_API_DEVICE_MAC_ADDRESS_EXISTS) {
-//                        callback.onSuccess(null);
-//                    } else {
-//                        callback.onError(XLinkErrorCodeHelper.getErrorCodeName(error.code));
-//                    }
-//                }
-//            }
-//
-//            @Override
-//            public void onSuccess(DeviceApi.RegisterDeviceResponse registerDeviceResponse) {
-//                if (callback != null) {
-//                    callback.onSuccess(registerDeviceResponse);
-//                }
-//            }
-//        });
-//        if (callback != null) {
-//            callback.onStart();
-//        }
-//    }
-
-    public void registerDevice(XDevice device, String name, final IXlinkRequestCallback<String> callback) {
-        Map<String, String> params = new HashMap<>();
-        params.put( "product_id", device.getProductId() );
-        params.put( "mac", device.getMacAddress() );
+    public void registerDevice(final XDevice device, String name, final IXlinkRegisterDeviceCallback callback) {
+        DeviceApi.RegisterDeviceRequest request = new DeviceApi.RegisterDeviceRequest();
+        request.productId = device.getProductId();
+        request.mac = device.getMacAddress();
         if (!TextUtils.isEmpty(name)) {
-            params.put("name", name);
+            request.name = name;
         }
-        String json = new JSONObject(params ).toString();
-        RequestBody requestBody = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), json);
-        final Request request = new Request.Builder()
-                                .url( "https://api2.xlink.cn/v2/user/" + XLinkUserManager.getInstance().getUid() + "/register_device" )
-                                .header( "Access-Token", XLinkUserManager.getInstance().getAccessToken())
-                                .post( requestBody )
-                                .build();
-        XLinkRestful.getApiHttpClient().newCall(request).enqueue(new Callback() {
+        Call<DeviceApi.RegisterDeviceResponse> call = XLinkRestful.getApplicationApi()
+                                                                  .userRegisterDevice(XLinkUserManager.getInstance().getUid(), request);
+        call.enqueue(new XLinkCallback<DeviceApi.RegisterDeviceResponse>() {
             @Override
-            public void onFailure(okhttp3.Call call, IOException e) {
+            public void onHttpError(Throwable throwable) {
                 if (callback != null) {
-                    callback.onError(e.getMessage());
+                    callback.onError(throwable.getMessage());
                 }
             }
 
             @Override
-            public void onResponse(okhttp3.Call call, Response response) throws IOException {
-                if (response.isSuccessful()) {
-                    if (callback != null) {
-                        callback.onSuccess(response.body().string());
+            public void onApiError(XLinkRestfulError.ErrorWrapper.Error error) {
+                if (callback != null) {
+                    if (error.code == XLinkErrorCodes.ERROR_API_DEVICE_MAC_ADDRESS_EXISTS) {
+                        callback.onDeviceAlreadyExists(device);
+                    } else {
+                        callback.onError(XLinkErrorCodeHelper.getErrorCodeName(error.code));
                     }
-                } else {
-                    String s = response.body().string();
-                    try {
-                        JSONObject object = new JSONObject(s);
-                        if (object != null && object.has("error")) {
-                            JSONObject error = object.getJSONObject("error");
-                            if (error != null && error.has("code") && error.has("msg")) {
-                                int code = error.getInt("code");
-                                if (callback != null) {
-                                    if (code == XLinkErrorCodes.ERROR_API_DEVICE_MAC_ADDRESS_EXISTS) {
-                                        callback.onSuccess(s);
-                                    } else {
-                                        callback.onError(XLinkErrorCodeHelper.getErrorCodeName(code));
-                                    }
-                                }
-                                return;
-                            }
-                        }
-                    }
-                    catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                    if (callback != null) {
-                        callback.onError(s);
-                    }
+                }
+            }
+
+            @Override
+            public void onSuccess(DeviceApi.RegisterDeviceResponse registerDeviceResponse) {
+                Log.e(TAG, "onSuccess: " + registerDeviceResponse.accessKey);
+                device.setDeviceId(registerDeviceResponse.deviceId);
+                if (callback != null) {
+                    callback.onSuccess(device);
                 }
             }
         });
         if (callback != null) {
             callback.onStart();
         }
+    }
+
+    public void registerDevice(final XDevice device, final IXlinkRegisterDeviceCallback callback) {
+        registerDevice(device, null, callback);
     }
 
     public void subscribeDevice(final XDevice device, byte[] pincode, int timeout, XLinkTaskListener<XDevice> listener) {
@@ -250,7 +189,30 @@ public class XlinkCloudManager {
         XLinkSDK.startTask(task);
     }
 
-    public void unsubscribeDevice(XDevice device, XLinkTaskListener<String> listener) {
+    public void subscribeDeviceBySn(@NonNull String pid, @NonNull String sn, XlinkRequestCallback<DeviceApi.SnSubscribeResponse> callback) {
+        DeviceApi.SnSubscribeRequest request = new DeviceApi.SnSubscribeRequest();
+        request.productId = pid;
+        request.sn = sn;
+        XLinkRestful.getApplicationApi()
+                    .snSubscribeDevice(XLinkUserManager.getInstance().getUid(), request)
+                    .enqueue(callback);
+        if (callback != null) {
+            callback.onStart();
+        }
+    }
+
+    public void subscribeDeviceByQr(@NonNull String code, XlinkRequestCallback<DeviceApi.QRCodeSubscribeResponse> callback) {
+        DeviceApi.QRCodeSubscribeRequest request = new DeviceApi.QRCodeSubscribeRequest();
+        request.qrCode = new String(Base64.decode(code.getBytes(), Base64.DEFAULT));
+        XLinkRestful.getApplicationApi()
+                    .qrCodeSubscribeDevice(XLinkUserManager.getInstance().getUid(), request)
+                    .enqueue(callback);
+        if (callback != null) {
+            callback.onStart();
+        }
+    }
+
+    public void unsubscribeDevice(@NonNull XDevice device, XLinkTaskListener<String> listener) {
         //setUserId??
         XLinkRemoveDeviceTask task = XLinkRemoveDeviceTask.newBuilder()
                                                           .setXDevice(device)
@@ -259,7 +221,7 @@ public class XlinkCloudManager {
         XLinkSDK.startTask(task);
     }
 
-    public void addLocalDevice(final XDevice device, byte[] pincode, int timeout, XLinkTaskListener<XDevice> listener) {
+    public void addLocalDevice(@NonNull final XDevice device, byte[] pincode, int timeout, XLinkTaskListener<XDevice> listener) {
         XLinkAddDeviceTask task = XLinkAddDeviceTask.newBuilder()
                                                     .setXDevice(device)
                                                     .setConnectLocal(false)
@@ -272,10 +234,21 @@ public class XlinkCloudManager {
         XLinkSDK.startTask(task);
     }
 
-    public void scanDevice(List<String> pid, int timeout, XLinkScanDeviceListener listener) {
+    public void scanDevice(String pid, int timeout, int retryInterval, XLinkScanDeviceListener listener) {
         XLinkScanDeviceTask task = XLinkScanDeviceTask.newBuilder()
-                                                      .setTotalTimeout(timeout)
                                                       .setProductIds(pid)
+                                                      .setTotalTimeout(timeout)
+                                                      .setRetryInterval(retryInterval)
+                                                      .setScanDeviceListener(listener)
+                                                      .build();
+        XLinkSDK.startTask(task);
+    }
+
+    public void scanDevice(List<String> pid, int timeout, int retryInterval, XLinkScanDeviceListener listener) {
+        XLinkScanDeviceTask task = XLinkScanDeviceTask.newBuilder()
+                                                      .setProductIds(pid)
+                                                      .setTotalTimeout(timeout)
+                                                      .setRetryInterval(retryInterval)
                                                       .setScanDeviceListener(listener)
                                                       .build();
         XLinkSDK.startTask(task);
@@ -298,7 +271,7 @@ public class XlinkCloudManager {
         XLinkSDK.startTask(task);
     }
 
-    public void getDeviceMetaDatapoints(XDevice device, XLinkTaskListener<List<XLinkDataPoint>> listener) {
+    public void getDeviceMetaDatapoints(@NonNull XDevice device, XLinkTaskListener<List<XLinkDataPoint>> listener) {
         XLinkGetDataPointMetaInfoTask task = XLinkGetDataPointMetaInfoTask.newBuilder()
                                                                           .setProductId(device.getProductId())
                                                                           .setListener(listener)
@@ -306,7 +279,7 @@ public class XlinkCloudManager {
         XLinkSDK.startTask(task);
     }
 
-    public void getDeviceTemplateDatapoints(XDevice device, XLinkTaskListener<List<DeviceApi.DataPointsResponse>> listener) {
+    public void getDeviceTemplateDatapoints(@NonNull XDevice device, XLinkTaskListener<List<DeviceApi.DataPointsResponse>> listener) {
         XLinkGetDataPointTemplateTask task = XLinkGetDataPointTemplateTask.newBuilder()
                                                                           .setProductId(device.getProductId())
                                                                           .setListener(listener)
@@ -314,7 +287,7 @@ public class XlinkCloudManager {
         XLinkSDK.startTask(task);
     }
 
-    public void getDeviceDatapoints(XDevice device, XLinkTaskListener<List<XLinkDataPoint>> listener) {
+    public void getDeviceDatapoints(@NonNull XDevice device, XLinkTaskListener<List<XLinkDataPoint>> listener) {
         XLinkGetDataPointTask task = XLinkGetDataPointTask.newBuilder()
                                                           .setXDevice(device)
                                                           .setListener(listener)
@@ -322,7 +295,7 @@ public class XlinkCloudManager {
         XLinkSDK.startTask(task);
     }
 
-    public void setDeviceDatapoints(XDevice device, List<XLinkDataPoint> datapoints, XLinkTaskListener<XDevice> listener) {
+    public void setDeviceDatapoints(@NonNull XDevice device, final List<XLinkDataPoint> datapoints, XLinkTaskListener<XDevice> listener) {
         XLinkSetDataPointTask task = XLinkSetDataPointTask.newBuilder()
                                                           .setXDevice(device)
                                                           .setDataPoints(datapoints)
@@ -331,17 +304,89 @@ public class XlinkCloudManager {
         XLinkSDK.startTask(task);
     }
 
-    public void setDeviceDatapoints(final XDevice device, List<DeviceApi.DeviceDataPointRequest.Command> commands, final XlinkRequestCallback<String> callback) {
+    public void setDeviceDatapoints(@NonNull XDevice device, final List<XLinkDataPoint> datapoints, int timeout, XLinkTaskListener<XDevice> listener) {
+        XLinkSetDataPointTask task = XLinkSetDataPointTask.newBuilder()
+                                                          .setXDevice(device)
+                                                          .setDataPoints(datapoints)
+                                                          .setListener(listener)
+                                                          .setTotalTimeout(timeout)
+                                                          .build();
+        XLinkSDK.startTask(task);
+    }
+
+    public void setApplicationSetDatapoints(@NonNull final XDevice device, @NonNull final List<XLinkDataPoint> dps, final XlinkRequestCallback<List<XLinkDataPoint>> callback) {
+        final List<DeviceApi.DeviceDataPointRequest.Command> commands = new ArrayList<>();
+        for (XLinkDataPoint dp : dps) {
+            if (dp.getSource() != XLinkRestfulEnum.DataPointSource.APPLICATION_SET.getValue()) {
+                return;
+            }
+            DeviceApi.DeviceDataPointRequest.Command cmd = new DeviceApi.DeviceDataPointRequest.Command();
+            cmd.index = dp.getIndex();
+            switch (dp.getType()) {
+                case BOOL:
+                    cmd.value = String.valueOf(dp.getAsByte());
+                    break;
+                case BYTE:
+                case SHORT:
+                case USHORT:
+                case INT:
+                case UINT:
+                case LONG:
+                case ULONG:
+                case FLOAT:
+                case DOUBLE:
+                    cmd.value = String.valueOf(dp.getValue());
+                    break;
+                case STRING:
+                    cmd.value = dp.getValue();
+                    break;
+                case BYTE_ARRAY:
+                    cmd.value = ByteUtil.bytesToHex((byte[]) dp.getValue());
+                    break;
+            }
+            commands.add(cmd);
+        }
         DeviceApi.DeviceDataPointRequest request = new DeviceApi.DeviceDataPointRequest();
         request.source = XLinkRestfulEnum.DataPointSource.APPLICATION_SET;
         request.command = commands;
         Call<String> call = XLinkRestful.getApplicationApi()
                                         .setDeviceDataPoint(device.getDeviceId(), request);
-        call.enqueue(callback);
+        call.enqueue(new XlinkRequestCallback<String>() {
+            @Override
+            public void onStart() {
+
+            }
+
+            @Override
+            public void onError(String error) {
+                if (callback != null) {
+                    callback.onError(error);
+                }
+            }
+
+            @Override
+            public void onSuccess(String s) {
+                if (callback != null) {
+                    callback.onSuccess(dps);
+                }
+            }
+        });
         if (callback != null) {
             callback.onStart();
         }
     }
+
+//    public void setDeviceDatapoints(final XDevice device, List<DeviceApi.DeviceDataPointRequest.Command> commands, final XlinkRequestCallback<String> callback) {
+//        DeviceApi.DeviceDataPointRequest request = new DeviceApi.DeviceDataPointRequest();
+//        request.source = XLinkRestfulEnum.DataPointSource.APPLICATION_SET;
+//        request.command = commands;
+//        Call<String> call = XLinkRestful.getApplicationApi()
+//                                        .setDeviceDataPoint(device.getDeviceId(), request);
+//        call.enqueue(callback);
+//        if (callback != null) {
+//            callback.onStart();
+//        }
+//    }
 
     public void probeDevice(XDevice device, @NonNull Collection<Integer> indexs, XLinkTaskListener<List<XLinkDataPoint>> listener) {
         XLinkProbeDataPointTask task = XLinkProbeDataPointTask.newBuilder()

@@ -7,6 +7,7 @@ import android.support.annotation.Nullable;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,10 +18,15 @@ import com.liruya.base.BaseFragment;
 import com.liruya.exoterra.R;
 import com.liruya.exoterra.bean.Device;
 import com.liruya.exoterra.device.DeviceActivity;
+import com.liruya.exoterra.event.SubscribeChangedEvent;
 import com.liruya.exoterra.manager.DeviceManager;
 import com.liruya.exoterra.xlink.XlinkCloudManager;
 import com.liruya.swiperecyclerview.OnSwipeItemClickListener;
 import com.liruya.swiperecyclerview.OnSwipeItemTouchListener;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,10 +45,25 @@ public class DevicesFragment extends BaseFragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view =  super.onCreateView(inflater, container, savedInstanceState);
+        EventBus.getDefault().register(this);
         initData();
         initEvent();
 
         return view;
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        if (EventBus.getDefault().isRegistered(this)) {
+            EventBus.getDefault()
+                    .unregister(this);
+        }
+    }
+
+    @Subscribe (threadMode = ThreadMode.MAIN)
+    public void onSubscribeChangedEvent(SubscribeChangedEvent event) {
+        refreshSubcribeDevices();
     }
 
     @Override
@@ -104,9 +125,19 @@ public class DevicesFragment extends BaseFragment {
             }
         });
         devices_rv_show.setAdapter(mAdapter);
+        refreshSubcribeDevices();
+    }
+
+    @Override
+    protected void initEvent() {
+
+    }
+
+    private void refreshSubcribeDevices() {
         DeviceManager.getInstance().refreshSubcribeDevices(new XLinkTaskListener<List<Device>>() {
             @Override
             public void onError(XLinkCoreException e) {
+                Log.e(TAG, "onError: " + e.getErrorName());
                 devices_progress.setVisibility(View.INVISIBLE);
             }
 
@@ -123,11 +154,6 @@ public class DevicesFragment extends BaseFragment {
                 mAdapter.notifyDataSetChanged();
             }
         });
-    }
-
-    @Override
-    protected void initEvent() {
-
     }
 
     private void gotoDeviceActivity(String deviceTag) {

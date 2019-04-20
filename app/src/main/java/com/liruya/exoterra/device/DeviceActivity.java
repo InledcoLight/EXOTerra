@@ -5,17 +5,21 @@ import android.arch.lifecycle.ViewModelProviders;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.CheckableImageButton;
 import android.support.design.widget.TextInputEditText;
+import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.Toast;
 
 import com.liruya.base.BaseActivity;
@@ -36,6 +40,7 @@ import com.liruya.exoterra.event.DeviceStateChangedEvent;
 import com.liruya.exoterra.manager.DeviceManager;
 import com.liruya.exoterra.util.DeviceUtil;
 import com.liruya.exoterra.util.LogUtil;
+import com.liruya.exoterra.util.RegexUtil;
 import com.liruya.exoterra.xlink.XlinkCloudManager;
 import com.liruya.exoterra.xlink.XlinkConstants;
 import com.liruya.exoterra.xlink.XlinkRequestCallback;
@@ -62,7 +67,7 @@ public class DeviceActivity extends BaseActivity {
     private Device mDevice;
     private DeviceViewModel mDeviceViewModel;
 
-    private XlinkTaskCallback<List<XLinkDataPoint>> mSetCallback;
+    private XlinkTaskCallback<XDevice> mSetCallback;
     private XlinkTaskCallback<List<XLinkDataPoint>> mGetCallback;
 
     @Override
@@ -99,6 +104,7 @@ public class DeviceActivity extends BaseActivity {
         MenuItem device_edit = menu.findItem(R.id.menu_device_edit);
         MenuItem device_rename = menu.findItem(R.id.menu_device_rename);
         MenuItem device_datetime = menu.findItem(R.id.menu_device_datetime);
+        MenuItem device_share = menu.findItem(R.id.menu_device_share);
         device_edit.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
@@ -116,6 +122,13 @@ public class DeviceActivity extends BaseActivity {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
                 showDeviceDatetimeDialog();
+                return true;
+            }
+        });
+        device_share.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                showShareDeviceDialog();
                 return true;
             }
         });
@@ -168,20 +181,20 @@ public class DeviceActivity extends BaseActivity {
             XLinkDeviceManager.getInstance().connectDeviceLocal(mDevice.getXDevice().getDeviceTag());
             EventBus.getDefault().register(this);
 
-            mSetCallback = new XlinkTaskCallback<List<XLinkDataPoint>>() {
+            mSetCallback = new XlinkTaskCallback<XDevice>() {
                 @Override
                 public void onError(String error) {
-
+                    Log.e(TAG, "onError: setDataPointError - " + error);
                 }
 
                 @Override
                 public void onStart() {
-
+                    Log.e(TAG, "onStart: setDataPointStart");
                 }
 
                 @Override
-                public void onComplete(List<XLinkDataPoint> dataPoints) {
-
+                public void onComplete(XDevice xDevice) {
+                    Log.e(TAG, "onComplete: setDataPointComplete");
                 }
             };
             mGetCallback = new XlinkTaskCallback<List<XLinkDataPoint>>() {
@@ -217,6 +230,7 @@ public class DeviceActivity extends BaseActivity {
                 }
             };
             mDeviceViewModel.setGetCallback(mGetCallback);
+            mDeviceViewModel.setSetCallback(mSetCallback);
 
             XlinkCloudManager.getInstance().getDeviceMetaDatapoints(mDevice.getXDevice(), new XlinkTaskCallback<List<XLinkDataPoint>>() {
                 @Override
@@ -365,5 +379,51 @@ public class DeviceActivity extends BaseActivity {
             return true;
         }
         return false;
+    }
+
+    private void shareDevice(@NonNull String email) {
+        XlinkCloudManager.getInstance().shareDevice(mDevice.getXDevice(), email, 7200, new XlinkTaskCallback<DeviceApi.ShareDeviceResponse>() {
+            @Override
+            public void onError(String error) {
+                Toast.makeText(DeviceActivity.this, error, Toast.LENGTH_SHORT)
+                     .show();
+            }
+
+            @Override
+            public void onStart() {
+
+            }
+
+            @Override
+            public void onComplete(DeviceApi.ShareDeviceResponse shareDeviceResponse) {
+                Toast.makeText(DeviceActivity.this, "Share Success.", Toast.LENGTH_SHORT)
+                     .show();
+            }
+        });
+    }
+
+    private void showShareDeviceDialog() {
+        View view = LayoutInflater.from(DeviceActivity.this).inflate(R.layout.dialog_share_device, null, false);
+        final TextInputLayout til = view.findViewById(R.id.dialog_share_device_til);
+        final TextInputEditText et_email = view.findViewById(R.id.dialog_share_device_email);
+        AlertDialog.Builder builder = new AlertDialog.Builder(DeviceActivity.this);
+        final AlertDialog dialog = builder.setTitle(R.string.share_device)
+                                          .setView(view)
+                                          .setNegativeButton(R.string.cancel, null)
+                                          .setPositiveButton(R.string.share, null)
+                                          .show();
+        Button btn_share = dialog.getButton(DialogInterface.BUTTON_POSITIVE);
+        btn_share.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String email = et_email.getText().toString();
+                if (RegexUtil.isEmail(email)) {
+                    shareDevice(email);
+                    dialog.dismiss();
+                } else {
+                    til.setError(getString(R.string.error_email));
+                }
+            }
+        });
     }
 }

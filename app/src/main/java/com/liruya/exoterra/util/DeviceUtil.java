@@ -6,6 +6,9 @@ import android.text.TextUtils;
 import com.liruya.exoterra.R;
 import com.liruya.exoterra.xlink.XlinkConstants;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class DeviceUtil {
     public static String getDefaultName(String pid) {
         if (TextUtils.isEmpty(pid)) {
@@ -53,5 +56,29 @@ public class DeviceUtil {
             return "EXO Socket";
         }
         return pid;
+    }
+
+    public static List<String> getAllProducts() {
+        final List<String> products = new ArrayList<>();
+        products.add(XlinkConstants.PRODUCT_ID_LEDSTRIP);
+        products.add(XlinkConstants.PRODUCT_ID_SOCKET);
+        products.add(XlinkConstants.PRODUCT_ID_MONSOON);
+        return products;
+    }
+
+    public static boolean containsProduct(String prdt) {
+        if (TextUtils.isEmpty(prdt)) {
+            return false;
+        }
+        if (TextUtils.equals(XlinkConstants.PRODUCT_ID_LEDSTRIP, prdt)) {
+            return true;
+        }
+        if (TextUtils.equals(XlinkConstants.PRODUCT_ID_SOCKET, prdt)) {
+            return true;
+        }
+        if (TextUtils.equals(XlinkConstants.PRODUCT_ID_MONSOON, prdt)) {
+            return true;
+        }
+        return false;
     }
 }

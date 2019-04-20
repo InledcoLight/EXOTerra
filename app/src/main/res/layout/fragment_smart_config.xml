@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                                             xmlns:app="http://schemas.android.com/apk/res-auto"
+                                             xmlns:tools="http://schemas.android.com/tools"
+                                             android:clickable="true"
+                                             android:layout_width="match_parent"
+                                             android:layout_height="match_parent">
+
+    <com.github.lzyzsd.circleprogress.DonutProgress
+        android:id="@+id/smart_config_pb"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        app:donut_max="100"
+        app:donut_progress="0"
+        app:donut_finished_stroke_width="4dp"
+        app:donut_unfinished_stroke_width="4dp"
+        app:donut_unfinished_color="@color/colorGray"
+        app:donut_finished_color="@color/colorWhite"
+        app:donut_text_color="@color/colorWhite"
+        app:donut_prefix_text=""
+        app:donut_suffix_text=" %"
+        app:donut_text="0 %"
+        app:donut_circle_starting_degree="270"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <android.support.design.widget.CheckableImageButton
+        android:id="@+id/smart_config_cib_step1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="32dp"
+        android:background="@android:color/transparent"
+        android:src="@drawable/selector_circle"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/smart_config_pb"/>
+
+    <android.support.design.widget.CheckableImageButton
+        android:id="@+id/smart_config_cib_step2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="16dp"
+        android:background="@android:color/transparent"
+        android:src="@drawable/selector_circle"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/smart_config_cib_step1"/>
+
+    <android.support.design.widget.CheckableImageButton
+        android:id="@+id/smart_config_cib_step3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="16dp"
+        android:background="@android:color/transparent"
+        android:src="@drawable/selector_circle"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/smart_config_cib_step2"/>
+
+    <android.support.design.widget.CheckableImageButton
+        android:id="@+id/smart_config_cib_step4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="16dp"
+        android:background="@android:color/transparent"
+        android:src="@drawable/selector_circle"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/smart_config_cib_step3"/>
+
+    <android.support.design.widget.CheckableImageButton
+        android:id="@+id/smart_config_cib_step5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="16dp"
+        android:background="@android:color/transparent"
+        android:src="@drawable/selector_circle"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/smart_config_cib_step4"/>
+
+    <TextView
+        android:id="@+id/smart_config_tv_step1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:text="Device connected to router"
+        app:layout_constraintBottom_toBottomOf="@+id/smart_config_cib_step1"
+        app:layout_constraintStart_toEndOf="@+id/smart_config_cib_step1"
+        app:layout_constraintTop_toTopOf="@+id/smart_config_cib_step1"/>
+
+    <TextView
+        android:id="@+id/smart_config_tv_step2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:text="Device scanned"
+        app:layout_constraintBottom_toBottomOf="@+id/smart_config_cib_step2"
+        app:layout_constraintStart_toEndOf="@+id/smart_config_cib_step2"
+        app:layout_constraintTop_toTopOf="@+id/smart_config_cib_step2"/>
+
+    <TextView
+        android:id="@+id/smart_config_tv_step3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:text="Device registered to cloud"
+        app:layout_constraintBottom_toBottomOf="@+id/smart_config_cib_step3"
+        app:layout_constraintStart_toEndOf="@+id/smart_config_cib_step3"
+        app:layout_constraintTop_toTopOf="@+id/smart_config_cib_step3"/>
+
+    <TextView
+        android:id="@+id/smart_config_tv_step4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:text="Device subscribed"
+        app:layout_constraintBottom_toBottomOf="@+id/smart_config_cib_step4"
+        app:layout_constraintStart_toEndOf="@+id/smart_config_cib_step4"
+        app:layout_constraintTop_toTopOf="@+id/smart_config_cib_step4"/>
+
+    <TextView
+        android:id="@+id/smart_config_tv_step5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:text="Device Initialized"
+        app:layout_constraintBottom_toBottomOf="@+id/smart_config_cib_step5"
+        app:layout_constraintStart_toEndOf="@+id/smart_config_cib_step5"
+        app:layout_constraintTop_toTopOf="@+id/smart_config_cib_step5"/>
+
+    <ToggleButton
+        android:id="@+id/smart_config_start"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
+        android:enabled="false"
+        android:textOn="@string/stop"
+        android:textOff="@string/start"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"/>
+
+    <CheckBox
+        android:id="@+id/smart_config_led"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
+        android:text="Make sure the green led of the device is flash slowly. (Long press the deivce key until the green led flash slowly, for wifi strip press the touch button to change the led to green, then long press.)"
+        app:layout_constraintBottom_toTopOf="@+id/smart_config_start"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"/>
+</android.support.constraint.ConstraintLayout>

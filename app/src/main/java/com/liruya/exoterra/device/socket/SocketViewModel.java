@@ -9,7 +9,7 @@ import java.util.List;
 public class SocketViewModel extends DeviceViewModel<EXOSocket> {
 
     public void setConnectDevice(String devname) {
-        setDeviceDatapoint(getData().setConnectDevice(devname));
+        setApplicationSetDatapoint(getData().setConnectDevice(devname));
     }
 
     public void setPower(boolean power) {

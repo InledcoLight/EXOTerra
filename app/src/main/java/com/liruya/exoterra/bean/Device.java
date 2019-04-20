@@ -1,5 +1,7 @@
 package com.liruya.exoterra.bean;
 
+import android.support.annotation.NonNull;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,7 +25,7 @@ public class Device {
     private XDevice mXDevice;
     private List<XLinkDataPoint> mDataPointList;
 
-    public Device(XDevice xDevice) {
+    public Device(@NonNull XDevice xDevice) {
         mXDevice = xDevice;
         mDataPointList = new ArrayList<>();
     }

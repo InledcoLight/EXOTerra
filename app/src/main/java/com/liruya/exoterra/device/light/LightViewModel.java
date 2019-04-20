@@ -27,7 +27,7 @@ public class LightViewModel extends DeviceViewModel<EXOLedstrip> {
     }
 
     public void setCustomBrights(final int idx, byte[] brights) {
-        setDeviceDatapoint(getData().setCustomBrights(idx, brights));
+        setApplicationSetDatapoint(getData().setCustomBrights(idx, brights));
     }
 
     public void setGisEnable(boolean enable) {
@@ -104,7 +104,7 @@ public class LightViewModel extends DeviceViewModel<EXOLedstrip> {
     }
 
     public void setProfileName(int idx, String name) {
-        setDeviceDatapoint(getData().setProfileName(idx, name));
+        setApplicationSetDatapoint(getData().setProfileName(idx, name));
     }
 
     public void setSelectProfile(int select) {

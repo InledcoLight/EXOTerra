@@ -7,18 +7,6 @@ import com.liruya.exoterra.device.DeviceViewModel;
 import java.util.List;
 
 public class MonsoonViewModel extends DeviceViewModel<EXOMonsoon> {
-//    public void setZone(short zone) {
-//        setDeviceDatapoint(getData().setZone(zone));
-//    }
-//
-//    public void setLongitude(float longitude) {
-//        setDeviceDatapoint(getData().setLongitude(longitude));
-//    }
-//
-//    public void setLatitude(float latitude) {
-//        setDeviceDatapoint(getData().setLatitude(latitude));
-//    }
-
     public void setKeyAction(byte action) {
         setDeviceDatapoint(getData().setKeyAction(action));
     }
@@ -28,7 +16,7 @@ public class MonsoonViewModel extends DeviceViewModel<EXOMonsoon> {
     }
 
     public void setCustomActions(List<Byte> actions) {
-        setDeviceDatapoint(getData().setCustomActions(actions));
+        setApplicationSetDatapoint(getData().setCustomActions1(actions));
     }
 
     public void removeTimer(int idx) {

@@ -126,16 +126,16 @@ public class EXOMonsoon extends Device {
         return results;
     }
 
-//    public XLinkDataPoint setCustomActions1(List<Byte> actions) {
-//        if (actions == null || actions.size() > CUSTOM_ACTIONS_MAX) {
-//            return null;
-//        }
-//        byte[] values = new byte[CUSTOM_ACTIONS_MAX];
-//        for (int i = 0; i < actions.size(); i++) {
-//            values[i] = actions.get(i);
-//        }
-//        return setByteArray(INDEX_CUSTOM_ACTIONS, values);
-//    }
+    public XLinkDataPoint setCustomActions1(List<Byte> actions) {
+        if (actions == null || actions.size() > CUSTOM_ACTIONS_MAX) {
+            return null;
+        }
+        byte[] values = new byte[actions.size()];
+        for (int i = 0; i < actions.size(); i++) {
+            values[i] = actions.get(i);
+        }
+        return setByteArray(INDEX_CUSTOM_ACTIONS, values);
+    }
 
     public DeviceApi.DeviceDataPointRequest.Command setCustomActions(List<Byte> actions) {
         if (actions != null && actions.size() <= CUSTOM_ACTIONS_MAX) {

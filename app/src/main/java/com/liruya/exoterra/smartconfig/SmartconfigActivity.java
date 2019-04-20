@@ -130,7 +130,7 @@ public class SmartconfigActivity extends BaseActivity {
             public void onLinked(final EsptouchResult result) {
                 Log.e(TAG, "onLinked: " + result.getAddress() + " " + result.getInetAddress().getHostAddress());
 
-//                smartconfig_tv_msg.append("<" + result.getAddress() + "> is connected to router. IP: " + result.getInetAddress().getHostAddress() + "\n");
+//                smartconfig_tv_msg.append("<" + result.getGateway() + "> is connected to router. IP: " + result.getInetAddress().getHostAddress() + "\n");
             }
 
             @Override

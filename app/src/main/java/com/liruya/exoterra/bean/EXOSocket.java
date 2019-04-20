@@ -1,14 +1,11 @@
 package com.liruya.exoterra.bean;
 
-import android.text.TextUtils;
-
 import com.liruya.exoterra.AppConstants;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import cn.xlink.restful.api.app.DeviceApi;
 import cn.xlink.sdk.core.model.XLinkDataPoint;
 
 public class EXOSocket extends Device{
@@ -99,19 +96,19 @@ public class EXOSocket extends Device{
         return getString(INDEX_CONNECT_DEVICE);
     }
 
-    public DeviceApi.DeviceDataPointRequest.Command setConnectDevice(String devname) {
-        if (TextUtils.isEmpty(devname)) {
-            return null;
-        }
-        DeviceApi.DeviceDataPointRequest.Command cmd = new DeviceApi.DeviceDataPointRequest.Command<>();
-        cmd.index = INDEX_CONNECT_DEVICE;
-        cmd.value = devname;
-        return cmd;
-    }
-
-//    public XLinkDataPoint setConnectDevice(String devname) {
-//        return setString(INDEX_CONNECT_DEVICE, devname);
+//    public DeviceApi.DeviceDataPointRequest.Command setConnectDevice(String devname) {
+//        if (TextUtils.isEmpty(devname)) {
+//            return null;
+//        }
+//        DeviceApi.DeviceDataPointRequest.Command cmd = new DeviceApi.DeviceDataPointRequest.Command<>();
+//        cmd.index = INDEX_CONNECT_DEVICE;
+//        cmd.value = devname;
+//        return cmd;
 //    }
+
+    public XLinkDataPoint setConnectDevice(String devname) {
+        return setString(INDEX_CONNECT_DEVICE, devname);
+    }
 
     public boolean getS1Available() {
         return getBoolean(INDEX_S1_AVAILABLE);

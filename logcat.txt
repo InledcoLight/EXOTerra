@@ -1,0 +1,74 @@
+2019-04-19 18:13:32.129 20040-20040/com.liruya.exoterra E/DeviceActivity: onStart: setDataPointStart
+2019-04-19 18:13:32.220 20040-20040/com.liruya.exoterra E/DeviceActivity: onComplete: setDataPointComplete
+2019-04-19 18:13:32.293 20040-22673/com.liruya.exoterra E/XLinkCoreCloudDataInterceptor: invalid device id in topic:$a/465626043
+2019-04-19 18:13:32.308 20040-20040/com.liruya.exoterra E/DeviceActivity: onComplete: 34
+    0 property STRING M1
+    1 zone SHORT 800
+    2 longitude FLOAT 113.64823
+    3 latitude FLOAT 34.749214
+    4 device_datetime STRING 2019-04-19 18:04:47
+    10 status BYTE 0
+    11 key_action BYTE 5
+    12 power BYTE 0
+    13 poweron_tmr USHORT 0
+    14 custom_actions BYTE_ARRAY [B@54ed74d
+    15 timer1 UINT 0
+    16 timer2 UINT 0
+    17 timer3 UINT 0
+    18 timer4 UINT 0
+    19 timer5 UINT 0
+    20 timer6 UINT 0
+    21 timer7 UINT 0
+    22 timer8 UINT 0
+    23 timer9 UINT 0
+    24 timer10 UINT 0
+    25 timer11 UINT 0
+    26 timer12 UINT 0
+    27 timer13 UINT 0
+    28 timer14 UINT 0
+    29 timer15 UINT 0
+    30 timer16 UINT 0
+    31 timer17 UINT 0
+    32 timer18 UINT 0
+    33 timer19 UINT 0
+    34 timer20 UINT 0
+    35 timer21 UINT 0
+    36 timer22 UINT 0
+    37 timer23 UINT 0
+    38 timer24 UINT 0
+2019-04-19 18:13:35.960 20040-20040/com.liruya.exoterra E/DeviceActivity: onStart: setDataPointStart
+2019-04-19 18:13:36.063 20040-20040/com.liruya.exoterra E/DeviceActivity: onComplete: setDataPointComplete
+2019-04-19 18:13:36.255 20040-20040/com.liruya.exoterra E/DeviceActivity: onComplete: 33
+    0 property STRING M1
+    1 zone SHORT 800
+    2 longitude FLOAT 113.64823
+    3 latitude FLOAT 34.749214
+    4 device_datetime STRING 2019-04-19 18:13:36
+    10 status BYTE 0
+    11 key_action BYTE 5
+    12 power BYTE 0
+    13 poweron_tmr USHORT 0
+    15 timer1 UINT 0
+    16 timer2 UINT 0
+    17 timer3 UINT 0
+    18 timer4 UINT 0
+    19 timer5 UINT 0
+    20 timer6 UINT 0
+    21 timer7 UINT 0
+    22 timer8 UINT 0
+    23 timer9 UINT 0
+    24 timer10 UINT 0
+    25 timer11 UINT 0
+    26 timer12 UINT 0
+    27 timer13 UINT 0
+    28 timer14 UINT 0
+    29 timer15 UINT 0
+    30 timer16 UINT 0
+    31 timer17 UINT 0
+    32 timer18 UINT 0
+    33 timer19 UINT 0
+    34 timer20 UINT 0
+    35 timer21 UINT 0
+    36 timer22 UINT 0
+    37 timer23 UINT 0
+    38 timer24 UINT 0

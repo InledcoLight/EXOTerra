@@ -95,4 +95,17 @@
     <string name="poweron">Turnon</string>
     <string name="poweroff">Turnoff</string>
     <string name="timer_count_over">Timers count max 24.</string>
+    <string name="add_device">Add Device</string>
+    <string name="choose_product">Choose Device Type</string>
+    <string name="connect_net">Connect to net</string>
+    <string name="next">Next</string>
+    <string name="compatible_mode">Compatible Mode</string>
+    <string name="share">Share</string>
+    <string name="share_device">Share Device</string>
+    <string name="receive_device_share">Receive Device Share</string>
+    <string name="deny">Deny</string>
+    <string name="accept">Accept</string>
+    <string name="later">Later</string>
+    <string name="title_location_permission">Request Location Permission</string>
+    <string name="msg_location_permission">Application need Location permission to scan WiFi and Bluetooth Low Energy device from Android 6.0.</string>
 </resources>

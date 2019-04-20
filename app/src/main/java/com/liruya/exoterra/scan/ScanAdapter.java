@@ -16,7 +16,7 @@ import android.widget.Toast;
 
 import com.liruya.exoterra.R;
 import com.liruya.exoterra.util.DeviceUtil;
-import com.liruya.exoterra.xlink.IXlinkRequestCallback;
+import com.liruya.exoterra.xlink.IXlinkRegisterDeviceCallback;
 import com.liruya.exoterra.xlink.XlinkCloudManager;
 
 import java.util.HashMap;
@@ -75,7 +75,12 @@ public class ScanAdapter extends RecyclerView.Adapter<ScanAdapter.ScanViewHolder
                     holder.progress.setVisibility(View.VISIBLE);
                     mSubscribings.put(device.getDeviceTag(), true);
                     XlinkCloudManager.getInstance()
-                                     .registerDevice(device, null, new IXlinkRequestCallback<String>() {
+                                     .registerDevice(device, null, new IXlinkRegisterDeviceCallback() {
+                                         @Override
+                                         public void onDeviceAlreadyExists(XDevice xDevice) {
+
+                                         }
+
                                          @Override
                                          public void onStart() {
 
@@ -96,7 +101,7 @@ public class ScanAdapter extends RecyclerView.Adapter<ScanAdapter.ScanViewHolder
                                          }
 
                                          @Override
-                                         public void onSuccess(String s) {
+                                         public void onSuccess(XDevice xDevice) {
                                              XlinkCloudManager.getInstance()
                                                               .subscribeDevice(device, null, 30000, new XLinkTaskListener<XDevice>() {
                                                                   @Override
