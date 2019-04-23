@@ -51,8 +51,8 @@ public class MainActivity extends BaseActivity {
         menu.findItem(R.id.menu_main_add).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
-//                startScanActivity();
-                startAdddeviceActivity();
+                startScanActivity();
+//                startAdddeviceActivity();
                 return false;
             }
         });
@@ -86,12 +86,12 @@ public class MainActivity extends BaseActivity {
         getSupportFragmentManager().beginTransaction()
                                    .replace(R.id.main_fl_show, new DevicesFragment())
                                    .commit();
-        if (checkCameraPermissions() == false) {
-            requestCameraPermission();
-        } else {
-            scanQrCode();
+//        if (checkCameraPermissions() == false) {
+//            requestCameraPermission();
+//        } else {
+//            scanQrCode();
 //            test();
-        }
+//        }
     }
 
     @Override
