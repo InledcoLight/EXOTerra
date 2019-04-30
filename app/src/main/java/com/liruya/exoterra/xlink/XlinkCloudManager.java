@@ -17,9 +17,12 @@ import cn.xlink.restful.api.app.DeviceApi;
 import cn.xlink.restful.api.app.UserApi;
 import cn.xlink.restful.api.app.UserAuthApi;
 import cn.xlink.sdk.common.ByteUtil;
+import cn.xlink.sdk.core.constant.CoreConstant;
 import cn.xlink.sdk.core.error.XLinkErrorCodeHelper;
 import cn.xlink.sdk.core.error.XLinkErrorCodes;
+import cn.xlink.sdk.core.java.local.XLinkLocalSendTriggerUpgradeTask;
 import cn.xlink.sdk.core.model.XLinkDataPoint;
+import cn.xlink.sdk.task.TaskListener;
 import cn.xlink.sdk.v5.listener.XLinkScanDeviceListener;
 import cn.xlink.sdk.v5.listener.XLinkTaskListener;
 import cn.xlink.sdk.v5.manager.XLinkUserManager;
@@ -130,10 +133,20 @@ public class XlinkCloudManager {
         }
     }
 
+    public void getUserInfo(final int userid, XlinkRequestCallback<UserApi.UserInfoResponse> callback) {
+        Call<UserApi.UserInfoResponse> call = XLinkRestful.getApplicationApi()
+                                                              .getUserInfo(userid);
+        call.enqueue(callback);
+        if (callback != null) {
+            callback.onStart();
+        }
+    }
+
     public void registerDevice(final XDevice device, String name, final IXlinkRegisterDeviceCallback callback) {
         DeviceApi.RegisterDeviceRequest request = new DeviceApi.RegisterDeviceRequest();
         request.productId = device.getProductId();
         request.mac = device.getMacAddress();
+        request.firmwareMod = "0";                  //wifi:0  gprs:1, 如果不设置无法手动升级
         if (!TextUtils.isEmpty(name)) {
             request.name = name;
         }
@@ -159,9 +172,9 @@ public class XlinkCloudManager {
             }
 
             @Override
-            public void onSuccess(DeviceApi.RegisterDeviceResponse registerDeviceResponse) {
-                Log.e(TAG, "onSuccess: " + registerDeviceResponse.accessKey);
-                device.setDeviceId(registerDeviceResponse.deviceId);
+            public void onSuccess(DeviceApi.RegisterDeviceResponse response) {
+                Log.e(TAG, "onSuccess: " + response.accessKey );
+                device.setDeviceId(response.deviceId);
                 if (callback != null) {
                     callback.onSuccess(device);
                 }
@@ -180,10 +193,9 @@ public class XlinkCloudManager {
         XLinkAddDeviceTask task = XLinkAddDeviceTask.newBuilder()
                                                     .setXDevice(device)
                                                     .setConnectLocal(false)
-                                                    .setClearCache(true)
                                                     .setNeedSubscription(true)
                                                     .setPinCode(pincode)
-                                                    .setTimeout(timeout)
+                                                    .setTotalTimeout(timeout)
                                                     .setListener(listener)
                                                     .build();
         XLinkSDK.startTask(task);
@@ -225,10 +237,9 @@ public class XlinkCloudManager {
         XLinkAddDeviceTask task = XLinkAddDeviceTask.newBuilder()
                                                     .setXDevice(device)
                                                     .setConnectLocal(false)
-                                                    .setClearCache(true)
                                                     .setNeedSubscription(false)
                                                     .setPinCode(pincode)
-                                                    .setTimeout(timeout)
+                                                    .setTotalTimeout(timeout)
                                                     .setListener(listener)
                                                     .build();
         XLinkSDK.startTask(task);
@@ -269,6 +280,12 @@ public class XlinkCloudManager {
                                                               .setListener(listener)
                                                               .build();
         XLinkSDK.startTask(task);
+    }
+
+    public void getDeviceInfo(@NonNull final XDevice xDevice, XlinkRequestCallback<DeviceApi.DeviceResponse> callback) {
+        Call<DeviceApi.DeviceResponse> call = XLinkRestful.getApplicationApi()
+                                                                .getDeviceInfo(xDevice.getProductId(), xDevice.getDeviceId());
+        call.enqueue(callback);
     }
 
     public void getDeviceMetaDatapoints(@NonNull XDevice device, XLinkTaskListener<List<XLinkDataPoint>> listener) {
@@ -455,6 +472,43 @@ public class XlinkCloudManager {
     public void getDeviceLocation(XDevice xDevice, final XlinkRequestCallback<DeviceApi.DeviceGeographyResponse> callback) {
         final Call<DeviceApi.DeviceGeographyResponse> call = XLinkRestful.getApplicationApi()
                                                                          .getDeviceGeography(xDevice.getProductId(), xDevice.getDeviceId());
+        call.enqueue(callback);
+        if (callback != null) {
+            callback.onStart();
+        }
+    }
+
+    public void checkUpgradeTask(final XDevice xDevice, TaskListener<Boolean> listener) {
+        XLinkLocalSendTriggerUpgradeTask task = XLinkLocalSendTriggerUpgradeTask.newBuilder()
+                                                                                .setFirmwareType(CoreConstant.FIRMWARE_TYPE_WIFI)
+                                                                                .setCoreDevice(xDevice)
+                                                                                .setListener(listener)
+                                                                                .build();
+        XLinkSDK.startTask(task);
+    }
+
+//    public void sendUpgradeTask(final XDevice xDevice) {
+//        XLinkLocalSendUpgradeTaskResultTask task = XLinkLocalSendUpgradeTaskResultTask.newBuilder()
+//                                                                                      .setCoreDevice(xDevice)
+//                                                                                      .setCode(FirmwareUpgradeTaskResult.FIRMWARE_RESULT_CODE_CHECK_VERSION_SUCCESS).build()
+//    }
+
+    public void getNewsetVersion(@NonNull final XDevice xDevice, final XlinkRequestCallback<DeviceApi.DeviceNewestVersionResponse> callback) {
+        DeviceApi.DeviceNewestVersionRequest request = new DeviceApi.DeviceNewestVersionRequest();
+        request.productId = xDevice.getProductId();
+        request.deviceId = xDevice.getDeviceId();
+        Call<DeviceApi.DeviceNewestVersionResponse> call = XLinkRestful.getApplicationApi().getDeviceNewestVersion(request);
+        call.enqueue(callback);
+        if (callback != null) {
+            callback.onStart();
+        }
+    }
+
+    public void upgradeDevice(@NonNull final XDevice xDevice, final XlinkRequestCallback<String> callback) {
+        DeviceApi.UpgradeDeviceRequest request = new DeviceApi.UpgradeDeviceRequest();
+        request.productId = xDevice.getProductId();
+        request.deviceId = xDevice.getDeviceId();
+        Call<String> call = XLinkRestful.getApplicationApi().upgradeDevice(request);
         call.enqueue(callback);
         if (callback != null) {
             callback.onStart();

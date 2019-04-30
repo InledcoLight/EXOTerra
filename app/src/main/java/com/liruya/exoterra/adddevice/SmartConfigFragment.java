@@ -145,9 +145,12 @@ public class SmartConfigFragment extends BaseFragment {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
+//                    smart_config_start.setChecked(false);
+//                    smart_config_start.setEnabled(true);
+//                    showSmartConfigFailedDialog(error);
                     smart_config_start.setChecked(false);
                     smart_config_start.setEnabled(true);
-                    showSmartConfigFailedDialog(error);
+                    showSmartConfigSuccessDialog();
                 }
             });
         }

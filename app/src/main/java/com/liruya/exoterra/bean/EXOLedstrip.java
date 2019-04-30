@@ -256,7 +256,7 @@ public class EXOLedstrip extends Device {
     }
 
     public int getSunriseRamp() {
-        return getByte(INDEX_SUNRISE_RAMP);
+        return getByte(INDEX_SUNRISE_RAMP)&0xFF;
     }
 
     public XLinkDataPoint setSunriseRamp(int ramp) {
@@ -294,7 +294,7 @@ public class EXOLedstrip extends Device {
     }
 
     public int getSunsetRamp() {
-        return getByte(INDEX_SUNSET_RAMP);
+        return getByte(INDEX_SUNSET_RAMP)&0xFF;
     }
 
     public XLinkDataPoint setSunsetRamp(int ramp) {

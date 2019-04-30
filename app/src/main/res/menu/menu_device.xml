@@ -24,5 +24,9 @@
         android:title="@string/share"
         android:icon="@drawable/ic_share_white_32dp"
         app:showAsAction="collapseActionView"/>
+    <item
+        android:id="@+id/menu_device_upgrade"
+        android:title="@string/upgrade"
+        app:showAsAction="collapseActionView"/>
 
 </menu>

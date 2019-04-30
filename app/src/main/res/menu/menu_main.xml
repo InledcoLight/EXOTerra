@@ -3,9 +3,15 @@
       xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
         android:id="@+id/menu_main_smartconfig"
-        android:icon="@drawable/ic_wifi_tethering_white_32dp"
         android:title=""
-        android:visible="false"
+        android:icon="@drawable/ic_wifi_tethering_white_32dp"
+        android:visible="true"
+        app:showAsAction="always"/>
+    <item
+        android:id="@+id/menu_main_scan"
+        android:title=""
+        android:icon="@drawable/ic_add_white_32dp"
+        android:visible="true"
         app:showAsAction="always"/>
     <item
         android:id="@+id/menu_main_add"

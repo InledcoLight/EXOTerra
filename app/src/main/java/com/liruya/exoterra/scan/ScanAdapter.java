@@ -6,6 +6,7 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.CheckableImageButton;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -53,7 +54,7 @@ public class ScanAdapter extends RecyclerView.Adapter<ScanAdapter.ScanViewHolder
     @SuppressLint ("RestrictedApi")
     @Override
     public void onBindViewHolder(@NonNull final ScanViewHolder holder, int i) {
-        final XDevice device = mScannedDevices.get(holder.getAdapterPosition());
+        final XDevice device = mScannedDevices.get(i);
         String pid = device.getProductId();
         String name = device.getDeviceName();
         String mac = device.getMacAddress();
@@ -78,7 +79,45 @@ public class ScanAdapter extends RecyclerView.Adapter<ScanAdapter.ScanViewHolder
                                      .registerDevice(device, null, new IXlinkRegisterDeviceCallback() {
                                          @Override
                                          public void onDeviceAlreadyExists(XDevice xDevice) {
+                                             XlinkCloudManager.getInstance()
+                                                              .subscribeDevice(device, null, 35000, new XLinkTaskListener<XDevice>() {
+                                                                  @Override
+                                                                  public void onError(final XLinkCoreException e) {
+                                                                      Log.e(TAG, "onError: " + e.getErrorName());
+                                                                      mSubscribings.remove(device.getDeviceTag());
+                                                                      holder.itemView.post(new Runnable() {
+                                                                          @Override
+                                                                          public void run() {
+                                                                              Toast.makeText(mContext, mContext.getString(R.string.msg_subscribe_fail) + e.getErrorName(),
+                                                                                             Toast.LENGTH_SHORT)
+                                                                                   .show();
+                                                                              holder.progress.setVisibility(View.GONE);
+                                                                              holder.cib_subscribe.setEnabled(true);
+                                                                          }
+                                                                      });
+                                                                  }
 
+                                                                  @Override
+                                                                  public void onStart() {
+                                                                      Log.e(TAG, "onStart: ");
+                                                                  }
+
+                                                                  @Override
+                                                                  public void onComplete(XDevice device) {
+                                                                      Log.e(TAG, "onComplete: ");
+                                                                      mSubscribings.remove(device.getDeviceTag());
+                                                                      holder.itemView.post(new Runnable() {
+                                                                          @Override
+                                                                          public void run() {
+                                                                              Toast.makeText(mContext, R.string.msg_subscribe_success, Toast.LENGTH_SHORT)
+                                                                                   .show();
+                                                                              holder.progress.setVisibility(View.GONE);
+                                                                              holder.cib_subscribe.setChecked(true);
+                                                                              holder.cib_subscribe.setEnabled(true);
+                                                                          }
+                                                                      });
+                                                                  }
+                                                              });
                                          }
 
                                          @Override
@@ -102,43 +141,7 @@ public class ScanAdapter extends RecyclerView.Adapter<ScanAdapter.ScanViewHolder
 
                                          @Override
                                          public void onSuccess(XDevice xDevice) {
-                                             XlinkCloudManager.getInstance()
-                                                              .subscribeDevice(device, null, 30000, new XLinkTaskListener<XDevice>() {
-                                                                  @Override
-                                                                  public void onError(final XLinkCoreException e) {
-                                                                      mSubscribings.remove(device.getDeviceTag());
-                                                                      holder.itemView.post(new Runnable() {
-                                                                          @Override
-                                                                          public void run() {
-                                                                              Toast.makeText(mContext, mContext.getString(R.string.msg_subscribe_fail) + e.getErrorName(),
-                                                                                             Toast.LENGTH_SHORT)
-                                                                                   .show();
-                                                                              holder.progress.setVisibility(View.GONE);
-                                                                              holder.cib_subscribe.setEnabled(true);
-                                                                          }
-                                                                      });
-                                                                  }
 
-                                                                  @Override
-                                                                  public void onStart() {
-
-                                                                  }
-
-                                                                  @Override
-                                                                  public void onComplete(XDevice device) {
-                                                                      mSubscribings.remove(device.getDeviceTag());
-                                                                      holder.itemView.post(new Runnable() {
-                                                                          @Override
-                                                                          public void run() {
-                                                                              Toast.makeText(mContext, R.string.msg_subscribe_success, Toast.LENGTH_SHORT)
-                                                                                   .show();
-                                                                              holder.progress.setVisibility(View.GONE);
-                                                                              holder.cib_subscribe.setChecked(true);
-                                                                              holder.cib_subscribe.setEnabled(true);
-                                                                          }
-                                                                      });
-                                                                  }
-                                                              });
                                          }
                                      });
                 }

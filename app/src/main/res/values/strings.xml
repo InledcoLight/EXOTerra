@@ -108,4 +108,11 @@
     <string name="later">Later</string>
     <string name="title_location_permission">Request Location Permission</string>
     <string name="msg_location_permission">Application need Location permission to scan WiFi and Bluetooth Low Energy device from Android 6.0.</string>
+    <string name="upgrade">Upgrade</string>
+    <string name="devices">Devices</string>
+    <string name="me">Me</string>
+    <string name="home">Home</string>
+    <string name="invalid_profile">Invalid Profile</string>
+    <string name="imort_from_default">Import profile from default</string>
+    <string name="msg_import_from_default">Invalid profile, import from default?</string>
 </resources>

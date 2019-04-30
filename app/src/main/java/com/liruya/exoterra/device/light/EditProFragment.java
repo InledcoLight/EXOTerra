@@ -46,8 +46,6 @@ public class EditProFragment extends BaseFragment {
     private RecyclerView edit_pro_rv;
     private ImageButton edit_pro_add;
     private ImageButton edit_pro_remove;
-//    private Button edit_pro_cancel;
-//    private Button edit_pro_save;
 
     private final int INTERVAL = 5;
 
@@ -108,8 +106,6 @@ public class EditProFragment extends BaseFragment {
         edit_pro_rv = view.findViewById(R.id.edit_pro_rv);
         edit_pro_add = view.findViewById(R.id.edit_pro_add);
         edit_pro_remove = view.findViewById(R.id.edit_pro_remove);
-//        edit_pro_cancel = view.findViewById(R.id.edit_pro_cancel);
-//        edit_pro_save = view.findViewById(R.id.edit_pro_save);
 
         edit_pro_toolbar.inflateMenu(R.menu.menu_edit_profile);
         edit_pro_mps.setMaxLengthHint("00:00");
@@ -132,24 +128,11 @@ public class EditProFragment extends BaseFragment {
                                                 .get(LightViewModel.class);
             mLight = mLightViewModel.getData();
             mProfile = mLight.getProfile(mIndex);
-            LineChartHelper.setProfile(edit_pro_chart, mLight.getChannelCount(), mLight.getChannelNames(), mProfile);
-
-            edit_pro_toolbar.setTitle(mLight.getProfileName(mIndex));
-            if (mProfile != null && mProfile.isValid()) {
-                edit_pro_mps.setPointCount(mProfile.getPointCount());
-                List<TimePoint> points = mProfile.getPoints();
-                for (int i = 0; i < points.size(); i++) {
-                    edit_pro_mps.setProgress(i, points.get(i).getTimer()/INTERVAL);
-                }
-                edit_pro_mps.setSelectedPoint(0);
-                mAdapter = new EditProAdapter(mLight.getChannelNames(),
-                                              mProfile.getPoints()
-                                                      .get(0)
-                                                      .getBrights());
-                edit_pro_rv.setAdapter(mAdapter);
-            } else {
-
+            if (mProfile == null || mProfile.isValid() == false) {
+                showImportDialog();
             }
+            edit_pro_toolbar.setTitle(mLight.getProfileName(mIndex));
+            init();
         }
     }
 
@@ -177,6 +160,9 @@ public class EditProFragment extends BaseFragment {
 
             @Override
             public void onPointSelected(int index) {
+                if (mProfile == null) {
+                    return;
+                }
                 mAdapter.setBrights(mProfile.getPoints().get(index).getBrights());
             }
 
@@ -192,6 +178,9 @@ public class EditProFragment extends BaseFragment {
 
             @Override
             public void onPointProgressChanged(int index, int progress, boolean fromUser) {
+                if (mProfile == null) {
+                    return;
+                }
                 mProfile.getPoints().get(index).setTimer(progress*INTERVAL);
                 EventBus.getDefault().post(mEvent);
             }
@@ -208,19 +197,44 @@ public class EditProFragment extends BaseFragment {
                 showAddPointDialog();
             }
         });
-//        edit_pro_cancel.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                getActivity().getSupportFragmentManager().popBackStack();
-//            }
-//        });
-//        edit_pro_save.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                mLightViewModel.setProfile(mIndex, mProfile);
-//                getActivity().getSupportFragmentManager().popBackStack();
-//            }
-//        });
+    }
+
+    private void init() {
+        LineChartHelper.setProfile(edit_pro_chart, mLight.getChannelCount(), mLight.getChannelNames(), mProfile);
+        if (mProfile != null && mProfile.isValid()) {
+            edit_pro_mps.setPointCount(mProfile.getPointCount());
+            List<TimePoint> points = mProfile.getPoints();
+            for (int i = 0; i < points.size(); i++) {
+                edit_pro_mps.setProgress(i, points.get(i).getTimer()/INTERVAL);
+            }
+            mAdapter = new EditProAdapter(mLight.getChannelNames(),
+                                          mProfile.getPoints()
+                                                  .get(0)
+                                                  .getBrights());
+            edit_pro_rv.setAdapter(mAdapter);
+            edit_pro_mps.setSelectedPoint(0);
+        }
+    }
+
+    private void showImportDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        builder.setTitle(R.string.imort_from_default);
+        builder.setMessage(R.string.msg_import_from_default);
+        builder.setCancelable(false);
+        builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                mProfile = mLight.getProfile(0);
+                init();
+            }
+        });
+        builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                getActivity().getSupportFragmentManager().popBackStack();
+            }
+        });
+        builder.show();
     }
 
     private int getPointIndex(final int point)
@@ -312,10 +326,9 @@ public class EditProFragment extends BaseFragment {
     }
 
     private boolean isValidTime(int tmr) {
-        if (tmr < 0 || tmr > 1439) {
+        if (mProfile == null || tmr < 0 || tmr > 1439) {
             return false;
         }
-        List<TimePoint> points = mProfile.getPoints();
         int[] timers = mProfile.getTimes();
         for (int i = 0; i < timers.length; i++) {
             if (tmr == timers[i]) {
@@ -326,7 +339,7 @@ public class EditProFragment extends BaseFragment {
     }
 
     private void addPoint(int hour, int minute) {
-        if (hour < 0 || hour > 23 || minute < 0 || minute > 59) {
+        if (mProfile == null || hour < 0 || hour > 23 || minute < 0 || minute > 59) {
             return;
         }
         int tmr = hour*60+minute;

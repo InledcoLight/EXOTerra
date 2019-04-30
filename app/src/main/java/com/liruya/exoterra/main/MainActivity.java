@@ -6,7 +6,9 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.BottomNavigationView;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.Toolbar;
 import android.util.Base64;
@@ -20,6 +22,9 @@ import com.liruya.base.BaseActivity;
 import com.liruya.exoterra.R;
 import com.liruya.exoterra.adddevice.AddDeviceActivity;
 import com.liruya.exoterra.main.devices.DevicesFragment;
+import com.liruya.exoterra.main.home.HomeFragment;
+import com.liruya.exoterra.main.me.MeFragment;
+import com.liruya.exoterra.manager.DeviceManager;
 import com.liruya.exoterra.scan.ScanActivity;
 import com.liruya.exoterra.smartconfig.SmartconfigActivity;
 
@@ -30,12 +35,14 @@ import cn.xlink.sdk.core.model.XLinkDataPoint;
 public class MainActivity extends BaseActivity {
 
     private Toolbar main_toolbar;
+    private BottomNavigationView main_bnv;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         initData();
+        initEvent();
     }
 
     @Override
@@ -45,15 +52,21 @@ public class MainActivity extends BaseActivity {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
                 startSmartconfigActivity();
-                return false;
+                return true;
+            }
+        });
+        menu.findItem(R.id.menu_main_scan).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                startScanActivity();
+                return true;
             }
         });
         menu.findItem(R.id.menu_main_add).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
-                startScanActivity();
-//                startAdddeviceActivity();
-                return false;
+                startAdddeviceActivity();
+                return true;
             }
         });
         return super.onCreateOptionsMenu(menu);
@@ -78,11 +91,13 @@ public class MainActivity extends BaseActivity {
     @Override
     protected void initView() {
         main_toolbar = findViewById(R.id.main_toolbar);
+        main_bnv = findViewById(R.id.main_bnv);
         setSupportActionBar(main_toolbar);
     }
 
     @Override
     protected void initData() {
+//        main_bnv.setSelectedItemId(R.id.main_bnv_devices);
         getSupportFragmentManager().beginTransaction()
                                    .replace(R.id.main_fl_show, new DevicesFragment())
                                    .commit();
@@ -96,7 +111,39 @@ public class MainActivity extends BaseActivity {
 
     @Override
     protected void initEvent() {
-
+        main_bnv.setOnNavigationItemReselectedListener(new BottomNavigationView.OnNavigationItemReselectedListener() {
+            @Override
+            public void onNavigationItemReselected(@NonNull MenuItem menuItem) {
+                if (menuItem.getItemId() == R.id.main_bnv_devices && DeviceManager.getInstance().getAllDevices().size() == 0) {
+                    getSupportFragmentManager().beginTransaction()
+                                               .replace(R.id.main_fl_show, new DevicesFragment())
+                                               .commit();
+                }
+            }
+        });
+        main_bnv.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
+                switch (menuItem.getItemId()) {
+                    case R.id.main_bnv_devices:
+                        getSupportFragmentManager().beginTransaction()
+                                                   .replace(R.id.main_fl_show, new DevicesFragment())
+                                                   .commit();
+                        break;
+                    case R.id.main_bnv_home:
+                        getSupportFragmentManager().beginTransaction()
+                                                   .replace(R.id.main_fl_show, new HomeFragment())
+                                                   .commit();
+                        break;
+                    case R.id.main_bnv_me:
+                        getSupportFragmentManager().beginTransaction()
+                                                   .replace(R.id.main_fl_show, new MeFragment())
+                                                   .commit();
+                        break;
+                }
+                return true;
+            }
+        });
     }
 
     private void startSmartconfigActivity() {

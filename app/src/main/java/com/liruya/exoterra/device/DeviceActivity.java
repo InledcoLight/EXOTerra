@@ -5,6 +5,7 @@ import android.arch.lifecycle.ViewModelProviders;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.CheckableImageButton;
@@ -70,6 +71,8 @@ public class DeviceActivity extends BaseActivity {
     private XlinkTaskCallback<XDevice> mSetCallback;
     private XlinkTaskCallback<List<XLinkDataPoint>> mGetCallback;
 
+    private final Handler mHandler = new Handler();
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -105,6 +108,7 @@ public class DeviceActivity extends BaseActivity {
         MenuItem device_rename = menu.findItem(R.id.menu_device_rename);
         MenuItem device_datetime = menu.findItem(R.id.menu_device_datetime);
         MenuItem device_share = menu.findItem(R.id.menu_device_share);
+        MenuItem device_upgrade = menu.findItem(R.id.menu_device_upgrade);
         device_edit.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
@@ -129,6 +133,13 @@ public class DeviceActivity extends BaseActivity {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
                 showShareDeviceDialog();
+                return true;
+            }
+        });
+        device_upgrade.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                upgrade();
                 return true;
             }
         });
@@ -200,7 +211,7 @@ public class DeviceActivity extends BaseActivity {
             mGetCallback = new XlinkTaskCallback<List<XLinkDataPoint>>() {
                 @Override
                 public void onError(String error) {
-
+                    Log.e(TAG, "onError: getDataPoints- " + error );
                 }
 
                 @Override
@@ -210,6 +221,7 @@ public class DeviceActivity extends BaseActivity {
 
                 @Override
                 public void onComplete(List<XLinkDataPoint> dataPoints) {
+                    Log.e(TAG, "onComplete: getDataPoints");
                     Collections.sort(dataPoints, new Comparator<XLinkDataPoint>() {
                         @Override
                         public int compare(XLinkDataPoint o1, XLinkDataPoint o2) {
@@ -235,7 +247,7 @@ public class DeviceActivity extends BaseActivity {
             XlinkCloudManager.getInstance().getDeviceMetaDatapoints(mDevice.getXDevice(), new XlinkTaskCallback<List<XLinkDataPoint>>() {
                 @Override
                 public void onError(String error) {
-
+                    Log.e(TAG, "onError: getMetaDatapoints- " + error );
                 }
 
                 @Override
@@ -245,9 +257,15 @@ public class DeviceActivity extends BaseActivity {
 
                 @Override
                 public void onComplete(List<XLinkDataPoint> dataPoints) {
+                    Log.e(TAG, "onComplete: getMetaDatapoints");
                     device.setDataPointList(dataPoints);
                     mDevice.setDataPointList(dataPoints);
-                    mDeviceViewModel.getDatapoints();
+                    mHandler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            mDeviceViewModel.getDatapoints();
+                        }
+                    }, 1000);
                 }
             });
         }
@@ -379,6 +397,45 @@ public class DeviceActivity extends BaseActivity {
             return true;
         }
         return false;
+    }
+
+    private void checkUpdate() {
+        XlinkCloudManager.getInstance().getNewsetVersion(mDevice.getXDevice(), new XlinkRequestCallback<DeviceApi.DeviceNewestVersionResponse>() {
+            @Override
+            public void onStart() {
+
+            }
+
+            @Override
+            public void onError(String error) {
+                Toast.makeText(DeviceActivity.this, error, Toast.LENGTH_SHORT)
+                     .show();
+            }
+
+            @Override
+            public void onSuccess(DeviceApi.DeviceNewestVersionResponse response) {
+            }
+        });
+    }
+
+    private void upgrade() {
+        XlinkCloudManager.getInstance().upgradeDevice(mDevice.getXDevice(), new XlinkRequestCallback<String>() {
+            @Override
+            public void onStart() {
+
+            }
+
+            @Override
+            public void onError(String error) {
+                Toast.makeText(DeviceActivity.this, error, Toast.LENGTH_SHORT)
+                     .show();
+            }
+
+            @Override
+            public void onSuccess(String s) {
+
+            }
+        });
     }
 
     private void shareDevice(@NonNull String email) {

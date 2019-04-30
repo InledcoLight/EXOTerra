@@ -4,6 +4,7 @@ import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -71,8 +72,14 @@ public class SelectProfileFragment extends BaseFragment {
             @Override
             public boolean onMenuItemClick(MenuItem menuItem) {
                 if (menuItem.getItemId() == R.id.menu_select_choose) {
-                    mLightViewModel.setSelectProfile(mAdapter.getSelect());
-                    close();
+                    int idx = mAdapter.getSelect();
+                    Profile profile = mLightViewModel.getData().getProfile(idx);
+                    if (profile == null || profile.isValid() == false) {
+                        showInvalidProfileDialog();
+                    } else {
+                        mLightViewModel.setSelectProfile(idx);
+                        close();
+                    }
                 }
                 return false;
             }
@@ -81,6 +88,13 @@ public class SelectProfileFragment extends BaseFragment {
 
     private void close() {
         getActivity().getSupportFragmentManager().popBackStack();
+    }
+
+    private void showInvalidProfileDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        builder.setTitle(R.string.invalid_profile);
+        builder.setNegativeButton(R.string.cancel, null);
+        builder.show();
     }
 
     class ProfileAdapter extends RecyclerView.Adapter<ProfileViewHolder> {

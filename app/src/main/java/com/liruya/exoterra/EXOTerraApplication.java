@@ -12,6 +12,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.NotificationCompat;
 import android.support.v7.app.AlertDialog;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.liruya.base.BaseActivity;
@@ -32,9 +33,14 @@ import java.lang.ref.WeakReference;
 import java.util.List;
 
 import cn.xlink.sdk.common.Loggable;
+import cn.xlink.sdk.core.java.model.local.FirmwareReportUpgradeResult;
+import cn.xlink.sdk.core.java.model.local.FirmwareReportVersion;
+import cn.xlink.sdk.core.java.model.local.FirmwareUpgradeTaskRequest;
 import cn.xlink.sdk.core.model.XLinkDataPoint;
+import cn.xlink.sdk.core.model.XLinkDeviceEvent;
 import cn.xlink.sdk.v5.listener.XLinkCloudListener;
 import cn.xlink.sdk.v5.listener.XLinkDataListener;
+import cn.xlink.sdk.v5.listener.XLinkDeviceEventListener;
 import cn.xlink.sdk.v5.listener.XLinkDeviceStateListener;
 import cn.xlink.sdk.v5.listener.XLinkUserListener;
 import cn.xlink.sdk.v5.manager.CloudConnectionState;
@@ -54,6 +60,7 @@ public class EXOTerraApplication extends Application {
     private XLinkUserListener mXlinkUserListener;
     private XLinkCloudListener mXlinkCloudListener;
     private XLinkDeviceStateListener mXlinkDeviceStateListener;
+    private XLinkDeviceEventListener mXLinkDeviceEventListener;
 
     @Override
     public void onCreate() {
@@ -177,6 +184,37 @@ public class EXOTerraApplication extends Application {
 
             @Override
             public void onDeviceChanged(XDevice xDevice, XDevice.Event event) {
+                Log.e(TAG, "onDeviceChanged: " + event.name() );
+            }
+        };
+        mXLinkDeviceEventListener = new XLinkDeviceEventListener() {
+            @Override
+            public void onDeviceEventNotify(XDevice xDevice, List<XLinkDeviceEvent> list, int from) {
+                if (list == null || list.size() == 0) {
+                    return;
+                }
+                XLinkDeviceEvent event = list.get(0);
+                switch (event.type) {
+                    case XLinkDeviceEvent.TYPE_FIRMWARE_CHECK_UPGRADE_TASK:
+                        FirmwareUpgradeTaskRequest request = event.parseFrame2DeviceEvent(FirmwareUpgradeTaskRequest.class);
+                        Log.e(TAG, "onDeviceEventNotify: " + request.identifyCode + " " + request.firmwareType + " " + request.currentVersion);
+                        break;
+                    case XLinkDeviceEvent.TYPE_FIRMWARE_REPORT_UPGRADE_RESULT:
+                        FirmwareReportUpgradeResult result = event.parseFrame2DeviceEvent(FirmwareReportUpgradeResult.class);
+                        Log.e(TAG, "onDeviceEventNotify: " + result.code + "\n"
+                                                                + result.currentVersion + "\n"
+                                                                + result.firmwareType + "\n"
+                                                                + result.identifyCode + "\n"
+                                                                + result.mod + "\n"
+                                                                + result.originalVersion + "\n"
+                                                                + result.taskId + "\n"
+                                                                + result.taskIdLen);
+                        break;
+                    case XLinkDeviceEvent.TYPE_FIRMWARE_REPORT_VERSION:
+                        FirmwareReportVersion version = event.parseFrame2DeviceEvent(FirmwareReportVersion.class);
+                        Log.e(TAG, "onDeviceEventNotify: " + version.firmwareCount + " " + version.firmwareFrames.toString());
+                        break;
+                }
             }
         };
 
@@ -185,7 +223,7 @@ public class EXOTerraApplication extends Application {
                                         .setCloudServer(XlinkConstants.HOST_CM_FORMAL, XlinkConstants.PORT_CM_FORMAL)
                                         .setEnableSSL(true)
                                         .setLocalNetworkAutoConnection(false)
-                                        .setLogConfig(XLinkAndroidSDK.defaultLogConfig(this).setDebugLevel(Loggable.ERROR))
+                                        .setLogConfig(XLinkAndroidSDK.defaultLogConfig(this).setDebugLevel(Loggable.ERROR).setEnableLogFile(false))
                                         .setSendDataPolicy(XLinkSendDataPolicy.AUTO)
                                         .setDebug(false)
                                         .setDebugMqtt(false)
@@ -195,6 +233,7 @@ public class EXOTerraApplication extends Application {
                                         .setDataListener(mXlinkDataListener)
                                         .setUserListener(mXlinkUserListener)
                                         .setDeviceStateListener(mXlinkDeviceStateListener)
+                                        .setEventListener(mXLinkDeviceEventListener)
                                         .build();
         XLinkAndroidSDK.init(config);
 

@@ -35,7 +35,7 @@ public class DevicesAdapter extends SimpleSwipeAdapter<Device, DevicesAdapter.De
 
     @Override
     protected void onBindSwipeViewHolder(@NonNull DevicesViewHolder holder, int position) {
-        Device device = getItem(holder.getAdapterPosition());
+        Device device = getItem(position);
         String pid = device.getXDevice().getProductId();
         String name = device.getXDevice().getDeviceName();
         String mac = device.getXDevice().getMacAddress();

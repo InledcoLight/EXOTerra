@@ -32,8 +32,9 @@ public class SmartConfigLinker {
 
     private final int SCAN_DEVICE_TIMEOUT       = 15000;
     private final int SCAN_RETRY_INTERVAL       = 1000;
-    private final int SUBSCRIBE_DEVICE_TIMEOUT  = 35000;
+    private final int SUBSCRIBE_DEVICE_TIMEOUT  = 25000;
     private final int INITIAL_DATA_TIMEOUT      = 10000;
+    private final int WAIT_TIME                 = 5000;
 
     private final int INDEX_ZONE                = 1;
     private final int INDEX_LONGITUDE           = 2;
@@ -42,12 +43,14 @@ public class SmartConfigLinker {
     private final int PROGRESS_ESPTOUCH         = 48;
     private final int PROGRESS_SCAN             = 60;
     private final int PROGRESS_REGISTER         = 64;
-    private final int PROGRESS_SUBSCRIBE        = 92;
+    private final int PROGRESS_SUBSCRIBE        = 88;
     private final int PROGRESS_INITIALIZE       = 100;
 
+    private final boolean mAllowUserRegisterDevice = false;
+
     /**
-     * 配网60s  扫描15s  注册5s  订阅35s  初始化10s
-     * 48%  60%  64%  92%  100%
+     * 配网60s  扫描15s  注册5s  (等待5s)  订阅25s  (等待5s)  初始化10s
+     * 48%  60%  64%  88%  100%
      */
 
     private int mProgress;
@@ -201,7 +204,7 @@ public class SmartConfigLinker {
             @Override
             public void onSuccess(XDevice xDevice) {
                 mProgress = PROGRESS_REGISTER;
-                initDevice(xDevice, SUBSCRIBE_DEVICE_TIMEOUT);
+                initDevice(xDevice, WAIT_TIME + SUBSCRIBE_DEVICE_TIMEOUT);
                 if (mListener != null) {
                     mListener.onProgressUpdate(mProgress);
                     mListener.onRegisterSuccess();
@@ -225,9 +228,9 @@ public class SmartConfigLinker {
 
             @Override
             public void onComplete(XDevice xDevice) {
-                Log.e(TAG, "onComplete: " + xDevice.toJson() );
+
                 mProgress = PROGRESS_SUBSCRIBE;
-                initDevice(xDevice);
+                initDevice(xDevice, WAIT_TIME);
                 if (mListener != null) {
                     mListener.onProgressUpdate(mProgress);
                     mListener.onSubscribeSuccess();
@@ -279,12 +282,20 @@ public class SmartConfigLinker {
                          .scanDevice(mProductId, SCAN_DEVICE_TIMEOUT, SCAN_RETRY_INTERVAL, mScanListener);
     }
 
-    private void register(@NonNull XDevice xDevice) {
+    private void register(@NonNull final XDevice xDevice) {
         XlinkCloudManager.getInstance().registerDevice(xDevice, mRegisterLisener);
     }
 
     private void subscribe(@NonNull final XDevice xDevice) {
-        XlinkCloudManager.getInstance().subscribeDevice(xDevice, null, SUBSCRIBE_DEVICE_TIMEOUT, mSubscribeListener);
+        /**
+         * 增加延时避免订阅失败
+         */
+        mHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                XlinkCloudManager.getInstance().subscribeDevice(xDevice, null, SUBSCRIBE_DEVICE_TIMEOUT, mSubscribeListener);
+            }
+        }, WAIT_TIME);
 //        XlinkCloudManager.getInstance().subscribeDeviceBySn(mProductId, mAddress.toLowerCase(), new XlinkRequestCallback<DeviceApi.SnSubscribeResponse>() {
 //            @Override
 //            public void onStart() {
@@ -314,18 +325,15 @@ public class SmartConfigLinker {
         XlinkCloudManager.getInstance().getDeviceLocation(xDevice, new XlinkRequestCallback<DeviceApi.DeviceGeographyResponse>() {
             @Override
             public void onStart() {
-                Log.e(TAG, "onStart: ");
             }
 
             @Override
             public void onError(String error) {
-                Log.e(TAG, "onError: " + error);
                 XlinkCloudManager.getInstance().setDeviceDatapoints(xDevice, dps, INITIAL_DATA_TIMEOUT, mDataListener);
             }
 
             @Override
             public void onSuccess(DeviceApi.DeviceGeographyResponse response) {
-                Log.e(TAG, "onSuccess: " + response.lon + "  " + response.lat);
                 final XLinkDataPoint dp2 = new XLinkDataPoint(INDEX_LONGITUDE, DataPointValueType.FLOAT, (float) response.lon);
                 final XLinkDataPoint dp3 = new XLinkDataPoint(INDEX_LATITUDE, DataPointValueType.FLOAT, (float) response.lat);
                 dps.add(dp2);

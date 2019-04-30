@@ -48,7 +48,7 @@ dependencies {
     implementation 'com.github.liruya:base:1.0.1'
     implementation 'com.github.liruya:esptouch:0.0.1'
     implementation 'com.github.liruya:loaddialog:1.0.0'
-    implementation 'com.github.liruya:swiperecyclerview:0.0.3'
+    implementation 'com.github.liruya:swiperecyclerview:0.0.4'
     implementation 'com.android.support:recyclerview-v7:28.0.0'
     implementation 'com.android.support:support-v4:28.0.0'
     implementation 'com.github.PhilJay:MPAndroidChart:v3.0.3'

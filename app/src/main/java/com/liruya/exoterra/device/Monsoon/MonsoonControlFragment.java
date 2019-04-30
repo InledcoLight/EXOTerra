@@ -27,9 +27,46 @@ public class MonsoonControlFragment extends BaseFragment {
     private ImageButton monsoon_ctrl_on;
     private ImageButton monsoon_ctrl_off;
     private Button[] monsoon_ctrl_custom = new Button[8];
+    private TextView monsoon_key;
+
+    private static final String[] mPeriods = new String[127];
+    private static final String[] mKeyActions = new String[128];
 
     private MonsoonViewModel mMonsoonViewModel;
     private EXOMonsoon mMonsoon;
+
+    static {
+        for (int i = 0; i < 59; i++) {
+            mPeriods[i] = "" + (i+1) + " Sec";
+        }
+        for (int i = 59; i < 119; i++) {
+            mPeriods[i] = "1 Min " + (i-59) + " Sec";
+        }
+        mPeriods[119] = "2 Min";
+        mPeriods[120] = "3 Min";
+        mPeriods[121] = "4 Min";
+        mPeriods[122] = "5 Min";
+        mPeriods[123] = "6 Min";
+        mPeriods[124] = "8 Min";
+        mPeriods[125] = "10 Min";
+        mPeriods[126] = "15 Min";
+
+        mKeyActions[0] = "Turn on/Turn off";
+        for (int i = 1; i < 60; i++) {
+            mKeyActions[i] = "Turn on " + i + " Sec/Turn off";
+        }
+        for (int i = 60; i < 120; i++) {
+            mKeyActions[i] = "Turn on 1 Min " + (i-60) + " Sec/Turn off";
+        }
+        mKeyActions[120] = "Turn on 2 Min/Turn off";
+        mKeyActions[121] = "Turn on 3 Min/Turn off";
+        mKeyActions[122] = "Turn on 4 Min/Turn off";
+        mKeyActions[123] = "Turn on 5 Min/Turn off";
+        mKeyActions[124] = "Turn on 6 Min/Turn off";
+        mKeyActions[125] = "Turn on 8 Min/Turn off";
+        mKeyActions[126] = "Turn on 10 Min/Turn off";
+        mKeyActions[127] = "Turn on 15 Min/Turn off";
+    }
 
     @Nullable
     @Override
@@ -59,6 +96,7 @@ public class MonsoonControlFragment extends BaseFragment {
         monsoon_ctrl_custom[5] = view.findViewById(R.id.monsoon_ctrl_custom6);
         monsoon_ctrl_custom[6] = view.findViewById(R.id.monsoon_ctrl_custom7);
         monsoon_ctrl_custom[7] = view.findViewById(R.id.monsoon_ctrl_custom8);
+        monsoon_key = view.findViewById(R.id.monsoon_key);
     }
 
     @Override
@@ -91,6 +129,13 @@ public class MonsoonControlFragment extends BaseFragment {
                 mMonsoonViewModel.setPower(AppConstants.MONSOON_POWEROFF);
             }
         });
+
+        monsoon_key.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showKeyActionDialog();
+            }
+        });
     }
 
     private void refreshData() {
@@ -103,7 +148,7 @@ public class MonsoonControlFragment extends BaseFragment {
             for (int i = 0; i < addIdx && i < monsoon_ctrl_custom.length; i++) {
                 monsoon_ctrl_custom[i].setCompoundDrawablesWithIntrinsicBounds(0, R.mipmap.ic_monsoon_pulse_64, 0, 0);
                 monsoon_ctrl_custom[i].setVisibility(View.VISIBLE);
-                monsoon_ctrl_custom[i].setText("" + actions.get(i));
+                monsoon_ctrl_custom[i].setText((actions.get(i) <= 0 || actions.get(i) > 127) ? "" : mPeriods[actions.get(i)-1]);
                 final int idx = i;
                 monsoon_ctrl_custom[i].setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -138,7 +183,38 @@ public class MonsoonControlFragment extends BaseFragment {
                 }
             }
             monsoon_ctrl_status.setText((mMonsoon.getPower()&0x80) == 0x00 ? "Off" : "On");
+            monsoon_key.setText("Device button action: " + getKeyActionText());
         }
+    }
+
+    private String getKeyActionText() {
+        if (mMonsoon == null || mMonsoon.getKeyAction() < 0 || mMonsoon.getKeyAction() > 127) {
+            return "";
+        }
+        return mKeyActions[mMonsoon.getKeyAction()];
+    }
+
+    private void showKeyActionDialog() {
+        if (mMonsoon == null || mMonsoon.getKeyAction() < 0 || mMonsoon.getKeyAction() > 127) {
+            return;
+        }
+        View view = LayoutInflater.from(getContext()).inflate(R.layout.dialog_key_action, null, false);
+        final NumberPicker np = view.findViewById(R.id.dialog_key_action_np);
+        np.setDisplayedValues(mKeyActions);
+        np.setMinValue(0);
+        np.setMaxValue(127);
+        np.setValue(mMonsoon.getKeyAction());
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        builder.setView(view);
+        builder.setTitle("Device Key Action");
+        builder.setNegativeButton(R.string.cancel, null);
+        builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                mMonsoonViewModel.setKeyAction((byte) np.getValue());
+            }
+        });
+        builder.show();
     }
 
     private void showEditCustomActionDialog(final int idx) {
@@ -153,23 +229,9 @@ public class MonsoonControlFragment extends BaseFragment {
             View view = LayoutInflater.from(getContext()).inflate(R.layout.dialog_custom_actions, null, false);
             final NumberPicker np = view.findViewById(R.id.dialog_custom_np);
             String[] values = new String[127];
-            for (int i = 0; i < 59; i++) {
-                values[i] = "" + (i+1) + " Sec";
-            }
-            for (int i = 59; i < 119; i++) {
-                values[i] = "1 Min " + (i-59) + " Sec";
-            }
-            values[119] = "2 Min";
-            values[120] = "3 Min";
-            values[121] = "4 Min";
-            values[122] = "5 Min";
-            values[123] = "6 Min";
-            values[124] = "8 Min";
-            values[125] = "10 Min";
-            values[126] = "15 Min";
             np.setMinValue(1);
             np.setMaxValue(127);
-            np.setDisplayedValues(values);
+            np.setDisplayedValues(mPeriods);
             if (idx == actions.size()) {
                 np.setValue(5);
             } else {
