@@ -5,13 +5,13 @@
         android:id="@+id/menu_main_smartconfig"
         android:title=""
         android:icon="@drawable/ic_wifi_tethering_white_32dp"
-        android:visible="true"
+        android:visible="false"
         app:showAsAction="always"/>
     <item
         android:id="@+id/menu_main_scan"
         android:title=""
         android:icon="@drawable/ic_add_white_32dp"
-        android:visible="true"
+        android:visible="false"
         app:showAsAction="always"/>
     <item
         android:id="@+id/menu_main_add"
