@@ -20,8 +20,6 @@ public class UserManager {
 
     private static final String PREF_KEY_USER_AUTHORIZE = "user_authorize";
 
-    private static final String PREF_KEY_USER_ACCESS_TOKEN = "user_access_token";
-
     private static final String PREF_KEY_USER_REFRESH_TOKEN = "user_refresh_token";
 
     public static void setAccount(Context context, String account) {
@@ -32,12 +30,20 @@ public class UserManager {
         return PrefUtil.getString(context, PREF_FILE_USER, PREF_KEY_USER_ACCOUNT, "");
     }
 
+    public static void removeAccount(Context context) {
+        PrefUtil.remove(context, PREF_FILE_USER, PREF_KEY_USER_ACCOUNT);
+    }
+
     public static void setUserId(Context context, int userid) {
         PrefUtil.putInt(context, PREF_FILE_USER, PREF_KEY_USER_ID, userid);
     }
 
     public static int getUserId(Context context) {
         return PrefUtil.getInt(context, PREF_FILE_USER, PREF_KEY_USER_ID, 0);
+    }
+
+    public static void removeUserId(Context context) {
+        PrefUtil.remove(context, PREF_FILE_USER, PREF_KEY_USER_ID);
     }
 
     public static void setAuthorize(Context context, String authorize) {
@@ -48,12 +54,8 @@ public class UserManager {
         return PrefUtil.getString(context, PREF_FILE_USER, PREF_KEY_USER_AUTHORIZE, "");
     }
 
-    public static void setAccessToken(Context context, String access_token) {
-        PrefUtil.putString(context, PREF_FILE_USER, PREF_KEY_USER_ACCESS_TOKEN, access_token);
-    }
-
-    public static String getAccessToken(Context context) {
-        return PrefUtil.getString(context, PREF_FILE_USER, PREF_KEY_USER_ACCESS_TOKEN, "");
+    public static void removeAuthorize(Context context) {
+        PrefUtil.remove(context, PREF_FILE_USER, PREF_KEY_USER_AUTHORIZE);
     }
 
     public static void setRefreshToken(Context context, String refresh_token) {
@@ -62,6 +64,10 @@ public class UserManager {
 
     public static String getRefreshToken(Context context) {
         return PrefUtil.getString(context, PREF_FILE_USER, PREF_KEY_USER_REFRESH_TOKEN, "");
+    }
+
+    public static void removeRefreshToken(Context context) {
+        PrefUtil.remove(context, PREF_FILE_USER, PREF_KEY_USER_REFRESH_TOKEN);
     }
 
     public static void clear(Context context) {

@@ -5,15 +5,23 @@ import android.text.TextUtils;
 import android.util.Base64;
 import android.util.Log;
 
+import com.liruya.exoterra.util.DeviceUtil;
+
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
 import cn.xlink.restful.XLinkCallback;
 import cn.xlink.restful.XLinkRestful;
 import cn.xlink.restful.XLinkRestfulEnum;
 import cn.xlink.restful.XLinkRestfulError;
 import cn.xlink.restful.api.app.DeviceApi;
+import cn.xlink.restful.api.app.HomeApi;
 import cn.xlink.restful.api.app.UserApi;
 import cn.xlink.restful.api.app.UserAuthApi;
 import cn.xlink.sdk.common.ByteUtil;
@@ -27,6 +35,7 @@ import cn.xlink.sdk.v5.listener.XLinkScanDeviceListener;
 import cn.xlink.sdk.v5.listener.XLinkTaskListener;
 import cn.xlink.sdk.v5.manager.XLinkUserManager;
 import cn.xlink.sdk.v5.model.XDevice;
+import cn.xlink.sdk.v5.module.connection.XLinkConnectDeviceTask;
 import cn.xlink.sdk.v5.module.connection.XLinkScanDeviceTask;
 import cn.xlink.sdk.v5.module.datapoint.XLinkGetDataPointMetaInfoTask;
 import cn.xlink.sdk.v5.module.datapoint.XLinkGetDataPointTask;
@@ -38,7 +47,6 @@ import cn.xlink.sdk.v5.module.http.XLinkRemoveDeviceTask;
 import cn.xlink.sdk.v5.module.http.XLinkSyncDeviceListTask;
 import cn.xlink.sdk.v5.module.http.XLinkUserAuthorizeTask;
 import cn.xlink.sdk.v5.module.main.XLinkSDK;
-import cn.xlink.sdk.v5.module.notify.EventNotifyHelper;
 import cn.xlink.sdk.v5.module.share.XLinkHandleShareDeviceTask;
 import cn.xlink.sdk.v5.module.share.XLinkShareDeviceTask;
 import cn.xlink.sdk.v5.module.subscription.XLinkAddDeviceTask;
@@ -79,9 +87,9 @@ public class XlinkCloudManager {
         request.password = password;
         request.localLang = XLinkRestfulEnum.LocalLang.EN_US;
         request.source = XLinkRestfulEnum.UserSource.ANDROID;
-        final Call<UserAuthApi.EmailRegisterResponse> call = XLinkRestful.getApplicationApi()
-                                                                         .registEmailAccount(request);
-        call.enqueue(callback);
+        XLinkRestful.getApplicationApi()
+                    .registEmailAccount(request)
+                    .enqueue(callback);
         if (callback != null) {
             callback.onStart();
         }
@@ -92,6 +100,7 @@ public class XlinkCloudManager {
                                                           .setUserId(userid)
                                                           .setAuthString(authorize)
                                                           .setRefreshToken(refresh_token)
+                                                          .setTimeout(5000)
                                                           .setListener(listener)
                                                           .build();
         XLinkSDK.startTask(task);
@@ -101,8 +110,9 @@ public class XlinkCloudManager {
         UserApi.PasswordResetRequest request = new UserApi.PasswordResetRequest();
         request.oldPassword = oldPassword;
         request.newPassword = newPassword;
-        Call<String> call = XLinkRestful.getApplicationApi().updatePassword(request);
-        call.enqueue(callback);
+        XLinkRestful.getApplicationApi()
+                    .updatePassword(request)
+                    .enqueue(callback);
         if (callback != null) {
             callback.onStart();
         }
@@ -113,8 +123,9 @@ public class XlinkCloudManager {
         request.corpId = mCorpId;
         request.email = email;
         request.localLang = XLinkRestfulEnum.LocalLang.EN_US;
-        Call<String> call = XLinkRestful.getApplicationApi().sendEmailPasswordFound(request);
-        call.enqueue(callback);
+        XLinkRestful.getApplicationApi()
+                    .sendEmailPasswordFound(request)
+                    .enqueue(callback);
         if (callback != null) {
             callback.onStart();
         }
@@ -126,17 +137,18 @@ public class XlinkCloudManager {
         request.email = email;
         request.newPassword = password;
         request.verifycode = verifycode;
-        Call<String> call = XLinkRestful.getApplicationApi().sendPasswordReset(request);
-        call.enqueue(callback);
+        XLinkRestful.getApplicationApi()
+                    .sendPasswordReset(request)
+                    .enqueue(callback);
         if (callback != null) {
             callback.onStart();
         }
     }
 
     public void getUserInfo(final int userid, XlinkRequestCallback<UserApi.UserInfoResponse> callback) {
-        Call<UserApi.UserInfoResponse> call = XLinkRestful.getApplicationApi()
-                                                              .getUserInfo(userid);
-        call.enqueue(callback);
+        XLinkRestful.getApplicationApi()
+                    .getUserInfo(userid)
+                    .enqueue(callback);
         if (callback != null) {
             callback.onStart();
         }
@@ -173,7 +185,7 @@ public class XlinkCloudManager {
 
             @Override
             public void onSuccess(DeviceApi.RegisterDeviceResponse response) {
-                Log.e(TAG, "onSuccess: " + response.accessKey );
+                Log.e(TAG, "onSubscribeSuccess: " + response.accessKey );
                 device.setDeviceId(response.deviceId);
                 if (callback != null) {
                     callback.onSuccess(device);
@@ -189,6 +201,27 @@ public class XlinkCloudManager {
         registerDevice(device, null, callback);
     }
 
+    public void addDevice(final XDevice device, int timeout, XLinkTaskListener<XDevice> listener) {
+        XLinkAddDeviceTask task = XLinkAddDeviceTask.newBuilder()
+                                                    .setXDevice(device)
+                                                    .setConnectLocal(true)
+                                                    .setNeedSubscription(false)
+                                                    .setPinCode(null)
+                                                    .setTotalTimeout(timeout)
+                                                    .setListener(listener)
+                                                    .build();
+        XLinkSDK.startTask(task);
+    }
+
+    public void connectDevice(final XDevice device, XLinkTaskListener<XDevice> listener) {
+        XLinkConnectDeviceTask task = XLinkConnectDeviceTask.newBuilder()
+                                                            .setXDevice(device)
+                                                            .setConnectionFlags(CoreConstant.FROM_LOCAL)
+                                                            .setListener(listener)
+                                                            .build();
+        XLinkSDK.startTask(task);
+    }
+
     public void subscribeDevice(final XDevice device, byte[] pincode, int timeout, XLinkTaskListener<XDevice> listener) {
         XLinkAddDeviceTask task = XLinkAddDeviceTask.newBuilder()
                                                     .setXDevice(device)
@@ -201,13 +234,38 @@ public class XlinkCloudManager {
         XLinkSDK.startTask(task);
     }
 
-    public void subscribeDeviceBySn(@NonNull String pid, @NonNull String sn, XlinkRequestCallback<DeviceApi.SnSubscribeResponse> callback) {
+    public void subscribeDeviceBySn(@NonNull String pid, @NonNull String sn, final XlinkRequestCallback<DeviceApi.SnSubscribeResponse> callback) {
         DeviceApi.SnSubscribeRequest request = new DeviceApi.SnSubscribeRequest();
         request.productId = pid;
         request.sn = sn;
         XLinkRestful.getApplicationApi()
                     .snSubscribeDevice(XLinkUserManager.getInstance().getUid(), request)
-                    .enqueue(callback);
+                    .enqueue(new XLinkCallback<DeviceApi.SnSubscribeResponse>() {
+                        @Override
+                        public void onHttpError(Throwable throwable) {
+                            if (callback != null) {
+                                callback.onError(throwable.getMessage());
+                            }
+                        }
+
+                        @Override
+                        public void onApiError(XLinkRestfulError.ErrorWrapper.Error error) {
+                            if (callback != null) {
+                                if (error.code == XLinkErrorCodes.ERROR_API_USER_HAS_SUBSCRIBE_DEVICE) {
+                                    callback.onSuccess(null);
+                                } else {
+                                    callback.onError(XLinkErrorCodeHelper.getErrorCodeName(error.code));
+                                }
+                            }
+                        }
+
+                        @Override
+                        public void onSuccess(DeviceApi.SnSubscribeResponse response) {
+                            if (callback != null) {
+                                callback.onSuccess(response);
+                            }
+                        }
+                    });
         if (callback != null) {
             callback.onStart();
         }
@@ -268,8 +326,9 @@ public class XlinkCloudManager {
     public void renameDevice(String pid, int devid, String newName, XlinkRequestCallback<DeviceApi.DeviceResponse> callback) {
         DeviceApi.DeviceRequest request = new DeviceApi.DeviceRequest();
         request.name = newName;
-        Call<DeviceApi.DeviceResponse> call = XLinkRestful.getApplicationApi().updateDeviceInfo(pid, devid, request);
-        call.enqueue(callback);
+        XLinkRestful.getApplicationApi()
+                    .updateDeviceInfo(pid, devid, request)
+                    .enqueue(callback);
         if (callback != null) {
             callback.onStart();
         }
@@ -283,9 +342,12 @@ public class XlinkCloudManager {
     }
 
     public void getDeviceInfo(@NonNull final XDevice xDevice, XlinkRequestCallback<DeviceApi.DeviceResponse> callback) {
-        Call<DeviceApi.DeviceResponse> call = XLinkRestful.getApplicationApi()
-                                                                .getDeviceInfo(xDevice.getProductId(), xDevice.getDeviceId());
-        call.enqueue(callback);
+        XLinkRestful.getApplicationApi()
+                    .getDeviceInfo(xDevice.getProductId(), xDevice.getDeviceId())
+                    .enqueue(callback);
+        if (callback != null) {
+            callback.onStart();
+        }
     }
 
     public void getDeviceMetaDatapoints(@NonNull XDevice device, XLinkTaskListener<List<XLinkDataPoint>> listener) {
@@ -393,17 +455,18 @@ public class XlinkCloudManager {
         }
     }
 
-//    public void setDeviceDatapoints(final XDevice device, List<DeviceApi.DeviceDataPointRequest.Command> commands, final XlinkRequestCallback<String> callback) {
-//        DeviceApi.DeviceDataPointRequest request = new DeviceApi.DeviceDataPointRequest();
-//        request.source = XLinkRestfulEnum.DataPointSource.APPLICATION_SET;
-//        request.command = commands;
-//        Call<String> call = XLinkRestful.getApplicationApi()
-//                                        .setDeviceDataPoint(device.getDeviceId(), request);
-//        call.enqueue(callback);
-//        if (callback != null) {
-//            callback.onStart();
-//        }
-//    }
+    public void setDeviceDatapoints(@NonNull final int devid, List<DeviceApi.DeviceDataPointRequest.Command> commands, final XlinkRequestCallback<String> callback) {
+        DeviceApi.DeviceDataPointRequest request = new DeviceApi.DeviceDataPointRequest();
+        request.source = XLinkRestfulEnum.DataPointSource.DEVICE_POST;
+        request.command = commands;
+        request.writeBack = true;
+        Call<String> call = XLinkRestful.getApplicationApi()
+                                        .setDeviceDataPoint(devid, request);
+        call.enqueue(callback);
+        if (callback != null) {
+            callback.onStart();
+        }
+    }
 
     public void probeDevice(XDevice device, @NonNull Collection<Integer> indexs, XLinkTaskListener<List<XLinkDataPoint>> listener) {
         XLinkProbeDataPointTask task = XLinkProbeDataPointTask.newBuilder()
@@ -414,21 +477,33 @@ public class XlinkCloudManager {
         XLinkSDK.startTask(task);
     }
 
-    public void shareDevice(XDevice device, String account, int expired, XLinkTaskListener<DeviceApi.ShareDeviceResponse> listener) {
+    /**
+     * 增加扩展字段，productID，name，
+     * @param device
+     * @param account
+     * @param listener
+     */
+    public void shareDevice(@NonNull final XDevice device, String account, XLinkTaskListener<DeviceApi.ShareDeviceResponse> listener) {
+        String pid = device.getProductId();
+        String name = device.getDeviceName();
+        if (TextUtils.isEmpty(name)) {
+            name = DeviceUtil.getDefaultName(pid);
+        }
         XLinkShareDeviceTask task = XLinkShareDeviceTask.newBuilder()
                                                         .setXDevice(device)
                                                         .setMode(XLinkRestfulEnum.ShareMode.ACCOUNT)
                                                         .setAccount(account)
-                                                        .setExpired(expired)
+                                                        .setExpired(24*3600)
+                                                        .setExtendString(pid + "-" + name)
                                                         .setListener(listener)
                                                         .build();
         XLinkSDK.startTask(task);
     }
 
-    public void denyShareDevice(EventNotifyHelper.DeviceShareNotify notify, XLinkTaskListener<String> listener) {
+    public void denyShareDevice(@NonNull final String inviteCode, XLinkTaskListener<String> listener) {
         XLinkHandleShareDeviceTask task = XLinkHandleShareDeviceTask.newBuilder()
                                                                     .setAction(XLinkHandleShareDeviceTask.Action.DENY)
-                                                                    .setInviteCode(notify.invite_code)
+                                                                    .setInviteCode(inviteCode)
                                                                     .setUid(XLinkUserManager.getInstance()
                                                                                             .getUid())
                                                                     .setListener(listener)
@@ -436,10 +511,10 @@ public class XlinkCloudManager {
         XLinkSDK.startTask(task);
     }
 
-    public void acceptShareDevice(EventNotifyHelper.DeviceShareNotify notify, XLinkTaskListener<String> listener) {
+    public void acceptShareDevice(@NonNull final String inviteCode, XLinkTaskListener<String> listener) {
         XLinkHandleShareDeviceTask task = XLinkHandleShareDeviceTask.newBuilder()
                                                                     .setAction(XLinkHandleShareDeviceTask.Action.ACCEPT)
-                                                                    .setInviteCode(notify.invite_code)
+                                                                    .setInviteCode(inviteCode)
                                                                     .setUid(XLinkUserManager.getInstance()
                                                                                             .getUid())
                                                                     .setListener(listener)
@@ -447,10 +522,10 @@ public class XlinkCloudManager {
         XLinkSDK.startTask(task);
     }
 
-    public void cancelShareDevice(DeviceApi.ShareDeviceItem item, XLinkTaskListener<String> listener) {
+    public void cancelShareDevice(@NonNull final String inviteCode, XLinkTaskListener<String> listener) {
         XLinkHandleShareDeviceTask task = XLinkHandleShareDeviceTask.newBuilder()
                                                                     .setAction(XLinkHandleShareDeviceTask.Action.CANCEL)
-                                                                    .setInviteCode(item.inviteCode)
+                                                                    .setInviteCode(inviteCode)
                                                                     .setUid(XLinkUserManager.getInstance()
                                                                                             .getUid())
                                                                     .setListener(listener)
@@ -458,10 +533,10 @@ public class XlinkCloudManager {
         XLinkSDK.startTask(task);
     }
 
-    public void deleteShareDevice(DeviceApi.ShareDeviceItem item, XLinkTaskListener<String> listener) {
+    public void deleteShareDevice(@NonNull final String inviteCode, XLinkTaskListener<String> listener) {
         XLinkHandleShareDeviceTask task = XLinkHandleShareDeviceTask.newBuilder()
                                                                     .setAction(XLinkHandleShareDeviceTask.Action.DELETE)
-                                                                    .setInviteCode(item.inviteCode)
+                                                                    .setInviteCode(inviteCode)
                                                                     .setUid(XLinkUserManager.getInstance()
                                                                                             .getUid())
                                                                     .setListener(listener)
@@ -469,13 +544,35 @@ public class XlinkCloudManager {
         XLinkSDK.startTask(task);
     }
 
-    public void getDeviceLocation(XDevice xDevice, final XlinkRequestCallback<DeviceApi.DeviceGeographyResponse> callback) {
-        final Call<DeviceApi.DeviceGeographyResponse> call = XLinkRestful.getApplicationApi()
-                                                                         .getDeviceGeography(xDevice.getProductId(), xDevice.getDeviceId());
-        call.enqueue(callback);
+    public void getDeviceShareList(final XlinkRequestCallback<List<DeviceApi.ShareDeviceItem>> callback) {
+        XLinkRestful.getApplicationApi()
+                    .getDeviceShareList()
+                    .enqueue(callback);
         if (callback != null) {
             callback.onStart();
         }
+    }
+
+    public void getDeviceUserList(final int devid, final XlinkRequestCallback<DeviceApi.DeviceSubscribeUsersResponse> callback) {
+        XLinkRestful.getApplicationApi()
+                    .getDeviceSubscribeUserList(XLinkUserManager.getInstance().getUid(), devid)
+                    .enqueue(callback);
+        if (callback != null) {
+            callback.onStart();
+        }
+    }
+
+    public void getDeviceLocation(@NonNull final String pid, @NonNull final int devid, final XlinkRequestCallback<DeviceApi.DeviceGeographyResponse> callback) {
+        XLinkRestful.getApplicationApi()
+                    .getDeviceGeography(pid, devid)
+                    .enqueue(callback);
+        if (callback != null) {
+            callback.onStart();
+        }
+    }
+
+    public void getDeviceLocation(@NonNull final XDevice xDevice, final XlinkRequestCallback<DeviceApi.DeviceGeographyResponse> callback) {
+        getDeviceLocation(xDevice.getProductId(), xDevice.getDeviceId(), callback);
     }
 
     public void checkUpgradeTask(final XDevice xDevice, TaskListener<Boolean> listener) {
@@ -497,8 +594,9 @@ public class XlinkCloudManager {
         DeviceApi.DeviceNewestVersionRequest request = new DeviceApi.DeviceNewestVersionRequest();
         request.productId = xDevice.getProductId();
         request.deviceId = xDevice.getDeviceId();
-        Call<DeviceApi.DeviceNewestVersionResponse> call = XLinkRestful.getApplicationApi().getDeviceNewestVersion(request);
-        call.enqueue(callback);
+        XLinkRestful.getApplicationApi()
+                    .getDeviceNewestVersion(request)
+                    .enqueue(callback);
         if (callback != null) {
             callback.onStart();
         }
@@ -508,11 +606,149 @@ public class XlinkCloudManager {
         DeviceApi.UpgradeDeviceRequest request = new DeviceApi.UpgradeDeviceRequest();
         request.productId = xDevice.getProductId();
         request.deviceId = xDevice.getDeviceId();
-        Call<String> call = XLinkRestful.getApplicationApi().upgradeDevice(request);
-        call.enqueue(callback);
+        XLinkRestful.getApplicationApi()
+                    .upgradeDevice(request)
+                    .enqueue(callback);
         if (callback != null) {
             callback.onStart();
         }
+    }
+
+    public void createHome(@NonNull final String homeName, final XlinkRequestCallback<HomeApi.HomeResponse> callback) {
+        HomeApi.HomeRequest request = new HomeApi.HomeRequest();
+        request.name = homeName;
+        XLinkRestful.getApplicationApi()
+                    .createHome(request)
+                    .enqueue(callback);
+        if (callback != null) {
+            callback.onStart();
+        }
+    }
+
+    public void getHomeList(final XlinkRequestCallback<HomeApi.HomesResponse> callback) {
+        Map<String, Object> requestMap = new HashMap<>();
+        requestMap.put("user_id", XLinkUserManager.getInstance().getUid());
+        XLinkRestful.getApplicationApi()
+                    .getHomeList(requestMap)
+                    .enqueue(callback);
+        if (callback != null) {
+            callback.onStart();
+        }
+    }
+
+    public void getHomeDeviceList(@NonNull final String homeid, final XlinkRequestCallback<HomeApi.HomeDevicesResponse> callback) {
+        XLinkRestful.getApplicationApi()
+                    .getHomeDeviceList(homeid)
+                    .enqueue(callback);
+        if (callback != null) {
+            callback.onStart();
+        }
+    }
+
+    public void addDeviceToHome(@NonNull final String homeid, final int deviceid, final XlinkRequestCallback<String> callback) {
+        HomeApi.DeviceAddRequest request = new HomeApi.DeviceAddRequest();
+        request.deviceId = deviceid;
+        request.authority = XLinkRestfulEnum.DeviceAuthority.RW;
+        request.subRole = XLinkRestfulEnum.DeviceSubscribeRole.USER;
+        XLinkRestful.getApplicationApi()
+                    .addHomeDevice(homeid, request)
+                    .enqueue(callback);
+        if (callback != null) {
+            callback.onStart();
+        }
+    }
+
+    public void removeDeviceFromHome(@NonNull final String homeid, final int deviceid, final XlinkRequestCallback<String> callback) {
+        XLinkRestful.getApplicationApi()
+                    .deleteHomeDevice(homeid, deviceid)
+                    .enqueue(callback);
+        if (callback != null) {
+            callback.onStart();
+        }
+    }
+
+    public void shareHome(@NonNull final String homeid, @NonNull final String account, final XlinkRequestCallback<HomeApi.UserInviteResponse> callback) {
+        HomeApi.UserInviteRequest request = new HomeApi.UserInviteRequest();
+        request.account = account;
+        request.authority = XLinkRestfulEnum.DeviceAuthority.RW;
+        request.mode = XLinkRestfulEnum.InvitationType.USER_ID;
+        request.role = XLinkRestfulEnum.HomeUserType.USER;
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.DATE, calendar.get(Calendar.DATE) + 2);
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault());
+        request.expireTime = df.format(calendar.getTime());
+        XLinkRestful.getApplicationApi()
+                    .inviteHomeUser(homeid, request)
+                    .enqueue(callback);
+        if (callback != null) {
+            callback.onStart();
+        }
+    }
+
+    public void acceptHomeInvite(@NonNull final String homeid, @NonNull final String inviteId, final XlinkRequestCallback<String> callback) {
+        HomeApi.UserAcceptRequest request = new HomeApi.UserAcceptRequest();
+        request.inviteId = inviteId;
+        XLinkRestful.getApplicationApi()
+                    .acceptHomeInvite(homeid, request)
+                    .enqueue(callback);
+        if (callback != null) {
+            callback.onStart();
+        }
+    }
+
+    public void denyHomeInvite(@NonNull final String homeid, @NonNull final String inviteId, final XlinkRequestCallback<String> callback) {
+        HomeApi.UserDenyRequest request = new HomeApi.UserDenyRequest();
+        request.inviteId = inviteId;
+        XLinkRestful.getApplicationApi()
+                    .denyHomeInvite(homeid, request)
+                    .enqueue(callback);
+        if (callback != null) {
+            callback.onStart();
+        }
+    }
+
+    public void deleteHome(@NonNull final HomeApi.HomesResponse.Home home, final XlinkRequestCallback<String> callback) {
+        boolean isHomeAdmin = false;
+        for (HomeApi.HomesResponse.Home.User user : home.userList) {
+            if (user.userId == XLinkUserManager.getInstance().getUid()) {
+                isHomeAdmin = (user.role == XLinkRestfulEnum.HomeUserType.ADMIN || user.role == XLinkRestfulEnum.HomeUserType.SUPER_ADMIN);
+                break;
+            }
+        }
+        if (isHomeAdmin) {
+            XLinkRestful.getApplicationApi()
+                        .deleteHome(home.id)
+                        .enqueue(callback);
+        } else {
+            XLinkRestful.getApplicationApi()
+                        .deleteHomeUser(home.id, XLinkUserManager.getInstance().getUid())
+                        .enqueue(callback);
+        }
+        if (callback != null) {
+            callback.onStart();
+        }
+    }
+
+    public void getHomeInviteeList(final XlinkRequestCallback<HomeApi.InviteeListResponse> callback) {
+        XLinkRestful.getApplicationApi()
+                    .getHomeInviteeList(XLinkUserManager.getInstance().getUid())
+                    .enqueue(callback);
+        if (callback != null) {
+            callback.onStart();
+        }
+    }
+
+    public void getHomeInviterList(final XlinkRequestCallback<HomeApi.InviterListResponse> callback) {
+        XLinkRestful.getApplicationApi()
+                    .getHomeInviterList(XLinkUserManager.getInstance().getUid())
+                    .enqueue(callback);
+        if (callback != null) {
+            callback.onStart();
+        }
+    }
+
+    public boolean isHomeAdmin(@NonNull final String homeid) {
+        return false;
     }
 
     private static class LazyHolder {

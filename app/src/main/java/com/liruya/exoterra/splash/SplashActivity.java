@@ -1,8 +1,8 @@
 package com.liruya.exoterra.splash;
 
 import android.content.Intent;
-import android.os.CountDownTimer;
 import android.text.TextUtils;
+import android.widget.Toast;
 
 import com.liruya.base.BaseActivity;
 import com.liruya.exoterra.R;
@@ -10,16 +10,15 @@ import com.liruya.exoterra.login.LoginActivity;
 import com.liruya.exoterra.main.MainActivity;
 import com.liruya.exoterra.manager.UserManager;
 import com.liruya.exoterra.xlink.XlinkCloudManager;
+import com.liruya.exoterra.xlink.XlinkTaskCallback;
 
 import cn.xlink.restful.api.app.UserApi;
-import cn.xlink.sdk.core.XLinkCoreException;
-import cn.xlink.sdk.v5.listener.XLinkTaskListener;
 import cn.xlink.sdk.v5.module.main.XLinkSDK;
 
 public class SplashActivity extends BaseActivity {
 
-    private CountDownTimer mTimer;
     private boolean[] mResult = new boolean[]{false, false};
+    private long mStartTime;
 
     @Override
     protected void onStart() {
@@ -43,17 +42,19 @@ public class SplashActivity extends BaseActivity {
 
         int userid = UserManager.getUserId(this);
         String authorize = UserManager.getAuthorize(this);
-        String refresh_token = UserManager.getRefreshToken(this);
+        final String refresh_token = UserManager.getRefreshToken(this);
         if (userid == 0 || TextUtils.isEmpty(authorize) || TextUtils.isEmpty(refresh_token)) {
             mResult[0] = true;
             mResult[1] = false;
         } else {
             XlinkCloudManager.getInstance()
-                             .refreshToken(userid, authorize, refresh_token, new XLinkTaskListener<UserApi.TokenRefreshResponse>() {
+                             .refreshToken(userid, authorize, refresh_token, new XlinkTaskCallback<UserApi.TokenRefreshResponse>() {
                                  @Override
-                                 public void onError(XLinkCoreException e) {
-                                    mResult[0] = true;
-                                    mResult[1] = false;
+                                 public void onError(String error) {
+                                                    mResult[0] = true;
+                                     mResult[1] = false;
+                                     Toast.makeText(SplashActivity.this, error, Toast.LENGTH_SHORT)
+                                          .show();
                                  }
 
                                  @Override
@@ -62,32 +63,24 @@ public class SplashActivity extends BaseActivity {
                                  }
 
                                  @Override
-                                 public void onComplete(UserApi.TokenRefreshResponse tokenRefreshResponse) {
-                                    mResult[0] = true;
-                                    mResult[1] = true;
+                                 public void onComplete(UserApi.TokenRefreshResponse response) {
+                                     mResult[0] = true;
+                                     mResult[1] = true;
                                  }
                              });
         }
-        mTimer = new CountDownTimer(1500, 500) {
+        mStartTime = System.currentTimeMillis();
+        new Thread(new Runnable() {
             @Override
-            public void onTick(long millisUntilFinished) {
-
-            }
-
-            @Override
-            public void onFinish() {
-                if (mResult[0]) {
-                    if (mResult[1]) {
-                        gotoMainActivity();
-                    } else {
-                        gotoLoginActivity();
-                    }
-                } else {
+            public void run() {
+                while (mResult[0] == false || System.currentTimeMillis() - mStartTime < 1500);
+                if (mResult[1]) {
                     gotoMainActivity();
+                } else {
+                    gotoLoginActivity();
                 }
             }
-        };
-        mTimer.start();
+        }).start();
     }
 
     @Override

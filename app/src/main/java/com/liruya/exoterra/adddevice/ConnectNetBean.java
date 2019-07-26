@@ -3,8 +3,9 @@ package com.liruya.exoterra.adddevice;
 public class ConnectNetBean {
     private String mProductId;
     private String mSsid;
-    private String mGateway;
+    private String mBssid;
     private String mPassword;
+    private boolean mConflict;
     private boolean mCompatibleMode;
     private boolean mRunning;
 
@@ -24,12 +25,12 @@ public class ConnectNetBean {
         mSsid = ssid;
     }
 
-    public String getGateway() {
-        return mGateway;
+    public String getBssid() {
+        return mBssid;
     }
 
-    public void setGateway(String gateway) {
-        mGateway = gateway;
+    public void setBssid(String bssid) {
+        mBssid = bssid;
     }
 
     public String getPassword() {
@@ -38,6 +39,14 @@ public class ConnectNetBean {
 
     public void setPassword(String password) {
         mPassword = password;
+    }
+
+    public boolean isConflict() {
+        return mConflict;
+    }
+
+    public void setConflict(boolean conflict) {
+        mConflict = conflict;
     }
 
     public boolean isCompatibleMode() {

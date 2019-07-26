@@ -16,7 +16,8 @@ public class MonsoonViewModel extends DeviceViewModel<EXOMonsoon> {
     }
 
     public void setCustomActions(List<Byte> actions) {
-        setApplicationSetDatapoint(getData().setCustomActions1(actions));
+//        setApplicationSetDatapoint(getData().setCustomActions(actions));
+        setDeviceDatapoint(getData().setCustomActions(actions));
     }
 
     public void removeTimer(int idx) {

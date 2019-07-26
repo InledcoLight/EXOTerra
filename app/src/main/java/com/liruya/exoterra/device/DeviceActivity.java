@@ -13,6 +13,7 @@ import android.support.design.widget.TextInputEditText;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.app.AppCompatDelegate;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Log;
@@ -25,6 +26,7 @@ import android.widget.Toast;
 
 import com.liruya.base.BaseActivity;
 import com.liruya.exoterra.AppConstants;
+import com.liruya.exoterra.BaseViewModel;
 import com.liruya.exoterra.R;
 import com.liruya.exoterra.bean.Device;
 import com.liruya.exoterra.bean.EXOLedstrip;
@@ -32,6 +34,7 @@ import com.liruya.exoterra.bean.EXOMonsoon;
 import com.liruya.exoterra.bean.EXOSocket;
 import com.liruya.exoterra.device.Monsoon.MonsoonFragment;
 import com.liruya.exoterra.device.Monsoon.MonsoonViewModel;
+import com.liruya.exoterra.device.detail.DeviceDetailFragment;
 import com.liruya.exoterra.device.light.LightFragment;
 import com.liruya.exoterra.device.light.LightViewModel;
 import com.liruya.exoterra.device.socket.SocketFragment;
@@ -67,11 +70,16 @@ public class DeviceActivity extends BaseActivity {
 
     private Device mDevice;
     private DeviceViewModel mDeviceViewModel;
+    private BaseViewModel<Device> mDeviceBaseViewModel;
 
     private XlinkTaskCallback<XDevice> mSetCallback;
     private XlinkTaskCallback<List<XLinkDataPoint>> mGetCallback;
 
     private final Handler mHandler = new Handler();
+
+    static {
+        AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
+    }
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -109,6 +117,7 @@ public class DeviceActivity extends BaseActivity {
         MenuItem device_datetime = menu.findItem(R.id.menu_device_datetime);
         MenuItem device_share = menu.findItem(R.id.menu_device_share);
         MenuItem device_upgrade = menu.findItem(R.id.menu_device_upgrade);
+        MenuItem device_detail = menu.findItem(R.id.menu_device_detail);
         device_edit.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
@@ -143,6 +152,16 @@ public class DeviceActivity extends BaseActivity {
                 return true;
             }
         });
+        device_detail.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                getSupportFragmentManager().beginTransaction()
+                                           .add(R.id.device_root, new DeviceDetailFragment())
+                                           .addToBackStack("")
+                                           .commit();
+                return true;
+            }
+        });
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -160,115 +179,122 @@ public class DeviceActivity extends BaseActivity {
     @Override
     protected void initData() {
         Intent intent = getIntent();
-        if (intent != null) {
-            String deviceTag = intent.getStringExtra(AppConstants.DEVICE_TAG);
-            final Device device = DeviceManager.getInstance().getDevice(deviceTag);
-            String pid = device.getXDevice().getProductId();
-            String name = device.getXDevice().getDeviceName();
-            device_toolbar.setTitle(TextUtils.isEmpty(name) ? DeviceUtil.getDefaultName(pid) : name);
-//            device_toolbar.setLogo(DeviceUtil.getProductIcon(pid));
-            setSupportActionBar(device_toolbar);
-            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-
-            if (TextUtils.equals(pid, XlinkConstants.PRODUCT_ID_LEDSTRIP)) {
-                mDevice = new EXOLedstrip(device);
-                mDeviceViewModel = ViewModelProviders.of(this).get(LightViewModel.class);
-                mDeviceViewModel.setData(mDevice);
-                transaction.replace(R.id.device_fl_show, new LightFragment()).commit();
-            } else if (TextUtils.equals(pid, XlinkConstants.PRODUCT_ID_MONSOON)) {
-                mDevice = new EXOMonsoon(device);
-                mDeviceViewModel = ViewModelProviders.of(this).get(MonsoonViewModel.class);
-                mDeviceViewModel.setData(mDevice);
-                transaction.replace(R.id.device_fl_show, new MonsoonFragment()).commit();
-            } else if (TextUtils.equals(pid, XlinkConstants.PRODUCT_ID_SOCKET)) {
-                mDevice = new EXOSocket(device);
-                mDeviceViewModel = ViewModelProviders.of(this).get(SocketViewModel.class);
-                mDeviceViewModel.setData(mDevice);
-                transaction.replace(R.id.device_fl_show, new SocketFragment()).commit();
-            } else {
-                throw new RuntimeException("Invalid ProductID.");
-            }
-            XLinkDeviceManager.getInstance().addDeviceConnectionFlags(mDevice.getXDevice().getDeviceTag(), 1);
-            XLinkDeviceManager.getInstance().connectDeviceLocal(mDevice.getXDevice().getDeviceTag());
-            EventBus.getDefault().register(this);
-
-            mSetCallback = new XlinkTaskCallback<XDevice>() {
-                @Override
-                public void onError(String error) {
-                    Log.e(TAG, "onError: setDataPointError - " + error);
-                }
-
-                @Override
-                public void onStart() {
-                    Log.e(TAG, "onStart: setDataPointStart");
-                }
-
-                @Override
-                public void onComplete(XDevice xDevice) {
-                    Log.e(TAG, "onComplete: setDataPointComplete");
-                }
-            };
-            mGetCallback = new XlinkTaskCallback<List<XLinkDataPoint>>() {
-                @Override
-                public void onError(String error) {
-                    Log.e(TAG, "onError: getDataPoints- " + error );
-                }
-
-                @Override
-                public void onStart() {
-
-                }
-
-                @Override
-                public void onComplete(List<XLinkDataPoint> dataPoints) {
-                    Log.e(TAG, "onComplete: getDataPoints");
-                    Collections.sort(dataPoints, new Comparator<XLinkDataPoint>() {
-                        @Override
-                        public int compare(XLinkDataPoint o1, XLinkDataPoint o2) {
-                            return o1.getIndex() - o2.getIndex();
-                        }
-                    });
-                    StringBuilder sb = new StringBuilder();
-                    for (XLinkDataPoint dp : dataPoints) {
-                        device.setDataPoint(dp);
-                        mDevice.setDataPoint(dp);
-                        sb.append(dp.getIndex()).append(" ")
-                          .append(dp.getName()).append(" ")
-                          .append(dp.getType()).append(" ")
-                          .append(dp.getValue()).append("\n");
-                    }
-                    mDeviceViewModel.postValue();
-                    LogUtil.e(TAG, "onComplete: " + dataPoints.size() + "\n" + sb);
-                }
-            };
-            mDeviceViewModel.setGetCallback(mGetCallback);
-            mDeviceViewModel.setSetCallback(mSetCallback);
-
-            XlinkCloudManager.getInstance().getDeviceMetaDatapoints(mDevice.getXDevice(), new XlinkTaskCallback<List<XLinkDataPoint>>() {
-                @Override
-                public void onError(String error) {
-                    Log.e(TAG, "onError: getMetaDatapoints- " + error );
-                }
-
-                @Override
-                public void onStart() {
-
-                }
-
-                @Override
-                public void onComplete(List<XLinkDataPoint> dataPoints) {
-                    Log.e(TAG, "onComplete: getMetaDatapoints");
-                    device.setDataPointList(dataPoints);
-                    mDevice.setDataPointList(dataPoints);
-                    mHandler.postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            mDeviceViewModel.getDatapoints();
-                        }
-                    }, 1000);
-                }
-            });
+        if (intent == null) {
+            return;
         }
+        String deviceTag = intent.getStringExtra(AppConstants.DEVICE_TAG);
+        final Device device = DeviceManager.getInstance().getDevice(deviceTag);
+        if (device == null) {
+            return;
+        }
+        mDeviceBaseViewModel = ViewModelProviders.of(this).get(BaseViewModel.class);
+        mDeviceBaseViewModel.setData(device);
+
+        String pid = device.getXDevice().getProductId();
+        String name = device.getXDevice().getDeviceName();
+        device_toolbar.setTitle(TextUtils.isEmpty(name) ? DeviceUtil.getDefaultName(pid) : name);
+//            device_toolbar.setLogo(DeviceUtil.getProductIcon(pid));
+        setSupportActionBar(device_toolbar);
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+
+        if (TextUtils.equals(pid, XlinkConstants.PRODUCT_ID_LEDSTRIP)) {
+            mDevice = new EXOLedstrip(device);
+            mDeviceViewModel = ViewModelProviders.of(this).get(LightViewModel.class);
+            mDeviceViewModel.setData(mDevice);
+            transaction.replace(R.id.device_fl_show, new LightFragment()).commit();
+        } else if (TextUtils.equals(pid, XlinkConstants.PRODUCT_ID_MONSOON)) {
+            mDevice = new EXOMonsoon(device);
+            mDeviceViewModel = ViewModelProviders.of(this).get(MonsoonViewModel.class);
+            mDeviceViewModel.setData(mDevice);
+            transaction.replace(R.id.device_fl_show, new MonsoonFragment()).commit();
+        } else if (TextUtils.equals(pid, XlinkConstants.PRODUCT_ID_SOCKET)) {
+            mDevice = new EXOSocket(device);
+            mDeviceViewModel = ViewModelProviders.of(this).get(SocketViewModel.class);
+            mDeviceViewModel.setData(mDevice);
+            transaction.replace(R.id.device_fl_show, new SocketFragment()).commit();
+        } else {
+            throw new RuntimeException("Invalid ProductID.");
+        }
+        XLinkDeviceManager.getInstance().addDeviceConnectionFlags(mDevice.getXDevice().getDeviceTag(), 1);
+        XLinkDeviceManager.getInstance().connectDeviceLocal(mDevice.getXDevice().getDeviceTag());
+        EventBus.getDefault().register(this);
+
+        mSetCallback = new XlinkTaskCallback<XDevice>() {
+            @Override
+            public void onError(String error) {
+                Log.e(TAG, "onError: setDataPointError - " + error);
+            }
+
+            @Override
+            public void onStart() {
+                Log.e(TAG, "onStart: setDataPointStart");
+            }
+
+            @Override
+            public void onComplete(XDevice xDevice) {
+                Log.e(TAG, "onComplete: setDataPointComplete");
+            }
+        };
+        mGetCallback = new XlinkTaskCallback<List<XLinkDataPoint>>() {
+            @Override
+            public void onError(String error) {
+                Log.e(TAG, "onError: getDataPoints- " + error );
+            }
+
+            @Override
+            public void onStart() {
+
+            }
+
+            @Override
+            public void onComplete(List<XLinkDataPoint> dataPoints) {
+                Log.e(TAG, "onComplete: getDataPoints");
+                Collections.sort(dataPoints, new Comparator<XLinkDataPoint>() {
+                    @Override
+                    public int compare(XLinkDataPoint o1, XLinkDataPoint o2) {
+                        return o1.getIndex() - o2.getIndex();
+                    }
+                });
+                StringBuilder sb = new StringBuilder();
+                for (XLinkDataPoint dp : dataPoints) {
+                    device.setDataPoint(dp);
+                    mDevice.setDataPoint(dp);
+                    sb.append(dp.getIndex()).append(" ")
+                      .append(dp.getName()).append(" ")
+                      .append(dp.getType()).append(" ")
+                      .append(dp.getValue()).append("\n");
+                }
+                mDeviceViewModel.postValue();
+                LogUtil.e(TAG, "onComplete: " + dataPoints.size() + "\n" + sb);
+            }
+        };
+        mDeviceViewModel.setGetCallback(mGetCallback);
+        mDeviceViewModel.setSetCallback(mSetCallback);
+
+        XlinkCloudManager.getInstance().getDeviceMetaDatapoints(mDevice.getXDevice(), new XlinkTaskCallback<List<XLinkDataPoint>>() {
+            @Override
+            public void onError(String error) {
+                Log.e(TAG, "onError: getMetaDatapoints- " + error );
+            }
+
+            @Override
+            public void onStart() {
+
+            }
+
+            @Override
+            public void onComplete(List<XLinkDataPoint> dataPoints) {
+                Log.e(TAG, "onComplete: getMetaDatapoints");
+                device.setDataPointList(dataPoints);
+                mDevice.setDataPointList(dataPoints);
+                mHandler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        mDeviceViewModel.getDatapoints();
+                    }
+                }, 1000);
+            }
+        });
     }
 
     @Override
@@ -384,7 +410,6 @@ public class DeviceActivity extends BaseActivity {
                 });
             }
         });
-//        dialog.show();
     }
 
     private boolean gotoDeviceSetFragment() {
@@ -439,7 +464,7 @@ public class DeviceActivity extends BaseActivity {
     }
 
     private void shareDevice(@NonNull String email) {
-        XlinkCloudManager.getInstance().shareDevice(mDevice.getXDevice(), email, 7200, new XlinkTaskCallback<DeviceApi.ShareDeviceResponse>() {
+        XlinkCloudManager.getInstance().shareDevice(mDevice.getXDevice(), email, new XlinkTaskCallback<DeviceApi.ShareDeviceResponse>() {
             @Override
             public void onError(String error) {
                 Toast.makeText(DeviceActivity.this, error, Toast.LENGTH_SHORT)
@@ -452,7 +477,7 @@ public class DeviceActivity extends BaseActivity {
             }
 
             @Override
-            public void onComplete(DeviceApi.ShareDeviceResponse shareDeviceResponse) {
+            public void onComplete(DeviceApi.ShareDeviceResponse response) {
                 Toast.makeText(DeviceActivity.this, "Share Success.", Toast.LENGTH_SHORT)
                      .show();
             }
@@ -460,9 +485,9 @@ public class DeviceActivity extends BaseActivity {
     }
 
     private void showShareDeviceDialog() {
-        View view = LayoutInflater.from(DeviceActivity.this).inflate(R.layout.dialog_share_device, null, false);
-        final TextInputLayout til = view.findViewById(R.id.dialog_share_device_til);
-        final TextInputEditText et_email = view.findViewById(R.id.dialog_share_device_email);
+        View view = LayoutInflater.from(DeviceActivity.this).inflate(R.layout.dialog_share, null, false);
+        final TextInputLayout til = view.findViewById(R.id.dialog_share_til);
+        final TextInputEditText et_email = view.findViewById(R.id.dialog_share_email);
         AlertDialog.Builder builder = new AlertDialog.Builder(DeviceActivity.this);
         final AlertDialog dialog = builder.setTitle(R.string.share_device)
                                           .setView(view)

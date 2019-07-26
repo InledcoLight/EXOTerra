@@ -5,8 +5,6 @@ import com.liruya.exoterra.AppConstants;
 import java.util.ArrayList;
 import java.util.List;
 
-import cn.xlink.restful.api.app.DeviceApi;
-import cn.xlink.sdk.common.ByteUtil;
 import cn.xlink.sdk.core.model.XLinkDataPoint;
 
 public class EXOMonsoon extends Device {
@@ -126,7 +124,7 @@ public class EXOMonsoon extends Device {
         return results;
     }
 
-    public XLinkDataPoint setCustomActions1(List<Byte> actions) {
+    public XLinkDataPoint setCustomActions(List<Byte> actions) {
         if (actions == null || actions.size() > CUSTOM_ACTIONS_MAX) {
             return null;
         }
@@ -137,19 +135,19 @@ public class EXOMonsoon extends Device {
         return setByteArray(INDEX_CUSTOM_ACTIONS, values);
     }
 
-    public DeviceApi.DeviceDataPointRequest.Command setCustomActions(List<Byte> actions) {
-        if (actions != null && actions.size() <= CUSTOM_ACTIONS_MAX) {
-            byte[] values = new byte[actions.size()];
-            for (int i = 0; i < actions.size(); i++) {
-                values[i] = actions.get(i);
-            }
-            DeviceApi.DeviceDataPointRequest.Command cmd = new DeviceApi.DeviceDataPointRequest.Command<>();
-            cmd.index = INDEX_CUSTOM_ACTIONS;
-            cmd.value = ByteUtil.bytesToHex(values);            //字节数组需要转换为字符串
-            return cmd;
-        }
-        return null;
-    }
+//    public DeviceApi.DeviceDataPointRequest.Command setCustomActions(List<Byte> actions) {
+//        if (actions != null && actions.size() <= CUSTOM_ACTIONS_MAX) {
+//            byte[] values = new byte[actions.size()];
+//            for (int i = 0; i < actions.size(); i++) {
+//                values[i] = actions.get(i);
+//            }
+//            DeviceApi.DeviceDataPointRequest.Command cmd = new DeviceApi.DeviceDataPointRequest.Command<>();
+//            cmd.index = INDEX_CUSTOM_ACTIONS;
+//            cmd.value = ByteUtil.bytesToHex(values);            //字节数组需要转换为字符串
+//            return cmd;
+//        }
+//        return null;
+//    }
 
     public EXOMonsoonTimer getTimer(int idx) {
         if (idx < 0 || idx >= TIMER_COUNT_MAX) {

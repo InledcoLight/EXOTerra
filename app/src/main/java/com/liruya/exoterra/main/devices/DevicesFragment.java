@@ -4,24 +4,26 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
+import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.liruya.base.BaseFragment;
 import com.liruya.exoterra.R;
+import com.liruya.exoterra.adddevice.AddDeviceActivity;
 import com.liruya.exoterra.bean.Device;
 import com.liruya.exoterra.device.DeviceActivity;
 import com.liruya.exoterra.event.SubscribeChangedEvent;
 import com.liruya.exoterra.manager.DeviceManager;
-import com.liruya.exoterra.xlink.XlinkCloudManager;
-import com.liruya.swiperecyclerview.OnSwipeItemClickListener;
-import com.liruya.swiperecyclerview.OnSwipeItemTouchListener;
+import com.liruya.exoterra.scan.ScanActivity;
+import com.liruya.exoterra.smartconfig.SmartconfigActivity;
+import com.liruya.exoterra.xlink.XlinkTaskCallback;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -29,14 +31,11 @@ import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.List;
 
-import cn.xlink.sdk.core.XLinkCoreException;
-import cn.xlink.sdk.v5.listener.XLinkTaskListener;
-
 public class DevicesFragment extends BaseFragment {
-    private ProgressBar devices_progress;
+    private Toolbar devices_toolbar;
+    private SwipeRefreshLayout devices_swipe_refresh;
     private RecyclerView devices_rv_show;
 
-    private final OnSwipeItemTouchListener mSwipeItemTouchListener = new OnSwipeItemTouchListener();
     private final List<Device> mSubscribedDevices = DeviceManager.getInstance().getAllDevices();
     private DevicesAdapter mAdapter;
 
@@ -72,78 +71,78 @@ public class DevicesFragment extends BaseFragment {
 
     @Override
     protected void initView(View view) {
-        devices_progress = view.findViewById(R.id.devices_progress);
+        devices_toolbar = view.findViewById(R.id.devices_toolbar);
+        devices_swipe_refresh = view.findViewById(R.id.devices_swipe_refresh);
         devices_rv_show = view.findViewById(R.id.devices_rv_show);
+
+        devices_toolbar.inflateMenu(R.menu.menu_devices);
         devices_rv_show.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL));
-        devices_rv_show.addOnItemTouchListener(mSwipeItemTouchListener);
     }
 
     @Override
     protected void initData() {
-        mAdapter = new DevicesAdapter(getContext(), mSubscribedDevices);
-        mAdapter.setOnSwipeItemClickListener(new OnSwipeItemClickListener() {
+        mAdapter = new DevicesAdapter(getContext(), mSubscribedDevices) {
             @Override
-            public void onContentClick(int position) {
+            protected void onItemClick(int position) {
                 String deviceTag = mSubscribedDevices.get(position).getDeviceTag();
                 gotoDeviceActivity(deviceTag);
             }
 
             @Override
-            public void onActionClick(final int position, int actionid) {
-                final Device device = mSubscribedDevices.get(position);
-                switch (actionid) {
-                    case R.id.item_device_unsubsribe:
-                        XlinkCloudManager.getInstance().unsubscribeDevice(device.getXDevice(), new XLinkTaskListener<String>() {
-                            @Override
-                            public void onError(XLinkCoreException e) {
-                                Toast.makeText(getContext(), "Unsubscribe failed", Toast.LENGTH_LONG)
-                                     .show();
-                            }
-
-                            @Override
-                            public void onStart() {
-
-                            }
-
-                            @Override
-                            public void onComplete(String s) {
-                                Toast.makeText(getContext(), "Unsubscribe success", Toast.LENGTH_LONG)
-                                     .show();
-                                DeviceManager.getInstance().removeDevice(device);
-                                mSwipeItemTouchListener.close();
-                                mSubscribedDevices.remove(position);
-                                mAdapter.notifyItemRemoved(position);
-                            }
-                        });
-                        break;
-                }
+            protected boolean onItemLongClick(int position) {
+                return false;
             }
-        });
+        };
         devices_rv_show.setAdapter(mAdapter);
         refreshSubcribeDevices();
     }
 
     @Override
     protected void initEvent() {
-
+        devices_toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem menuItem) {
+                switch (menuItem.getItemId()) {
+                    case R.id.menu_devices_smartconfig:
+                        startSmartconfigActivity();
+                        break;
+                    case R.id.menu_devices_scan:
+                        startScanActivity();
+                        break;
+                    case R.id.menu_devices_add:
+                        startAdddeviceActivity();
+                        break;
+                }
+                return true;
+            }
+        });
+        devices_swipe_refresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                refreshSubcribeDevices();
+            }
+        });
     }
 
     private void refreshSubcribeDevices() {
-        DeviceManager.getInstance().refreshSubcribeDevices(new XLinkTaskListener<List<Device>>() {
+        DeviceManager.getInstance().refreshSubcribeDevices(new XlinkTaskCallback<List<Device>>() {
             @Override
-            public void onError(XLinkCoreException e) {
-                Log.e(TAG, "onError: " + e.getErrorName());
-                devices_progress.setVisibility(View.INVISIBLE);
+            public void onError(String error) {
+                Toast.makeText(getContext(), error, Toast.LENGTH_SHORT)
+                     .show();
+                devices_swipe_refresh.setRefreshing(false);
             }
 
             @Override
             public void onStart() {
-                devices_progress.setVisibility(View.VISIBLE);
+                if (devices_swipe_refresh.isRefreshing() == false) {
+                    devices_swipe_refresh.setRefreshing(true);
+                }
             }
 
             @Override
             public void onComplete(List<Device> devices) {
-                devices_progress.setVisibility(View.INVISIBLE);
+                devices_swipe_refresh.setRefreshing(false);
                 mSubscribedDevices.clear();
                 mSubscribedDevices.addAll(devices);
                 mAdapter.notifyDataSetChanged();
@@ -154,6 +153,21 @@ public class DevicesFragment extends BaseFragment {
     private void gotoDeviceActivity(String deviceTag) {
         Intent intent = new Intent(getContext(), DeviceActivity.class);
         intent.putExtra("device_tag", deviceTag);
+        startActivity(intent);
+    }
+
+    private void startSmartconfigActivity() {
+        Intent intent = new Intent(getContext(), SmartconfigActivity.class);
+        startActivity(intent);
+    }
+
+    private void startScanActivity() {
+        Intent intent = new Intent(getContext(), ScanActivity.class);
+        startActivity(intent);
+    }
+
+    private void startAdddeviceActivity() {
+        Intent intent = new Intent(getContext(), AddDeviceActivity.class);
         startActivity(intent);
     }
 }

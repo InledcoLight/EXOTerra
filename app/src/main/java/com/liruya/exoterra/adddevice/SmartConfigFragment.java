@@ -49,6 +49,30 @@ public class SmartConfigFragment extends BaseFragment {
         }
 
         @Override
+        public void onError(final String error) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    smart_config_start.setChecked(false);
+                    smart_config_start.setEnabled(true);
+                    showSmartConfigFailedDialog(error);
+                }
+            });
+        }
+
+        @Override
+        public void onSuccess() {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    smart_config_start.setChecked(false);
+                    smart_config_start.setEnabled(true);
+                    showSmartConfigSuccessDialog();
+                }
+            });
+        }
+
+        @Override
         public void onEsptouchFailed() {
             runOnUiThread(new Runnable() {
                 @Override
@@ -214,7 +238,7 @@ public class SmartConfigFragment extends BaseFragment {
         ConnectNetBean bean = mConnectNetViewModel.getData();
         String pid = bean.getProductId();
         String ssid = bean.getSsid();
-        String gateway = bean.getGateway();
+        String gateway = bean.getBssid();
         String psw = bean.getPassword();
         mSmartConfigLinker = new SmartConfigLinker((AppCompatActivity) getActivity(), pid, ssid, gateway, psw);
         mSmartConfigLinker.setSmartConfigListener(mSmartConfigListener);
@@ -238,9 +262,9 @@ public class SmartConfigFragment extends BaseFragment {
                     smart_config_cib_step3.setChecked(false);
                     smart_config_cib_step4.setChecked(false);
                     smart_config_cib_step5.setChecked(false);
-                    mSmartConfigLinker.start();
+                    mSmartConfigLinker.startTask();
                 } else {
-                    mSmartConfigLinker.stop();
+                    mSmartConfigLinker.stopTask();
                 }
                 mConnectNetViewModel.getData().setRunning(isChecked);
                 mConnectNetViewModel.postValue();

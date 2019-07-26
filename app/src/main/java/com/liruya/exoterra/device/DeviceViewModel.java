@@ -45,8 +45,8 @@ public class DeviceViewModel<T extends Device> extends BaseViewModel<T> {
 //                }
 //
 //                @Override
-//                public void onSuccess(String s) {
-//                    Log.e(TAG, "onSuccess: " + s);
+//                public void onSubscribeSuccess(String s) {
+//                    Log.e(TAG, "onSubscribeSuccess: " + s);
 //                    if (mSetCallback != null) {
 //                        mSetCallback.onComplete(getData().getXDevice());
 //                    }
@@ -74,7 +74,7 @@ public class DeviceViewModel<T extends Device> extends BaseViewModel<T> {
 //                }
 //
 //                @Override
-//                public void onSuccess(String s) {
+//                public void onSubscribeSuccess(String s) {
 //                    if (mSetCallback != null) {
 //                        mSetCallback.onComplete(getData().getXDevice());
 //                    }

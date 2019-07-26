@@ -1,9 +1,12 @@
 package com.liruya.exoterra.manager;
 
+import android.support.annotation.NonNull;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.liruya.exoterra.bean.Device;
 import com.liruya.exoterra.xlink.XlinkCloudManager;
+import com.liruya.exoterra.xlink.XlinkTaskCallback;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -12,14 +15,12 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import cn.xlink.sdk.core.XLinkCoreException;
-import cn.xlink.sdk.v5.listener.XLinkTaskListener;
 import cn.xlink.sdk.v5.model.XDevice;
 
 public class DeviceManager {
     private static final String TAG = "DeviceManager";
 
-    private Map<String, Device> mSubcribedDevices;
+    private final Map<String, Device> mSubcribedDevices;
 
     private DeviceManager() {
         mSubcribedDevices = new ConcurrentHashMap<>();
@@ -29,9 +30,13 @@ public class DeviceManager {
         return LazyHolder.INSTANCE;
     }
 
+    public String getDeviceTag(@NonNull XDevice xDevice) {
+        return xDevice.getProductId() + "_" +xDevice.getMacAddress();
+    }
+
     public void addDevice(XDevice xDevice) {
         if (xDevice != null) {
-            String key = xDevice.getDeviceTag();
+            String key = getDeviceTag(xDevice);
             if (!TextUtils.isEmpty(key)) {
                 mSubcribedDevices.put(key, new Device(xDevice));
             }
@@ -54,7 +59,7 @@ public class DeviceManager {
 
     public void removeDevice(XDevice xDevice) {
         if (xDevice != null) {
-            String key = xDevice.getDeviceTag();
+            String key = getDeviceTag(xDevice);
             removeDevice(key);
         }
     }
@@ -78,7 +83,7 @@ public class DeviceManager {
 
     public boolean contains(XDevice xDevice) {
         if (xDevice != null) {
-            String key = xDevice.getDeviceTag();
+            String key = getDeviceTag(xDevice);
             return contains(key);
         }
         return false;
@@ -100,8 +105,17 @@ public class DeviceManager {
 
     public Device getDevice(XDevice xDevice) {
         if (xDevice != null) {
-            String key = xDevice.getDeviceTag();
+            String key = getDeviceTag(xDevice);
             return getDevice(key);
+        }
+        return null;
+    }
+
+    public Device getDeviceBySN(@NonNull final String sn) {
+        for (Device device : mSubcribedDevices.values()) {
+            if (sn.equals(device.getXDevice().getSN())) {
+                return device;
+            }
         }
         return null;
     }
@@ -115,6 +129,7 @@ public class DeviceManager {
     }
 
     public void updateDevice(XDevice xDevice) {
+        Log.e(TAG, "updateDevice: ");
         Device device = getDevice(xDevice);
         if (device == null) {
             addDevice(xDevice);
@@ -123,12 +138,13 @@ public class DeviceManager {
         }
     }
 
-    public void refreshSubcribeDevices(final XLinkTaskListener<List<Device>> listener) {
-        XlinkCloudManager.getInstance().syncSubscribedDevices(new XLinkTaskListener<List<XDevice>>() {
+    public void refreshSubcribeDevices(final XlinkTaskCallback<List<Device>> listener) {
+        Log.e(TAG, "refreshSubcribeDevices: ");
+        XlinkCloudManager.getInstance().syncSubscribedDevices(new XlinkTaskCallback<List<XDevice>>() {
             @Override
-            public void onError(XLinkCoreException e) {
+            public void onError(String error) {
                 if (listener != null) {
-                    listener.onError(e);
+                    listener.onError(error);
                 }
             }
 
@@ -149,7 +165,7 @@ public class DeviceManager {
                     Set<String> keys = new HashSet<>();
                     for (XDevice xDevice : xDevices) {
                         if (xDevice != null) {
-                            keys.add(xDevice.getDeviceTag());
+                            keys.add(getDeviceTag(xDevice));
                             updateDevice(xDevice);
                         }
                     }

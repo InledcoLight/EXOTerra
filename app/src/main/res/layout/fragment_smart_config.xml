@@ -3,8 +3,23 @@
                                              xmlns:app="http://schemas.android.com/apk/res-auto"
                                              xmlns:tools="http://schemas.android.com/tools"
                                              android:clickable="true"
+                                             android:background="@color/colorPrimaryDark"
                                              android:layout_width="match_parent"
                                              android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/smart_config_title"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:padding="8dp"
+        android:text="@string/smartconfig"
+        android:textSize="24sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
 
     <com.github.lzyzsd.circleprogress.DonutProgress
         android:id="@+id/smart_config_pb"
@@ -13,20 +28,20 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
-        app:donut_max="100"
-        app:donut_progress="0"
-        app:donut_finished_stroke_width="4dp"
-        app:donut_unfinished_stroke_width="4dp"
-        app:donut_unfinished_color="@color/colorGray"
+        app:donut_circle_starting_degree="270"
         app:donut_finished_color="@color/colorWhite"
-        app:donut_text_color="@color/colorWhite"
+        app:donut_finished_stroke_width="4dp"
+        app:donut_max="100"
         app:donut_prefix_text=""
+        app:donut_progress="0"
         app:donut_suffix_text=" %"
         app:donut_text="0 %"
-        app:donut_circle_starting_degree="270"
+        app:donut_text_color="@color/colorWhite"
+        app:donut_unfinished_color="@color/colorGray"
+        app:donut_unfinished_stroke_width="4dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
+        app:layout_constraintTop_toBottomOf="@+id/smart_config_title"/>
 
     <android.support.design.widget.CheckableImageButton
         android:id="@+id/smart_config_cib_step1"

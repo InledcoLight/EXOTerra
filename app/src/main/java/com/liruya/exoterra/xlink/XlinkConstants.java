@@ -16,4 +16,9 @@ public class XlinkConstants {
     public static final String PRODUCT_ID_LEDSTRIP = "160fa2b85ae803e9160fa2b85ae84e01";
     public static final String PRODUCT_ID_MONSOON = "160fa2b88b1903e9160fa2b88b19a401";
     public static final String PRODUCT_ID_SOCKET = "160fa2b95aac03e9160fa2b95aac5e01";
+
+
+    public static final String LEDSTRIP_AP_SSID = "EXOTerraStrip_XXXXXX";
+    public static final String LEDSOCKET_AP_SSID = "EXOTerraSocket_XXXXXX";
+    public static final String LEDMONSOON_AP_SSID = "EXOTerraMonsoon_XXXXXX";
 }

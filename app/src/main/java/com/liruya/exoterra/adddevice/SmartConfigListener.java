@@ -3,6 +3,10 @@ package com.liruya.exoterra.adddevice;
 public interface SmartConfigListener {
     void onProgressUpdate(int progress);
 
+    void onError(String error);
+
+    void onSuccess();
+
     void onEsptouchFailed();
 
     void onEsptouchSuccess();

@@ -2,6 +2,7 @@
 <android.support.constraint.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:clickable="true"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -25,8 +26,7 @@
             android:paddingLeft="16dp"
             android:paddingRight="16dp"
             android:scaleType="center"
-            android:tint="@color/selector_mode_fg"
-            app:srcCompat="@drawable/ic_slider_white_32dp"/>
+            app:srcCompat="@drawable/selector_slider"/>
 
         <android.support.design.widget.CheckableImageButton
             android:id="@+id/light_cib_auto"
@@ -35,8 +35,7 @@
             android:background="@drawable/selector_mode_bg"
             android:paddingLeft="16dp"
             android:paddingRight="16dp"
-            android:tint="@color/selector_mode_fg"
-            app:srcCompat="@drawable/ic_timer_white_32dp"/>
+            app:srcCompat="@drawable/selector_timer"/>
 
         <CheckedTextView
             android:id="@+id/light_ctv_pro"

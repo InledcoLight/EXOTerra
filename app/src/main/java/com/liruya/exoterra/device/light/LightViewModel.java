@@ -27,7 +27,8 @@ public class LightViewModel extends DeviceViewModel<EXOLedstrip> {
     }
 
     public void setCustomBrights(final int idx, byte[] brights) {
-        setApplicationSetDatapoint(getData().setCustomBrights(idx, brights));
+//        setApplicationSetDatapoint(getData().setCustomBrights(idx, brights));
+        setDeviceDatapoint(getData().setCustomBrights(idx, brights));
     }
 
     public void setGisEnable(boolean enable) {

@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.location.LocationManager;
+import android.net.DhcpInfo;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Build;
@@ -34,11 +35,10 @@ public class ConnectNetFragment extends BaseFragment {
     private TextInputLayout connect_net_tl2;
     private TextInputEditText connect_net_password;
     private ImageButton connect_net_change;
-    private Button connect_net_next;
+    private Button connect_net_smartconfig;
+    private Button connect_net_apconfig;
 
     private WifiHelper mWifiHelper;
-    private String mSsid;
-    private String mAddress;
     private ConnectNetViewModel mConnectNetViewModel;
 
     private boolean mRegistered;
@@ -53,10 +53,10 @@ public class ConnectNetFragment extends BaseFragment {
             if (wifiManager != null) {
                 switch (action) {
                     case WifiManager.NETWORK_STATE_CHANGED_ACTION:
-                        onWiFiChanged(wifiManager.getConnectionInfo());
+                        onWiFiChanged(wifiManager.getConnectionInfo(), wifiManager.getDhcpInfo());
                         break;
                     case LocationManager.PROVIDERS_CHANGED_ACTION:
-                        onWiFiChanged(wifiManager.getConnectionInfo());
+                        onWiFiChanged(wifiManager.getConnectionInfo(), wifiManager.getDhcpInfo());
                         onLocationChanged();
                         break;
                 }
@@ -93,7 +93,8 @@ public class ConnectNetFragment extends BaseFragment {
         connect_net_tl2 = view.findViewById(R.id.connect_net_tl2);
         connect_net_password = view.findViewById(R.id.connect_net_password);
         connect_net_change = view.findViewById(R.id.connect_net_change);
-        connect_net_next = view.findViewById(R.id.connect_net_next);
+        connect_net_smartconfig = view.findViewById(R.id.connect_net_smartconfig);
+        connect_net_apconfig = view.findViewById(R.id.connect_net_apconfig);
     }
 
     @Override
@@ -111,19 +112,36 @@ public class ConnectNetFragment extends BaseFragment {
             }
         });
 
-        connect_net_next.setOnClickListener(new View.OnClickListener() {
+        connect_net_smartconfig.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mConnectNetViewModel.getData().setSsid(mSsid);
-                mConnectNetViewModel.getData().setGateway(mWifiHelper.getGatewayMacAddress());
+                mConnectNetViewModel.getData().setSsid(getSsid());
+                mConnectNetViewModel.getData().setBssid(mWifiHelper.getGatewayMacAddress());
                 mConnectNetViewModel.getData().setPassword(getPassword());
                 getActivity().getSupportFragmentManager()
                              .beginTransaction()
-                             .add(R.id.adddevice_fl, new ConfigNetFragment())
+                             .add(R.id.adddevice_fl, new SmartConfigFragment())
                              .addToBackStack("")
                              .commit();
             }
         });
+        connect_net_apconfig.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mConnectNetViewModel.getData().setSsid(getSsid());
+                mConnectNetViewModel.getData().setBssid(mWifiHelper.getGatewayMacAddress());
+                mConnectNetViewModel.getData().setPassword(getPassword());
+                getActivity().getSupportFragmentManager()
+                             .beginTransaction()
+                             .add(R.id.adddevice_fl, new APConfigGuideFragment())
+                             .addToBackStack("")
+                             .commit();
+            }
+        });
+    }
+
+    private String getSsid() {
+        return connect_net_router.getText().toString();
     }
 
     private String getPassword() {
@@ -146,12 +164,12 @@ public class ConnectNetFragment extends BaseFragment {
         }
     }
 
-    private void onWiFiChanged(WifiInfo wifiInfo) {
+    private void onWiFiChanged(WifiInfo wifiInfo, DhcpInfo dhcpInfo) {
         if (wifiInfo == null) {
             return;
         }
         String ssid = wifiInfo.getSSID();
-        Log.e(TAG, "onWiFiChanged: " + ssid + "  " + wifiInfo.getBSSID());
+        Log.e(TAG, "onWiFiChanged: " + ssid + "  " + wifiInfo.getBSSID() + (dhcpInfo==null?"dhcpinfo=null":dhcpInfo.toString()));
         if (ssid.length() >= 2 && ssid.startsWith("\"") && ssid.endsWith("\"")) {
             ssid = ssid.substring(1, ssid.length() - 1);
         }
@@ -160,17 +178,29 @@ public class ConnectNetFragment extends BaseFragment {
         if (connected) {
             if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP && wifiInfo.getFrequency() > 4900 && wifiInfo.getFrequency() < 5900) {
                 connect_net_tl1.setError(getString(R.string.warn_device_donot_support_5g));
-                connect_net_next.setEnabled(false);
+                connect_net_smartconfig.setEnabled(false);
+                connect_net_apconfig.setEnabled(false);
             } else {
-                mSsid = ssid;
                 connect_net_tl1.setError(null);
                 connect_net_password.requestFocus();
-                connect_net_next.setEnabled(true);
+                connect_net_smartconfig.setEnabled(true);
+                connect_net_apconfig.setEnabled(true);
             }
         } else {
             connect_net_tl1.setError("Please connect router.");
-            connect_net_next.setEnabled(false);
+            connect_net_smartconfig.setEnabled(false);
+            connect_net_apconfig.setEnabled(false);
         }
+        boolean conflict = false;
+        if (dhcpInfo != null) {
+            int gw1 = dhcpInfo.gateway&0xFF;
+            int gw2 = (dhcpInfo.gateway&0xFF00)>>8;
+            int gw3 = (dhcpInfo.gateway&0xFF0000)>>16;
+            if (gw1 == 192 && gw2 == 168 && gw3 == 4) {
+                conflict = true;
+            }
+        }
+        mConnectNetViewModel.getData().setConflict(conflict);
     }
 
     private void onLocationChanged() {

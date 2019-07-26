@@ -39,7 +39,8 @@ public class Device {
     }
 
     public String getDeviceTag() {
-        return mXDevice.getDeviceTag();
+//        return mXDevice.getDeviceTag();
+        return mXDevice.getProductId() + "_" + mXDevice.getMacAddress();
     }
 
     public List<XLinkDataPoint> getDataPointList() {

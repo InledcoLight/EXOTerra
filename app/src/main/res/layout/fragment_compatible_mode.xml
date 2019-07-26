@@ -1,15 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
                                              xmlns:tools="http://schemas.android.com/tools"
+                                             xmlns:app="http://schemas.android.com/apk/res-auto"
                                              android:clickable="true"
+                                             android:background="@color/colorPrimaryDark"
                                              android:layout_width="match_parent"
                                              android:layout_height="match_parent">
 
     <TextView
+        android:id="@+id/apconfig_title"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:padding="8dp"
+        android:text="@string/compatible_mode"
+        android:textSize="24sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <com.github.lzyzsd.circleprogress.DonutProgress
+        android:id="@+id/apconfig_pb"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Coming soon..."
-        tools:layout_editor_absoluteX="176dp"
-        tools:layout_editor_absoluteY="70dp"
-        android:id="@+id/textView2"/>
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        app:donut_circle_starting_degree="270"
+        app:donut_finished_color="@color/colorWhite"
+        app:donut_finished_stroke_width="4dp"
+        app:donut_max="100"
+        app:donut_prefix_text=""
+        app:donut_progress="0"
+        app:donut_suffix_text=" %"
+        app:donut_text="0 %"
+        app:donut_text_color="@color/colorWhite"
+        app:donut_unfinished_color="@color/colorGray"
+        app:donut_unfinished_stroke_width="4dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/apconfig_title"/>
+
 </android.support.constraint.ConstraintLayout>

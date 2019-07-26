@@ -2,40 +2,41 @@ package com.liruya.exoterra.main.devices;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.liruya.exoterra.R;
 import com.liruya.exoterra.bean.Device;
 import com.liruya.exoterra.util.DeviceUtil;
-import com.liruya.swiperecyclerview.SimpleSwipeAdapter;
-import com.liruya.swiperecyclerview.SwipeLayout;
-import com.liruya.swiperecyclerview.SwipeViewHolder;
 
 import java.util.List;
 
-public class DevicesAdapter extends SimpleSwipeAdapter<Device, DevicesAdapter.DevicesViewHolder> {
+public abstract class DevicesAdapter extends RecyclerView.Adapter<DevicesAdapter.DevicesViewHolder> {
     private final String TAG = "DevicesAdapter";
 
-    public DevicesAdapter(@NonNull Context context, List<Device> list) {
-        super(context, list);
+    private Context mContext;
+    private List<Device> mDevices;
+
+    public DevicesAdapter(@NonNull final Context context, List<Device> devices) {
+        mContext = context;
+        mDevices = devices;
+    }
+
+    @NonNull
+    @Override
+    public DevicesViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
+        DevicesViewHolder holder = new DevicesViewHolder(LayoutInflater.from(mContext).inflate(R.layout.item_device_content, viewGroup, false));
+        return holder;
     }
 
     @Override
-    protected int getLayoutResID(int viewType) {
-        return R.layout.item_device;
-    }
-
-    @Override
-    protected DevicesViewHolder onCreateSwipeViewHolder(SwipeLayout swipeLayout) {
-        return new DevicesViewHolder(swipeLayout);
-    }
-
-    @Override
-    protected void onBindSwipeViewHolder(@NonNull DevicesViewHolder holder, int position) {
-        Device device = getItem(position);
+    public void onBindViewHolder(@NonNull final DevicesViewHolder holder, int i) {
+        Device device = mDevices.get(i);
         String pid = device.getXDevice().getProductId();
         String name = device.getXDevice().getDeviceName();
         String mac = device.getXDevice().getMacAddress();
@@ -43,24 +44,42 @@ public class DevicesAdapter extends SimpleSwipeAdapter<Device, DevicesAdapter.De
         holder.tv_name.setText(TextUtils.isEmpty(name) ? DeviceUtil.getDefaultName(pid) : name);
         holder.tv_product.setText(DeviceUtil.getProductType(pid));
         holder.tv_desc.setText(mac);
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onItemClick(holder.getAdapterPosition());
+            }
+        });
+        holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                return onItemLongClick(holder.getAdapterPosition());
+            }
+        });
     }
 
-    public class DevicesViewHolder extends SwipeViewHolder {
+    @Override
+    public int getItemCount() {
+        return mDevices == null ? 0 : mDevices.size();
+    }
+
+    protected abstract void onItemClick(int position);
+
+    protected abstract boolean onItemLongClick(int position);
+
+    public class DevicesViewHolder extends RecyclerView.ViewHolder {
         private ImageView iv_icon;
         private TextView tv_name;
         private TextView tv_product;
         private TextView tv_desc;
 
-        public DevicesViewHolder(@NonNull SwipeLayout itemView) {
+        public DevicesViewHolder(@NonNull View itemView) {
             super(itemView);
 
-            View contentView = getContentView();
-            if (contentView != null) {
-                iv_icon = contentView.findViewById(R.id.item_device_icon);
-                tv_name = contentView.findViewById(R.id.item_device_name);
-                tv_product = contentView.findViewById(R.id.item_device_product);
-                tv_desc = contentView.findViewById(R.id.item_device_desc);
-            }
+            iv_icon = itemView.findViewById(R.id.item_device_icon);
+            tv_name = itemView.findViewById(R.id.item_device_name);
+            tv_product = itemView.findViewById(R.id.item_device_product);
+            tv_desc = itemView.findViewById(R.id.item_device_desc);
         }
     }
 }

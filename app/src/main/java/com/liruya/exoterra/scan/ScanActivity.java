@@ -1,34 +1,43 @@
 package com.liruya.exoterra.scan;
 
+import android.app.ProgressDialog;
+import android.content.Intent;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import com.liruya.base.BaseActivity;
 import com.liruya.exoterra.R;
+import com.liruya.exoterra.device.DeviceActivity;
 import com.liruya.exoterra.manager.DeviceManager;
 import com.liruya.exoterra.xlink.XlinkCloudManager;
 import com.liruya.exoterra.xlink.XlinkConstants;
+import com.liruya.exoterra.xlink.XlinkTaskCallback;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.TimeZone;
 
 import cn.xlink.sdk.core.XLinkCoreException;
+import cn.xlink.sdk.core.model.DataPointValueType;
+import cn.xlink.sdk.core.model.XLinkDataPoint;
 import cn.xlink.sdk.v5.listener.XLinkScanDeviceListener;
 import cn.xlink.sdk.v5.model.XDevice;
-import cn.xlink.sdk.v5.module.connection.XLinkScanDeviceTask;
 
 public class ScanActivity extends BaseActivity {
-    private final int SCAN_DEVICE_TIMEOUT = 30000;
-    private final int SCAN_RETRY_INTERVAL = 2000;
+    private final int SCAN_DEVICE_TIMEOUT = 10000;
+    private final int SCAN_RETRY_INTERVAL = 1000;
 
     private Toolbar scan_toolbar;
     private ToggleButton scan_tb_scan;
@@ -37,9 +46,10 @@ public class ScanActivity extends BaseActivity {
     private Set<String> mSubscribedDevices;
     private List<XDevice> mScannedDevices;
     private ScanAdapter mAdapter;
-    private XLinkScanDeviceTask mScanDeviceTask;
     private XLinkScanDeviceListener mScanDeviceListener;
     private boolean mScanning;
+
+    private ProgressDialog mProgressDialog;
 
     @Override
     protected void onStart() {
@@ -89,13 +99,43 @@ public class ScanActivity extends BaseActivity {
         setSupportActionBar(scan_toolbar);
         scan_rv_show = findViewById(R.id.scan_rv_show);
         scan_rv_show.addItemDecoration(new DividerItemDecoration(ScanActivity.this, DividerItemDecoration.VERTICAL));
+
+        mProgressDialog = new ProgressDialog(ScanActivity.this);
+        mProgressDialog.setCancelable(false);
     }
 
     @Override
     protected void initData() {
         mSubscribedDevices = DeviceManager.getInstance().getAllDeviceAddress();
         mScannedDevices = new ArrayList<>();
-        mAdapter = new ScanAdapter(ScanActivity.this, mScannedDevices, mSubscribedDevices);
+        mAdapter = new ScanAdapter(ScanActivity.this, mScannedDevices, mSubscribedDevices) {
+            @Override
+            public void onItemClick(final XDevice device) {
+                mProgressDialog.show();
+                XlinkCloudManager.getInstance().addDevice(device, 10000, new XlinkTaskCallback<XDevice>() {
+                    @Override
+                    public void onError(String error) {
+                        mProgressDialog.dismiss();
+                        Toast.makeText(ScanActivity.this, error, Toast.LENGTH_SHORT)
+                             .show();
+                    }
+
+                    @Override
+                    public void onStart() {
+
+                    }
+
+                    @Override
+                    public void onComplete(XDevice xDevice) {
+                        mProgressDialog.dismiss();
+                        Intent intent = new Intent(ScanActivity.this, DeviceActivity.class);
+                        intent.putExtra("device_tag", DeviceManager.getInstance().getDeviceTag(device));
+                        startActivity(intent);
+                        finish();
+                    }
+                });
+            }
+        };
         scan_rv_show.setAdapter(mAdapter);
         mScanDeviceListener = new XLinkScanDeviceListener() {
             @Override
@@ -162,10 +202,30 @@ public class ScanActivity extends BaseActivity {
     }
 
     private void stopScan() {
-        if (mScanDeviceTask != null) {
-            mScanDeviceTask.cancel();
-            mScanDeviceTask = null;
-        }
         mScanning = false;
+    }
+
+    private void initZone(@NonNull final XDevice device) {
+        final int rawZone = TimeZone.getDefault().getRawOffset() / 60000;
+        final int zone = (rawZone/60)*100 + (rawZone%60);
+        final List<XLinkDataPoint> dps = new ArrayList<>();
+        final XLinkDataPoint dp1 = new XLinkDataPoint(1, DataPointValueType.SHORT, (short) zone);
+        dps.add(dp1);
+        XlinkCloudManager.getInstance().setDeviceDatapoints(device, dps, new XlinkTaskCallback<XDevice>() {
+            @Override
+            public void onError(String error) {
+                Log.e(TAG, "onError: " + error);
+            }
+
+            @Override
+            public void onStart() {
+
+            }
+
+            @Override
+            public void onComplete(XDevice xDevice) {
+                Log.e(TAG, "onComplete: ");
+            }
+        });
     }
 }

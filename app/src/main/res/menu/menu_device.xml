@@ -14,10 +14,12 @@
     <item
         android:id="@+id/menu_device_rename"
         android:title="@string/rename"
+        android:visible="false"
         app:showAsAction="collapseActionView"/>
     <item
         android:id="@+id/menu_device_datetime"
         android:title="@string/device_datetime"
+        android:visible="false"
         app:showAsAction="collapseActionView"/>
     <item
         android:id="@+id/menu_device_share"
@@ -27,6 +29,11 @@
     <item
         android:id="@+id/menu_device_upgrade"
         android:title="@string/upgrade"
+        android:visible="false"
+        app:showAsAction="collapseActionView"/>
+    <item
+        android:id="@+id/menu_device_detail"
+        android:title="@string/detail"
         app:showAsAction="collapseActionView"/>
 
 </menu>
