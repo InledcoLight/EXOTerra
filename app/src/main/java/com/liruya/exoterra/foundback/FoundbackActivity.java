@@ -3,28 +3,36 @@ package com.liruya.exoterra.foundback;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.Bundle;
 import android.os.CountDownTimer;
-import android.support.design.widget.TextInputEditText;
+import android.support.annotation.Nullable;
+import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AlertDialog;
+import android.text.Editable;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
-import com.liruya.base.BaseActivity;
+import com.liruya.base.BaseImmersiveActivity;
 import com.liruya.exoterra.R;
 import com.liruya.exoterra.util.RegexUtil;
+import com.liruya.exoterra.view.AdvancedTextInputEditText;
 import com.liruya.exoterra.xlink.XlinkCloudManager;
 import com.liruya.exoterra.xlink.XlinkRequestCallback;
 import com.liruya.loaddialog.LoadDialog;
 
-public class FoundbackActivity extends BaseActivity {
+public class FoundbackActivity extends BaseImmersiveActivity {
 
     private final int VERIFY_CODE_SEND_INTERVAL = 120000;
 
-    private TextInputEditText foundback_et_email;
-    private TextInputEditText foundback_et_password;
-    private TextInputEditText foundback_et_verifycode;
+    private TextInputLayout foundback_til_email;
+    private AdvancedTextInputEditText foundback_et_email;
+    private TextInputLayout foundback_til_password;
+    private AdvancedTextInputEditText foundback_et_password;
+    private TextInputLayout foundback_til_verifycode;
+    private AdvancedTextInputEditText foundback_et_verifycode;
     private Button foundback_btn_send;
     private Button foundback_btn_found;
     private LoadDialog mLoadDialog;
@@ -35,8 +43,8 @@ public class FoundbackActivity extends BaseActivity {
     private XlinkRequestCallback<String> mFoundbackPasswordCallback;
 
     @Override
-    protected void onStart() {
-        super.onStart();
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
 
         initData();
         initEvent();
@@ -49,11 +57,18 @@ public class FoundbackActivity extends BaseActivity {
 
     @Override
     protected void initView() {
+        foundback_til_email = findViewById(R.id.foundback_til_email);
         foundback_et_email = findViewById(R.id.foundback_et_email);
+        foundback_til_password = findViewById(R.id.foundback_til_password);
         foundback_et_password = findViewById(R.id.foundback_et_password);
+        foundback_til_verifycode = findViewById(R.id.foundback_til_verifycode);
         foundback_et_verifycode = findViewById(R.id.foundback_et_verifycode);
         foundback_btn_send = findViewById(R.id.foundback_btn_send);
         foundback_btn_found = findViewById(R.id.foundback_btn_found);
+
+        foundback_et_email.bindTextInputLayout(foundback_til_email);
+        foundback_et_verifycode.bindTextInputLayout(foundback_til_verifycode);
+        foundback_et_password.bindTextInputLayout(foundback_til_password);
     }
 
     @Override
@@ -125,6 +140,54 @@ public class FoundbackActivity extends BaseActivity {
 
     @Override
     protected void initEvent() {
+        foundback_et_email.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                foundback_til_email.setError(null);
+            }
+        });
+        foundback_et_password.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                foundback_til_password.setError(null);
+            }
+        });
+        foundback_et_verifycode.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                foundback_til_verifycode.setError(null);
+            }
+        });
         foundback_btn_send.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -133,7 +196,7 @@ public class FoundbackActivity extends BaseActivity {
                     XlinkCloudManager.getInstance()
                                      .requestEmailFoundbackPasswordVerifyCode(email, mRequestVerifycodeCallback);
                 } else {
-                    foundback_et_email.setError(getString(R.string.error_email));
+                    foundback_til_email.setError(getString(R.string.error_email));
                 }
             }
         });
@@ -144,17 +207,17 @@ public class FoundbackActivity extends BaseActivity {
                 String password = getPasswordText();
                 String verifycode = getVerifycodeText();
                 if (!RegexUtil.isEmail(email)) {
-                    foundback_et_email.setError(getString(R.string.error_email));
+                    foundback_til_email.setError(getString(R.string.error_email));
                     foundback_et_email.requestFocus();
                     return;
                 }
                 if (TextUtils.isEmpty(password) || password.length() < 6) {
-                    foundback_et_password.setError(getString(R.string.error_password));
+                    foundback_til_password.setError(getString(R.string.error_password));
                     foundback_et_password.requestFocus();
                     return;
                 }
                 if (TextUtils.isEmpty(verifycode) || verifycode.length() != 6) {
-                    foundback_et_verifycode.setError(getString(R.string.error_verifycode));
+                    foundback_til_verifycode.setError(getString(R.string.error_verifycode));
                     foundback_et_verifycode.requestFocus();
                     return;
                 }

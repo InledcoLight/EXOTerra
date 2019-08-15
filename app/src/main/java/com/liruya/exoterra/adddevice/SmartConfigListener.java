@@ -7,23 +7,9 @@ public interface SmartConfigListener {
 
     void onSuccess();
 
-    void onEsptouchFailed();
-
     void onEsptouchSuccess();
 
-    void onRegisterError(String error);
+    void onDeviceScanned();
 
-    void onRegisterSuccess();
-
-    void onScanError(String error);
-
-    void onScanSuccess();
-
-    void onSubscribeError(String error);
-
-    void onSubscribeSuccess();
-
-    void onInitDeviceError(String error);
-
-    void onInitDeviceSuccess();
+    void onDeviceInitialized();
 }

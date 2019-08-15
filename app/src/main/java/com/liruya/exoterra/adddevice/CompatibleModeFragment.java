@@ -40,7 +40,7 @@ public class CompatibleModeFragment extends BaseFragment {
     public void onDestroyView() {
         super.onDestroyView();
         if (mAPConfigLinker != null) {
-            mAPConfigLinker.stop();
+            mAPConfigLinker.stopTask();
         }
     }
 
@@ -72,12 +72,12 @@ public class CompatibleModeFragment extends BaseFragment {
                 apconfig_pb.setText("" + progress + " %");
             }
 
-            @Override
-            public void onSubscribeFailed(String error) {
-                mConnectNetBean.setRunning(false);
-                mConnectNetViewModel.postValue();
-                showAPConfigFailedDialog(error);
-            }
+//            @Override
+//            public void onSubscribeFailed(String error) {
+//                mConnectNetBean.setRunning(false);
+//                mConnectNetViewModel.postValue();
+//                showAPConfigFailedDialog(error);
+//            }
 
             @Override
             public void onTimeout() {
@@ -92,9 +92,16 @@ public class CompatibleModeFragment extends BaseFragment {
                 mConnectNetViewModel.postValue();
                 showAPConfigSuccessDialog();
             }
+
+            @Override
+            public void onAPConfigFailed(String error) {
+                mConnectNetBean.setRunning(false);
+                mConnectNetViewModel.postValue();
+                showAPConfigFailedDialog(error);
+            }
         };
         mAPConfigLinker.setListener(mListener);
-        mAPConfigLinker.start();
+        mAPConfigLinker.startTask();
     }
 
     @Override

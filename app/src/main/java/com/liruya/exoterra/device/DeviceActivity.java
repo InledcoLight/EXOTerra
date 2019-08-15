@@ -24,7 +24,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
-import com.liruya.base.BaseActivity;
+import com.liruya.base.BaseImmersiveActivity;
 import com.liruya.exoterra.AppConstants;
 import com.liruya.exoterra.BaseViewModel;
 import com.liruya.exoterra.R;
@@ -62,8 +62,9 @@ import cn.xlink.restful.api.app.DeviceApi;
 import cn.xlink.sdk.core.model.XLinkDataPoint;
 import cn.xlink.sdk.v5.manager.XLinkDeviceManager;
 import cn.xlink.sdk.v5.model.XDevice;
+import cn.xlink.sdk.v5.module.main.XLinkSDK;
 
-public class DeviceActivity extends BaseActivity {
+public class DeviceActivity extends BaseImmersiveActivity {
     private Toolbar device_toolbar;
     private CheckableImageButton device_cib_cloud;
     private CheckableImageButton device_cib_wifi;
@@ -178,6 +179,7 @@ public class DeviceActivity extends BaseActivity {
 
     @Override
     protected void initData() {
+        XLinkSDK.start();
         Intent intent = getIntent();
         if (intent == null) {
             return;
@@ -248,53 +250,61 @@ public class DeviceActivity extends BaseActivity {
 
             @Override
             public void onComplete(List<XLinkDataPoint> dataPoints) {
-                Log.e(TAG, "onComplete: getDataPoints");
                 Collections.sort(dataPoints, new Comparator<XLinkDataPoint>() {
                     @Override
                     public int compare(XLinkDataPoint o1, XLinkDataPoint o2) {
                         return o1.getIndex() - o2.getIndex();
                     }
                 });
+                device.setDataPointList(dataPoints);
+                mDevice.setDataPointList(dataPoints);
                 StringBuilder sb = new StringBuilder();
                 for (XLinkDataPoint dp : dataPoints) {
-                    device.setDataPoint(dp);
-                    mDevice.setDataPoint(dp);
+//                    device.setDataPoint(dp);
+//                    mDevice.setDataPoint(dp);
                     sb.append(dp.getIndex()).append(" ")
                       .append(dp.getName()).append(" ")
                       .append(dp.getType()).append(" ")
-                      .append(dp.getValue()).append("\n");
+                      .append(dp.getValue()).append(" ").append(mDevice.getDataPoint(dp.getIndex()).getRawValue()).append("\n");
                 }
                 mDeviceViewModel.postValue();
-                LogUtil.e(TAG, "onComplete: " + dataPoints.size() + "\n" + sb);
+                LogUtil.e(TAG, "onComplete: " + dataPoints.size() + "\n" + sb + "\n" + ((EXOLedstrip) mDevice).getPower() + " " + mDevice.getDataPoint(18).getRawValue());
             }
         };
         mDeviceViewModel.setGetCallback(mGetCallback);
         mDeviceViewModel.setSetCallback(mSetCallback);
 
-        XlinkCloudManager.getInstance().getDeviceMetaDatapoints(mDevice.getXDevice(), new XlinkTaskCallback<List<XLinkDataPoint>>() {
+        mHandler.postDelayed(new Runnable() {
             @Override
-            public void onError(String error) {
-                Log.e(TAG, "onError: getMetaDatapoints- " + error );
+            public void run() {
+                mDeviceViewModel.getDatapoints();
             }
+        }, 500);
 
-            @Override
-            public void onStart() {
-
-            }
-
-            @Override
-            public void onComplete(List<XLinkDataPoint> dataPoints) {
-                Log.e(TAG, "onComplete: getMetaDatapoints");
-                device.setDataPointList(dataPoints);
-                mDevice.setDataPointList(dataPoints);
-                mHandler.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        mDeviceViewModel.getDatapoints();
-                    }
-                }, 1000);
-            }
-        });
+//        XlinkCloudManager.getInstance().getDeviceMetaDatapoints(mDevice.getXDevice(), new XlinkTaskCallback<List<XLinkDataPoint>>() {
+//            @Override
+//            public void onError(String error) {
+//                Log.e(TAG, "onError: getMetaDatapoints- " + error );
+//            }
+//
+//            @Override
+//            public void onStart() {
+//
+//            }
+//
+//            @Override
+//            public void onComplete(List<XLinkDataPoint> dataPoints) {
+//                Log.e(TAG, "onComplete: getMetaDatapoints");
+//                device.setDataPointList(dataPoints);
+//                mDevice.setDataPointList(dataPoints);
+//                mHandler.postDelayed(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        mDeviceViewModel.getDatapoints();
+//                    }
+//                }, 1000);
+//            }
+//        });
     }
 
     @Override

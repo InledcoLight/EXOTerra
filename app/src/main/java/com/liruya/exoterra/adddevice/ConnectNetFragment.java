@@ -22,19 +22,18 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.ImageButton;
 
 import com.liruya.base.BaseFragment;
 import com.liruya.exoterra.R;
 import com.liruya.exoterra.helper.WifiHelper;
+import com.liruya.exoterra.view.AdvancedTextInputEditText;
 
 public class ConnectNetFragment extends BaseFragment {
 
     private TextInputLayout connect_net_tl1;
-    private TextInputEditText connect_net_router;
+    private AdvancedTextInputEditText connect_net_router;
     private TextInputLayout connect_net_tl2;
     private TextInputEditText connect_net_password;
-    private ImageButton connect_net_change;
     private Button connect_net_smartconfig;
     private Button connect_net_apconfig;
 
@@ -92,9 +91,10 @@ public class ConnectNetFragment extends BaseFragment {
         connect_net_router = view.findViewById(R.id.connect_net_router);
         connect_net_tl2 = view.findViewById(R.id.connect_net_tl2);
         connect_net_password = view.findViewById(R.id.connect_net_password);
-        connect_net_change = view.findViewById(R.id.connect_net_change);
         connect_net_smartconfig = view.findViewById(R.id.connect_net_smartconfig);
         connect_net_apconfig = view.findViewById(R.id.connect_net_apconfig);
+
+        connect_net_router.bindTextInputLayout(connect_net_tl1);
     }
 
     @Override
@@ -105,9 +105,9 @@ public class ConnectNetFragment extends BaseFragment {
 
     @Override
     protected void initEvent() {
-        connect_net_change.setOnClickListener(new View.OnClickListener() {
+        connect_net_router.setDrawableRightClickListener(new AdvancedTextInputEditText.DrawableRightClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onDrawableRightClick() {
                 gotoSystemWifiSettings();
             }
         });

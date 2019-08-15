@@ -3,31 +3,35 @@ package com.liruya.exoterra.login;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.support.annotation.Nullable;
-import android.support.design.widget.TextInputEditText;
+import android.support.design.widget.TextInputLayout;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
-import com.liruya.base.BaseActivity;
+import com.liruya.base.BaseImmersiveActivity;
 import com.liruya.exoterra.R;
 import com.liruya.exoterra.foundback.FoundbackActivity;
 import com.liruya.exoterra.main.MainActivity;
 import com.liruya.exoterra.manager.UserManager;
 import com.liruya.exoterra.register.RegisterActivity;
-import com.liruya.exoterra.util.LogUtil;
 import com.liruya.exoterra.util.RegexUtil;
+import com.liruya.exoterra.view.AdvancedTextInputEditText;
 import com.liruya.exoterra.xlink.XlinkCloudManager;
 import com.liruya.loaddialog.LoadDialog;
 
 import cn.xlink.restful.api.app.UserAuthApi;
 import cn.xlink.sdk.core.XLinkCoreException;
 import cn.xlink.sdk.v5.listener.XLinkTaskListener;
+import cn.xlink.sdk.v5.module.main.XLinkSDK;
 
-public class LoginActivity extends BaseActivity {
+public class LoginActivity extends BaseImmersiveActivity {
 
-    private TextInputEditText login_et_email;
-    private TextInputEditText login_et_password;
+    private TextInputLayout login_til_email;
+    private AdvancedTextInputEditText login_et_email;
+    private TextInputLayout login_til_password;
+    private AdvancedTextInputEditText login_et_password;
     private Button login_btn_signin;
     private Button login_btn_forget;
     private Button login_btn_signup;
@@ -63,16 +67,23 @@ public class LoginActivity extends BaseActivity {
 
     @Override
     protected void initView() {
+        login_til_email = findViewById(R.id.login_til_email);
         login_et_email = findViewById(R.id.login_et_email);
+        login_til_password = findViewById(R.id.login_til_password);
         login_et_password = findViewById(R.id.login_et_password);
         login_btn_signin = findViewById(R.id.login_btn_signin);
         login_btn_forget = findViewById(R.id.login_btn_forget);
         login_btn_signup = findViewById(R.id.login_btn_signup);
         login_btn_skip = findViewById(R.id.login_btn_skip);
+
+        login_et_email.bindTextInputLayout(login_til_email);
+        login_et_password.bindTextInputLayout(login_til_password);
     }
 
     @Override
     protected void initData() {
+        XLinkSDK.start();
+
         String email = UserManager.getAccount(this);
         if (TextUtils.isEmpty(email)) {
             login_et_email.requestFocus();
@@ -92,20 +103,22 @@ public class LoginActivity extends BaseActivity {
             @Override
             public void onClick(View v) {
                 final String email = getEmailText();
-                String password = getPasswordText();
+                final String password = getPasswordText();
                 if (!RegexUtil.isEmail(email)) {
-                    login_et_email.setError(getString(R.string.error_email));
+                    login_til_email.setError(getString(R.string.error_email));
                     login_et_email.requestFocus();
                     return;
                 }
                 if (TextUtils.isEmpty(password) || password.length() < 6) {
-                    login_et_password.setError(getString(R.string.error_password));
+                    login_til_password.setError(getString(R.string.error_password));
                     login_et_password.requestFocus();
                     return;
                 }
+                Log.e(TAG, "onClick: login....");
                 XlinkCloudManager.getInstance().login(email, password, 5000, new XLinkTaskListener<UserAuthApi.UserAuthResponse>() {
                     @Override
                     public void onError(XLinkCoreException e) {
+                        Log.e(TAG, "onError: ");
                         Toast.makeText(LoginActivity.this, e.getErrorName(), Toast.LENGTH_SHORT)
                              .show();
                         dismissLoading();
@@ -113,17 +126,19 @@ public class LoginActivity extends BaseActivity {
 
                     @Override
                     public void onStart() {
+                        Log.e(TAG, "onStart: ");
                         showLoading();
                     }
 
                     @Override
-                    public void onComplete(UserAuthApi.UserAuthResponse userAuthResponse) {
-                        LogUtil.d(TAG, "onComplete: ");
+                    public void onComplete(UserAuthApi.UserAuthResponse response) {
+                        Log.e(TAG, "onComplete: ");
                         dismissLoading();
                         UserManager.setAccount(LoginActivity.this, email);
-                        UserManager.setUserId(LoginActivity.this, userAuthResponse.userId);
-                        UserManager.setAuthorize(LoginActivity.this, userAuthResponse.authorize);
-                        UserManager.setRefreshToken(LoginActivity.this, userAuthResponse.refreshToken);
+                        UserManager.setPassword(LoginActivity.this, password);
+                        UserManager.setUserId(LoginActivity.this, response.userId);
+                        UserManager.setAuthorize(LoginActivity.this, response.authorize);
+                        UserManager.setRefreshToken(LoginActivity.this, response.refreshToken);
                         gotoMainActivity();
                     }
                 });

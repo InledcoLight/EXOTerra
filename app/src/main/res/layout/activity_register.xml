@@ -14,67 +14,82 @@
         app:layout_constraintGuide_percent="0.15"/>
 
     <android.support.design.widget.TextInputLayout
-        android:id="@+id/textInputLayout3"
+        android:id="@+id/register_til_email"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
+        android:hint="@string/hint_email"
+        app:errorEnabled="true"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/register_gl1">
 
-        <android.support.design.widget.TextInputEditText
+        <com.liruya.exoterra.view.AdvancedTextInputEditText
             android:id="@+id/register_et_email"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/hint_email"
             android:inputType="textEmailAddress"
             android:maxLength="@integer/email_text_length_max"
             android:maxLines="1"/>
+
     </android.support.design.widget.TextInputLayout>
 
+    <Button
+        android:id="@+id/register_btn_send"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:text="@string/send_verifycode"
+        app:layout_constraintBottom_toBottomOf="@+id/register_til_verifycode"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/register_til_verifycode"/>
+
     <android.support.design.widget.TextInputLayout
-        android:id="@+id/textInputLayout4"
+        android:id="@+id/register_til_verifycode"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
-        android:layout_marginEnd="16dp"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginEnd="8dp"
+        android:hint="@string/hint_verifycode"
+        app:errorEnabled="true"
+        app:layout_constraintEnd_toStartOf="@+id/register_btn_send"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textInputLayout3">
+        app:layout_constraintTop_toBottomOf="@+id/register_til_email">
 
-        <android.support.design.widget.TextInputEditText
-            android:id="@+id/register_et_nickname"
+        <com.liruya.exoterra.view.AdvancedTextInputEditText
+            android:id="@+id/register_et_verifycode"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/hint_nickname"
-            android:inputType="text"
-            android:maxLength="@integer/nickname_text_length_max"
-            android:maxLines="1"/>
+            android:inputType="number"
+            android:maxLines="1"
+            android:maxLength="@integer/verifycode_text_length_max"/>
     </android.support.design.widget.TextInputLayout>
 
     <android.support.design.widget.TextInputLayout
-        android:id="@+id/textInputLayout5"
+        android:id="@+id/register_til_password"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
-        app:passwordToggleEnabled="true"
+        android:hint="@string/hint_password"
+        app:errorEnabled="true"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textInputLayout4">
+        app:layout_constraintTop_toBottomOf="@+id/register_til_verifycode"
+        app:passwordToggleEnabled="true">
 
-        <android.support.design.widget.TextInputEditText
+        <com.liruya.exoterra.view.AdvancedTextInputEditText
             android:id="@+id/register_et_password"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/hint_password"
             android:inputType="textPassword"
             android:maxLength="@integer/password_text_length_max"
-            android:maxLines="1"/>
+            android:maxLines="1"
+            android:singleLine="true"/>
     </android.support.design.widget.TextInputLayout>
 
     <Button
@@ -87,7 +102,7 @@
         android:text="@string/signup"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textInputLayout5"/>
+        app:layout_constraintTop_toBottomOf="@+id/register_til_password"/>
 
     <Button
         android:id="@+id/register_btn_signin"
@@ -100,4 +115,5 @@
         android:textAllCaps="false"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/register_btn_signup"/>
+
 </android.support.constraint.ConstraintLayout>

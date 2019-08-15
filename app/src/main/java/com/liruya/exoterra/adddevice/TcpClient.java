@@ -1,7 +1,5 @@
 package com.liruya.exoterra.adddevice;
 
-import android.os.Handler;
-import android.os.Message;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
@@ -12,85 +10,96 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketException;
 import java.util.Arrays;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
-public class TcpClient {
+public class TcpClient extends BaseClient {
     private static final String TAG = "TcpClient";
 
     private final int TCP_SEND_MAX_LENGTH = 1460;
     private final int TCP_SEND_BUFFER_SIZE = 2048;
     private final int TCP_RECEIVE_BUFFER_SIZE = 2048;
 
-    private final int MSG_TYPE_CONNECTED = 1;
-    private final int MSG_TYPE_DISCONNECTED = 2;
-    private final int MSG_TYPE_ERROR = 3;
-    private final int MSG_TYPE_SEND = 4;
-    private final int MSG_TYPE_RECEIVE = 5;
+    private int mConnectTimeout;
 
-    private final ExecutorService mExecutorService;
     private Socket mSocket;
-    private final int mRemoteIp;
-    private final int mRemotePort;
-    private final int mConnectTimeout;
     private BufferedInputStream mInputStream;
     private BufferedOutputStream mOutputStream;
-    private final byte[] mRxBuffer;
-    private boolean mListening;
-    private TcpClientListener mListener;
-    private final Handler mHandler;
 
     public TcpClient(int remoteIp, int remotePort, int connectTimeout) {
-        if (remotePort < 0 || remotePort > 65535) {
-            throw new RuntimeException("Invalid remote port.");
-        }
-        mRemoteIp = remoteIp;
-        mRemotePort = remotePort;
+        super(remoteIp, remotePort);
         mConnectTimeout = connectTimeout;
-        mRxBuffer = new byte[TCP_RECEIVE_BUFFER_SIZE];
-        mExecutorService = Executors.newCachedThreadPool();
-        mHandler = new Handler() {
-            @Override
-            public void handleMessage(Message msg) {
-                super.handleMessage(msg);
-                if (mListener != null) {
-                    switch (msg.what) {
-                        case MSG_TYPE_CONNECTED:
-                            mListener.onConnected();
-                            break;
-                        case MSG_TYPE_DISCONNECTED:
-                            mListener.onDisconnected();
-                            break;
-                        case MSG_TYPE_ERROR:
-                            mListener.onError((String) msg.obj);
-                            break;
-                        case MSG_TYPE_SEND:
-                            mListener.onSend();
-                            break;
-                        case MSG_TYPE_RECEIVE:
-                            mListener.onReceive((byte[]) msg.obj);
-                            break;
-                    }
-                }
-            }
-        };
     }
 
     public TcpClient(int remoteIp, int remotePort) {
         this(remoteIp, remotePort, 2000);
     }
 
-    public void setListener(TcpClientListener listener) {
-        mListener = listener;
+    public int getConnectTimeout() {
+        return mConnectTimeout;
     }
 
-    public synchronized void disconnect() {
+    public void setConnectTimeout(int connectTimeout) {
+        if (!mListening) {
+            mConnectTimeout = connectTimeout;
+        }
+    }
+
+    @Override
+    protected synchronized void start() {
+        if (mListening) {
+            return;
+        }
         mExecutorService.execute(new Runnable() {
             @Override
             public void run() {
-                if (mListening) {
-                    mListening = false;
-                    try {
+                try {
+                    synchronized (mLock) {
+                        mSocket = new Socket();
+                        mSocket.setTcpNoDelay(true);
+                        mSocket.setKeepAlive(true);
+                        mSocket.setReceiveBufferSize(TCP_RECEIVE_BUFFER_SIZE);
+                        mSocket.setSendBufferSize(TCP_SEND_BUFFER_SIZE);
+                        String remoteIp = ipstr(mRemoteIp);
+                        mSocket.connect(new InetSocketAddress(remoteIp, mRemotePort), mConnectTimeout);
+                        mInputStream = new BufferedInputStream(mSocket.getInputStream());
+                        mOutputStream = new BufferedOutputStream(mSocket.getOutputStream());
+
+                        Thread.sleep(100);
+                        mListening = true;
+                    }
+                    receive();
+                }
+                catch (SocketException e) {
+                    e.printStackTrace();
+                    Log.e(TAG, "run: " + e.getMessage());
+                    if (mListener != null) {
+                        mListener.onError(e.getMessage());
+                    }
+                }
+                catch (IOException e) {
+                    e.printStackTrace();
+                    Log.e(TAG, "run: " + e.getMessage());
+                    if (mListener != null) {
+                        mListener.onError(e.getMessage());
+                    }
+                }
+                catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
+
+    @Override
+    protected synchronized void stop() {
+        if (!mListening) {
+            return;
+        }
+        mExecutorService.execute(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    synchronized (mLock) {
+                        mListening = false;
                         if (mInputStream != null) {
                             mInputStream.close();
                             mInputStream = null;
@@ -102,90 +111,29 @@ public class TcpClient {
                         if (mSocket != null) {
                             mSocket.close();
                             mSocket = null;
-                            mHandler.sendEmptyMessage(MSG_TYPE_DISCONNECTED);
                         }
                     }
-                    catch (IOException e) {
-                        e.printStackTrace();
-                        Log.e(TAG, "run: " + e.getMessage());
+                }
+                catch (IOException e) {
+                    e.printStackTrace();
+                    if (mListener != null) {
+                        mListener.onError(e.getMessage());
                     }
                 }
             }
         });
     }
 
-    public synchronized void connect() {
-        if (mSocket == null) {
-            mSocket = new Socket();
+    @Override
+    protected synchronized void send(@NonNull final byte[] bytes) {
+        if (!mListening || mSocket == null || mSocket.isClosed() || mOutputStream == null || bytes.length == 0) {
+            return;
         }
         mExecutorService.execute(new Runnable() {
             @Override
             public void run() {
                 try {
-                    mSocket.setTcpNoDelay(true);
-                    mSocket.setKeepAlive(true);
-                    mSocket.setReceiveBufferSize(TCP_RECEIVE_BUFFER_SIZE);
-                    mSocket.setSendBufferSize(TCP_SEND_BUFFER_SIZE);
-                    String remoteIp = "" + (mRemoteIp & 0xFF) + "." + ((mRemoteIp & 0xFF00) >> 8) + "." + ((mRemoteIp & 0xFF0000) >> 16) + "." + ((mRemoteIp & 0xFF000000) >> 24);
-                    mSocket.connect(new InetSocketAddress(remoteIp, mRemotePort), mConnectTimeout);
-                    mInputStream = new BufferedInputStream(mSocket.getInputStream());
-                    mOutputStream = new BufferedOutputStream(mSocket.getOutputStream());
-                    mListening = true;
-                    mHandler.sendEmptyMessageDelayed(MSG_TYPE_CONNECTED, 100);
-                    receive();
-                }
-                catch (SocketException e) {
-                    e.printStackTrace();
-                    Log.e(TAG, "run1: " + e.getMessage());
-                    Message msg = new Message();
-                    msg.what = MSG_TYPE_ERROR;
-                    msg.obj = e.getMessage();
-                    mHandler.sendMessage(msg);
-                }
-                catch (IOException e) {
-                    e.printStackTrace();
-                    Log.e(TAG, "run2: " + e.getMessage());
-                    Message msg = new Message();
-                    msg.what = MSG_TYPE_ERROR;
-                    msg.obj = e.getMessage();
-                    mHandler.sendMessage(msg);
-                }
-            }
-        });
-    }
-
-    private void receive() {
-        while (mListening) {
-            try {
-                int len = mInputStream.read(mRxBuffer);
-                if (len > 0) {
-                    byte[] bytes = Arrays.copyOf(mRxBuffer, len);
-                    Message msg = new Message();
-                    msg.what = MSG_TYPE_RECEIVE;
-                    msg.obj = bytes;
-                    mHandler.sendMessage(msg);
-                }
-            }
-            catch (IOException e) {
-                e.printStackTrace();
-                Log.e(TAG, "receive: " + e.getMessage());
-                Message msg = new Message();
-                msg.what = MSG_TYPE_ERROR;
-                msg.obj = e.getMessage();
-                mHandler.sendMessage(msg);
-            }
-        }
-    }
-
-    public synchronized void send(@NonNull final byte[] bytes) {
-        if (mSocket == null || mSocket.isClosed() || mOutputStream == null) {
-            return;
-        }
-        if (bytes.length > 0) {
-            mExecutorService.execute(new Runnable() {
-                @Override
-                public void run() {
-                    try {
+                    synchronized (mLock) {
                         int index = 0;
                         while (index < bytes.length) {
                             int len = bytes.length - index;
@@ -196,34 +144,39 @@ public class TcpClient {
                             mOutputStream.flush();
                             index += len;
                         }
-                        mHandler.sendEmptyMessage(MSG_TYPE_SEND);
-                    }
-                    catch (IOException e) {
-                        e.printStackTrace();
-                        Log.e(TAG, "run: " + e.getMessage());
-                        Message msg = new Message();
-                        msg.what = MSG_TYPE_ERROR;
-                        msg.obj = e.getMessage();
-                        mHandler.sendMessage(msg);
                     }
                 }
-            });
+                catch (IOException e) {
+                    e.printStackTrace();
+                    if (mListener != null) {
+                        mListener.onError(e.getMessage());
+                    }
+                }
+            }
+        });
+    }
+
+    @Override
+    protected void receive() {
+        byte[] rxBuffer = new byte[TCP_RECEIVE_BUFFER_SIZE];
+        while (mListening) {
+            if (mInputStream != null) {
+                try {
+                    int len = mInputStream.read(rxBuffer);
+                    if (len > 0) {
+                        byte[] bytes = Arrays.copyOf(rxBuffer, len);
+                        if (mListener != null) {
+                            mListener.onReceive(bytes);
+                        }
+                    }
+                }
+                catch (IOException e) {
+                    e.printStackTrace();
+                    if (mListener != null) {
+                        mListener.onError(e.getMessage());
+                    }
+                }
+            }
         }
-    }
-
-    public synchronized void send(@NonNull final String value) {
-        send(value.getBytes());
-    }
-
-    public interface TcpClientListener {
-        void onConnected();
-
-        void onDisconnected();
-
-        void onSend();
-
-        void onReceive(byte[] bytes);
-
-        void onError(String error);
     }
 }

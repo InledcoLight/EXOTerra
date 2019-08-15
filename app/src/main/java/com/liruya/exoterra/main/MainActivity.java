@@ -11,13 +11,14 @@ import android.support.annotation.Nullable;
 import android.support.design.internal.BottomNavigationItemView;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AppCompatDelegate;
 import android.util.Base64;
 import android.util.Log;
 import android.view.MenuItem;
 
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
-import com.liruya.base.BaseActivity;
+import com.liruya.base.BaseImmersiveActivity;
 import com.liruya.exoterra.R;
 import com.liruya.exoterra.adddevice.AddDeviceActivity;
 import com.liruya.exoterra.main.devices.DevicesFragment;
@@ -27,13 +28,18 @@ import com.liruya.exoterra.manager.DeviceManager;
 import com.liruya.exoterra.scan.ScanActivity;
 import com.liruya.exoterra.smartconfig.SmartconfigActivity;
 
+import cn.xlink.sdk.v5.module.main.XLinkSDK;
 import q.rorbin.badgeview.Badge;
 
-public class MainActivity extends BaseActivity {
+public class MainActivity extends BaseImmersiveActivity {
 
     private BottomNavigationView main_bnv;
     private BottomNavigationItemView main_me;
     private Badge badge;
+
+    static {
+        AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
+    }
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -67,6 +73,7 @@ public class MainActivity extends BaseActivity {
 
     @Override
     protected void initData() {
+        XLinkSDK.start();
         getSupportFragmentManager().beginTransaction()
                                    .replace(R.id.main_fl_show, new DevicesFragment())
                                    .commit();

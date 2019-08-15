@@ -15,7 +15,7 @@ import android.widget.TextView;
 
 import com.liruya.base.BaseFragment;
 import com.liruya.exoterra.R;
-import com.liruya.exoterra.splash.SplashActivity;
+import com.liruya.exoterra.login.LoginActivity;
 import com.liruya.exoterra.xlink.XlinkCloudManager;
 import com.liruya.exoterra.xlink.XlinkRequestCallback;
 
@@ -103,7 +103,7 @@ public class MeFragment extends BaseFragment {
     }
 
     private void relogin() {
-        Intent intent = new Intent(getContext(), SplashActivity.class);
+        Intent intent = new Intent(getContext(), LoginActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
     }

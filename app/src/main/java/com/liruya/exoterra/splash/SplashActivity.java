@@ -1,29 +1,65 @@
 package com.liruya.exoterra.splash;
 
 import android.content.Intent;
-import android.text.TextUtils;
-import android.widget.Toast;
+import android.media.MediaPlayer;
+import android.os.Bundle;
+import android.support.annotation.Nullable;
+import android.util.Log;
+import android.widget.VideoView;
 
-import com.liruya.base.BaseActivity;
+import com.liruya.base.BaseFullscreenActivity;
 import com.liruya.exoterra.R;
 import com.liruya.exoterra.login.LoginActivity;
 import com.liruya.exoterra.main.MainActivity;
 import com.liruya.exoterra.manager.UserManager;
 import com.liruya.exoterra.xlink.XlinkCloudManager;
-import com.liruya.exoterra.xlink.XlinkTaskCallback;
+import com.liruya.exoterra.xlink.XlinkTaskHandler;
 
 import cn.xlink.restful.api.app.UserApi;
 import cn.xlink.sdk.v5.module.main.XLinkSDK;
 
-public class SplashActivity extends BaseActivity {
+public class SplashActivity extends BaseFullscreenActivity {
 
-    private boolean[] mResult = new boolean[]{false, false};
-    private long mStartTime;
+    private VideoView splash_vv;
+
+    private boolean mPause;
+    private int mProgress;
+    private boolean mVideoCompleted;
+    private final XlinkTaskHandler<UserApi.TokenRefreshResponse> mAuthinListener = new XlinkTaskHandler<>();
+    private Runnable mRunnable;
 
     @Override
-    protected void onStart() {
-        super.onStart();
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
         initData();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (!mVideoCompleted && mPause) {
+            Log.e(TAG, "onResume: " + mProgress);
+            splash_vv.seekTo(mProgress);
+            splash_vv.resume();
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (!mVideoCompleted) {
+            Log.e(TAG, "onPause: " + splash_vv.canPause() + "  " + splash_vv.getCurrentPosition() + "  " + splash_vv.getDuration());
+            splash_vv.pause();
+            mPause = true;
+            mProgress = splash_vv.getCurrentPosition();
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        splash_vv.stopPlayback();
     }
 
     @Override
@@ -33,54 +69,69 @@ public class SplashActivity extends BaseActivity {
 
     @Override
     protected void initView() {
-
+        splash_vv = findViewById(R.id.splash_vv);
     }
 
     @Override
     protected void initData() {
+        Log.e(TAG, "initData: ");
         XLinkSDK.start();
 
         int userid = UserManager.getUserId(this);
         String authorize = UserManager.getAuthorize(this);
         final String refresh_token = UserManager.getRefreshToken(this);
-        if (userid == 0 || TextUtils.isEmpty(authorize) || TextUtils.isEmpty(refresh_token)) {
-            mResult[0] = true;
-            mResult[1] = false;
-        } else {
-            XlinkCloudManager.getInstance()
-                             .refreshToken(userid, authorize, refresh_token, new XlinkTaskCallback<UserApi.TokenRefreshResponse>() {
-                                 @Override
-                                 public void onError(String error) {
-                                                    mResult[0] = true;
-                                     mResult[1] = false;
-                                     Toast.makeText(SplashActivity.this, error, Toast.LENGTH_SHORT)
-                                          .show();
-                                 }
-
-                                 @Override
-                                 public void onStart() {
-
-                                 }
-
-                                 @Override
-                                 public void onComplete(UserApi.TokenRefreshResponse response) {
-                                     mResult[0] = true;
-                                     mResult[1] = true;
-                                 }
-                             });
-        }
-        mStartTime = System.currentTimeMillis();
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                while (mResult[0] == false || System.currentTimeMillis() - mStartTime < 1500);
-                if (mResult[1]) {
-                    gotoMainActivity();
-                } else {
+        if (!UserManager.checkAuthorize(userid, authorize, refresh_token)) {
+            mRunnable = new Runnable() {
+                @Override
+                public void run() {
+                    while (!mVideoCompleted);
                     gotoLoginActivity();
                 }
+            };
+        } else {
+            XlinkCloudManager.getInstance()
+                             .refreshToken(userid, authorize, refresh_token, mAuthinListener);
+            mRunnable = new Runnable() {
+                @Override
+                public void run() {
+                    while (!mVideoCompleted || !mAuthinListener.isOver());
+                    if (mAuthinListener.isSuccess()) {
+                        gotoMainActivity();
+                    } else {
+                        gotoLoginActivity();
+                    }
+                }
+            };
+        }
+
+        splash_vv.setOnErrorListener(new MediaPlayer.OnErrorListener() {
+            @Override
+            public boolean onError(MediaPlayer mp, int what, int extra) {
+                mVideoCompleted = true;
+                mPause = false;
+                return false;
             }
-        }).start();
+        });
+        splash_vv.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+            @Override
+            public void onPrepared(MediaPlayer mp) {
+                Log.e(TAG, "onPrepared: " );
+                mVideoCompleted = false;
+                mPause = false;
+                splash_vv.requestFocus();
+                splash_vv.seekTo(0);
+                splash_vv.start();
+            }
+        });
+        splash_vv.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            @Override
+            public void onCompletion(MediaPlayer mp) {
+                mVideoCompleted = true;
+                mPause = false;
+            }
+        });
+        splash_vv.setVideoPath("android.resource://" + getPackageName() + "/" + R.raw.splash);
+        new Thread(mRunnable).start();
     }
 
     @Override

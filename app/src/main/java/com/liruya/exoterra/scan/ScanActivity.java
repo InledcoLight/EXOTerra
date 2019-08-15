@@ -2,12 +2,10 @@ package com.liruya.exoterra.scan;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
-import android.support.annotation.NonNull;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -16,7 +14,7 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
-import com.liruya.base.BaseActivity;
+import com.liruya.base.BaseImmersiveActivity;
 import com.liruya.exoterra.R;
 import com.liruya.exoterra.device.DeviceActivity;
 import com.liruya.exoterra.manager.DeviceManager;
@@ -27,15 +25,12 @@ import com.liruya.exoterra.xlink.XlinkTaskCallback;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import java.util.TimeZone;
 
 import cn.xlink.sdk.core.XLinkCoreException;
-import cn.xlink.sdk.core.model.DataPointValueType;
-import cn.xlink.sdk.core.model.XLinkDataPoint;
 import cn.xlink.sdk.v5.listener.XLinkScanDeviceListener;
 import cn.xlink.sdk.v5.model.XDevice;
 
-public class ScanActivity extends BaseActivity {
+public class ScanActivity extends BaseImmersiveActivity {
     private final int SCAN_DEVICE_TIMEOUT = 10000;
     private final int SCAN_RETRY_INTERVAL = 1000;
 
@@ -203,29 +198,5 @@ public class ScanActivity extends BaseActivity {
 
     private void stopScan() {
         mScanning = false;
-    }
-
-    private void initZone(@NonNull final XDevice device) {
-        final int rawZone = TimeZone.getDefault().getRawOffset() / 60000;
-        final int zone = (rawZone/60)*100 + (rawZone%60);
-        final List<XLinkDataPoint> dps = new ArrayList<>();
-        final XLinkDataPoint dp1 = new XLinkDataPoint(1, DataPointValueType.SHORT, (short) zone);
-        dps.add(dp1);
-        XlinkCloudManager.getInstance().setDeviceDatapoints(device, dps, new XlinkTaskCallback<XDevice>() {
-            @Override
-            public void onError(String error) {
-                Log.e(TAG, "onError: " + error);
-            }
-
-            @Override
-            public void onStart() {
-
-            }
-
-            @Override
-            public void onComplete(XDevice xDevice) {
-                Log.e(TAG, "onComplete: ");
-            }
-        });
     }
 }

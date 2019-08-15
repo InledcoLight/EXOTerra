@@ -18,7 +18,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.ToggleButton;
 
-import com.liruya.base.BaseActivity;
+import com.liruya.base.BaseImmersiveActivity;
 import com.liruya.esptouch.EsptouchLinker;
 import com.liruya.esptouch.EsptouchResult;
 import com.liruya.esptouch.IEsptouchLinkListener;
@@ -28,7 +28,7 @@ import com.liruya.exoterra.scan.ScanActivity;
 
 import java.util.List;
 
-public class SmartconfigActivity extends BaseActivity {
+public class SmartconfigActivity extends BaseImmersiveActivity {
     private Toolbar smartconfig_toolbar;
     private TextInputEditText smartconfig_et_ssid;
     private TextInputEditText smartconfig_et_password;

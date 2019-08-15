@@ -1,31 +1,46 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
 
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
+    <style name="AppTheme" parent="Theme.AppCompat.NoActionBar">
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
-        <item name="android:windowBackground">@color/colorPrimaryDark</item>
+
+        <item name="android:textColor">@color/textColorPrimary</item>
+        <item name="android:textColorPrimary">@color/textColorPrimary</item>
+        <item name="android:textColorSecondary">@color/textColorSencondary</item>
+        <item name="android:textColorHint">@color/colorGray</item>
+        <item name="android:textColorLink">@color/colorAccent</item>
+        <item name="colorError">@color/colorRed</item>
+        <item name="colorButtonNormal">@color/colorButton</item>
+
+        <item name="android:windowBackground">@mipmap/ic_background</item>
+        <item name="alertDialogTheme">@style/DialogTheme</item>
+
     </style>
 
-    <style name="TextDarkTheme" parent="AppTheme">
-        <item name="android:textColorPrimary">#FFFFFF</item>
-        <item name="android:textColorSecondary">#E0E0E0</item>
-    </style>
+    <!--<style name="TextDarkTheme" parent="AppTheme">-->
+        <!--<item name="android:textColorPrimary">#FFFFFF</item>-->
+        <!--<item name="android:textColorSecondary">#E0E0E0</item>-->
+    <!--</style>-->
 
-    <style name="TextLightTheme" parent="AppTheme">
-        <item name="android:textColorPrimary">#000000</item>
-        <item name="android:textColorSecondary">#9E9E9E</item>
-    </style>
+    <!--<style name="TextLightTheme" parent="AppTheme">-->
+        <!--<item name="android:textColorPrimary">#000000</item>-->
+        <!--<item name="android:textColorSecondary">#9E9E9E</item>-->
+    <!--</style>-->
 
-    <style name="BottomDialogTheme" parent="Theme.AppCompat.Light.Dialog.Alert">
+    <style name="BottomDialogTheme" parent="Theme.AppCompat.Dialog.Alert">
         <item name="android:windowFrame">@null</item>
-        <item name="windowNoTitle">true</item>
+        <item name="android:windowNoTitle">true</item>
         <item name="android:windowIsTranslucent">true</item>
         <item name="android:windowBackground">@android:color/transparent</item>
         <item name="android:windowIsFloating">true</item>
         <item name="android:backgroundDimEnabled">true</item>
+    </style>
+
+    <style name="DialogTheme" parent="Theme.AppCompat.Dialog.Alert">
+        <item name="android:windowBackground">@drawable/dialog_background</item>
     </style>
 
 </resources>

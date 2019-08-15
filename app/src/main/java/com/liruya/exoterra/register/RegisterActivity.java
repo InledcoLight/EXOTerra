@@ -3,32 +3,39 @@ package com.liruya.exoterra.register;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.support.design.widget.TextInputEditText;
+import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
-import com.liruya.base.BaseActivity;
+import com.liruya.base.BaseImmersiveActivity;
 import com.liruya.exoterra.R;
 import com.liruya.exoterra.util.RegexUtil;
+import com.liruya.exoterra.view.AdvancedTextInputEditText;
 import com.liruya.exoterra.xlink.XlinkCloudManager;
 import com.liruya.exoterra.xlink.XlinkRequestCallback;
 import com.liruya.loaddialog.LoadDialog;
 
 import cn.xlink.restful.api.app.UserAuthApi;
 
-public class RegisterActivity extends BaseActivity {
+public class RegisterActivity extends BaseImmersiveActivity {
 
-    private TextInputEditText register_et_email;
-    private TextInputEditText register_et_nickname;
-    private TextInputEditText register_et_password;
+    private TextInputLayout register_til_email;
+    private AdvancedTextInputEditText register_et_email;
+    private TextInputLayout register_til_verifycode;
+    private AdvancedTextInputEditText register_et_verifycode;
+    private TextInputLayout register_til_password;
+    private AdvancedTextInputEditText register_et_password;
+    private Button register_btn_send;
     private Button register_btn_signup;
+    private Button register_btn_signin;
     private LoadDialog mLoadDialog;
     private ProgressDialog mProgressDialog;
 
-    private XlinkRequestCallback<UserAuthApi.EmailRegisterResponse> mRegisterCallback;
+    private XlinkRequestCallback<String> mVerifycodeCallback;
+    private XlinkRequestCallback<UserAuthApi.EmailVerifyCodeRegisterResponse> mRegisterCallback;
 
     @Override
     protected void onStart() {
@@ -45,10 +52,19 @@ public class RegisterActivity extends BaseActivity {
 
     @Override
     protected void initView() {
+        register_til_email = findViewById(R.id.register_til_email);
         register_et_email = findViewById(R.id.register_et_email);
-        register_et_nickname = findViewById(R.id.register_et_nickname);
+        register_til_verifycode = findViewById(R.id.register_til_verifycode);
+        register_et_verifycode = findViewById(R.id.register_et_verifycode);
+        register_til_password = findViewById(R.id.register_til_password);
         register_et_password = findViewById(R.id.register_et_password);
+        register_btn_send = findViewById(R.id.register_btn_send);
         register_btn_signup = findViewById(R.id.register_btn_signup);
+        register_btn_signin = findViewById(R.id.register_btn_signin);
+
+        register_et_email.bindTextInputLayout(register_til_email);
+        register_et_verifycode.bindTextInputLayout(register_til_verifycode);
+        register_et_password.bindTextInputLayout(register_til_password);
     }
 
     @Override
@@ -57,7 +73,26 @@ public class RegisterActivity extends BaseActivity {
         mProgressDialog = new ProgressDialog(this);
         mProgressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
 
-        mRegisterCallback = new XlinkRequestCallback<UserAuthApi.EmailRegisterResponse>() {
+        mVerifycodeCallback = new XlinkRequestCallback<String>() {
+            @Override
+            public void onStart() {
+
+            }
+
+            @Override
+            public void onError(String error) {
+                Toast.makeText(RegisterActivity.this, "发送邮箱验证码失败", Toast.LENGTH_SHORT)
+                     .show();
+            }
+
+            @Override
+            public void onSuccess(String s) {
+                Toast.makeText(RegisterActivity.this, "发送邮箱验证码成功. " + s, Toast.LENGTH_SHORT)
+                     .show();
+            }
+        };
+
+        mRegisterCallback = new XlinkRequestCallback<UserAuthApi.EmailVerifyCodeRegisterResponse>() {
             @Override
             public void onStart() {
                 showLoading();
@@ -71,7 +106,7 @@ public class RegisterActivity extends BaseActivity {
             }
 
             @Override
-            public void onSuccess(UserAuthApi.EmailRegisterResponse emailRegisterResponse) {
+            public void onSuccess(UserAuthApi.EmailVerifyCodeRegisterResponse response) {
                 dismissLoading();
                 showRegisterSuccessDialog();
             }
@@ -80,28 +115,48 @@ public class RegisterActivity extends BaseActivity {
 
     @Override
     protected void initEvent() {
+        register_btn_send.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String email = getEmailText();
+                if (!RegexUtil.isEmail(email)) {
+                    register_til_email.setError(getString(R.string.error_email));
+                    register_et_email.requestFocus();
+                    return;
+                }
+                XlinkCloudManager.getInstance().requestRegisterEmailVerifycode(email, mVerifycodeCallback);
+            }
+        });
+
         register_btn_signup.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 String email = getEmailText();
-                String nickname = getNicknameText();
-                String password = getPasswordText();
                 if (!RegexUtil.isEmail(email)) {
-                    register_et_email.setError(getString(R.string.error_email));
+                    register_til_email.setError(getString(R.string.error_email));
                     register_et_email.requestFocus();
                     return;
                 }
-                if (TextUtils.isEmpty(nickname)) {
-                    register_et_nickname.setError(getString(R.string.error_nickname));
-                    register_et_email.requestFocus();
+                String verifycode = getVerifycodeText();
+                if (TextUtils.isEmpty(verifycode)) {
+                    register_til_verifycode.setError(getString(R.string.error_verifycode));
+                    register_et_verifycode.requestFocus();
                     return;
                 }
+                String password = getPasswordText();
                 if (TextUtils.isEmpty(password) || password.length() < 6) {
-                    register_et_password.setError(getString(R.string.error_password));
+                    register_til_password.setError(getString(R.string.error_password));
                     register_et_password.requestFocus();
                     return;
                 }
-                XlinkCloudManager.getInstance().register(email, nickname, password, mRegisterCallback);
+                XlinkCloudManager.getInstance().registerEmailByVerifycode(email, password, verifycode, mRegisterCallback);
+            }
+        });
+
+        register_btn_signin.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
             }
         });
     }
@@ -110,8 +165,8 @@ public class RegisterActivity extends BaseActivity {
         return register_et_email.getText().toString();
     }
 
-    private String getNicknameText() {
-        return register_et_nickname.getText().toString();
+    private String getVerifycodeText() {
+        return register_et_verifycode.getText().toString();
     }
 
     private String getPasswordText() {

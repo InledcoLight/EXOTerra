@@ -225,6 +225,7 @@ public class HomeFragment extends BaseFragment {
             }
         });
     }
+
     private void gotoDeviceActivity(String deviceTag) {
         Intent intent = new Intent(getContext(), DeviceActivity.class);
         intent.putExtra("device_tag", deviceTag);

@@ -5,6 +5,7 @@ import cn.xlink.restful.XLinkRestfulError;
 import cn.xlink.sdk.core.error.XLinkErrorCodeHelper;
 
 public abstract class XlinkRequestCallback<T> extends XLinkCallback<T> {
+
     @Override
     public void onHttpError(Throwable throwable) {
         onError(throwable.getMessage());

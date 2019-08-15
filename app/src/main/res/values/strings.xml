@@ -147,4 +147,5 @@
     <string name="phone_connect_to_device">3. Connect your phone to %1$s.</string>
     <string name="connect_device">Connect Device</string>
     <string name="timeout">Timeout</string>
+    <string name="error_empty">Can not be empty.</string>
 </resources>

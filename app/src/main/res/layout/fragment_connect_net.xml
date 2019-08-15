@@ -2,8 +2,8 @@
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
                                              xmlns:app="http://schemas.android.com/apk/res-auto"
                                              xmlns:tools="http://schemas.android.com/tools"
-                                             android:background="@color/colorPrimaryDark"
                                              android:clickable="true"
+                                             android:background="@mipmap/ic_background"
                                              android:layout_width="match_parent"
                                              android:layout_height="match_parent">
 
@@ -52,6 +52,16 @@
         android:orientation="horizontal"
         app:layout_constraintGuide_percent="0.5"/>
 
+    <!--<ImageButton-->
+        <!--android:id="@+id/connect_net_change"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_marginEnd="16dp"-->
+        <!--app:layout_constraintBottom_toBottomOf="@+id/connect_net_tl1"-->
+        <!--app:layout_constraintEnd_toEndOf="parent"-->
+        <!--app:layout_constraintTop_toTopOf="@+id/connect_net_tl1"-->
+        <!--app:srcCompat="@drawable/ic_arrow_right_black_32dp"/>-->
+
     <android.support.design.widget.TextInputLayout
         android:id="@+id/connect_net_tl1"
         android:layout_width="0dp"
@@ -60,30 +70,28 @@
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="16dp"
         android:hint="@string/router"
+        app:errorEnabled="true"
         app:hintEnabled="true"
         app:layout_constraintBottom_toTopOf="@+id/connect_net_tl2"
-        app:layout_constraintEnd_toStartOf="@+id/connect_net_change"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
 
-        <android.support.design.widget.TextInputEditText
+        <com.liruya.exoterra.view.AdvancedTextInputEditText
             android:id="@+id/connect_net_router"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:drawableRight="@drawable/ic_arrow_right_black_32dp"
+            android:drawablePadding="8dp"
             android:enabled="false"
+            android:focusable="false"
+            android:focusableInTouchMode="false"
+            android:gravity="center_vertical"
             android:imeOptions="actionNext"
             android:inputType="text"
             android:lines="1"/>
     </android.support.design.widget.TextInputLayout>
 
-    <ImageButton
-        android:id="@+id/connect_net_change"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
-        app:layout_constraintBottom_toBottomOf="@+id/connect_net_tl1"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/connect_net_tl1"
-        app:srcCompat="@drawable/ic_arrow_right_black_32dp"/>
+
 
     <android.support.design.widget.TextInputLayout
         android:id="@+id/connect_net_tl2"
@@ -94,6 +102,7 @@
         android:layout_marginBottom="8dp"
         android:hint="@string/hint_password"
         app:hintEnabled="true"
+        app:errorEnabled="true"
         app:passwordToggleEnabled="true"
         app:layout_constraintBottom_toTopOf="@+id/connect_net_gl1"
         app:layout_constraintEnd_toEndOf="parent"

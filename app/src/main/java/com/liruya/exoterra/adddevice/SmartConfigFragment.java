@@ -31,7 +31,6 @@ public class SmartConfigFragment extends BaseFragment {
     private CheckableImageButton smart_config_cib_step2;
     private CheckableImageButton smart_config_cib_step3;
     private CheckableImageButton smart_config_cib_step4;
-    private CheckableImageButton smart_config_cib_step5;
     private CheckBox smart_config_led;
     private ToggleButton smart_config_start;
 
@@ -39,158 +38,43 @@ public class SmartConfigFragment extends BaseFragment {
     private SmartConfigListener mSmartConfigListener = new SmartConfigListener() {
         @Override
         public void onProgressUpdate(final int progress) {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    smart_config_pb.setProgress(progress);
-                    smart_config_pb.setText("" + progress + " %");
-                }
-            });
+            smart_config_pb.setProgress(progress);
+            smart_config_pb.setText("" + progress + " %");
         }
 
         @Override
         public void onError(final String error) {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    smart_config_start.setChecked(false);
-                    smart_config_start.setEnabled(true);
-                    showSmartConfigFailedDialog(error);
-                }
-            });
+            smart_config_start.setChecked(false);
+            smart_config_start.setEnabled(true);
+            showSmartConfigFailedDialog(error);
         }
 
+        @SuppressLint ("RestrictedApi")
         @Override
         public void onSuccess() {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    smart_config_start.setChecked(false);
-                    smart_config_start.setEnabled(true);
-                    showSmartConfigSuccessDialog();
-                }
-            });
+            smart_config_cib_step4.setChecked(true);
+            smart_config_start.setChecked(false);
+            smart_config_start.setEnabled(true);
+            showSmartConfigSuccessDialog();
         }
 
-        @Override
-        public void onEsptouchFailed() {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    smart_config_start.setChecked(false);
-                    showSmartConfigFailedDialog("Esptouch failed.");
-                }
-            });
-        }
-
+        @SuppressLint ("RestrictedApi")
         @Override
         public void onEsptouchSuccess() {
-            runOnUiThread(new Runnable() {
-                @SuppressLint ("RestrictedApi")
-                @Override
-                public void run() {
-                    smart_config_cib_step1.setChecked(true);
-                    smart_config_start.setEnabled(false);
-                }
-            });
+            smart_config_cib_step1.setChecked(true);
+            smart_config_start.setEnabled(false);
         }
 
+        @SuppressLint ("RestrictedApi")
         @Override
-        public void onScanError(final String error) {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    smart_config_start.setChecked(false);
-                    smart_config_start.setEnabled(true);
-                    showSmartConfigFailedDialog(error);
-                }
-            });
+        public void onDeviceScanned() {
+            smart_config_cib_step2.setChecked(true);
         }
 
+        @SuppressLint ("RestrictedApi")
         @Override
-        public void onScanSuccess() {
-            runOnUiThread(new Runnable() {
-                @SuppressLint ("RestrictedApi")
-                @Override
-                public void run() {
-                    smart_config_cib_step2.setChecked(true);
-                }
-            });
-        }
-
-        @Override
-        public void onRegisterError(final String error) {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    smart_config_start.setChecked(false);
-                    smart_config_start.setEnabled(true);
-                    showSmartConfigFailedDialog(error);
-                }
-            });
-        }
-
-        @Override
-        public void onRegisterSuccess() {
-            runOnUiThread(new Runnable() {
-                @SuppressLint ("RestrictedApi")
-                @Override
-                public void run() {
-                    smart_config_cib_step3.setChecked(true);
-                }
-            });
-        }
-
-        @Override
-        public void onSubscribeError(final String error) {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    smart_config_start.setChecked(false);
-                    smart_config_start.setEnabled(true);
-                    showSmartConfigFailedDialog(error);
-                }
-            });
-        }
-
-        @Override
-        public void onSubscribeSuccess() {
-            runOnUiThread(new Runnable() {
-                @SuppressLint ("RestrictedApi")
-                @Override
-                public void run() {
-                    smart_config_cib_step4.setChecked(true);
-                }
-            });
-        }
-
-        @Override
-        public void onInitDeviceError(final String error) {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-//                    smart_config_start.setChecked(false);
-//                    smart_config_start.setEnabled(true);
-//                    showSmartConfigFailedDialog(error);
-                    smart_config_start.setChecked(false);
-                    smart_config_start.setEnabled(true);
-                    showSmartConfigSuccessDialog();
-                }
-            });
-        }
-
-        @Override
-        public void onInitDeviceSuccess() {
-            runOnUiThread(new Runnable() {
-                @SuppressLint ("RestrictedApi")
-                @Override
-                public void run() {
-                    smart_config_cib_step5.setChecked(true);
-                    smart_config_start.setChecked(false);
-                    smart_config_start.setEnabled(true);
-                    showSmartConfigSuccessDialog();
-                }
-            });
+        public void onDeviceInitialized() {
+            smart_config_cib_step3.setChecked(true);
         }
     };
 
@@ -218,7 +102,6 @@ public class SmartConfigFragment extends BaseFragment {
         smart_config_cib_step2 = view.findViewById(R.id.smart_config_cib_step2);
         smart_config_cib_step3 = view.findViewById(R.id.smart_config_cib_step3);
         smart_config_cib_step4 = view.findViewById(R.id.smart_config_cib_step4);
-        smart_config_cib_step5 = view.findViewById(R.id.smart_config_cib_step5);
         smart_config_led = view.findViewById(R.id.smart_config_led);
         smart_config_start = view.findViewById(R.id.smart_config_start);
     }
@@ -261,7 +144,6 @@ public class SmartConfigFragment extends BaseFragment {
                     smart_config_cib_step2.setChecked(false);
                     smart_config_cib_step3.setChecked(false);
                     smart_config_cib_step4.setChecked(false);
-                    smart_config_cib_step5.setChecked(false);
                     mSmartConfigLinker.startTask();
                 } else {
                     mSmartConfigLinker.stopTask();

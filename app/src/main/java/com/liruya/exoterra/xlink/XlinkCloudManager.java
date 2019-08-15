@@ -3,10 +3,10 @@ package com.liruya.exoterra.xlink;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.util.Base64;
-import android.util.Log;
 
 import com.liruya.exoterra.util.DeviceUtil;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -27,7 +27,6 @@ import cn.xlink.restful.api.app.UserAuthApi;
 import cn.xlink.sdk.common.ByteUtil;
 import cn.xlink.sdk.core.constant.CoreConstant;
 import cn.xlink.sdk.core.error.XLinkErrorCodeHelper;
-import cn.xlink.sdk.core.error.XLinkErrorCodes;
 import cn.xlink.sdk.core.java.local.XLinkLocalSendTriggerUpgradeTask;
 import cn.xlink.sdk.core.model.XLinkDataPoint;
 import cn.xlink.sdk.task.TaskListener;
@@ -51,6 +50,7 @@ import cn.xlink.sdk.v5.module.share.XLinkHandleShareDeviceTask;
 import cn.xlink.sdk.v5.module.share.XLinkShareDeviceTask;
 import cn.xlink.sdk.v5.module.subscription.XLinkAddDeviceTask;
 import retrofit2.Call;
+import retrofit2.Response;
 
 public class XlinkCloudManager {
     private static final String TAG = "XlinkCloudManager";
@@ -79,20 +79,67 @@ public class XlinkCloudManager {
         XLinkSDK.startTask(task);
     }
 
-    public void register(final String email, String nickname, String password, final XlinkRequestCallback<UserAuthApi.EmailRegisterResponse> callback) {
-        UserAuthApi.EmailRegisterRequest request = new UserAuthApi.EmailRegisterRequest();
+//    public void register(final String email, String nickname, String password, final XlinkRequestCallback<UserAuthApi.EmailRegisterResponse> callback) {
+//        UserAuthApi.EmailRegisterRequest request = new UserAuthApi.EmailRegisterRequest();
+//        request.corpId = mCorpId;
+//        request.email = email;
+//        if (!TextUtils.isEmpty(nickname)) {
+//            request.nickname = nickname;
+//        }
+//        request.password = password;
+//        request.localLang = XLinkRestfulEnum.LocalLang.EN_US;
+//        request.source = XLinkRestfulEnum.UserSource.ANDROID;
+//        XLinkRestful.getApplicationApi()
+//                    .registEmailAccount(request)
+//                    .enqueue(callback);
+//        if (callback != null) {
+//            callback.onStart();
+//        }
+//
+//        UserAuthApi.EmailVerifyCodeRegisterRequest rq;
+//        UserAuthApi.RegisterEmailVerifyCodeRequest req = new UserAuthApi.RegisterEmailVerifyCodeRequest();
+//        req.corpId = mCorpId;
+//        req.email = email;
+//        req.localLang = XLinkRestfulEnum.LocalLang.EN_US;
+//        XLinkRestful.getApplicationApi().registerEmailVerifyCode(req).enqueue(null);
+//    }
+
+    public void requestRegisterEmailVerifycode(@NonNull final String email, final XlinkRequestCallback<String> callback) {
+        UserAuthApi.RegisterEmailVerifyCodeRequest request = new UserAuthApi.RegisterEmailVerifyCodeRequest();
         request.corpId = mCorpId;
         request.email = email;
-        request.nickname = nickname;
-        request.password = password;
         request.localLang = XLinkRestfulEnum.LocalLang.EN_US;
-        request.source = XLinkRestfulEnum.UserSource.ANDROID;
         XLinkRestful.getApplicationApi()
-                    .registEmailAccount(request)
+                    .registerEmailVerifyCode(request)
                     .enqueue(callback);
         if (callback != null) {
             callback.onStart();
         }
+    }
+
+    public void registerEmailByVerifycode(@NonNull final String email, final String nickname, final String password, @NonNull final String verifycode,
+                                          final XlinkRequestCallback<UserAuthApi.EmailVerifyCodeRegisterResponse> callback) {
+        UserAuthApi.EmailVerifyCodeRegisterRequest request = new UserAuthApi.EmailVerifyCodeRegisterRequest();
+        request.corpId = mCorpId;
+        request.email = email;
+        if (!TextUtils.isEmpty(nickname)) {
+            request.nickname = nickname;
+        }
+        request.password = password;
+        request.localLang = XLinkRestfulEnum.LocalLang.EN_US;
+        request.source = XLinkRestfulEnum.UserSource.ANDROID;
+        request.verifycode = verifycode;
+        XLinkRestful.getApplicationApi()
+                    .registerEmailVerifyCodeAccount(request)
+                    .enqueue(callback);
+        if (callback != null) {
+            callback.onStart();
+        }
+    }
+
+    public void registerEmailByVerifycode(@NonNull final String email, final String password, @NonNull final String verifycode,
+                                          final XlinkRequestCallback<UserAuthApi.EmailVerifyCodeRegisterResponse> callback) {
+        registerEmailByVerifycode(email, null, password, verifycode, callback);
     }
 
     public void refreshToken(int userid, String authorize, String refresh_token, XLinkTaskListener<UserApi.TokenRefreshResponse> listener) {
@@ -154,52 +201,52 @@ public class XlinkCloudManager {
         }
     }
 
-    public void registerDevice(final XDevice device, String name, final IXlinkRegisterDeviceCallback callback) {
-        DeviceApi.RegisterDeviceRequest request = new DeviceApi.RegisterDeviceRequest();
-        request.productId = device.getProductId();
-        request.mac = device.getMacAddress();
-        request.firmwareMod = "0";                  //wifi:0  gprs:1, 如果不设置无法手动升级
-        if (!TextUtils.isEmpty(name)) {
-            request.name = name;
-        }
-        Call<DeviceApi.RegisterDeviceResponse> call = XLinkRestful.getApplicationApi()
-                                                                  .userRegisterDevice(XLinkUserManager.getInstance().getUid(), request);
-        call.enqueue(new XLinkCallback<DeviceApi.RegisterDeviceResponse>() {
-            @Override
-            public void onHttpError(Throwable throwable) {
-                if (callback != null) {
-                    callback.onError(throwable.getMessage());
-                }
-            }
-
-            @Override
-            public void onApiError(XLinkRestfulError.ErrorWrapper.Error error) {
-                if (callback != null) {
-                    if (error.code == XLinkErrorCodes.ERROR_API_DEVICE_MAC_ADDRESS_EXISTS) {
-                        callback.onDeviceAlreadyExists(device);
-                    } else {
-                        callback.onError(XLinkErrorCodeHelper.getErrorCodeName(error.code));
-                    }
-                }
-            }
-
-            @Override
-            public void onSuccess(DeviceApi.RegisterDeviceResponse response) {
-                Log.e(TAG, "onSubscribeSuccess: " + response.accessKey );
-                device.setDeviceId(response.deviceId);
-                if (callback != null) {
-                    callback.onSuccess(device);
-                }
-            }
-        });
-        if (callback != null) {
-            callback.onStart();
-        }
-    }
-
-    public void registerDevice(final XDevice device, final IXlinkRegisterDeviceCallback callback) {
-        registerDevice(device, null, callback);
-    }
+//    public void registerDevice(final XDevice device, String name, final IXlinkRegisterDeviceCallback callback) {
+//        DeviceApi.RegisterDeviceRequest request = new DeviceApi.RegisterDeviceRequest();
+//        request.productId = device.getProductId();
+//        request.mac = device.getMacAddress();
+//        request.firmwareMod = "0";                  //wifi:0  gprs:1, 如果不设置无法手动升级
+//        if (!TextUtils.isEmpty(name)) {
+//            request.name = name;
+//        }
+//        Call<DeviceApi.RegisterDeviceResponse> call = XLinkRestful.getApplicationApi()
+//                                                                  .userRegisterDevice(XLinkUserManager.getInstance().getUid(), request);
+//        call.enqueue(new XLinkCallback<DeviceApi.RegisterDeviceResponse>() {
+//            @Override
+//            public void onHttpError(Throwable throwable) {
+//                if (callback != null) {
+//                    callback.onError(throwable.getMessage());
+//                }
+//            }
+//
+//            @Override
+//            public void onApiError(XLinkRestfulError.ErrorWrapper.Error error) {
+//                if (callback != null) {
+//                    if (error.code == XLinkErrorCodes.ERROR_API_DEVICE_MAC_ADDRESS_EXISTS) {
+//                        callback.onDeviceAlreadyExists(device);
+//                    } else {
+//                        callback.onError(XLinkErrorCodeHelper.getErrorCodeName(error.code));
+//                    }
+//                }
+//            }
+//
+//            @Override
+//            public void onSuccess(DeviceApi.RegisterDeviceResponse response) {
+//                Log.e(TAG, "onSubscribeSuccess: " + response.accessKey );
+//                device.setDeviceId(response.deviceId);
+//                if (callback != null) {
+//                    callback.onSuccess(device);
+//                }
+//            }
+//        });
+//        if (callback != null) {
+//            callback.onStart();
+//        }
+//    }
+//
+//    public void registerDevice(final XDevice device, final IXlinkRegisterDeviceCallback callback) {
+//        registerDevice(device, null, callback);
+//    }
 
     public void addDevice(final XDevice device, int timeout, XLinkTaskListener<XDevice> listener) {
         XLinkAddDeviceTask task = XLinkAddDeviceTask.newBuilder()
@@ -234,6 +281,30 @@ public class XlinkCloudManager {
         XLinkSDK.startTask(task);
     }
 
+    public XlinkResult<DeviceApi.SnSubscribeResponse> subscribeDeviceBySn(@NonNull String pid, @NonNull String sn) {
+        DeviceApi.SnSubscribeRequest request = new DeviceApi.SnSubscribeRequest();
+        request.productId = pid;
+        request.sn = sn;
+        try {
+            Response<DeviceApi.SnSubscribeResponse> response = XLinkRestful.getApplicationApi()
+                                                                           .snSubscribeDevice(XLinkUserManager.getInstance().getUid(), request)
+                                                                           .execute();
+            if (response.isSuccessful()) {
+                return new XlinkResult<>(response.body());
+            } else {
+                XLinkRestfulError.ErrorWrapper.Error error = XLinkRestfulError.parseError(XLinkRestful.getBaseRetrofit(), response);
+                if (error == null) {
+                    error = new XLinkRestfulError.ErrorWrapper.Error(response.message(), response.code());
+                }
+                return new XlinkResult<>(XLinkErrorCodeHelper.getErrorCodeName(error.code));
+            }
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+            return new XlinkResult<>(e.getMessage());
+        }
+    }
+
     public void subscribeDeviceBySn(@NonNull String pid, @NonNull String sn, final XlinkRequestCallback<DeviceApi.SnSubscribeResponse> callback) {
         DeviceApi.SnSubscribeRequest request = new DeviceApi.SnSubscribeRequest();
         request.productId = pid;
@@ -251,11 +322,11 @@ public class XlinkCloudManager {
                         @Override
                         public void onApiError(XLinkRestfulError.ErrorWrapper.Error error) {
                             if (callback != null) {
-                                if (error.code == XLinkErrorCodes.ERROR_API_USER_HAS_SUBSCRIBE_DEVICE) {
-                                    callback.onSuccess(null);
-                                } else {
+        //                                if (error.code == XLinkErrorCodes.ERROR_API_USER_HAS_SUBSCRIBE_DEVICE) {
+        //                                    callback.onSuccess(null);
+        //                                } else {
                                     callback.onError(XLinkErrorCodeHelper.getErrorCodeName(error.code));
-                                }
+        //                                }
                             }
                         }
 
@@ -291,19 +362,7 @@ public class XlinkCloudManager {
         XLinkSDK.startTask(task);
     }
 
-    public void addLocalDevice(@NonNull final XDevice device, byte[] pincode, int timeout, XLinkTaskListener<XDevice> listener) {
-        XLinkAddDeviceTask task = XLinkAddDeviceTask.newBuilder()
-                                                    .setXDevice(device)
-                                                    .setConnectLocal(false)
-                                                    .setNeedSubscription(false)
-                                                    .setPinCode(pincode)
-                                                    .setTotalTimeout(timeout)
-                                                    .setListener(listener)
-                                                    .build();
-        XLinkSDK.startTask(task);
-    }
-
-    public void scanDevice(String pid, int timeout, int retryInterval, XLinkScanDeviceListener listener) {
+    public void scanDevice(@NonNull final String pid, final int timeout, final int retryInterval, final XLinkScanDeviceListener listener) {
         XLinkScanDeviceTask task = XLinkScanDeviceTask.newBuilder()
                                                       .setProductIds(pid)
                                                       .setTotalTimeout(timeout)
@@ -387,8 +446,8 @@ public class XlinkCloudManager {
         XLinkSetDataPointTask task = XLinkSetDataPointTask.newBuilder()
                                                           .setXDevice(device)
                                                           .setDataPoints(datapoints)
-                                                          .setListener(listener)
                                                           .setTotalTimeout(timeout)
+                                                          .setListener(listener)
                                                           .build();
         XLinkSDK.startTask(task);
     }

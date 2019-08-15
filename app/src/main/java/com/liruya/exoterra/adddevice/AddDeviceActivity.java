@@ -6,10 +6,10 @@ import android.support.annotation.Nullable;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 
-import com.liruya.base.BaseActivity;
+import com.liruya.base.BaseImmersiveActivity;
 import com.liruya.exoterra.R;
 
-public class AddDeviceActivity extends BaseActivity {
+public class AddDeviceActivity extends BaseImmersiveActivity {
 
     private final int REQUEST_LOCATION_CODE = 1;
 

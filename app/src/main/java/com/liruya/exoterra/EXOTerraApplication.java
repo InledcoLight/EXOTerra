@@ -142,27 +142,29 @@ public class EXOTerraApplication extends Application {
         mXlinkUserListener = new XLinkUserListener() {
             @Override
             public void onUserLogout(LogoutReason logoutReason) {
-                final String[] reason = new String[1];
+                String rsn = null;
                 switch (logoutReason) {
                     case USER_LOGOUT:
-                        reason[0] = "User logout";
+                        rsn = "User logout";
                         UserManager.clear(EXOTerraApplication.this);
+                        DeviceManager.getInstance().clear();
                         break;
                     case SINGLE_SIGN_KICK_OFF:
-                        reason[0] = "Kick off user";
+                        rsn = "Kick off user";
                         UserManager.removeUserId(EXOTerraApplication.this);
                         relogin();
                         break;
                     case TOKEN_EXPIRED:
-                        reason[0] = "Token expired";
+                        rsn = "Token expired";
                         UserManager.removeRefreshToken(EXOTerraApplication.this);
                         relogin();
                         break;
                 }
+                final String reason = rsn;
                 mCurrentActivity.get().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        Toast.makeText(mCurrentActivity.get(), reason[0], Toast.LENGTH_SHORT)
+                        Toast.makeText(mCurrentActivity.get(), reason, Toast.LENGTH_SHORT)
                              .show();
                     }
                 });

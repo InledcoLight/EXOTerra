@@ -4,6 +4,7 @@ import android.content.Context;
 import android.text.TextUtils;
 
 import com.liruya.exoterra.util.PrefUtil;
+import com.liruya.exoterra.util.RegexUtil;
 
 public class UserManager {
     /**
@@ -16,11 +17,24 @@ public class UserManager {
      */
     private static final String PREF_KEY_USER_ACCOUNT = "user_account";
 
+    private static final String PREF_KEY_USER_PASSWORD = "user_password";
+
     private static final String PREF_KEY_USER_ID = "user_id";
 
     private static final String PREF_KEY_USER_AUTHORIZE = "user_authorize";
 
     private static final String PREF_KEY_USER_REFRESH_TOKEN = "user_refresh_token";
+
+
+    private static boolean mLogin;
+
+    public static void setIsLogin(boolean isLogin) {
+        mLogin = isLogin;
+    }
+
+    public static boolean ismLogin() {
+        return mLogin;
+    }
 
     public static void setAccount(Context context, String account) {
         PrefUtil.putString(context, PREF_FILE_USER, PREF_KEY_USER_ACCOUNT, account);
@@ -32,6 +46,18 @@ public class UserManager {
 
     public static void removeAccount(Context context) {
         PrefUtil.remove(context, PREF_FILE_USER, PREF_KEY_USER_ACCOUNT);
+    }
+
+    public static void setPassword(Context context, String password) {
+        PrefUtil.putString(context, PREF_FILE_USER, PREF_KEY_USER_PASSWORD, password);
+    }
+
+    public static String getPassword(Context context) {
+        return PrefUtil.getString(context, PREF_FILE_USER, PREF_KEY_USER_PASSWORD, "");
+    }
+
+    public static void removePassword(Context context) {
+        PrefUtil.remove(context, PREF_FILE_USER, PREF_KEY_USER_PASSWORD);
     }
 
     public static void setUserId(Context context, int userid) {
@@ -72,13 +98,28 @@ public class UserManager {
 
     public static void clear(Context context) {
         PrefUtil.clear(context, PREF_FILE_USER);
+        mLogin = false;
     }
 
-    public static boolean check(Context context) {
-        int userid = UserManager.getUserId(context);
-        String authorize = UserManager.getAuthorize(context);
-        String refresh_token = UserManager.getRefreshToken(context);
+//    public static boolean check(Context context) {
+//        int userid = UserManager.getUserId(context);
+//        String authorize = UserManager.getAuthorize(context);
+//        String refresh_token = UserManager.getRefreshToken(context);
+//        if (userid == 0 || TextUtils.isEmpty(authorize) || TextUtils.isEmpty(refresh_token)) {
+//            return false;
+//        }
+//        return true;
+//    }
+
+    public static boolean checkAuthorize(int userid, String authorize, String refresh_token) {
         if (userid == 0 || TextUtils.isEmpty(authorize) || TextUtils.isEmpty(refresh_token)) {
+            return false;
+        }
+        return true;
+    }
+
+    public static boolean checkAccount(String email, String password) {
+        if (!RegexUtil.isEmail(email) || TextUtils.isEmpty(password) || password.length() < 6 || password.length() > 16) {
             return false;
         }
         return true;

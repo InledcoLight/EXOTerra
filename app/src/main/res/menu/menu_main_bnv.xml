@@ -2,14 +2,14 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/main_bnv_devices"
-        android:icon="@drawable/ic_devices_white_32dp"
+        android:icon="@drawable/ic_device"
         android:title="@string/devices"/>
     <item
         android:id="@+id/main_bnv_home"
-        android:icon="@drawable/ic_home_white_32dp"
+        android:icon="@drawable/ic_group"
         android:title="@string/home"/>
     <item
         android:id="@+id/main_bnv_me"
-        android:icon="@drawable/ic_person_white_32dp"
+        android:icon="@drawable/ic_settings"
         android:title="@string/me"/>
 </menu>

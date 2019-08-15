@@ -3,7 +3,7 @@
                                              xmlns:app="http://schemas.android.com/apk/res-auto"
                                              xmlns:tools="http://schemas.android.com/tools"
                                              android:clickable="true"
-                                             android:background="@color/colorPrimaryDark"
+                                             android:background="@mipmap/ic_background"
                                              android:layout_width="match_parent"
                                              android:layout_height="match_parent">
 
@@ -87,17 +87,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/smart_config_cib_step3"/>
 
-    <android.support.design.widget.CheckableImageButton
-        android:id="@+id/smart_config_cib_step5"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="32dp"
-        android:layout_marginTop="16dp"
-        android:background="@android:color/transparent"
-        android:src="@drawable/selector_circle"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/smart_config_cib_step4"/>
-
     <TextView
         android:id="@+id/smart_config_tv_step1"
         android:layout_width="wrap_content"
@@ -123,7 +112,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:text="Device registered to cloud"
+        android:text="Device Initialized"
         app:layout_constraintBottom_toBottomOf="@+id/smart_config_cib_step3"
         app:layout_constraintStart_toEndOf="@+id/smart_config_cib_step3"
         app:layout_constraintTop_toTopOf="@+id/smart_config_cib_step3"/>
@@ -137,16 +126,6 @@
         app:layout_constraintBottom_toBottomOf="@+id/smart_config_cib_step4"
         app:layout_constraintStart_toEndOf="@+id/smart_config_cib_step4"
         app:layout_constraintTop_toTopOf="@+id/smart_config_cib_step4"/>
-
-    <TextView
-        android:id="@+id/smart_config_tv_step5"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:text="Device Initialized"
-        app:layout_constraintBottom_toBottomOf="@+id/smart_config_cib_step5"
-        app:layout_constraintStart_toEndOf="@+id/smart_config_cib_step5"
-        app:layout_constraintTop_toTopOf="@+id/smart_config_cib_step5"/>
 
     <ToggleButton
         android:id="@+id/smart_config_start"
@@ -169,7 +148,7 @@
         android:layout_marginStart="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="8dp"
-        android:text="Make sure the green led of the device is flash slowly. (Long press the deivce key until the green led flash slowly, for wifi strip press the touch button to change the led to green, then long press.)"
+        android:text="Make sure the green led of the device is flash quicky. (Long press the deivce key until the green led flash quicky, for wifi strip press the touch button to change the led to green, then long press.)"
         app:layout_constraintBottom_toTopOf="@+id/smart_config_start"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"/>

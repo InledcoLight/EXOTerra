@@ -79,17 +79,42 @@ public class Device {
         return null;
     }
 
+    public XLinkDataPoint setRawValue(int index, Object value) {
+        if (index >= DATAPOINT_COUNT_MAX) {
+            return null;
+        }
+        for (XLinkDataPoint dp : mDataPointList) {
+            if (dp.getIndex() == index) {
+//                if (!dp.isWritable()) {
+//                    return null;
+//                }
+                dp.setValue(value);
+                return dp;
+            }
+        }
+        return null;
+    }
+
     public XLinkDataPoint setValue(int index, DataPointValueType type, Object value) {
         if (index >= DATAPOINT_COUNT_MAX) {
             return null;
         }
         for (XLinkDataPoint dp : mDataPointList) {
             if (dp.getIndex() == index && dp.getType() == type) {
-                if (!dp.isWritable()) {
-                    return null;
-                }
+//                if (!dp.isWritable()) {
+//                    return null;
+//                }
                 dp.setValue(value);
                 return dp;
+            }
+        }
+        return null;
+    }
+
+    public Object getRawValue(int index) {
+        for (XLinkDataPoint dp : mDataPointList) {
+            if (dp.getIndex() == index) {
+                return dp.getRawValue();
             }
         }
         return null;
@@ -105,14 +130,19 @@ public class Device {
     }
 
     protected XLinkDataPoint setBoolean(int index, boolean value) {
-        return setValue(index, DataPointValueType.BOOL, value);
+        return setRawValue(index, (byte) (value ? 0x01 : 0x00));
     }
 
     protected boolean getBoolean(int index) {
-        Object value = getValue(index, DataPointValueType.BOOL);
-        if (value != null && value instanceof Boolean) {
-            return (boolean) value;
+        Object value = getRawValue(index);
+        if (value != null) {
+            if (value instanceof Boolean) {
+                return (boolean) value;
+            } else if (value instanceof Byte) {
+                return (((byte) value) == 1 ? true : false);
+            }
         }
+
         return false;
     }
 

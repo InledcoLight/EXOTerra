@@ -11,6 +11,7 @@ import android.support.v7.widget.RecyclerView;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.style.ImageSpan;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -64,6 +65,7 @@ public class LightManualFragment extends BaseFragment {
     protected void initData() {
         mLightViewModel = ViewModelProviders.of(getActivity()).get(LightViewModel.class);
         mLight = mLightViewModel.getData();
+        Log.e(TAG, "initData: " + mLight.getPower());
         mAdapter = new SliderAdapter(getContext(), mLight) {
             @Override
             protected void setBright(int idx, int bright) {
@@ -74,6 +76,7 @@ public class LightManualFragment extends BaseFragment {
         mLightViewModel.observe(this, new Observer<EXOLedstrip>() {
             @Override
             public void onChanged(@Nullable EXOLedstrip exoLedstrip) {
+                Log.e(TAG, "onChanged: " + exoLedstrip.getPower());
                 refreshData();
             }
         });
@@ -171,6 +174,7 @@ public class LightManualFragment extends BaseFragment {
 
     @SuppressLint ("RestrictedApi")
     private void refreshData() {
+        Log.e(TAG, "refreshData: " + mLight.getPower());
         mAdapter.notifyDataSetChanged();
         light_manual_power.setChecked(mLight.getPower());
         int count = mLight.getChannelCount();
