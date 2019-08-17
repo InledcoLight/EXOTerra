@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputEditText;
-import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
@@ -22,7 +21,6 @@ import com.liruya.base.BaseFragment;
 import com.liruya.exoterra.BaseViewModel;
 import com.liruya.exoterra.R;
 import com.liruya.exoterra.bean.Device;
-import com.liruya.exoterra.device.DeviceSetFragment;
 import com.liruya.exoterra.event.SubscribeChangedEvent;
 import com.liruya.exoterra.manager.DeviceManager;
 import com.liruya.exoterra.util.DeviceUtil;
@@ -33,6 +31,7 @@ import com.liruya.exoterra.xlink.XlinkTaskCallback;
 import org.greenrobot.eventbus.EventBus;
 
 import java.text.DateFormat;
+import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -53,6 +52,7 @@ public class DeviceDetailFragment extends BaseFragment {
     private LinearLayout device_detail_ll_name;
     private LinearLayout device_detail_ll_datetime;
     private TextView device_detail_name;
+    private TextView device_detail_zone;
     private TextView device_detail_datetime;
     private TextView device_detail_user_list;
     private TextView device_detail_home;
@@ -110,6 +110,7 @@ public class DeviceDetailFragment extends BaseFragment {
         device_detail_ll_name = view.findViewById(R.id.device_detail_ll_name);
         device_detail_ll_datetime = view.findViewById(R.id.device_detail_ll_datetime);
         device_detail_name = view.findViewById(R.id.device_detail_name);
+        device_detail_zone = view.findViewById(R.id.device_detail_zone);
         device_detail_datetime = view.findViewById(R.id.device_detail_datetime);
         device_detail_user_list = view.findViewById(R.id.device_detail_user_list);
         device_detail_home = view.findViewById(R.id.device_detail_home);
@@ -119,8 +120,8 @@ public class DeviceDetailFragment extends BaseFragment {
         device_detail_upgrade = view.findViewById(R.id.device_detail_upgrade);
         device_detail_unsubscribe = view.findViewById(R.id.device_detail_unsubscribe);
 
-        device_detail_user_list.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_arrow_right_black_32dp, 0);
-        device_detail_upgrade.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_arrow_right_black_32dp, 0);
+        device_detail_user_list.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_arrow_right_white_32dp, 0);
+        device_detail_upgrade.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_arrow_right_white_32dp, 0);
     }
 
     @Override
@@ -137,6 +138,7 @@ public class DeviceDetailFragment extends BaseFragment {
             String mac = mDevice.getXDevice().getMacAddress();
             String fwversion = mDevice.getXDevice().getFirmwareVersion();
             device_detail_name.setText(name);
+            device_detail_zone.setText(getTimezoneDesc(mDevice.getZone()));
             device_detail_devid.setText(String.valueOf(devid));
             device_detail_mac.setText(mac);
             device_detail_fwversion.setText(fwversion);
@@ -166,7 +168,6 @@ public class DeviceDetailFragment extends BaseFragment {
                 if (mDevice == null) {
                     return;
                 }
-                gotoDeviceSetFragment();
             }
         });
         device_detail_user_list.setOnClickListener(new View.OnClickListener() {
@@ -213,6 +214,17 @@ public class DeviceDetailFragment extends BaseFragment {
                 });
             }
         });
+    }
+
+    private String getTimezoneDesc(int zone) {
+        DecimalFormat df = new DecimalFormat("00");
+        String zoneDesc = "GMT+";
+        if (zone < 0) {
+            zoneDesc = "GMT-";
+            zone = -zone;
+        }
+        zoneDesc = zoneDesc + df.format(zone/100) + ":" + df.format(zone%100);
+        return zoneDesc;
     }
 
     private void getNewestVersion() {
@@ -273,11 +285,6 @@ public class DeviceDetailFragment extends BaseFragment {
         XlinkCloudManager.getInstance().probeDevice(mDevice.getXDevice(), ids, new XlinkTaskCallback<List<XLinkDataPoint>>() {
             @Override
             public void onError(String error) {
-
-            }
-
-            @Override
-            public void onStart() {
 
             }
 
@@ -345,19 +352,6 @@ public class DeviceDetailFragment extends BaseFragment {
                 });
             }
         });
-    }
-
-    private void gotoDeviceSetFragment() {
-        if (mDevice == null) {
-            return;
-        }
-        FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
-        if (fragmentManager.findFragmentByTag("device_set") == null) {
-            fragmentManager.beginTransaction()
-                           .add(R.id.device_root, DeviceSetFragment.newInstance(mDevice.getDeviceTag()), "device_set")
-                           .addToBackStack("")
-                           .commit();
-        }
     }
 
     private void gotoUserListFragment() {

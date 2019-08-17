@@ -31,7 +31,7 @@
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="8dp"
         android:background="?attr/selectableItemBackground"
-        android:drawableRight="@drawable/ic_arrow_right_black_32dp"
+        android:drawableRight="@drawable/ic_arrow_right_white_32dp"
         android:drawablePadding="8dp"
         android:gravity="center_vertical"
         android:text=""

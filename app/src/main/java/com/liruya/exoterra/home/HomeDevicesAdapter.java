@@ -7,6 +7,7 @@ import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckedTextView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -40,8 +41,10 @@ public abstract class HomeDevicesAdapter extends RecyclerView.Adapter<HomeDevice
         String name = TextUtils.isEmpty(device.name) ? DeviceUtil.getDefaultName(pid) : device.name;
         holder.iv_icon.setImageResource(DeviceUtil.getProductIcon(pid));
         holder.tv_name.setText(name);
-        holder.tv_product.setText(DeviceUtil.getProductType(pid));
-        holder.tv_desc.setText(device.mac);
+        boolean state = device.isOnline;
+        holder.ctv_state.setChecked(state);
+        holder.ctv_state.setText(state ? R.string.cloud_online : R.string.cloud_offline);
+//        holder.tv_desc.setText(device.mac);
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -68,14 +71,14 @@ public abstract class HomeDevicesAdapter extends RecyclerView.Adapter<HomeDevice
     class HomeDevicesViewHolder extends RecyclerView.ViewHolder {
         private ImageView iv_icon;
         private TextView tv_name;
-        private TextView tv_product;
-        private TextView tv_desc;
+        private CheckedTextView ctv_state;
+//        private TextView tv_desc;
         public HomeDevicesViewHolder(@NonNull View itemView) {
             super(itemView);
             iv_icon = itemView.findViewById(R.id.item_device_icon);
             tv_name = itemView.findViewById(R.id.item_device_name);
-            tv_product = itemView.findViewById(R.id.item_device_product);
-            tv_desc = itemView.findViewById(R.id.item_device_desc);
+            ctv_state = itemView.findViewById(R.id.item_device_state);
+//            tv_desc = itemView.findViewById(R.id.item_device_desc);
         }
     }
 }

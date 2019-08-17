@@ -9,6 +9,7 @@ import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,8 +20,10 @@ import com.liruya.exoterra.R;
 import com.liruya.exoterra.adddevice.AddDeviceActivity;
 import com.liruya.exoterra.bean.Device;
 import com.liruya.exoterra.device.DeviceActivity;
+import com.liruya.exoterra.event.DeviceStateChangedEvent;
 import com.liruya.exoterra.event.SubscribeChangedEvent;
 import com.liruya.exoterra.manager.DeviceManager;
+import com.liruya.exoterra.manager.UserManager;
 import com.liruya.exoterra.scan.ScanActivity;
 import com.liruya.exoterra.smartconfig.SmartconfigActivity;
 import com.liruya.exoterra.xlink.XlinkTaskCallback;
@@ -64,6 +67,11 @@ public class DevicesFragment extends BaseFragment {
         refreshSubcribeDevices();
     }
 
+    @Subscribe (threadMode = ThreadMode.MAIN)
+    public void onDeviceStateChangedEvent(DeviceStateChangedEvent event) {
+        refreshSubcribeDevices();
+    }
+
     @Override
     protected int getLayoutRes() {
         return R.layout.fragment_devices;
@@ -76,6 +84,12 @@ public class DevicesFragment extends BaseFragment {
         devices_rv_show = view.findViewById(R.id.devices_rv_show);
 
         devices_toolbar.inflateMenu(R.menu.menu_devices);
+        Menu menu = devices_toolbar.getMenu();
+        if (menu != null) {
+            boolean login = UserManager.isLogin();
+            menu.findItem(R.id.menu_devices_scan).setVisible(!login);
+            menu.findItem(R.id.menu_devices_add).setVisible(login);
+        }
         devices_rv_show.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL));
     }
 
@@ -94,7 +108,9 @@ public class DevicesFragment extends BaseFragment {
             }
         };
         devices_rv_show.setAdapter(mAdapter);
-        refreshSubcribeDevices();
+        if (UserManager.isLogin()) {
+            refreshSubcribeDevices();
+        }
     }
 
     @Override
@@ -119,7 +135,11 @@ public class DevicesFragment extends BaseFragment {
         devices_swipe_refresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                refreshSubcribeDevices();
+                if (UserManager.isLogin()) {
+                    refreshSubcribeDevices();
+                } else {
+                    devices_swipe_refresh.setRefreshing(false);
+                }
             }
         });
     }
@@ -131,13 +151,6 @@ public class DevicesFragment extends BaseFragment {
                 Toast.makeText(getContext(), error, Toast.LENGTH_SHORT)
                      .show();
                 devices_swipe_refresh.setRefreshing(false);
-            }
-
-            @Override
-            public void onStart() {
-                if (devices_swipe_refresh.isRefreshing() == false) {
-                    devices_swipe_refresh.setRefreshing(true);
-                }
             }
 
             @Override

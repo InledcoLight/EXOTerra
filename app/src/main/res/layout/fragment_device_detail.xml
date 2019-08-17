@@ -3,6 +3,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:clickable="true"
+    android:background="@mipmap/ic_background"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
@@ -22,7 +23,6 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:gravity="center_vertical"
-        android:layout_margin="8dp"
         android:padding="8dp">
 
         <TextView
@@ -44,7 +44,32 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="?attr/selectableItemBackground"
-            app:srcCompat="@drawable/ic_arrow_right_black_32dp"/>
+            app:srcCompat="@drawable/ic_arrow_right_white_32dp"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/device_detail_ll_zone"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:padding="8dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/textColorPrimary"
+            android:text="@string/device_zone"/>
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"/>
+        <TextView
+            android:id="@+id/device_detail_zone"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/textColorSencondary"
+            android:text=""/>
     </LinearLayout>
 
     <LinearLayout
@@ -53,7 +78,6 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:gravity="center_vertical"
-        android:layout_margin="8dp"
         android:padding="8dp">
 
         <TextView
@@ -75,14 +99,13 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="?attr/selectableItemBackground"
-            app:srcCompat="@drawable/ic_arrow_right_black_32dp"/>
+            app:srcCompat="@drawable/ic_arrow_right_white_32dp"/>
     </LinearLayout>
 
     <TextView
         android:id="@+id/device_detail_user_list"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="8dp"
         android:padding="8dp"
         android:gravity="center_vertical"
         android:textColor="@color/textColorPrimary"
@@ -94,7 +117,6 @@
         android:orientation="horizontal"
         android:gravity="center_vertical"
         android:visibility="gone"
-        android:layout_margin="8dp"
         android:padding="8dp">
 
         <TextView
@@ -118,7 +140,6 @@
         android:id="@+id/device_detail_upgrade"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="8dp"
         android:padding="8dp"
         android:gravity="center_vertical"
         android:textColor="@color/textColorPrimary"
@@ -128,7 +149,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:layout_margin="8dp"
         android:padding="8dp">
         <TextView
             android:layout_width="wrap_content"

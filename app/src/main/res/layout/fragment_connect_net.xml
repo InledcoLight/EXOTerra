@@ -15,8 +15,8 @@
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
         android:padding="8dp"
-        android:text="@string/connect_net"
-        android:textSize="24sp"
+        android:text="@string/input_router_password"
+        android:textSize="@dimen/textSizeTitle"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"/>
@@ -52,23 +52,13 @@
         android:orientation="horizontal"
         app:layout_constraintGuide_percent="0.5"/>
 
-    <!--<ImageButton-->
-        <!--android:id="@+id/connect_net_change"-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:layout_marginEnd="16dp"-->
-        <!--app:layout_constraintBottom_toBottomOf="@+id/connect_net_tl1"-->
-        <!--app:layout_constraintEnd_toEndOf="parent"-->
-        <!--app:layout_constraintTop_toTopOf="@+id/connect_net_tl1"-->
-        <!--app:srcCompat="@drawable/ic_arrow_right_black_32dp"/>-->
-
     <android.support.design.widget.TextInputLayout
         android:id="@+id/connect_net_tl1"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginEnd="8dp"
-        android:layout_marginBottom="16dp"
+        android:layout_marginBottom="8dp"
         android:hint="@string/router"
         app:errorEnabled="true"
         app:hintEnabled="true"
@@ -80,7 +70,7 @@
             android:id="@+id/connect_net_router"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:drawableRight="@drawable/ic_arrow_right_black_32dp"
+            android:drawableRight="@drawable/ic_search_white_32dp"
             android:drawablePadding="8dp"
             android:enabled="false"
             android:focusable="false"
@@ -90,8 +80,6 @@
             android:inputType="text"
             android:lines="1"/>
     </android.support.design.widget.TextInputLayout>
-
-
 
     <android.support.design.widget.TextInputLayout
         android:id="@+id/connect_net_tl2"
@@ -108,7 +96,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
 
-        <android.support.design.widget.TextInputEditText
+        <com.liruya.exoterra.view.AdvancedTextInputEditText
             android:id="@+id/connect_net_password"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

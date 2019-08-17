@@ -7,6 +7,7 @@ import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckedTextView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -15,6 +16,8 @@ import com.liruya.exoterra.bean.Device;
 import com.liruya.exoterra.util.DeviceUtil;
 
 import java.util.List;
+
+import cn.xlink.sdk.v5.model.XDevice;
 
 public abstract class DevicesAdapter extends RecyclerView.Adapter<DevicesAdapter.DevicesViewHolder> {
     private final String TAG = "DevicesAdapter";
@@ -42,8 +45,10 @@ public abstract class DevicesAdapter extends RecyclerView.Adapter<DevicesAdapter
         String mac = device.getXDevice().getMacAddress();
         holder.iv_icon.setImageResource(DeviceUtil.getProductIcon(pid));
         holder.tv_name.setText(TextUtils.isEmpty(name) ? DeviceUtil.getDefaultName(pid) : name);
-        holder.tv_product.setText(DeviceUtil.getProductType(pid));
-        holder.tv_desc.setText(mac);
+        boolean state = device.getXDevice().getCloudConnectionState() == XDevice.State.CONNECTED ? true : false;
+        holder.ctv_state.setChecked(state);
+        holder.ctv_state.setText(state ? R.string.cloud_online : R.string.cloud_offline);
+//        holder.tv_desc.setText(mac);
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -70,16 +75,16 @@ public abstract class DevicesAdapter extends RecyclerView.Adapter<DevicesAdapter
     public class DevicesViewHolder extends RecyclerView.ViewHolder {
         private ImageView iv_icon;
         private TextView tv_name;
-        private TextView tv_product;
-        private TextView tv_desc;
+        private CheckedTextView ctv_state;
+//        private TextView tv_desc;
 
         public DevicesViewHolder(@NonNull View itemView) {
             super(itemView);
 
             iv_icon = itemView.findViewById(R.id.item_device_icon);
             tv_name = itemView.findViewById(R.id.item_device_name);
-            tv_product = itemView.findViewById(R.id.item_device_product);
-            tv_desc = itemView.findViewById(R.id.item_device_desc);
+            ctv_state = itemView.findViewById(R.id.item_device_state);
+//            tv_desc = itemView.findViewById(R.id.item_device_desc);
         }
     }
 }

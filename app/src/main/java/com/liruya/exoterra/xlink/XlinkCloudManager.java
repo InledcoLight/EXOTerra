@@ -362,6 +362,26 @@ public class XlinkCloudManager {
         XLinkSDK.startTask(task);
     }
 
+    public XLinkScanDeviceTask createScanDeviceTask(@NonNull final String pid, final int timeout, final int retryInterval, final XLinkScanDeviceListener listener) {
+        XLinkScanDeviceTask task = XLinkScanDeviceTask.newBuilder()
+                                                      .setProductIds(pid)
+                                                      .setTotalTimeout(timeout)
+                                                      .setRetryInterval(retryInterval)
+                                                      .setScanDeviceListener(listener)
+                                                      .build();
+        return task;
+    }
+
+    public XLinkScanDeviceTask createScanDeviceTask(@NonNull final List<String> pid, final int timeout, final int retryInterval, final XLinkScanDeviceListener listener) {
+        XLinkScanDeviceTask task = XLinkScanDeviceTask.newBuilder()
+                                                      .setProductIds(pid)
+                                                      .setTotalTimeout(timeout)
+                                                      .setRetryInterval(retryInterval)
+                                                      .setScanDeviceListener(listener)
+                                                      .build();
+        return task;
+    }
+
     public void scanDevice(@NonNull final String pid, final int timeout, final int retryInterval, final XLinkScanDeviceListener listener) {
         XLinkScanDeviceTask task = XLinkScanDeviceTask.newBuilder()
                                                       .setProductIds(pid)
@@ -372,7 +392,7 @@ public class XlinkCloudManager {
         XLinkSDK.startTask(task);
     }
 
-    public void scanDevice(List<String> pid, int timeout, int retryInterval, XLinkScanDeviceListener listener) {
+    public void scanDevice(@NonNull List<String> pid, final int timeout, final int retryInterval, final XLinkScanDeviceListener listener) {
         XLinkScanDeviceTask task = XLinkScanDeviceTask.newBuilder()
                                                       .setProductIds(pid)
                                                       .setTotalTimeout(timeout)

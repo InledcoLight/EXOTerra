@@ -24,17 +24,18 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center"
         android:orientation="horizontal"
         android:padding="8dp">
         <ImageView
+            android:id="@+id/me_icon_usr"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="?attr/selectableItemBackground"
             app:srcCompat="@drawable/ic_person_white_64dp"/>
         <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
             android:orientation="vertical"
             android:gravity="center_vertical">
             <TextView
@@ -42,25 +43,28 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/hint_nickname"
+                android:visibility="gone"
                 android:textColor="@color/textColorPrimary"
-                android:textSize="24sp"/>
+                android:textSize="@dimen/textSizePrimary"/>
             <TextView
                 android:id="@+id/me_tv_email"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:visibility="visible"
-                android:text="@string/hint_email"
+                android:text="@string/signin"
                 android:textColor="@color/textColorSencondary"
-                android:textSize="14sp"/>
+                android:textSize="@dimen/textSizeSecondary"/>
         </LinearLayout>
+
+        <Button
+            android:id="@+id/me_btn_logout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            android:visibility="gone"
+            android:text="@string/logout"/>
 
     </LinearLayout>
 
-    <Button
-        android:id="@+id/me_btn_logout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="8dp"
-        android:text="@string/logout"/>
+
 
 </LinearLayout>

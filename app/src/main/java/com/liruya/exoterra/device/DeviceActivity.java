@@ -47,7 +47,6 @@ import com.liruya.exoterra.util.LogUtil;
 import com.liruya.exoterra.util.RegexUtil;
 import com.liruya.exoterra.xlink.XlinkCloudManager;
 import com.liruya.exoterra.xlink.XlinkConstants;
-import com.liruya.exoterra.xlink.XlinkRequestCallback;
 import com.liruya.exoterra.xlink.XlinkTaskCallback;
 
 import org.greenrobot.eventbus.EventBus;
@@ -113,43 +112,12 @@ public class DeviceActivity extends BaseImmersiveActivity {
             device_cib_cloud.setChecked(mDevice.getXDevice().getCloudConnectionState() == XDevice.State.CONNECTED ? true : false);
             device_cib_wifi.setChecked(mDevice.getXDevice().getLocalConnectionState() == XDevice.State.CONNECTED ? true : false);
         }
-        MenuItem device_edit = menu.findItem(R.id.menu_device_edit);
-        MenuItem device_rename = menu.findItem(R.id.menu_device_rename);
-        MenuItem device_datetime = menu.findItem(R.id.menu_device_datetime);
         MenuItem device_share = menu.findItem(R.id.menu_device_share);
-        MenuItem device_upgrade = menu.findItem(R.id.menu_device_upgrade);
         MenuItem device_detail = menu.findItem(R.id.menu_device_detail);
-        device_edit.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                return gotoDeviceSetFragment();
-            }
-        });
-        device_rename.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                showRenameDialog();
-                return true;
-            }
-        });
-        device_datetime.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                showDeviceDatetimeDialog();
-                return true;
-            }
-        });
         device_share.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
                 showShareDeviceDialog();
-                return true;
-            }
-        });
-        device_upgrade.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                upgrade();
                 return true;
             }
         });
@@ -266,9 +234,9 @@ public class DeviceActivity extends BaseImmersiveActivity {
                       .append(dp.getName()).append(" ")
                       .append(dp.getType()).append(" ")
                       .append(dp.getValue()).append(" ").append(mDevice.getDataPoint(dp.getIndex()).getRawValue()).append("\n");
+                    Log.e(TAG, "onComplete: " + sb);
                 }
                 mDeviceViewModel.postValue();
-                LogUtil.e(TAG, "onComplete: " + dataPoints.size() + "\n" + sb + "\n" + ((EXOLedstrip) mDevice).getPower() + " " + mDevice.getDataPoint(18).getRawValue());
             }
         };
         mDeviceViewModel.setGetCallback(mGetCallback);
@@ -334,143 +302,6 @@ public class DeviceActivity extends BaseImmersiveActivity {
             LogUtil.e(TAG, "onDatapointChangedEvent: ");
             mDeviceViewModel.postValue();
         }
-    }
-
-    private void showDeviceDatetimeDialog() {
-        if (mDevice == null) {
-            return;
-        }
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(DeviceActivity.this);
-        final AlertDialog dialog = builder.create();
-        dialog.setTitle(R.string.device_datetime);
-        dialog.setMessage(mDevice.getDeviceDatetime() + "\n\n" + getString(R.string.device_datetime_not_correct));
-        dialog.setButton(DialogInterface.BUTTON_POSITIVE, getString(R.string.set_timezone), new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                gotoDeviceSetFragment();
-            }
-        });
-        dialog.setButton(DialogInterface.BUTTON_NEGATIVE, getString(R.string.cancel), new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-
-            }
-        });
-        mDeviceViewModel.probeDeviceDatetime(new XlinkTaskCallback<List<XLinkDataPoint>>() {
-            @Override
-            public void onError(String error) {
-
-            }
-
-            @Override
-            public void onStart() {
-
-            }
-
-            @Override
-            public void onComplete(List<XLinkDataPoint> dataPoints) {
-                for (XLinkDataPoint dp : dataPoints) {
-                    mDevice.setDataPoint(dp);
-                }
-                dialog.setMessage(mDevice.getDeviceDatetime() + "\n\n" + getString(R.string.device_datetime_not_correct));
-            }
-        });
-        dialog.show();
-    }
-
-    private void showRenameDialog() {
-        View view = LayoutInflater.from(DeviceActivity.this).inflate(R.layout.dialog_rename, null, false);
-        final TextInputEditText et_name = view.findViewById(R.id.dialog_rename_et);
-        et_name.setText(mDevice.getXDevice().getDeviceName());
-        AlertDialog.Builder builder = new AlertDialog.Builder(DeviceActivity.this);
-        final AlertDialog dialog = builder.setTitle(R.string.rename_device)
-                                          .setNegativeButton(R.string.cancel, null)
-                                          .setPositiveButton(R.string.ok, null)
-                                          .setView(view)
-                                          .create();
-        dialog.setCanceledOnTouchOutside(false);
-        dialog.show();
-        dialog.getButton(DialogInterface.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String name = et_name.getText().toString();
-                if (TextUtils.isEmpty(name)) {
-                    et_name.setError(getString(R.string.input_empty));
-                    return;
-                }
-                String pid = mDevice.getXDevice().getProductId();
-                int devid = mDevice.getXDevice().getDeviceId();
-                XlinkCloudManager.getInstance().renameDevice(pid, devid, name, new XlinkRequestCallback<DeviceApi.DeviceResponse>() {
-                    @Override
-                    public void onStart() {
-
-                    }
-
-                    @Override
-                    public void onError(String error) {
-                        Toast.makeText(DeviceActivity.this, error, Toast.LENGTH_SHORT)
-                             .show();
-                    }
-
-                    @Override
-                    public void onSuccess(DeviceApi.DeviceResponse deviceResponse) {
-                        dialog.dismiss();
-                    }
-                });
-            }
-        });
-    }
-
-    private boolean gotoDeviceSetFragment() {
-        if (getSupportFragmentManager().findFragmentByTag("device_set") == null) {
-            getSupportFragmentManager().beginTransaction()
-                                       .add(R.id.device_root,
-                                            DeviceSetFragment.newInstance(mDevice.getDeviceTag()), "device_set")
-                                       .addToBackStack("")
-                                       .commit();
-            return true;
-        }
-        return false;
-    }
-
-    private void checkUpdate() {
-        XlinkCloudManager.getInstance().getNewsetVersion(mDevice.getXDevice(), new XlinkRequestCallback<DeviceApi.DeviceNewestVersionResponse>() {
-            @Override
-            public void onStart() {
-
-            }
-
-            @Override
-            public void onError(String error) {
-                Toast.makeText(DeviceActivity.this, error, Toast.LENGTH_SHORT)
-                     .show();
-            }
-
-            @Override
-            public void onSuccess(DeviceApi.DeviceNewestVersionResponse response) {
-            }
-        });
-    }
-
-    private void upgrade() {
-        XlinkCloudManager.getInstance().upgradeDevice(mDevice.getXDevice(), new XlinkRequestCallback<String>() {
-            @Override
-            public void onStart() {
-
-            }
-
-            @Override
-            public void onError(String error) {
-                Toast.makeText(DeviceActivity.this, error, Toast.LENGTH_SHORT)
-                     .show();
-            }
-
-            @Override
-            public void onSuccess(String s) {
-
-            }
-        });
     }
 
     private void shareDevice(@NonNull String email) {

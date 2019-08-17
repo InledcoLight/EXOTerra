@@ -29,6 +29,8 @@ import java.util.Set;
 import cn.xlink.sdk.core.XLinkCoreException;
 import cn.xlink.sdk.v5.listener.XLinkScanDeviceListener;
 import cn.xlink.sdk.v5.model.XDevice;
+import cn.xlink.sdk.v5.module.connection.XLinkScanDeviceTask;
+import cn.xlink.sdk.v5.module.main.XLinkSDK;
 
 public class ScanActivity extends BaseImmersiveActivity {
     private final int SCAN_DEVICE_TIMEOUT = 10000;
@@ -41,6 +43,7 @@ public class ScanActivity extends BaseImmersiveActivity {
     private Set<String> mSubscribedDevices;
     private List<XDevice> mScannedDevices;
     private ScanAdapter mAdapter;
+    private XLinkScanDeviceTask mScanTask;
     private XLinkScanDeviceListener mScanDeviceListener;
     private boolean mScanning;
 
@@ -106,7 +109,6 @@ public class ScanActivity extends BaseImmersiveActivity {
         mAdapter = new ScanAdapter(ScanActivity.this, mScannedDevices, mSubscribedDevices) {
             @Override
             public void onItemClick(final XDevice device) {
-                mProgressDialog.show();
                 XlinkCloudManager.getInstance().addDevice(device, 10000, new XlinkTaskCallback<XDevice>() {
                     @Override
                     public void onError(String error) {
@@ -117,7 +119,7 @@ public class ScanActivity extends BaseImmersiveActivity {
 
                     @Override
                     public void onStart() {
-
+                        mProgressDialog.show();
                     }
 
                     @Override
@@ -189,14 +191,14 @@ public class ScanActivity extends BaseImmersiveActivity {
         }
         mScannedDevices.clear();
         mAdapter.notifyDataSetChanged();
-        List<String> pids = new ArrayList<>();
-        pids.add(XlinkConstants.PRODUCT_ID_LEDSTRIP);
-        pids.add(XlinkConstants.PRODUCT_ID_MONSOON);
-        pids.add(XlinkConstants.PRODUCT_ID_SOCKET);
-        XlinkCloudManager.getInstance().scanDevice(pids, SCAN_DEVICE_TIMEOUT, SCAN_RETRY_INTERVAL, mScanDeviceListener);
+        mScanTask = XlinkCloudManager.getInstance().createScanDeviceTask(XlinkConstants.XLINK_PRODUCTS, SCAN_DEVICE_TIMEOUT, SCAN_RETRY_INTERVAL, mScanDeviceListener);
+        XLinkSDK.startTask(mScanTask);
+//        XlinkCloudManager.getInstance().scanDevice(pids, SCAN_DEVICE_TIMEOUT, SCAN_RETRY_INTERVAL, mScanDeviceListener);
     }
 
     private void stopScan() {
+        XLinkSDK.stopTask(mScanTask);
+        mScanTask = null;
         mScanning = false;
     }
 }

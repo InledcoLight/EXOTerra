@@ -4,5 +4,6 @@
         android:id="@+id/menu_me_msg"
         android:icon="@drawable/ic_message_white_32dp"
         android:title="@string/message"
+        android:visible="false"
         app:showAsAction="always"/>
 </menu>

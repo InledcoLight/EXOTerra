@@ -96,6 +96,7 @@ public class SplashActivity extends BaseFullscreenActivity {
                 public void run() {
                     while (!mVideoCompleted || !mAuthinListener.isOver());
                     if (mAuthinListener.isSuccess()) {
+                        UserManager.setLogin(true);
                         gotoMainActivity();
                     } else {
                         gotoLoginActivity();

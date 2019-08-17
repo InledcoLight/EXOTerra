@@ -11,7 +11,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="8dp"
-        app:srcCompat="@drawable/ic_device_default_black_64dp"/>
+        app:srcCompat="@drawable/ic_device_default_white_64dp"/>
 
     <LinearLayout
         android:layout_width="0dp"
@@ -24,37 +24,16 @@
             android:id="@+id/item_scan_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text=""/>
-        <TextView
-            android:id="@+id/item_scan_product"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:textColor="@color/textColorPrimary"
+            android:textSize="@dimen/textSizePrimary"
             android:text=""/>
         <TextView
             android:id="@+id/item_scan_desc"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:textColor="@color/textColorSencondary"
+            android:textSize="@dimen/textSizeSecondary"
             android:text=""/>
-        <!--<Space-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="0dp"-->
-            <!--android:layout_weight="1"/>-->
-        <!--<ProgressBar-->
-            <!--android:id="@+id/item_scan_progress"-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:minHeight="4dp"-->
-            <!--android:visibility="gone"-->
-            <!--android:indeterminate="true"-->
-            <!--style="@style/Widget.AppCompat.ProgressBar.Horizontal"/>-->
     </LinearLayout>
-
-    <!--<android.support.design.widget.CheckableImageButton-->
-        <!--android:id="@+id/item_scan_subscribe"-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:background="@android:color/transparent"-->
-        <!--android:scaleType="center"-->
-        <!--app:srcCompat="@drawable/selector_subscribe"/>-->
 
 </LinearLayout>

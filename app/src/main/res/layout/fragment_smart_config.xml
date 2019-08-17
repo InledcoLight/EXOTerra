@@ -148,7 +148,7 @@
         android:layout_marginStart="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="8dp"
-        android:text="Make sure the green led of the device is flash quicky. (Long press the deivce key until the green led flash quicky, for wifi strip press the touch button to change the led to green, then long press.)"
+        android:text="Make sure the green led of the device is flash quicky. (Long press the deivce key until the green led flash quickly, for wifi strip press the touch button to change the led to green, then long press.)"
         app:layout_constraintBottom_toTopOf="@+id/smart_config_start"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"/>

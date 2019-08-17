@@ -39,7 +39,7 @@ import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import com.liruya.base.BaseFragment;
 import com.liruya.exoterra.R;
 import com.liruya.exoterra.bean.EXOLedstrip;
-import com.liruya.exoterra.device.DeviceSetFragment;
+import com.liruya.exoterra.device.LocationFragment;
 import com.liruya.exoterra.util.LightUtil;
 
 import java.text.DecimalFormat;
@@ -363,7 +363,7 @@ public class LightAutoFragment extends BaseFragment {
                    public void onClick(DialogInterface dialog, int which) {
                        getActivity().getSupportFragmentManager()
                                     .beginTransaction()
-                                    .add(R.id.device_root, DeviceSetFragment.newInstance(mLight.getDeviceTag()), "device_set")
+                                    .add(R.id.device_root, new LocationFragment(), "device_set")
                                     .addToBackStack("")
                                     .commit();
                    }

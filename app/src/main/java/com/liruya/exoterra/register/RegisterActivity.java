@@ -1,10 +1,9 @@
 package com.liruya.exoterra.register;
 
 import android.app.ProgressDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.design.widget.TextInputLayout;
-import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
@@ -14,6 +13,7 @@ import com.liruya.base.BaseImmersiveActivity;
 import com.liruya.exoterra.R;
 import com.liruya.exoterra.util.RegexUtil;
 import com.liruya.exoterra.view.AdvancedTextInputEditText;
+import com.liruya.exoterra.view.MessageDialog;
 import com.liruya.exoterra.xlink.XlinkCloudManager;
 import com.liruya.exoterra.xlink.XlinkRequestCallback;
 import com.liruya.loaddialog.LoadDialog;
@@ -21,7 +21,7 @@ import com.liruya.loaddialog.LoadDialog;
 import cn.xlink.restful.api.app.UserAuthApi;
 
 public class RegisterActivity extends BaseImmersiveActivity {
-
+    private Toolbar register_toolbar;
     private TextInputLayout register_til_email;
     private AdvancedTextInputEditText register_et_email;
     private TextInputLayout register_til_verifycode;
@@ -52,6 +52,7 @@ public class RegisterActivity extends BaseImmersiveActivity {
 
     @Override
     protected void initView() {
+        register_toolbar = findViewById(R.id.register_toolbar);
         register_til_email = findViewById(R.id.register_til_email);
         register_et_email = findViewById(R.id.register_et_email);
         register_til_verifycode = findViewById(R.id.register_til_verifycode);
@@ -62,6 +63,7 @@ public class RegisterActivity extends BaseImmersiveActivity {
         register_btn_signup = findViewById(R.id.register_btn_signup);
         register_btn_signin = findViewById(R.id.register_btn_signin);
 
+        setSupportActionBar(register_toolbar);
         register_et_email.bindTextInputLayout(register_til_email);
         register_et_verifycode.bindTextInputLayout(register_til_verifycode);
         register_et_password.bindTextInputLayout(register_til_password);
@@ -101,20 +103,28 @@ public class RegisterActivity extends BaseImmersiveActivity {
             @Override
             public void onError(String error) {
                 dismissLoading();
-                Toast.makeText(RegisterActivity.this, error, Toast.LENGTH_SHORT)
-                     .show();
+                new MessageDialog(RegisterActivity.this).setTitle(R.string.signup_failed)
+                                                     .setMessage(error)
+                                                     .setButton(getString(R.string.ok), null)
+                                                     .show();
             }
 
             @Override
             public void onSuccess(UserAuthApi.EmailVerifyCodeRegisterResponse response) {
                 dismissLoading();
-                showRegisterSuccessDialog();
+                backtoLoginActivity(true);
             }
         };
     }
 
     @Override
     protected void initEvent() {
+        register_toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onBackPressed();
+            }
+        });
         register_btn_send.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -156,7 +166,7 @@ public class RegisterActivity extends BaseImmersiveActivity {
         register_btn_signin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                finish();
+                backtoLoginActivity(false);
             }
         });
     }
@@ -183,26 +193,27 @@ public class RegisterActivity extends BaseImmersiveActivity {
         mProgressDialog.dismiss();
     }
 
-    private void showRegisterSuccessDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle(R.string.title_register_success)
-               .setMessage(R.string.msg_active_account)
-               .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-                   @Override
-                   public void onClick(DialogInterface dialog, int which) {
-                       backtoLoginActivity();
-                   }
-               })
-               .setCancelable(false)
-               .show();
-    }
+//    private void showRegisterSuccessDialog() {
+//        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+//        builder.setTitle(R.string.title_register_success)
+//               .setMessage(R.string.msg_active_account)
+//               .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+//                   @Override
+//                   public void onClick(DialogInterface dialog, int which) {
+//                       backtoLoginActivity(true);
+//                   }
+//               })
+//               .setCancelable(false)
+//               .show();
+//    }
 
-    private void backtoLoginActivity() {
+    private void backtoLoginActivity(boolean login) {
         String email = getEmailText();
         String password = getPasswordText();
         Intent intent = new Intent();
         intent.putExtra("email", email);
         intent.putExtra("password", password);
+        intent.putExtra("login", login);
         setResult(1, intent);
         finish();
     }

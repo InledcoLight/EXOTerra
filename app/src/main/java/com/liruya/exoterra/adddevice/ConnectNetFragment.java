@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.location.LocationManager;
 import android.net.DhcpInfo;
+import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Build;
@@ -14,7 +15,6 @@ import android.os.Bundle;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.design.widget.TextInputEditText;
 import android.support.design.widget.TextInputLayout;
 import android.text.TextUtils;
 import android.util.Log;
@@ -33,7 +33,7 @@ public class ConnectNetFragment extends BaseFragment {
     private TextInputLayout connect_net_tl1;
     private AdvancedTextInputEditText connect_net_router;
     private TextInputLayout connect_net_tl2;
-    private TextInputEditText connect_net_password;
+    private AdvancedTextInputEditText connect_net_password;
     private Button connect_net_smartconfig;
     private Button connect_net_apconfig;
 
@@ -41,6 +41,8 @@ public class ConnectNetFragment extends BaseFragment {
     private ConnectNetViewModel mConnectNetViewModel;
 
     private boolean mRegistered;
+    private boolean mOpen;                          //是否开放式热点
+
     private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -49,13 +51,16 @@ public class ConnectNetFragment extends BaseFragment {
                 return;
             }
             WifiManager wifiManager = (WifiManager) getActivity().getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+            wifiManager.getConfiguredNetworks();
             if (wifiManager != null) {
+                WifiInfo wifiInfo = wifiManager.getConnectionInfo();
+                DhcpInfo dhcpInfo = wifiManager.getDhcpInfo();
                 switch (action) {
                     case WifiManager.NETWORK_STATE_CHANGED_ACTION:
-                        onWiFiChanged(wifiManager.getConnectionInfo(), wifiManager.getDhcpInfo());
+                        onWiFiChanged(wifiInfo, dhcpInfo);
                         break;
                     case LocationManager.PROVIDERS_CHANGED_ACTION:
-                        onWiFiChanged(wifiManager.getConnectionInfo(), wifiManager.getDhcpInfo());
+                        onWiFiChanged(wifiInfo, dhcpInfo);
                         onLocationChanged();
                         break;
                 }
@@ -95,6 +100,7 @@ public class ConnectNetFragment extends BaseFragment {
         connect_net_apconfig = view.findViewById(R.id.connect_net_apconfig);
 
         connect_net_router.bindTextInputLayout(connect_net_tl1);
+        connect_net_password.bindTextInputLayout(connect_net_tl2);
     }
 
     @Override
@@ -115,6 +121,11 @@ public class ConnectNetFragment extends BaseFragment {
         connect_net_smartconfig.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                String error = checkPassword();
+                if (error != null) {
+                    connect_net_tl2.setError(error);
+                    return;
+                }
                 mConnectNetViewModel.getData().setSsid(getSsid());
                 mConnectNetViewModel.getData().setBssid(mWifiHelper.getGatewayMacAddress());
                 mConnectNetViewModel.getData().setPassword(getPassword());
@@ -128,6 +139,11 @@ public class ConnectNetFragment extends BaseFragment {
         connect_net_apconfig.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                String error = checkPassword();
+                if (error != null) {
+                    connect_net_tl2.setError(error);
+                    return;
+                }
                 mConnectNetViewModel.getData().setSsid(getSsid());
                 mConnectNetViewModel.getData().setBssid(mWifiHelper.getGatewayMacAddress());
                 mConnectNetViewModel.getData().setPassword(getPassword());
@@ -146,6 +162,18 @@ public class ConnectNetFragment extends BaseFragment {
 
     private String getPassword() {
         return connect_net_password.getText().toString();
+    }
+
+    private String checkPassword() {
+        String psw = getPassword();
+        if (mOpen) {
+            return null;
+        } else {
+            if (TextUtils.isEmpty(psw) || psw.length() < 8) {
+                return getString(R.string.error_wifi_password);
+            }
+        }
+        return null;
     }
 
     private void registerWiFiStateReceiver() {
@@ -168,8 +196,17 @@ public class ConnectNetFragment extends BaseFragment {
         if (wifiInfo == null) {
             return;
         }
+        WifiManager wifiManager = (WifiManager) getActivity().getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+        for (WifiConfiguration cfg : wifiManager.getConfiguredNetworks()) {
+            if (cfg.networkId == wifiInfo.getNetworkId()) {
+                mOpen = cfg.allowedKeyManagement.get(WifiConfiguration.KeyMgmt.NONE);
+                Log.e(TAG, "onWiFiChanged: " + mOpen);
+            }
+        }
+        connect_net_tl2.setError(null);
+
         String ssid = wifiInfo.getSSID();
-        Log.e(TAG, "onWiFiChanged: " + ssid + "  " + wifiInfo.getBSSID() + (dhcpInfo==null?"dhcpinfo=null":dhcpInfo.toString()));
+        Log.e(TAG, "onWiFiChanged: " + wifiInfo.getMacAddress() + "  " + wifiInfo.getBSSID() + " " + (dhcpInfo==null?"dhcpinfo=null":dhcpInfo.toString()));
         if (ssid.length() >= 2 && ssid.startsWith("\"") && ssid.endsWith("\"")) {
             ssid = ssid.substring(1, ssid.length() - 1);
         }

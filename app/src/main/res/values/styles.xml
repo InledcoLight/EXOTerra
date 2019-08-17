@@ -13,7 +13,7 @@
         <item name="android:textColorHint">@color/colorGray</item>
         <item name="android:textColorLink">@color/colorAccent</item>
         <item name="colorError">@color/colorRed</item>
-        <item name="colorButtonNormal">@color/colorButton</item>
+        <item name="colorButtonNormal">@color/selector_button</item>
 
         <item name="android:windowBackground">@mipmap/ic_background</item>
         <item name="alertDialogTheme">@style/DialogTheme</item>

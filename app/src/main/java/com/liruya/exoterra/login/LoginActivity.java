@@ -8,7 +8,6 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.Toast;
 
 import com.liruya.base.BaseImmersiveActivity;
 import com.liruya.exoterra.R;
@@ -18,12 +17,12 @@ import com.liruya.exoterra.manager.UserManager;
 import com.liruya.exoterra.register.RegisterActivity;
 import com.liruya.exoterra.util.RegexUtil;
 import com.liruya.exoterra.view.AdvancedTextInputEditText;
+import com.liruya.exoterra.view.MessageDialog;
 import com.liruya.exoterra.xlink.XlinkCloudManager;
+import com.liruya.exoterra.xlink.XlinkTaskCallback;
 import com.liruya.loaddialog.LoadDialog;
 
 import cn.xlink.restful.api.app.UserAuthApi;
-import cn.xlink.sdk.core.XLinkCoreException;
-import cn.xlink.sdk.v5.listener.XLinkTaskListener;
 import cn.xlink.sdk.v5.module.main.XLinkSDK;
 
 public class LoginActivity extends BaseImmersiveActivity {
@@ -54,8 +53,12 @@ public class LoginActivity extends BaseImmersiveActivity {
             if (data != null) {
                 String email = data.getStringExtra("email");
                 String password = data.getStringExtra("password");
+                boolean login = data.getBooleanExtra("login", false);
                 login_et_email.setText(email);
                 login_et_password.setText(password);
+                if (login) {
+                    login_btn_signin.performClick();
+                }
             }
         }
     }
@@ -115,25 +118,25 @@ public class LoginActivity extends BaseImmersiveActivity {
                     return;
                 }
                 Log.e(TAG, "onClick: login....");
-                XlinkCloudManager.getInstance().login(email, password, 5000, new XLinkTaskListener<UserAuthApi.UserAuthResponse>() {
+                XlinkCloudManager.getInstance().login(email, password, 5000, new XlinkTaskCallback<UserAuthApi.UserAuthResponse>() {
                     @Override
-                    public void onError(XLinkCoreException e) {
-                        Log.e(TAG, "onError: ");
-                        Toast.makeText(LoginActivity.this, e.getErrorName(), Toast.LENGTH_SHORT)
-                             .show();
+                    public void onError(String error) {
+                        new MessageDialog(LoginActivity.this).setTitle(R.string.signin_failed)
+                                                             .setMessage(error)
+                                                             .setButton(getString(R.string.ok), null)
+                                                             .show();
                         dismissLoading();
                     }
 
                     @Override
                     public void onStart() {
-                        Log.e(TAG, "onStart: ");
                         showLoading();
                     }
 
                     @Override
                     public void onComplete(UserAuthApi.UserAuthResponse response) {
-                        Log.e(TAG, "onComplete: ");
                         dismissLoading();
+                        UserManager.setLogin(true);
                         UserManager.setAccount(LoginActivity.this, email);
                         UserManager.setPassword(LoginActivity.this, password);
                         UserManager.setUserId(LoginActivity.this, response.userId);

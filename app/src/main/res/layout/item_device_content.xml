@@ -11,7 +11,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="8dp"
-        app:srcCompat="@drawable/ic_device_default_black_64dp"/>
+        app:srcCompat="@drawable/ic_device_default_white_64dp"/>
 
     <LinearLayout
         android:layout_width="0dp"
@@ -24,17 +24,26 @@
             android:id="@+id/item_device_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:textColor="@color/textColorPrimary"
+            android:textSize="@dimen/textSizePrimary"
             android:text=""/>
-        <TextView
-            android:id="@+id/item_device_product"
+        <CheckedTextView
+            android:id="@+id/item_device_state"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text=""/>
-        <TextView
-            android:id="@+id/item_device_desc"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text=""/>
+            android:gravity="center_vertical"
+            android:drawableLeft="@drawable/selector_cloud"
+            android:drawablePadding="8dp"
+            android:textColor="@color/textColorSencondary"
+            android:textSize="@dimen/textSizeSecondary"
+            android:text="@string/cloud_offline"/>
+        <!--<TextView-->
+            <!--android:id="@+id/item_device_desc"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:textColor="@color/textColorSencondary"-->
+            <!--android:textSize="@dimen/textSizeSecondary"-->
+            <!--android:text=""/>-->
     </LinearLayout>
 
 </LinearLayout>

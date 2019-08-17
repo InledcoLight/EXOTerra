@@ -11,14 +11,10 @@ import com.liruya.exoterra.R;
 
 public class AddDeviceActivity extends BaseImmersiveActivity {
 
-    private final int REQUEST_LOCATION_CODE = 1;
-
     private Toolbar adddevice_toolbar;
 
     private ConnectNetBean mConnectNetBean;
     private ConnectNetViewModel mConnectNetViewModel;
-
-//    private LocationHelper mLocationHelper;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -27,26 +23,6 @@ public class AddDeviceActivity extends BaseImmersiveActivity {
         initData();
         initEvent();
     }
-
-//    @Override
-//    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-//        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-//        if (requestCode == REQUEST_LOCATION_CODE) {
-//            if (permissions == null || permissions.length != 1 || grantResults == null || grantResults.length != 1) {
-//                return;
-//            }
-//            if (Manifest.permission.ACCESS_COARSE_LOCATION.equals(permissions[0])) {
-//                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-//
-//                } else if (mLocationHelper.shouldShowRequestPermissionRationale()) {
-//                    Toast.makeText(AddDeviceActivity.this, R.string.msg_location_permission, Toast.LENGTH_LONG)
-//                         .show();
-//                } else {
-//                    showLocationPermissionDialog();
-//                }
-//            }
-//        }
-//    }
 
     @Override
     protected int getLayoutRes() {
@@ -68,11 +44,6 @@ public class AddDeviceActivity extends BaseImmersiveActivity {
         getSupportFragmentManager().beginTransaction()
                                    .replace(R.id.adddevice_fl, new ProductsFragment())
                                    .commit();
-
-//        mLocationHelper = new LocationHelper(AddDeviceActivity.this);
-//        if (mLocationHelper.checkLocationPermisson() == false) {
-//            mLocationHelper.requestLocationPermission(REQUEST_LOCATION_CODE);
-//        }
     }
 
     @Override
@@ -93,19 +64,4 @@ public class AddDeviceActivity extends BaseImmersiveActivity {
             super.onBackPressed();
         }
     }
-
-//    private void showLocationPermissionDialog() {
-//        AlertDialog.Builder builder = new AlertDialog.Builder(AddDeviceActivity.this);
-//        builder.setTitle(R.string.title_location_permission)
-//               .setMessage(R.string.msg_location_permission)
-//               .setNegativeButton(R.string.cancel, null)
-//               .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-//                   @Override
-//                   public void onClick(DialogInterface dialog, int which) {
-//                       mLocationHelper.startAppDetailActivity();
-//                   }
-//               })
-//               .setCancelable(false)
-//               .show();
-//    }
 }

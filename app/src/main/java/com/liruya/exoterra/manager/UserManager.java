@@ -27,13 +27,31 @@ public class UserManager {
 
 
     private static boolean mLogin;
+    private static String mEmail;
+    private static String mNickname;
 
-    public static void setIsLogin(boolean isLogin) {
+    public static void setLogin(boolean isLogin) {
         mLogin = isLogin;
     }
 
-    public static boolean ismLogin() {
+    public static boolean isLogin() {
         return mLogin;
+    }
+
+    public static String getEmail() {
+        return mEmail;
+    }
+
+    public static void setEmail(String mEmail) {
+        UserManager.mEmail = mEmail;
+    }
+
+    public static String getNickname() {
+        return mNickname;
+    }
+
+    public static void setNickname(String mNickname) {
+        UserManager.mNickname = mNickname;
     }
 
     public static void setAccount(Context context, String account) {
@@ -99,6 +117,8 @@ public class UserManager {
     public static void clear(Context context) {
         PrefUtil.clear(context, PREF_FILE_USER);
         mLogin = false;
+        mEmail = null;
+        mNickname = null;
     }
 
 //    public static boolean check(Context context) {

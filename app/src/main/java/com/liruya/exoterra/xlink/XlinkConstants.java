@@ -1,5 +1,8 @@
 package com.liruya.exoterra.xlink;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class XlinkConstants {
     public static final String HOST_API_FORMAL = "https://api2.xlink.cn";
     public static final String HOST_CM_FORMAL = "mqtt.xlink.cn";
@@ -21,4 +24,13 @@ public class XlinkConstants {
     public static final String LEDSTRIP_AP_SSID = "EXOTerraStrip_XXXXXX";
     public static final String LEDSOCKET_AP_SSID = "EXOTerraSocket_XXXXXX";
     public static final String LEDMONSOON_AP_SSID = "EXOTerraMonsoon_XXXXXX";
+
+    public static final List<String> XLINK_PRODUCTS;
+
+    static {
+        XLINK_PRODUCTS = new ArrayList<>();
+        XLINK_PRODUCTS.add(PRODUCT_ID_LEDSTRIP);
+        XLINK_PRODUCTS.add(PRODUCT_ID_SOCKET);
+        XLINK_PRODUCTS.add(PRODUCT_ID_MONSOON);
+    }
 }

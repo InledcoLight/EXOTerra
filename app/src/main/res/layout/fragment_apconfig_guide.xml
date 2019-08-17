@@ -29,7 +29,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginTop="32dp"
-        android:text="@string/poweroff_device"
+        android:text="1. Long press the deivce key until the green led flash quickly (1s)"
         android:textColor="@color/textColorSencondary"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/apconfig_guide_title"/>
@@ -40,7 +40,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
-        android:text="@string/poweron_device"
+        android:text="1. Long press the deivce key until the green led flash slowly (3s)"
         android:textColor="@color/textColorSencondary"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/apconfig_guide_step1"/>

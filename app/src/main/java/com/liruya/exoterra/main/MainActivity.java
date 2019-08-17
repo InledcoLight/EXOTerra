@@ -25,6 +25,7 @@ import com.liruya.exoterra.main.devices.DevicesFragment;
 import com.liruya.exoterra.main.homes.HomesFragment;
 import com.liruya.exoterra.main.me.MeFragment;
 import com.liruya.exoterra.manager.DeviceManager;
+import com.liruya.exoterra.manager.UserManager;
 import com.liruya.exoterra.scan.ScanActivity;
 import com.liruya.exoterra.smartconfig.SmartconfigActivity;
 
@@ -69,6 +70,10 @@ public class MainActivity extends BaseImmersiveActivity {
     protected void initView() {
         main_bnv = findViewById(R.id.main_bnv);
         main_me = main_bnv.findViewById(R.id.main_bnv_me);
+
+        main_bnv.getMenu()
+                .findItem(R.id.main_bnv_home)
+                .setVisible(UserManager.isLogin());
     }
 
     @Override
