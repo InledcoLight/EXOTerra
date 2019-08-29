@@ -1,15 +1,17 @@
 package com.liruya.exoterra.adddevice;
 
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 
-import com.liruya.base.BaseImmersiveActivity;
 import com.liruya.exoterra.R;
+import com.liruya.exoterra.base.BaseActivity;
 
-public class AddDeviceActivity extends BaseImmersiveActivity {
+public class AddDeviceActivity extends BaseActivity {
 
     private Toolbar adddevice_toolbar;
 
@@ -41,9 +43,7 @@ public class AddDeviceActivity extends BaseImmersiveActivity {
         mConnectNetBean = new ConnectNetBean();
         mConnectNetViewModel = ViewModelProviders.of(this).get(ConnectNetViewModel.class);
         mConnectNetViewModel.setData(mConnectNetBean);
-        getSupportFragmentManager().beginTransaction()
-                                   .replace(R.id.adddevice_fl, new ProductsFragment())
-                                   .commit();
+        replaceFragment(R.id.adddevice_fl, new ProductsFragment());
     }
 
     @Override
@@ -59,7 +59,18 @@ public class AddDeviceActivity extends BaseImmersiveActivity {
     @Override
     public void onBackPressed() {
         if (mConnectNetViewModel.getData().isRunning()) {
-
+            AlertDialog.Builder builder = new AlertDialog.Builder(AddDeviceActivity.this);
+            builder.setTitle("Stop Add Device")
+                   .setMessage("This will stop add device, confirm to exit?")
+                   .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                       @Override
+                       public void onClick(DialogInterface dialog, int which) {
+                           AddDeviceActivity.super.onBackPressed();
+                       }
+                   })
+                   .setNegativeButton(R.string.cancel, null)
+                   .setCancelable(false)
+                   .show();
         } else {
             super.onBackPressed();
         }

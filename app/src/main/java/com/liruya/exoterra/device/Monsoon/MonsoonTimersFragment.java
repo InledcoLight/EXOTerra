@@ -15,12 +15,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.NumberPicker;
-import android.widget.Switch;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
-import com.liruya.base.BaseFragment;
 import com.liruya.exoterra.R;
+import com.liruya.exoterra.base.BaseFragment;
 import com.liruya.exoterra.bean.EXOMonsoon;
 import com.liruya.exoterra.bean.EXOMonsoonTimer;
 
@@ -81,6 +80,24 @@ public class MonsoonTimersFragment extends BaseFragment {
             @Override
             protected void onLongClickItem(int position) {
                 showRemoveDialog(position);
+            }
+
+            @Override
+            protected void onEnableTimer(int position) {
+                if (position >= 0 && position < mTimers.size()) {
+                    EXOMonsoonTimer tmr = new EXOMonsoonTimer(mTimers.get(position).getValue());
+                    tmr.setEnable(true);
+                    mMonsoonViewModel.setTimer(position, tmr);
+                }
+            }
+
+            @Override
+            protected void onDisableTimer(int position) {
+                if (position >= 0 && position < mTimers.size()) {
+                    EXOMonsoonTimer tmr = new EXOMonsoonTimer(mTimers.get(position).getValue());
+                    tmr.setEnable(false);
+                    mMonsoonViewModel.setTimer(position, tmr);
+                }
             }
         };
         monsoon_timers_rv.setAdapter(mAdapter);
@@ -144,7 +161,6 @@ public class MonsoonTimersFragment extends BaseFragment {
             cb_week[4] = view.findViewById(R.id.dialog_monsoon_thu);
             cb_week[5] = view.findViewById(R.id.dialog_monsoon_fri);
             cb_week[6] = view.findViewById(R.id.dialog_monsoon_sat);
-            final Switch sw_enable = view.findViewById(R.id.dialog_monsoon_enable);
             tp_tmr.setIs24HourView(true);
             tp_tmr.setCurrentHour(timer.getTimer() / 60);
             tp_tmr.setCurrentMinute(timer.getTimer() % 60);
@@ -152,7 +168,6 @@ public class MonsoonTimersFragment extends BaseFragment {
             for (int i = 0; i < 7; i++) {
                 cb_week[i].setChecked(timer.getWeek(i));
             }
-            sw_enable.setChecked(timer.isEnable());
             builder.setNegativeButton(R.string.cancel, null);
             builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                 @Override
@@ -162,7 +177,6 @@ public class MonsoonTimersFragment extends BaseFragment {
                     for (int i = 0; i < 7; i++) {
                         timer.setWeek(i, cb_week[i].isChecked());
                     }
-                    timer.setEnable(sw_enable.isChecked());
                     mMonsoonViewModel.setTimer(idx, timer);
                 }
             });
@@ -211,7 +225,6 @@ public class MonsoonTimersFragment extends BaseFragment {
         cb_week[4] = view.findViewById(R.id.dialog_monsoon_thu);
         cb_week[5] = view.findViewById(R.id.dialog_monsoon_fri);
         cb_week[6] = view.findViewById(R.id.dialog_monsoon_sat);
-        final Switch sw_enable = view.findViewById(R.id.dialog_monsoon_enable);
         tp_tmr.setIs24HourView(true);
         np.setValue(5);
         builder.setNegativeButton(R.string.cancel, null);
@@ -224,7 +237,7 @@ public class MonsoonTimersFragment extends BaseFragment {
                 for (int i = 0; i < 7; i++) {
                     tmr.setWeek(i, cb_week[i].isChecked());
                 }
-                tmr.setEnable(sw_enable.isChecked());
+                tmr.setEnable(true);
                 mMonsoonViewModel.addTimer(tmr);
             }
         });

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.liruya.exoterra.view.SquareLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_margin="8dp"
+    android:background="?attr/selectableItemBackground">
+
+    <android.support.design.card.MaterialCardView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:outlineSpotShadowColor="@color/colorTransparent"
+        android:outlineAmbientShadowColor="@color/colorTransparent"
+        app:cardElevation="8dp"
+        app:strokeColor="@color/colorAccent"
+        app:strokeWidth="1dp"
+        app:contentPadding="8dp"
+        app:cardCornerRadius="16dp"
+        app:cardBackgroundColor="@color/colorTransparent">
+
+    </android.support.design.card.MaterialCardView>
+
+    <TextView
+        android:id="@+id/item_home_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:padding="8dp"
+        android:text="home name"
+        android:textColor="@color/textColorPrimary"
+        android:textSize="@dimen/textSizePrimary" />
+
+</com.liruya.exoterra.view.SquareLayout>

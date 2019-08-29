@@ -9,8 +9,8 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
-import com.liruya.base.BaseImmersiveActivity;
 import com.liruya.exoterra.R;
+import com.liruya.exoterra.base.BaseActivity;
 import com.liruya.exoterra.foundback.FoundbackActivity;
 import com.liruya.exoterra.main.MainActivity;
 import com.liruya.exoterra.manager.UserManager;
@@ -25,7 +25,7 @@ import com.liruya.loaddialog.LoadDialog;
 import cn.xlink.restful.api.app.UserAuthApi;
 import cn.xlink.sdk.v5.module.main.XLinkSDK;
 
-public class LoginActivity extends BaseImmersiveActivity {
+public class LoginActivity extends BaseActivity {
 
     private TextInputLayout login_til_email;
     private AdvancedTextInputEditText login_et_email;

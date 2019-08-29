@@ -10,10 +10,11 @@
         android:id="@+id/socket_ll_sensor"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:background="?attr/selectableItemBackground"
         android:orientation="horizontal"
         android:gravity="center_vertical"
         android:padding="8dp"
-        android:visibility="invisible"
+        android:visibility="visible"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -48,7 +49,7 @@
             android:layout_height="wrap_content"
             android:padding="8dp"
             android:background="?attr/selectableItemBackground"
-            app:srcCompat="@drawable/ic_settings_black_32dp"/>
+            app:srcCompat="@drawable/ic_settings_white_32dp"/>
 
     </LinearLayout>
 

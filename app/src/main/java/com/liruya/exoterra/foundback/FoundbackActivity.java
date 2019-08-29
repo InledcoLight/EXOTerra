@@ -14,8 +14,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
-import com.liruya.base.BaseImmersiveActivity;
 import com.liruya.exoterra.R;
+import com.liruya.exoterra.base.BaseActivity;
 import com.liruya.exoterra.util.RegexUtil;
 import com.liruya.exoterra.view.AdvancedTextInputEditText;
 import com.liruya.exoterra.view.MessageDialog;
@@ -23,7 +23,7 @@ import com.liruya.exoterra.xlink.XlinkCloudManager;
 import com.liruya.exoterra.xlink.XlinkRequestCallback;
 import com.liruya.loaddialog.LoadDialog;
 
-public class FoundbackActivity extends BaseImmersiveActivity {
+public class FoundbackActivity extends BaseActivity {
 
     private final int VERIFY_CODE_SEND_INTERVAL = 120000;
 
@@ -118,6 +118,10 @@ public class FoundbackActivity extends BaseImmersiveActivity {
                 dismissLoading();
                 foundback_btn_send.setEnabled(false);
                 mSendVerifycodeTimer.start();
+                MessageDialog dialog = new MessageDialog(FoundbackActivity.this, true);
+                dialog.setTitle(R.string.title_verifycode_sent)
+                      .setMessage(R.string.msg_get_verifycode)
+                      .show();
             }
         };
         mFoundbackPasswordCallback = new XlinkRequestCallback<String>() {

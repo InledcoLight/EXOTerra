@@ -21,13 +21,14 @@
         android:id="@+id/device_detail_ll_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="?attr/selectableItemBackground"
         android:orientation="horizontal"
-        android:gravity="center_vertical"
-        android:padding="8dp">
+        android:gravity="center_vertical">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:padding="8dp"
             android:textColor="@color/textColorPrimary"
             android:text="@string/device_name"/>
         <Space
@@ -43,21 +44,21 @@
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="?attr/selectableItemBackground"
+            android:layout_marginRight="8dp"
+            android:background="@color/colorTransparent"
             app:srcCompat="@drawable/ic_arrow_right_white_32dp"/>
     </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/device_detail_ll_zone"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:gravity="center_vertical"
-        android:padding="8dp">
+        android:gravity="center_vertical">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:padding="8dp"
             android:textColor="@color/textColorPrimary"
             android:text="@string/device_zone"/>
         <Space
@@ -68,21 +69,22 @@
             android:id="@+id/device_detail_zone"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:padding="8dp"
+            android:layout_marginRight="8dp"
             android:textColor="@color/textColorSencondary"
             android:text=""/>
     </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/device_detail_ll_datetime"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:gravity="center_vertical"
-        android:padding="8dp">
+        android:gravity="center_vertical">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:padding="8dp"
             android:textColor="@color/textColorPrimary"
             android:text="@string/device_datetime"/>
         <Space
@@ -93,19 +95,17 @@
             android:id="@+id/device_detail_datetime"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:padding="8dp"
+            android:layout_marginRight="8dp"
             android:textColor="@color/textColorSencondary"
             android:text=""/>
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="?attr/selectableItemBackground"
-            app:srcCompat="@drawable/ic_arrow_right_white_32dp"/>
     </LinearLayout>
 
     <TextView
         android:id="@+id/device_detail_user_list"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="?attr/selectableItemBackground"
         android:padding="8dp"
         android:gravity="center_vertical"
         android:textColor="@color/textColorPrimary"
@@ -140,6 +140,7 @@
         android:id="@+id/device_detail_upgrade"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="?attr/selectableItemBackground"
         android:padding="8dp"
         android:gravity="center_vertical"
         android:textColor="@color/textColorPrimary"
@@ -148,11 +149,11 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="8dp">
+        android:orientation="vertical">
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:padding="8dp"
             android:textColor="@color/textColorPrimary"
             android:text="@string/detail"/>
         <LinearLayout
@@ -174,6 +175,7 @@
                 android:id="@+id/device_detail_devid"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginRight="16dp"
                 android:textColor="@color/textColorSencondary"/>
         </LinearLayout>
         <LinearLayout
@@ -195,6 +197,7 @@
                 android:id="@+id/device_detail_mac"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginRight="16dp"
                 android:textColor="@color/textColorSencondary"/>
         </LinearLayout>
         <LinearLayout
@@ -216,12 +219,13 @@
                 android:id="@+id/device_detail_fwversion"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginRight="16dp"
                 android:textColor="@color/textColorSencondary"/>
         </LinearLayout>
     </LinearLayout>
 
     <Space
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"/>
 
@@ -229,8 +233,8 @@
         android:id="@+id/device_detail_unsubscribe"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:theme="@style/DangerButtonTheme"
         android:layout_margin="8dp"
-        android:textColor="@color/colorRed"
         android:text="@string/unsubscribe"/>
 
 </LinearLayout>

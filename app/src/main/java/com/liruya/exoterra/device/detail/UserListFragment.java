@@ -12,8 +12,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
-import com.liruya.base.BaseFragment;
 import com.liruya.exoterra.R;
+import com.liruya.exoterra.base.BaseFragment;
 import com.liruya.exoterra.xlink.XlinkCloudManager;
 import com.liruya.exoterra.xlink.XlinkRequestCallback;
 

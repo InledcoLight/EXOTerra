@@ -13,9 +13,9 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
-import com.liruya.base.BaseFragment;
-import com.liruya.exoterra.BaseViewModel;
 import com.liruya.exoterra.R;
+import com.liruya.exoterra.base.BaseFragment;
+import com.liruya.exoterra.base.BaseViewModel;
 import com.liruya.exoterra.bean.Device;
 import com.liruya.exoterra.xlink.XlinkCloudManager;
 import com.liruya.exoterra.xlink.XlinkRequestCallback;
@@ -94,11 +94,6 @@ public class LocationFragment extends BaseFragment {
             public void onClick(View v) {
                 if (mDevice != null) {
                     XlinkCloudManager.getInstance().getDeviceLocation(mDevice.getXDevice(), new XlinkRequestCallback<DeviceApi.DeviceGeographyResponse>() {
-                        @Override
-                        public void onStart() {
-
-                        }
-
                         @Override
                         public void onError(String error) {
 

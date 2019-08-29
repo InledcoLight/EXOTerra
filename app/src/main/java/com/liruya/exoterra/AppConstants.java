@@ -7,6 +7,8 @@ public class AppConstants {
     public static final String  LONGITUDE               = "longitude";
     public static final String  LATITUDE                = "latitude";
 
+
+
     public static final byte    MONSOON_POWERON         = (byte) 0x80;
     public static final byte    MONSOON_POWEROFF        = 0x00;
     public static final int     MONSOON_TIMER_INVALID   = 0;

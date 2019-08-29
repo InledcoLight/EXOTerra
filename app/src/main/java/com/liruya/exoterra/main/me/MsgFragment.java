@@ -10,8 +10,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.liruya.base.BaseFragment;
 import com.liruya.exoterra.R;
+import com.liruya.exoterra.base.BaseFragment;
 import com.liruya.exoterra.base.SimpleAdapter;
 
 import java.util.ArrayList;

@@ -31,7 +31,7 @@ public class LineChartHelper {
         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
         xAxis.setDrawGridLines(false);
         xAxis.setDrawAxisLine(false);
-        xAxis.setTextColor(Color.BLACK);
+        xAxis.setTextColor(Color.WHITE);
         xAxis.setEnabled(true);
         xAxis.setAxisMaximum(24 * 60);
         xAxis.setAxisMinimum(0);
@@ -54,7 +54,7 @@ public class LineChartHelper {
         axisLeft.setLabelCount(5, true);
         axisLeft.setValueFormatter(formatter);
         axisLeft.setPosition(YAxis.YAxisLabelPosition.OUTSIDE_CHART);
-        axisLeft.setTextColor(Color.BLACK);
+        axisLeft.setTextColor(Color.WHITE);
         axisLeft.setDrawGridLines(true);
         axisLeft.setGridColor(0xFF9E9E9E);
         axisLeft.setGridLineWidth(0.75f);
@@ -71,7 +71,7 @@ public class LineChartHelper {
         axisRight.setLabelCount(5, true);
         axisRight.setValueFormatter(formatter);
         axisRight.setPosition(YAxis.YAxisLabelPosition.OUTSIDE_CHART);
-        axisRight.setTextColor(Color.BLACK);
+        axisRight.setTextColor(Color.WHITE);
         axisRight.setDrawGridLines(true);
         axisRight.setGridColor(0xFF9E9E9E);
         axisRight.setGridLineWidth(0.75f);
@@ -94,7 +94,7 @@ public class LineChartHelper {
         chart.setGridBackgroundColor(Color.TRANSPARENT);
         chart.setDescription(null);
         chart.setMaxVisibleValueCount(0);
-        chart.getLegend().setTextColor(Color.BLACK);
+        chart.getLegend().setTextColor(Color.WHITE);
         chart.getLegend().setHorizontalAlignment(Legend.LegendHorizontalAlignment.CENTER);
     }
 

@@ -1,7 +1,6 @@
 package com.liruya.exoterra.adddevice;
 
 import android.annotation.SuppressLint;
-import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.DialogInterface;
 import android.os.Bundle;
@@ -13,14 +12,12 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CheckBox;
-import android.widget.CompoundButton;
-import android.widget.ToggleButton;
 
 import com.github.lzyzsd.circleprogress.DonutProgress;
-import com.liruya.base.BaseFragment;
 import com.liruya.exoterra.R;
+import com.liruya.exoterra.base.BaseFragment;
 import com.liruya.exoterra.event.SubscribeChangedEvent;
+import com.liruya.exoterra.util.RouterUtil;
 
 import org.greenrobot.eventbus.EventBus;
 
@@ -31,8 +28,6 @@ public class SmartConfigFragment extends BaseFragment {
     private CheckableImageButton smart_config_cib_step2;
     private CheckableImageButton smart_config_cib_step3;
     private CheckableImageButton smart_config_cib_step4;
-    private CheckBox smart_config_led;
-    private ToggleButton smart_config_start;
 
     private SmartConfigLinker mSmartConfigLinker;
     private SmartConfigListener mSmartConfigListener = new SmartConfigListener() {
@@ -44,25 +39,23 @@ public class SmartConfigFragment extends BaseFragment {
 
         @Override
         public void onError(final String error) {
-            smart_config_start.setChecked(false);
-            smart_config_start.setEnabled(true);
+            mConnectNetViewModel.getData().setRunning(false);
             showSmartConfigFailedDialog(error);
         }
 
         @SuppressLint ("RestrictedApi")
         @Override
         public void onSuccess() {
+            mConnectNetViewModel.getData().setRunning(false);
             smart_config_cib_step4.setChecked(true);
-            smart_config_start.setChecked(false);
-            smart_config_start.setEnabled(true);
             showSmartConfigSuccessDialog();
+            RouterUtil.putRouterPassword(getContext(), mConnectNetViewModel.getData().getSsid(), mConnectNetViewModel.getData().getPassword());
         }
 
         @SuppressLint ("RestrictedApi")
         @Override
         public void onEsptouchSuccess() {
             smart_config_cib_step1.setChecked(true);
-            smart_config_start.setEnabled(false);
         }
 
         @SuppressLint ("RestrictedApi")
@@ -91,6 +84,15 @@ public class SmartConfigFragment extends BaseFragment {
     }
 
     @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        if (mSmartConfigLinker != null) {
+            mSmartConfigLinker.stopTask();
+            mConnectNetViewModel.getData().setRunning(false);
+        }
+    }
+
+    @Override
     protected int getLayoutRes() {
         return R.layout.fragment_smart_config;
     }
@@ -102,21 +104,11 @@ public class SmartConfigFragment extends BaseFragment {
         smart_config_cib_step2 = view.findViewById(R.id.smart_config_cib_step2);
         smart_config_cib_step3 = view.findViewById(R.id.smart_config_cib_step3);
         smart_config_cib_step4 = view.findViewById(R.id.smart_config_cib_step4);
-        smart_config_led = view.findViewById(R.id.smart_config_led);
-        smart_config_start = view.findViewById(R.id.smart_config_start);
     }
 
     @Override
     protected void initData() {
         mConnectNetViewModel = ViewModelProviders.of(getActivity()).get(ConnectNetViewModel.class);
-        mConnectNetViewModel.observe(this, new Observer<ConnectNetBean>() {
-            @SuppressLint ("RestrictedApi")
-            @Override
-            public void onChanged(@Nullable ConnectNetBean connectNetBean) {
-                boolean isRunning = connectNetBean.isRunning();
-                smart_config_led.setEnabled(!isRunning);
-            }
-        });
 
         ConnectNetBean bean = mConnectNetViewModel.getData();
         String pid = bean.getProductId();
@@ -125,39 +117,32 @@ public class SmartConfigFragment extends BaseFragment {
         String psw = bean.getPassword();
         mSmartConfigLinker = new SmartConfigLinker((AppCompatActivity) getActivity(), pid, ssid, gateway, psw);
         mSmartConfigLinker.setSmartConfigListener(mSmartConfigListener);
+
+        mSmartConfigLinker.startTask();
+        mConnectNetViewModel.getData().setRunning(true);
+        mConnectNetViewModel.postValue();
+
     }
 
     @Override
     protected void initEvent() {
-        smart_config_led.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                smart_config_start.setEnabled(isChecked);
-            }
-        });
-        smart_config_start.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @SuppressLint ("RestrictedApi")
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked) {
-                    smart_config_cib_step1.setChecked(false);
-                    smart_config_cib_step2.setChecked(false);
-                    smart_config_cib_step3.setChecked(false);
-                    smart_config_cib_step4.setChecked(false);
-                    mSmartConfigLinker.startTask();
-                } else {
-                    mSmartConfigLinker.stopTask();
-                }
-                mConnectNetViewModel.getData().setRunning(isChecked);
-                mConnectNetViewModel.postValue();
-            }
-        });
-    }
-
-    private void runOnUiThread(Runnable runnable) {
-        if (getActivity() != null) {
-            getActivity().runOnUiThread(runnable);
-        }
+//        smart_config_start.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+//            @SuppressLint ("RestrictedApi")
+//            @Override
+//            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+//                if (isChecked) {
+//                    smart_config_cib_step1.setChecked(false);
+//                    smart_config_cib_step2.setChecked(false);
+//                    smart_config_cib_step3.setChecked(false);
+//                    smart_config_cib_step4.setChecked(false);
+//                    mSmartConfigLinker.startTask();
+//                } else {
+//                    mSmartConfigLinker.stopTask();
+//                }
+//                mConnectNetViewModel.getData().setRunning(isChecked);
+//                mConnectNetViewModel.postValue();
+//            }
+//        });
     }
 
     private void showSmartConfigSuccessDialog() {
@@ -177,6 +162,21 @@ public class SmartConfigFragment extends BaseFragment {
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         builder.setTitle("SmartConfig Failed")
                .setMessage(error)
+               .setPositiveButton(R.string.close, new DialogInterface.OnClickListener() {
+                   @Override
+                   public void onClick(DialogInterface dialog, int which) {
+                       getActivity().getSupportFragmentManager().popBackStack();
+                   }
+               })
+               .setNeutralButton("Change config mode", new DialogInterface.OnClickListener() {
+                   @Override
+                   public void onClick(DialogInterface dialog, int which) {
+                       mConnectNetViewModel.getData().setCompatibleMode(true);
+                       mConnectNetViewModel.postValue();
+                       getActivity().getSupportFragmentManager().popBackStack();
+                   }
+               })
+               .setCancelable(false)
                .show();
     }
 }

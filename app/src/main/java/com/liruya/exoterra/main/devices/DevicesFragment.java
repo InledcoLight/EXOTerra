@@ -8,16 +8,16 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
-import com.liruya.base.BaseFragment;
 import com.liruya.exoterra.R;
 import com.liruya.exoterra.adddevice.AddDeviceActivity;
+import com.liruya.exoterra.base.BaseFragment;
 import com.liruya.exoterra.bean.Device;
 import com.liruya.exoterra.device.DeviceActivity;
 import com.liruya.exoterra.event.DeviceStateChangedEvent;
@@ -69,7 +69,17 @@ public class DevicesFragment extends BaseFragment {
 
     @Subscribe (threadMode = ThreadMode.MAIN)
     public void onDeviceStateChangedEvent(DeviceStateChangedEvent event) {
-        refreshSubcribeDevices();
+        if (event != null) {
+            Device device = DeviceManager.getInstance().getDevice(event.getDeviceTag());
+            if (device != null) {
+                for (int i = 0; i < mSubscribedDevices.size(); i++) {
+                    if (TextUtils.equals(event.getDeviceTag(), mSubscribedDevices.get(i).getDeviceTag())) {
+                        mSubscribedDevices.get(i).setXDevice(device.getXDevice());
+                        mAdapter.notifyItemChanged(i);
+                    }
+                }
+            }
+        }
     }
 
     @Override
@@ -148,8 +158,6 @@ public class DevicesFragment extends BaseFragment {
         DeviceManager.getInstance().refreshSubcribeDevices(new XlinkTaskCallback<List<Device>>() {
             @Override
             public void onError(String error) {
-                Toast.makeText(getContext(), error, Toast.LENGTH_SHORT)
-                     .show();
                 devices_swipe_refresh.setRefreshing(false);
             }
 

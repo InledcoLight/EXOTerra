@@ -1,5 +1,11 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
 
+    <style name="LaunchTheme" parent="Theme.AppCompat.NoActionBar">
+        <item name="android:windowBackground">@mipmap/ic_splash</item>
+        <item name="android:windowFullscreen">true</item>
+        <item name="android:windowNoTitle">true</item>
+    </style>
+
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat.NoActionBar">
         <!-- Customize your theme here. -->
@@ -15,20 +21,21 @@
         <item name="colorError">@color/colorRed</item>
         <item name="colorButtonNormal">@color/selector_button</item>
 
+        <item name="android:statusBarColor" tools:targetApi="lollipop">@color/colorTransparent</item>
+
         <item name="android:windowBackground">@mipmap/ic_background</item>
         <item name="alertDialogTheme">@style/DialogTheme</item>
 
+        <item name="android:windowAnimationStyle">@style/ActivityAnimation</item>
+
     </style>
 
-    <!--<style name="TextDarkTheme" parent="AppTheme">-->
-        <!--<item name="android:textColorPrimary">#FFFFFF</item>-->
-        <!--<item name="android:textColorSecondary">#E0E0E0</item>-->
-    <!--</style>-->
-
-    <!--<style name="TextLightTheme" parent="AppTheme">-->
-        <!--<item name="android:textColorPrimary">#000000</item>-->
-        <!--<item name="android:textColorSecondary">#9E9E9E</item>-->
-    <!--</style>-->
+    <style name="ActivityAnimation">
+        <item name="android:activityOpenEnterAnimation">@anim/slide_in_right</item>
+        <item name="android:activityCloseExitAnimation">@anim/slide_out_right</item>
+        <item name="android:activityOpenExitAnimation">@android:anim/fade_out</item>
+        <item name="android:activityCloseEnterAnimation">@android:anim/fade_in</item>
+    </style>
 
     <style name="BottomDialogTheme" parent="Theme.AppCompat.Dialog.Alert">
         <item name="android:windowFrame">@null</item>
@@ -42,5 +49,10 @@
     <style name="DialogTheme" parent="Theme.AppCompat.Dialog.Alert">
         <item name="android:windowBackground">@drawable/dialog_background</item>
     </style>
+
+    <style name="DangerButtonTheme" parent="AppTheme">
+        <item name="colorButtonNormal">@color/selector_button_danger</item>
+    </style>
+
 
 </resources>

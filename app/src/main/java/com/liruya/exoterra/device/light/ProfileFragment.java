@@ -13,8 +13,8 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.github.mikephil.charting.charts.LineChart;
-import com.liruya.base.BaseFragment;
 import com.liruya.exoterra.R;
+import com.liruya.exoterra.base.BaseFragment;
 import com.liruya.exoterra.bean.EXOLedstrip;
 import com.liruya.exoterra.bean.Profile;
 import com.liruya.exoterra.bean.TimePoint;
@@ -94,11 +94,7 @@ public class ProfileFragment extends BaseFragment {
         profile_fab_edit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                getActivity().getSupportFragmentManager()
-                             .beginTransaction()
-                             .add(R.id.device_root, EditProFragment.newInstance(mIndex))
-                             .addToBackStack("")
-                             .commit();
+                addFragmentToStack(R.id.device_root, EditProFragment.newInstance(mIndex));
             }
         });
     }

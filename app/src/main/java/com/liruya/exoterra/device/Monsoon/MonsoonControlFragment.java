@@ -3,6 +3,7 @@ package com.liruya.exoterra.device.Monsoon;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.DialogInterface;
+import android.graphics.drawable.AnimationDrawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -11,21 +12,22 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.ImageButton;
+import android.widget.CheckedTextView;
+import android.widget.ImageView;
 import android.widget.NumberPicker;
 import android.widget.TextView;
 
-import com.liruya.base.BaseFragment;
 import com.liruya.exoterra.AppConstants;
 import com.liruya.exoterra.R;
+import com.liruya.exoterra.base.BaseFragment;
 import com.liruya.exoterra.bean.EXOMonsoon;
 
 import java.util.List;
 
 public class MonsoonControlFragment extends BaseFragment {
-    private TextView monsoon_ctrl_status;
-    private ImageButton monsoon_ctrl_on;
-    private ImageButton monsoon_ctrl_off;
+    private ImageView monsoon_ctrl_status;
+    private TextView monsoon_ctrl_period;
+    private CheckedTextView monsoon_ctrl_turn;
     private Button[] monsoon_ctrl_custom = new Button[8];
     private TextView monsoon_key;
 
@@ -86,8 +88,8 @@ public class MonsoonControlFragment extends BaseFragment {
     @Override
     protected void initView(View view) {
         monsoon_ctrl_status = view.findViewById(R.id.monsoon_ctrl_status);
-        monsoon_ctrl_on = view.findViewById(R.id.monsoon_ctrl_on);
-        monsoon_ctrl_off = view.findViewById(R.id.monsoon_ctrl_off);
+        monsoon_ctrl_period = view.findViewById(R.id.monsoon_ctrl_period);
+        monsoon_ctrl_turn = view.findViewById(R.id.monsoon_ctrl_turn);
         monsoon_ctrl_custom[0] = view.findViewById(R.id.monsoon_ctrl_custom1);
         monsoon_ctrl_custom[1] = view.findViewById(R.id.monsoon_ctrl_custom2);
         monsoon_ctrl_custom[2] = view.findViewById(R.id.monsoon_ctrl_custom3);
@@ -116,17 +118,11 @@ public class MonsoonControlFragment extends BaseFragment {
 
     @Override
     protected void initEvent() {
-        monsoon_ctrl_on.setOnClickListener(new View.OnClickListener() {
+        monsoon_ctrl_turn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mMonsoonViewModel.setPower(AppConstants.MONSOON_POWERON);
-            }
-        });
-
-        monsoon_ctrl_off.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mMonsoonViewModel.setPower(AppConstants.MONSOON_POWEROFF);
+                byte power = monsoon_ctrl_turn.isChecked() ? AppConstants.MONSOON_POWEROFF : AppConstants.MONSOON_POWERON;
+                mMonsoonViewModel.setPower(power);
             }
         });
 
@@ -165,7 +161,7 @@ public class MonsoonControlFragment extends BaseFragment {
                 });
             }
             if (addIdx < monsoon_ctrl_custom.length) {
-                monsoon_ctrl_custom[addIdx].setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_add_black_64dp, 0, 0);
+                monsoon_ctrl_custom[addIdx].setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_add_white_64dp, 0, 0);
                 monsoon_ctrl_custom[addIdx].setVisibility(View.VISIBLE);
                 monsoon_ctrl_custom[addIdx].setText("");
                 final int idx = addIdx;
@@ -182,7 +178,22 @@ public class MonsoonControlFragment extends BaseFragment {
                     monsoon_ctrl_custom[i].setOnLongClickListener(null);
                 }
             }
-            monsoon_ctrl_status.setText((mMonsoon.getPower()&0x80) == 0x00 ? "Off" : "On");
+            int power = (mMonsoon.getPower()&0xFF);
+            int time = mMonsoon.getPoweronTmr();
+            if (power >= 0x80) {
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+                    AnimationDrawable animation = (AnimationDrawable) getContext().getDrawable(R.drawable.monsoon_spray);
+                    monsoon_ctrl_status.setImageDrawable(animation);
+                    animation.start();
+                } else {
+                    monsoon_ctrl_status.setImageResource(R.mipmap.ic_monsoon_turnon_0);
+                }
+            } else {
+                monsoon_ctrl_status.setImageResource(R.mipmap.ic_monsoon_turnoff);
+            }
+            monsoon_ctrl_period.setText(time == 0 ? null : "Turn off after " + time + " seconds");
+            monsoon_ctrl_turn.setChecked(power >= 0x80);
+            monsoon_ctrl_turn.setText(power >= 0x80 ? R.string.turnoff : R.string.turnon);
             monsoon_key.setText("Device button action: " + getKeyActionText());
         }
     }

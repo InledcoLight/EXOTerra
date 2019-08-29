@@ -11,18 +11,18 @@ import android.support.annotation.Nullable;
 import android.support.design.internal.BottomNavigationItemView;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AppCompatDelegate;
 import android.util.Base64;
 import android.util.Log;
 import android.view.MenuItem;
 
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
-import com.liruya.base.BaseImmersiveActivity;
 import com.liruya.exoterra.R;
 import com.liruya.exoterra.adddevice.AddDeviceActivity;
+import com.liruya.exoterra.base.BaseActivity;
 import com.liruya.exoterra.main.devices.DevicesFragment;
-import com.liruya.exoterra.main.homes.HomesFragment;
+import com.liruya.exoterra.main.groups.GroupsFragment;
+import com.liruya.exoterra.main.home.HomeFragment;
 import com.liruya.exoterra.main.me.MeFragment;
 import com.liruya.exoterra.manager.DeviceManager;
 import com.liruya.exoterra.manager.UserManager;
@@ -32,15 +32,11 @@ import com.liruya.exoterra.smartconfig.SmartconfigActivity;
 import cn.xlink.sdk.v5.module.main.XLinkSDK;
 import q.rorbin.badgeview.Badge;
 
-public class MainActivity extends BaseImmersiveActivity {
+public class MainActivity extends BaseActivity {
 
     private BottomNavigationView main_bnv;
     private BottomNavigationItemView main_me;
     private Badge badge;
-
-    static {
-        AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
-    }
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -72,16 +68,14 @@ public class MainActivity extends BaseImmersiveActivity {
         main_me = main_bnv.findViewById(R.id.main_bnv_me);
 
         main_bnv.getMenu()
-                .findItem(R.id.main_bnv_home)
+                .findItem(R.id.main_bnv_group)
                 .setVisible(UserManager.isLogin());
     }
 
     @Override
     protected void initData() {
         XLinkSDK.start();
-        getSupportFragmentManager().beginTransaction()
-                                   .replace(R.id.main_fl_show, new DevicesFragment())
-                                   .commit();
+        replaceFragment(R.id.main_fl_show, new HomeFragment());
 //        if (checkCameraPermissions() == false) {
 //            requestCameraPermission();
 //        } else {
@@ -97,9 +91,7 @@ public class MainActivity extends BaseImmersiveActivity {
             @Override
             public void onNavigationItemReselected(@NonNull MenuItem menuItem) {
                 if (menuItem.getItemId() == R.id.main_bnv_devices && DeviceManager.getInstance().getAllDevices().size() == 0) {
-                    getSupportFragmentManager().beginTransaction()
-                                               .replace(R.id.main_fl_show, new DevicesFragment())
-                                               .commit();
+                    replaceFragment(R.id.main_fl_show, new DevicesFragment());
                 }
             }
         });
@@ -107,20 +99,17 @@ public class MainActivity extends BaseImmersiveActivity {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
                 switch (menuItem.getItemId()) {
-                    case R.id.main_bnv_devices:
-                        getSupportFragmentManager().beginTransaction()
-                                                   .replace(R.id.main_fl_show, new DevicesFragment())
-                                                   .commit();
-                        break;
                     case R.id.main_bnv_home:
-                        getSupportFragmentManager().beginTransaction()
-                                                   .replace(R.id.main_fl_show, new HomesFragment())
-                                                   .commit();
+                        replaceFragment(R.id.main_fl_show, new HomeFragment());
+                        break;
+                    case R.id.main_bnv_devices:
+                        replaceFragment(R.id.main_fl_show, new DevicesFragment());
+                        break;
+                    case R.id.main_bnv_group:
+                        replaceFragment(R.id.main_fl_show, new GroupsFragment());
                         break;
                     case R.id.main_bnv_me:
-                        getSupportFragmentManager().beginTransaction()
-                                                   .replace(R.id.main_fl_show, new MeFragment())
-                                                   .commit();
+                        replaceFragment(R.id.main_fl_show, new MeFragment());
                         break;
                 }
                 return true;

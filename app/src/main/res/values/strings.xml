@@ -68,7 +68,7 @@
     <string name="day_light">Daylight</string>
     <string name="sunset">Sunset</string>
     <string name="night">Night</string>
-    <string name="turnoff">Turnoff</string>
+    <string name="turnoff">Turn off</string>
     <string name="disabled">Disabled</string>
     <string name="ramp">Ramp</string>
     <string name="device_datetime">Device datetime</string>
@@ -92,8 +92,8 @@
     <string name="current_profile">Current Profile:</string>
     <string name="smartconfig">SmartConfig</string>
     <string name="remove_timer">Remove Timer</string>
-    <string name="poweron">Turnon</string>
-    <string name="poweroff">Turnoff</string>
+    <string name="poweron">Turn on</string>
+    <string name="poweroff">Turn off</string>
     <string name="timer_count_over">Timers count max 24.</string>
     <string name="add_device">Add Device</string>
     <string name="choose_product">Choose Device Type</string>
@@ -155,4 +155,47 @@
     <string name="error_wifi_password">Wifi password invalid.</string>
     <string name="input_router_password">Input router password</string>
     <string name="device_zone">Device zone</string>
+
+    <string name="smartconfig_guide_default">
+        1.  Press and hold the device key until the green led flash quickly(1s)\n
+
+    </string>
+    <string name="smartconfig_guide_strip">
+        1.  Press the touch key to change the led to green\n
+
+
+        2.  Press and hold the touch key until the green led flash quickly(1s)
+    </string>
+    <string name="apconfig_guide_default">
+        1.  Press and hold the device key until the green led flash quickly(1s)\n
+
+        2.  Again press and hold the device key until the green led flash slowly(3s)\n
+
+        3.  Connect your phone to %1$s\n
+    </string>
+    <string name="apconfig_guide_strip">
+        1.  Press the touch key to change the led to green\n
+
+        2.  Press and hold the device key until the green led flash quickly(1s)\n
+
+        3.  Again press and hold the device key until the green led flash slowly(3s)\n
+
+        4.  Connect your phone to %1$s\n
+    </string>
+    <string name="config_guide">Config guide</string>
+    <string name="smartconfig_confirm">Make sure the green led flash quickly</string>
+    <string name="apconfig_confirm">Make sure the green led flash slowly</string>
+    <string name="turnon">Turn on</string>
+    <string name="device_upgrade_msg">Device firmware can upgrade from version %1$d to %2$d.</string>
+    <string name="upgrading">Upgrading</string>
+    <string name="hint_new_password">New password</string>
+    <string name="reset_password">Reset Password</string>
+    <string name="group">Group</string>
+    <string name="group_name">Group name</string>
+    <string name="create_group">Create group</string>
+    <string name="sync_func_enabled">Synchro function is enabled</string>
+    <string name="sync_func_disabled">Synchro function is disabled</string>
+    <string name="msg_get_verifycode">Verifycode has been sent to the email.</string>
+    <string name="title_verifycode_sent">Verifycode sent success</string>
+    <string name="rename_group">Rename group</string>
 </resources>

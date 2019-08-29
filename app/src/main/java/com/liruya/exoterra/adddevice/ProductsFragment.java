@@ -14,8 +14,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
-import com.liruya.base.BaseFragment;
 import com.liruya.exoterra.R;
+import com.liruya.exoterra.base.BaseFragment;
 import com.liruya.exoterra.helper.LocationHelper;
 import com.liruya.exoterra.util.DeviceUtil;
 
@@ -55,11 +55,7 @@ public class ProductsFragment extends BaseFragment {
                 if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     mConnectNetViewModel.getData()
                                         .setProductId(mProductId);
-                    getActivity().getSupportFragmentManager()
-                                 .beginTransaction()
-                                 .add(R.id.adddevice_fl, new ConnectNetFragment())
-                                 .addToBackStack("")
-                                 .commit();
+                    addFragmentToStack(R.id.adddevice_fl, new ConnectNetFragment());
                 } else if (mLocationHelper.shouldShowRequestPermissionRationale()) {
                     Toast.makeText(getContext(), R.string.msg_location_permission, Toast.LENGTH_LONG)
                          .show();
@@ -95,11 +91,7 @@ public class ProductsFragment extends BaseFragment {
                 } else {
                     mConnectNetViewModel.getData()
                                         .setProductId(mProductId);
-                    getActivity().getSupportFragmentManager()
-                                 .beginTransaction()
-                                 .add(R.id.adddevice_fl, new ConnectNetFragment())
-                                 .addToBackStack("")
-                                 .commit();
+                    addFragmentToStack(R.id.adddevice_fl, new ConnectNetFragment());
                 }
             }
         };

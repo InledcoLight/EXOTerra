@@ -17,9 +17,9 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.liruya.base.BaseFragment;
 import com.liruya.exoterra.AppConstants;
 import com.liruya.exoterra.R;
+import com.liruya.exoterra.base.BaseFragment;
 import com.liruya.exoterra.bean.EXOSocket;
 
 public class SocketControlFragment extends BaseFragment {

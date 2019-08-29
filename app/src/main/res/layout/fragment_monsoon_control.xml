@@ -7,36 +7,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <ImageButton
-        android:id="@+id/monsoon_ctrl_on"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginBottom="8dp"
-        android:background="@android:color/transparent"
-        app:layout_constraintBottom_toTopOf="@+id/monsoon_now_gl4"
-        app:layout_constraintEnd_toStartOf="@+id/monsoon_now_gl1"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@mipmap/ic_monsoon_on_128"/>
-
-    <ImageButton
-        android:id="@+id/monsoon_ctrl_off"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginBottom="8dp"
-        android:background="@android:color/transparent"
-        app:layout_constraintBottom_toTopOf="@+id/monsoon_now_gl4"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="@+id/monsoon_now_gl1"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@mipmap/ic_monsoon_off_128"/>
-
     <android.support.constraint.Guideline
         android:id="@+id/monsoon_now_gl1"
         android:layout_width="wrap_content"
@@ -49,14 +19,14 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.4"/>
+        app:layout_constraintGuide_percent="0.45" />
 
     <android.support.constraint.Guideline
         android:id="@+id/monsoon_now_gl5"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.6"/>
+        app:layout_constraintGuide_percent="0.65" />
 
     <android.support.constraint.Guideline
         android:id="@+id/monsoon_now_gl2"
@@ -80,7 +50,7 @@
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="8dp"
-        android:background="@android:color/transparent"
+        android:background="?attr/selectableItemBackground"
         android:text=""
         android:visibility="invisible"
         app:layout_constraintBottom_toTopOf="@+id/monsoon_now_gl5"
@@ -96,7 +66,7 @@
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="8dp"
-        android:background="@android:color/transparent"
+        android:background="?attr/selectableItemBackground"
         android:text=""
         android:visibility="invisible"
         app:layout_constraintBottom_toTopOf="@+id/monsoon_now_gl5"
@@ -112,7 +82,7 @@
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="8dp"
-        android:background="@android:color/transparent"
+        android:background="?attr/selectableItemBackground"
         android:text=""
         android:visibility="invisible"
         app:layout_constraintBottom_toTopOf="@+id/monsoon_now_gl5"
@@ -128,7 +98,7 @@
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="8dp"
-        android:background="@android:color/transparent"
+        android:background="?attr/selectableItemBackground"
         android:text=""
         android:visibility="invisible"
         app:layout_constraintBottom_toTopOf="@+id/monsoon_now_gl5"
@@ -144,7 +114,7 @@
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="8dp"
-        android:background="@android:color/transparent"
+        android:background="?attr/selectableItemBackground"
         android:text=""
         android:visibility="invisible"
         app:layout_constraintBottom_toTopOf="@+id/monsoon_now_gl6"
@@ -160,7 +130,7 @@
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="8dp"
-        android:background="@android:color/transparent"
+        android:background="?attr/selectableItemBackground"
         android:text=""
         android:visibility="invisible"
         app:layout_constraintBottom_toTopOf="@+id/monsoon_now_gl6"
@@ -177,7 +147,7 @@
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="8dp"
-        android:background="@android:color/transparent"
+        android:background="?attr/selectableItemBackground"
         android:text=""
         android:visibility="invisible"
         app:layout_constraintBottom_toTopOf="@+id/monsoon_now_gl6"
@@ -193,7 +163,7 @@
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="8dp"
-        android:background="@android:color/transparent"
+        android:background="?attr/selectableItemBackground"
         android:text=""
         android:visibility="invisible"
         app:layout_constraintBottom_toTopOf="@+id/monsoon_now_gl6"
@@ -201,38 +171,63 @@
         app:layout_constraintStart_toStartOf="@+id/monsoon_now_gl3"
         app:layout_constraintTop_toTopOf="@+id/monsoon_now_gl5"/>
 
-    <TextView
-        android:id="@+id/monsoon_ctrl_status"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="32dp"
-        android:layout_marginEnd="8dp"
-        android:text="TextView"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
-
     <android.support.constraint.Guideline
         android:id="@+id/monsoon_now_gl6"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.8"/>
+        app:layout_constraintGuide_percent="0.85" />
 
     <TextView
         android:id="@+id/monsoon_key"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="8dp"
         android:padding="8dp"
         android:textSize="16sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <ImageView
+        android:id="@+id/monsoon_ctrl_status"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/monsoon_now_gl6"/>
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@mipmap/ic_monsoon_turnoff" />
+
+    <TextView
+        android:id="@+id/monsoon_ctrl_period"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:text=""
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/monsoon_ctrl_status" />
+
+    <CheckedTextView
+        android:id="@+id/monsoon_ctrl_turn"
+        style="@android:style/Widget.DeviceDefault.Button.Toggle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
+        android:text=""
+        android:textAlignment="center"
+        app:layout_constraintBottom_toTopOf="@+id/monsoon_now_gl4"
+        app:layout_constraintEnd_toStartOf="@+id/monsoon_now_gl3"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="@+id/monsoon_now_gl2"
+        app:layout_constraintTop_toBottomOf="@+id/monsoon_ctrl_period" />
 
 </android.support.constraint.ConstraintLayout>

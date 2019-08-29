@@ -7,6 +7,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CompoundButton;
 import android.widget.Switch;
 import android.widget.TextView;
 
@@ -40,8 +41,8 @@ public abstract class MonsoonTimerAdapter extends RecyclerView.Adapter<MonsoonTi
     }
 
     @Override
-    public void onBindViewHolder(@NonNull MonsoonTimerViewHolder holder, final int position) {
-        EXOMonsoonTimer timer = mTimers.get(holder.getAdapterPosition());
+    public void onBindViewHolder(@NonNull final MonsoonTimerViewHolder holder, final int position) {
+        final EXOMonsoonTimer timer = mTimers.get(holder.getAdapterPosition());
         DecimalFormat df = new DecimalFormat("00");
         holder.tv_action.setText(getDurationDesc(timer.getDuration()));
         holder.tv_time.setText(df.format(timer.getTimer()/60) + ":" + df.format(timer.getTimer()%60));
@@ -67,6 +68,20 @@ public abstract class MonsoonTimerAdapter extends RecyclerView.Adapter<MonsoonTi
             public boolean onLongClick(View v) {
                 onLongClickItem(position);
                 return true;
+            }
+        });
+
+        holder.sw_enable.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (buttonView.isPressed()) {
+                    buttonView.setChecked(!isChecked);
+                    if (isChecked) {
+                        onEnableTimer(position);
+                    } else {
+                        onDisableTimer(position);
+                    }
+                }
             }
         });
     }
@@ -128,4 +143,8 @@ public abstract class MonsoonTimerAdapter extends RecyclerView.Adapter<MonsoonTi
     protected abstract void onClickItem(int position);
 
     protected abstract void onLongClickItem(int position);
+
+    protected abstract void onEnableTimer(int position);
+
+    protected abstract void onDisableTimer(int position);
 }

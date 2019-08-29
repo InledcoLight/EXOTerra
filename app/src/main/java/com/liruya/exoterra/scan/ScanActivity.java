@@ -14,8 +14,8 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
-import com.liruya.base.BaseImmersiveActivity;
 import com.liruya.exoterra.R;
+import com.liruya.exoterra.base.BaseActivity;
 import com.liruya.exoterra.device.DeviceActivity;
 import com.liruya.exoterra.manager.DeviceManager;
 import com.liruya.exoterra.xlink.XlinkCloudManager;
@@ -32,7 +32,7 @@ import cn.xlink.sdk.v5.model.XDevice;
 import cn.xlink.sdk.v5.module.connection.XLinkScanDeviceTask;
 import cn.xlink.sdk.v5.module.main.XLinkSDK;
 
-public class ScanActivity extends BaseImmersiveActivity {
+public class ScanActivity extends BaseActivity {
     private final int SCAN_DEVICE_TIMEOUT = 10000;
     private final int SCAN_RETRY_INTERVAL = 1000;
 

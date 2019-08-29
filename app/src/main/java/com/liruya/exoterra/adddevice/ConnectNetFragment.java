@@ -23,9 +23,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
-import com.liruya.base.BaseFragment;
 import com.liruya.exoterra.R;
+import com.liruya.exoterra.base.BaseFragment;
 import com.liruya.exoterra.helper.WifiHelper;
+import com.liruya.exoterra.util.RouterUtil;
 import com.liruya.exoterra.view.AdvancedTextInputEditText;
 
 public class ConnectNetFragment extends BaseFragment {
@@ -129,11 +130,8 @@ public class ConnectNetFragment extends BaseFragment {
                 mConnectNetViewModel.getData().setSsid(getSsid());
                 mConnectNetViewModel.getData().setBssid(mWifiHelper.getGatewayMacAddress());
                 mConnectNetViewModel.getData().setPassword(getPassword());
-                getActivity().getSupportFragmentManager()
-                             .beginTransaction()
-                             .add(R.id.adddevice_fl, new SmartConfigFragment())
-                             .addToBackStack("")
-                             .commit();
+                mConnectNetViewModel.getData().setCompatibleMode(false);
+                addFragmentToStack(R.id.adddevice_fl, new ConfigGuideFragment());
             }
         });
         connect_net_apconfig.setOnClickListener(new View.OnClickListener() {
@@ -147,11 +145,8 @@ public class ConnectNetFragment extends BaseFragment {
                 mConnectNetViewModel.getData().setSsid(getSsid());
                 mConnectNetViewModel.getData().setBssid(mWifiHelper.getGatewayMacAddress());
                 mConnectNetViewModel.getData().setPassword(getPassword());
-                getActivity().getSupportFragmentManager()
-                             .beginTransaction()
-                             .add(R.id.adddevice_fl, new APConfigGuideFragment())
-                             .addToBackStack("")
-                             .commit();
+                mConnectNetViewModel.getData().setCompatibleMode(true);
+                addFragmentToStack(R.id.adddevice_fl, new ConfigGuideFragment());
             }
         });
     }
@@ -200,7 +195,6 @@ public class ConnectNetFragment extends BaseFragment {
         for (WifiConfiguration cfg : wifiManager.getConfiguredNetworks()) {
             if (cfg.networkId == wifiInfo.getNetworkId()) {
                 mOpen = cfg.allowedKeyManagement.get(WifiConfiguration.KeyMgmt.NONE);
-                Log.e(TAG, "onWiFiChanged: " + mOpen);
             }
         }
         connect_net_tl2.setError(null);
@@ -211,6 +205,7 @@ public class ConnectNetFragment extends BaseFragment {
             ssid = ssid.substring(1, ssid.length() - 1);
         }
         connect_net_router.setText(ssid);
+        connect_net_password.setText(RouterUtil.getRouterPassword(getContext(), ssid));
         boolean connected = !TextUtils.isEmpty(wifiInfo.getBSSID());
         if (connected) {
             if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP && wifiInfo.getFrequency() > 4900 && wifiInfo.getFrequency() < 5900) {

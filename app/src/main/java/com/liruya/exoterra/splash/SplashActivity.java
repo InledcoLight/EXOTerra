@@ -7,8 +7,8 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 import android.widget.VideoView;
 
-import com.liruya.base.BaseFullscreenActivity;
 import com.liruya.exoterra.R;
+import com.liruya.exoterra.base.BaseActivity;
 import com.liruya.exoterra.login.LoginActivity;
 import com.liruya.exoterra.main.MainActivity;
 import com.liruya.exoterra.manager.UserManager;
@@ -18,7 +18,7 @@ import com.liruya.exoterra.xlink.XlinkTaskHandler;
 import cn.xlink.restful.api.app.UserApi;
 import cn.xlink.sdk.v5.module.main.XLinkSDK;
 
-public class SplashActivity extends BaseFullscreenActivity {
+public class SplashActivity extends BaseActivity {
 
     private VideoView splash_vv;
 

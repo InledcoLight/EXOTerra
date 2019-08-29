@@ -11,9 +11,8 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.CheckableImageButton;
 import android.support.design.widget.TextInputEditText;
 import android.support.design.widget.TextInputLayout;
-import android.support.v4.app.FragmentTransaction;
+import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatDelegate;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Log;
@@ -24,10 +23,10 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
-import com.liruya.base.BaseImmersiveActivity;
 import com.liruya.exoterra.AppConstants;
-import com.liruya.exoterra.BaseViewModel;
 import com.liruya.exoterra.R;
+import com.liruya.exoterra.base.BaseActivity;
+import com.liruya.exoterra.base.BaseViewModel;
 import com.liruya.exoterra.bean.Device;
 import com.liruya.exoterra.bean.EXOLedstrip;
 import com.liruya.exoterra.bean.EXOMonsoon;
@@ -43,7 +42,6 @@ import com.liruya.exoterra.event.DatapointChangedEvent;
 import com.liruya.exoterra.event.DeviceStateChangedEvent;
 import com.liruya.exoterra.manager.DeviceManager;
 import com.liruya.exoterra.util.DeviceUtil;
-import com.liruya.exoterra.util.LogUtil;
 import com.liruya.exoterra.util.RegexUtil;
 import com.liruya.exoterra.xlink.XlinkCloudManager;
 import com.liruya.exoterra.xlink.XlinkConstants;
@@ -63,7 +61,7 @@ import cn.xlink.sdk.v5.manager.XLinkDeviceManager;
 import cn.xlink.sdk.v5.model.XDevice;
 import cn.xlink.sdk.v5.module.main.XLinkSDK;
 
-public class DeviceActivity extends BaseImmersiveActivity {
+public class DeviceActivity extends BaseActivity {
     private Toolbar device_toolbar;
     private CheckableImageButton device_cib_cloud;
     private CheckableImageButton device_cib_wifi;
@@ -72,14 +70,12 @@ public class DeviceActivity extends BaseImmersiveActivity {
     private DeviceViewModel mDeviceViewModel;
     private BaseViewModel<Device> mDeviceBaseViewModel;
 
+    private Fragment mDeviceFragment;
+
     private XlinkTaskCallback<XDevice> mSetCallback;
     private XlinkTaskCallback<List<XLinkDataPoint>> mGetCallback;
 
     private final Handler mHandler = new Handler();
-
-    static {
-        AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
-    }
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -124,10 +120,7 @@ public class DeviceActivity extends BaseImmersiveActivity {
         device_detail.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
-                getSupportFragmentManager().beginTransaction()
-                                           .add(R.id.device_root, new DeviceDetailFragment())
-                                           .addToBackStack("")
-                                           .commit();
+                addFragmentToStack(R.id.device_root, new DeviceDetailFragment());
                 return true;
             }
         });
@@ -152,7 +145,7 @@ public class DeviceActivity extends BaseImmersiveActivity {
         if (intent == null) {
             return;
         }
-        String deviceTag = intent.getStringExtra(AppConstants.DEVICE_TAG);
+        final String deviceTag = intent.getStringExtra(AppConstants.DEVICE_TAG);
         final Device device = DeviceManager.getInstance().getDevice(deviceTag);
         if (device == null) {
             return;
@@ -160,34 +153,36 @@ public class DeviceActivity extends BaseImmersiveActivity {
         mDeviceBaseViewModel = ViewModelProviders.of(this).get(BaseViewModel.class);
         mDeviceBaseViewModel.setData(device);
 
-        String pid = device.getXDevice().getProductId();
-        String name = device.getXDevice().getDeviceName();
+        final String pid = device.getXDevice().getProductId();
+        final String name = device.getXDevice().getDeviceName();
         device_toolbar.setTitle(TextUtils.isEmpty(name) ? DeviceUtil.getDefaultName(pid) : name);
-//            device_toolbar.setLogo(DeviceUtil.getProductIcon(pid));
         setSupportActionBar(device_toolbar);
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+
+        XLinkDeviceManager.getInstance().addDeviceConnectionFlags(device.getXDevice().getDeviceTag(), 1);
+        XLinkDeviceManager.getInstance().connectDeviceLocal(device.getXDevice().getDeviceTag());
+        EventBus.getDefault().register(this);
 
         if (TextUtils.equals(pid, XlinkConstants.PRODUCT_ID_LEDSTRIP)) {
             mDevice = new EXOLedstrip(device);
-            mDeviceViewModel = ViewModelProviders.of(this).get(LightViewModel.class);
+            mDeviceViewModel = ViewModelProviders.of(DeviceActivity.this).get(LightViewModel.class);
             mDeviceViewModel.setData(mDevice);
-            transaction.replace(R.id.device_fl_show, new LightFragment()).commit();
+            mDeviceFragment = new LightFragment();
+//            replaceFragment(R.id.device_fl_show, new LightFragment());
         } else if (TextUtils.equals(pid, XlinkConstants.PRODUCT_ID_MONSOON)) {
             mDevice = new EXOMonsoon(device);
-            mDeviceViewModel = ViewModelProviders.of(this).get(MonsoonViewModel.class);
+            mDeviceViewModel = ViewModelProviders.of(DeviceActivity.this).get(MonsoonViewModel.class);
             mDeviceViewModel.setData(mDevice);
-            transaction.replace(R.id.device_fl_show, new MonsoonFragment()).commit();
+            mDeviceFragment = new MonsoonFragment();
+//            replaceFragment(R.id.device_fl_show, new MonsoonFragment());
         } else if (TextUtils.equals(pid, XlinkConstants.PRODUCT_ID_SOCKET)) {
             mDevice = new EXOSocket(device);
-            mDeviceViewModel = ViewModelProviders.of(this).get(SocketViewModel.class);
+            mDeviceViewModel = ViewModelProviders.of(DeviceActivity.this).get(SocketViewModel.class);
             mDeviceViewModel.setData(mDevice);
-            transaction.replace(R.id.device_fl_show, new SocketFragment()).commit();
+            mDeviceFragment = new SocketFragment();
+//            replaceFragment(R.id.device_fl_show, new SocketFragment());
         } else {
             throw new RuntimeException("Invalid ProductID.");
         }
-        XLinkDeviceManager.getInstance().addDeviceConnectionFlags(mDevice.getXDevice().getDeviceTag(), 1);
-        XLinkDeviceManager.getInstance().connectDeviceLocal(mDevice.getXDevice().getDeviceTag());
-        EventBus.getDefault().register(this);
 
         mSetCallback = new XlinkTaskCallback<XDevice>() {
             @Override
@@ -226,28 +221,28 @@ public class DeviceActivity extends BaseImmersiveActivity {
                 });
                 device.setDataPointList(dataPoints);
                 mDevice.setDataPointList(dataPoints);
-                StringBuilder sb = new StringBuilder();
-                for (XLinkDataPoint dp : dataPoints) {
-//                    device.setDataPoint(dp);
-//                    mDevice.setDataPoint(dp);
-                    sb.append(dp.getIndex()).append(" ")
-                      .append(dp.getName()).append(" ")
-                      .append(dp.getType()).append(" ")
-                      .append(dp.getValue()).append(" ").append(mDevice.getDataPoint(dp.getIndex()).getRawValue()).append("\n");
-                    Log.e(TAG, "onComplete: " + sb);
-                }
+
+//                StringBuilder sb = new StringBuilder();
+//                for (XLinkDataPoint dp : dataPoints) {
+//                    sb.append(dp.getIndex()).append(" ")
+//                      .append(dp.getName()).append(" ")
+//                      .append(dp.getType()).append(" ")
+//                      .append(dp.getValue()).append(" ").append(dp.getRawValue()).append("\n");
+//                }
+//                Log.e(TAG, "onComplete: " + (dataPoints==null || dataPoints.size() == 0) + "    " + sb);
                 mDeviceViewModel.postValue();
+                replaceFragment(R.id.device_fl_show, mDeviceFragment);
             }
         };
+
         mDeviceViewModel.setGetCallback(mGetCallback);
         mDeviceViewModel.setSetCallback(mSetCallback);
-
         mHandler.postDelayed(new Runnable() {
             @Override
             public void run() {
                 mDeviceViewModel.getDatapoints();
             }
-        }, 500);
+        }, 100);
 
 //        XlinkCloudManager.getInstance().getDeviceMetaDatapoints(mDevice.getXDevice(), new XlinkTaskCallback<List<XLinkDataPoint>>() {
 //            @Override
@@ -270,7 +265,7 @@ public class DeviceActivity extends BaseImmersiveActivity {
 //                    public void run() {
 //                        mDeviceViewModel.getDatapoints();
 //                    }
-//                }, 1000);
+//                }, 500);
 //            }
 //        });
     }
@@ -289,7 +284,7 @@ public class DeviceActivity extends BaseImmersiveActivity {
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onDeviceStateChangedEvent(DeviceStateChangedEvent event) {
         if (event != null && mDevice != null
-            && TextUtils.equals(event.getDeviceTag(), mDevice.getXDevice().getDeviceTag())) {
+            && TextUtils.equals(event.getDeviceTag(), mDevice.getDeviceTag())) {
             device_cib_cloud.setChecked(mDevice.getXDevice().getCloudConnectionState() == XDevice.State.CONNECTED ? true : false);
             device_cib_wifi.setChecked(mDevice.getXDevice().getLocalConnectionState() == XDevice.State.CONNECTED ? true : false);
         }
@@ -298,9 +293,15 @@ public class DeviceActivity extends BaseImmersiveActivity {
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onDatapointChangedEvent(DatapointChangedEvent event) {
         if (event != null && mDevice != null
-            && TextUtils.equals(event.getDeviceTag(), mDevice.getXDevice().getDeviceTag())) {
-            LogUtil.e(TAG, "onDatapointChangedEvent: ");
-            mDeviceViewModel.postValue();
+            && TextUtils.equals(event.getDeviceTag(), mDevice.getDeviceTag())) {
+            Device device = DeviceManager.getInstance().getDevice(event.getDeviceTag());
+            if (device != null) {
+                for (XLinkDataPoint dp : device.getDataPointList()) {
+                    mDevice.setDataPoint(dp);
+                }
+                mDeviceBaseViewModel.postValue(device);
+                mDeviceViewModel.postValue();
+            }
         }
     }
 

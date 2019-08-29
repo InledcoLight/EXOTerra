@@ -17,7 +17,7 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.liruya.base.BaseActivity;
+import com.liruya.exoterra.base.BaseActivity;
 import com.liruya.exoterra.bean.Device;
 import com.liruya.exoterra.event.DatapointChangedEvent;
 import com.liruya.exoterra.event.DeviceStateChangedEvent;
@@ -131,12 +131,9 @@ public class EXOTerraApplication extends Application {
             public void onDataPointUpdate(XDevice xDevice, List<XLinkDataPoint> list) {
                 Device device = DeviceManager.getInstance().getDevice(xDevice);
                 if (device != null) {
-                    for (XLinkDataPoint dp : list) {
-                        device.setDataPoint(dp);
-                    }
+                    device.setDataPointList(list);
+                    EventBus.getDefault().post(new DatapointChangedEvent(device.getDeviceTag()));
                 }
-                EventBus.getDefault().post(new DatapointChangedEvent(xDevice.getDeviceTag()));
-                LogUtil.e(TAG, "onDataPointUpdate: ");
             }
         };
         mXlinkUserListener = new XLinkUserListener() {
@@ -217,7 +214,11 @@ public class EXOTerraApplication extends Application {
         mXlinkDeviceStateListener = new XLinkDeviceStateListener() {
             @Override
             public void onDeviceStateChanged(XDevice xDevice, XDevice.State state) {
-                EventBus.getDefault().post(new DeviceStateChangedEvent(xDevice.getDeviceTag()));
+                Device device = DeviceManager.getInstance().getDevice(xDevice);
+                if (device != null) {
+                    DeviceManager.getInstance().updateDevice(xDevice);
+                    EventBus.getDefault().post(new DeviceStateChangedEvent(device.getDeviceTag(), state));
+                }
             }
 
             @Override

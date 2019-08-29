@@ -7,15 +7,13 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.CheckableImageButton;
-import android.support.v4.app.FragmentTransaction;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckedTextView;
 
-import com.liruya.base.BaseFragment;
 import com.liruya.exoterra.R;
+import com.liruya.exoterra.base.BaseFragment;
 import com.liruya.exoterra.bean.EXOLedstrip;
 
 public class LightFragment extends BaseFragment {
@@ -96,23 +94,21 @@ public class LightFragment extends BaseFragment {
 
     @SuppressLint ("RestrictedApi")
     private void refreshData() {
-        FragmentTransaction transaction = getActivity().getSupportFragmentManager()
-                                                       .beginTransaction();
-        if (mLight.getMode() == EXOLedstrip.MODE_AUTO) {
+        if (!light_cib_auto.isChecked() && mLight.getMode() == EXOLedstrip.MODE_AUTO) {
             light_cib_manual.setChecked(false);
             light_cib_auto.setChecked(true);
             light_ctv_pro.setChecked(false);
-            transaction.replace(R.id.light_fl_show, new LightAutoFragment()).commit();
-        } else if (mLight.getMode() == EXOLedstrip.MODE_PRO) {
+            replaceFragment(R.id.light_fl_show, new LightAutoFragment());
+        } else if (!light_ctv_pro.isChecked() && mLight.getMode() == EXOLedstrip.MODE_PRO) {
             light_cib_manual.setChecked(false);
             light_cib_auto.setChecked(false);
             light_ctv_pro.setChecked(true);
-            transaction.replace(R.id.light_fl_show, new LightProFragment()).commit();
-        } else {
+            replaceFragment(R.id.light_fl_show, new LightProFragment());
+        } else if (!light_cib_manual.isChecked() && mLight.getMode() == EXOLedstrip.MODE_MANUAL){
             light_cib_manual.setChecked(true);
             light_cib_auto.setChecked(false);
             light_ctv_pro.setChecked(false);
-            transaction.replace(R.id.light_fl_show, new LightManualFragment()).commit();
+            replaceFragment(R.id.light_fl_show, new LightManualFragment());
         }
     }
 }

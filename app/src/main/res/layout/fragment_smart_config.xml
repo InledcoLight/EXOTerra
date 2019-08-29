@@ -25,9 +25,10 @@
         android:id="@+id/smart_config_pb"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="32dp"
+        android:layout_marginEnd="32dp"
+        android:layout_marginBottom="32dp"
         app:donut_circle_starting_degree="270"
         app:donut_finished_color="@color/colorWhite"
         app:donut_finished_stroke_width="4dp"
@@ -39,6 +40,7 @@
         app:donut_text_color="@color/colorWhite"
         app:donut_unfinished_color="@color/colorGray"
         app:donut_unfinished_stroke_width="4dp"
+        app:layout_constraintBottom_toTopOf="@+id/smart_config_tv_step1"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/smart_config_title"/>
@@ -127,29 +129,29 @@
         app:layout_constraintStart_toEndOf="@+id/smart_config_cib_step4"
         app:layout_constraintTop_toTopOf="@+id/smart_config_cib_step4"/>
 
-    <ToggleButton
-        android:id="@+id/smart_config_start"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginBottom="8dp"
-        android:enabled="false"
-        android:textOn="@string/stop"
-        android:textOff="@string/start"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"/>
+    <!--<ToggleButton-->
+        <!--android:id="@+id/smart_config_start"-->
+        <!--android:layout_width="0dp"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_marginStart="8dp"-->
+        <!--android:layout_marginEnd="8dp"-->
+        <!--android:layout_marginBottom="8dp"-->
+        <!--android:enabled="false"-->
+        <!--android:textOn="@string/stop"-->
+        <!--android:textOff="@string/start"-->
+        <!--app:layout_constraintBottom_toBottomOf="parent"-->
+        <!--app:layout_constraintEnd_toEndOf="parent"-->
+        <!--app:layout_constraintStart_toStartOf="parent"/>-->
 
-    <CheckBox
-        android:id="@+id/smart_config_led"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginBottom="8dp"
-        android:text="Make sure the green led of the device is flash quicky. (Long press the deivce key until the green led flash quickly, for wifi strip press the touch button to change the led to green, then long press.)"
-        app:layout_constraintBottom_toTopOf="@+id/smart_config_start"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"/>
+    <!--<CheckBox-->
+        <!--android:id="@+id/smart_config_led"-->
+        <!--android:layout_width="0dp"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_marginStart="8dp"-->
+        <!--android:layout_marginEnd="8dp"-->
+        <!--android:layout_marginBottom="8dp"-->
+        <!--android:text="Make sure the green led of the device is flash quicky. (Long press the deivce key until the green led flash quickly, for wifi strip press the touch button to change the led to green, then long press.)"-->
+        <!--app:layout_constraintBottom_toTopOf="@+id/smart_config_start"-->
+        <!--app:layout_constraintEnd_toEndOf="parent"-->
+        <!--app:layout_constraintStart_toStartOf="parent"/>-->
 </android.support.constraint.ConstraintLayout>

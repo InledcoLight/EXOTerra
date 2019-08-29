@@ -1,38 +1,43 @@
 package com.liruya.exoterra.device.light;
 
-import android.annotation.SuppressLint;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.design.widget.CheckableImageButton;
+import android.support.v7.widget.AppCompatImageButton;
 import android.support.v7.widget.RecyclerView;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.style.ImageSpan;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.SeekBar;
 import android.widget.TextView;
 
-import com.liruya.base.BaseFragment;
 import com.liruya.exoterra.R;
+import com.liruya.exoterra.base.BaseFragment;
 import com.liruya.exoterra.bean.EXOLedstrip;
 import com.liruya.exoterra.util.LightUtil;
 import com.liruya.exoterra.view.MultiCircleProgress;
+import com.liruya.exoterra.view.VerticalSeekBar;
+
+import java.text.DecimalFormat;
+import java.util.Arrays;
 
 public class LightManualFragment extends BaseFragment {
 
     private RecyclerView light_manual_rv;
     private MultiCircleProgress[] light_manual_custom;
-    private CheckableImageButton light_manual_power;
+    private AppCompatImageButton light_manual_power;
     private TextView light_manual_desc;
+    private VerticalSeekBar light_manual_slider_all;
+    private TextView light_manual_progress;
 
     private LightViewModel mLightViewModel;
     private EXOLedstrip mLight;
-    private SliderAdapter mAdapter;
+    private VerticalSliderAdapter mAdapter;
 
     @Nullable
     @Override
@@ -59,13 +64,15 @@ public class LightManualFragment extends BaseFragment {
         light_manual_custom[2] = view.findViewById(R.id.light_manual_custom3);
         light_manual_custom[3] = view.findViewById(R.id.light_manual_custom4);
         light_manual_power = view.findViewById(R.id.light_manual_power);
+        light_manual_slider_all = view.findViewById(R.id.light_manual_slider_all);
+        light_manual_progress = view.findViewById(R.id.light_manual_progress);
     }
 
     @Override
     protected void initData() {
         mLightViewModel = ViewModelProviders.of(getActivity()).get(LightViewModel.class);
         mLight = mLightViewModel.getData();
-        mAdapter = new SliderAdapter(getContext(), mLight) {
+        mAdapter = new VerticalSliderAdapter(getContext(), mLight) {
             @Override
             protected void setBright(int idx, int bright) {
                 mLightViewModel.setBright(idx, bright);
@@ -95,7 +102,8 @@ public class LightManualFragment extends BaseFragment {
         light_manual_custom[0].setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                int[] progress = light_manual_custom[0].getProgress();
+                int[] prgs = light_manual_custom[0].getProgress();
+                int[] progress = Arrays.copyOf(prgs, prgs.length);
                 for (int i = 0; i < progress.length; i++) {
                     progress[i] *= 10;
                 }
@@ -105,7 +113,8 @@ public class LightManualFragment extends BaseFragment {
         light_manual_custom[1].setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                int[] progress = light_manual_custom[1].getProgress();
+                int[] prgs = light_manual_custom[1].getProgress();
+                int[] progress = Arrays.copyOf(prgs, prgs.length);
                 for (int i = 0; i < progress.length; i++) {
                     progress[i] *= 10;
                 }
@@ -115,7 +124,8 @@ public class LightManualFragment extends BaseFragment {
         light_manual_custom[2].setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                int[] progress = light_manual_custom[2].getProgress();
+                int[] prgs = light_manual_custom[2].getProgress();
+                int[] progress = Arrays.copyOf(prgs, prgs.length);
                 for (int i = 0; i < progress.length; i++) {
                     progress[i] *= 10;
                 }
@@ -125,7 +135,8 @@ public class LightManualFragment extends BaseFragment {
         light_manual_custom[3].setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                int[] progress = light_manual_custom[3].getProgress();
+                int[] prgs = light_manual_custom[3].getProgress();
+                int[] progress = Arrays.copyOf(prgs, prgs.length);
                 for (int i = 0; i < progress.length; i++) {
                     progress[i] *= 10;
                 }
@@ -133,10 +144,9 @@ public class LightManualFragment extends BaseFragment {
             }
         });
         light_manual_power.setOnClickListener(new View.OnClickListener() {
-            @SuppressLint ("RestrictedApi")
             @Override
             public void onClick(View v) {
-                mLightViewModel.setPower(!light_manual_power.isChecked());
+                mLightViewModel.setPower(!mLight.getPower());
             }
         });
 
@@ -168,12 +178,35 @@ public class LightManualFragment extends BaseFragment {
                 return true;
             }
         });
+
+        light_manual_slider_all.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                int progress = seekBar.getProgress();
+                int[] brights = new int[mLight.getChannelCount()];
+                for (int i = 0; i < brights.length; i++) {
+                    brights[i] = progress;
+                }
+                mLightViewModel.setAllBrights(brights);
+                DecimalFormat df = new DecimalFormat("##0");
+                light_manual_progress.setText(df.format(progress/10) + "%");
+            }
+        });
     }
 
-    @SuppressLint ("RestrictedApi")
     private void refreshData() {
         mAdapter.notifyDataSetChanged();
-        light_manual_power.setChecked(mLight.getPower());
+        light_manual_power.setImageResource(mLight.getPower() ? R.drawable.ic_power_white : R.drawable.ic_power_red);
         int count = mLight.getChannelCount();
         for (int i = 0; i < 4; i++) {
             light_manual_custom[i].setCircleCount(count);

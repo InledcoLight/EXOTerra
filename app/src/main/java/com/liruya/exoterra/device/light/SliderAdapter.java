@@ -30,7 +30,8 @@ public abstract class SliderAdapter extends RecyclerView.Adapter<SliderAdapter.S
     @NonNull
     @Override
     public SliderViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
-        SliderViewHolder holder = new SliderViewHolder(LayoutInflater.from(mContext).inflate(R.layout.item_slider, viewGroup, false));
+        SliderViewHolder holder = new SliderViewHolder(LayoutInflater.from(mContext)
+                                                                     .inflate(R.layout.item_slider, viewGroup, false));
         return holder;
     }
 
@@ -40,12 +41,14 @@ public abstract class SliderAdapter extends RecyclerView.Adapter<SliderAdapter.S
         String name = mLight.getChannelName(holder.getAdapterPosition());
         DecimalFormat df = new DecimalFormat("##0");
         holder.iv_color.setImageResource(LightUtil.getIconRes(name));
-        Drawable progressDrawable = mContext.getResources().getDrawable(LightUtil.getProgressRes(name));
-        Drawable thumbDrawable = mContext.getResources().getDrawable(LightUtil.getThumbRes(name));
+        Drawable progressDrawable = mContext.getResources()
+                                            .getDrawable(LightUtil.getProgressRes(name));
+        Drawable thumbDrawable = mContext.getResources()
+                                         .getDrawable(LightUtil.getThumbRes(name));
         holder.sb_progress.setProgressDrawable(progressDrawable);
         holder.sb_progress.setThumb(thumbDrawable);
         holder.sb_progress.setProgress(progress);
-        holder.tv_percent.setText(df.format(progress/10) + "%");
+        holder.tv_percent.setText(df.format(progress / 10) + "%");
         holder.sb_progress.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
@@ -71,25 +74,22 @@ public abstract class SliderAdapter extends RecyclerView.Adapter<SliderAdapter.S
 
     public byte[] getBrights() {
         byte[] brights = new byte[mLight.getChannelCount()];
-        for ( int i = 0; i < mLight.getChannelCount(); i++ )
-        {
-            brights[i] = (byte) ( mLight.getBright( i ) / 10);
+        for (int i = 0; i < mLight.getChannelCount(); i++) {
+            brights[i] = (byte) (mLight.getBright(i) / 10);
         }
         return brights;
     }
 
-    class SliderViewHolder extends RecyclerView.ViewHolder
-    {
+    class SliderViewHolder extends RecyclerView.ViewHolder {
         private ImageView iv_color;
         private SeekBar sb_progress;
         private TextView tv_percent;
 
-        public SliderViewHolder( View itemView)
-        {
-            super( itemView );
+        public SliderViewHolder(View itemView) {
+            super(itemView);
             iv_color = itemView.findViewById(R.id.item_slider_color);
-            sb_progress = itemView.findViewById( R.id.item_slider_progress );
-            tv_percent = itemView.findViewById( R.id.item_slider_percent );
+            sb_progress = itemView.findViewById(R.id.item_slider_progress);
+            tv_percent = itemView.findViewById(R.id.item_slider_percent);
         }
     }
 

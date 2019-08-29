@@ -1,22 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:layout_width="match_parent"
-              android:layout_height="wrap_content"
-              android:orientation="vertical">
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="8dp">
 
     <Button
         android:id="@+id/dialog_action_act1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/delete"/>
+        android:visibility="gone"/>
 
-    <Space
+    <Button
+        android:id="@+id/dialog_action_act2"
         android:layout_width="match_parent"
-        android:layout_height="8dp"/>
+        android:layout_height="wrap_content"
+        android:text="@string/delete"
+        android:theme="@style/DangerButtonTheme"/>
 
     <Button
         android:id="@+id/dialog_action_cancel"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/cancel"/>
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="16dp"
+        android:text="@string/cancel" />
 </LinearLayout>

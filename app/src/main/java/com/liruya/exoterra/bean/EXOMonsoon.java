@@ -94,7 +94,7 @@ public class EXOMonsoon extends Device {
     }
 
     public short getPoweronTmr() {
-        return getShort(INDEX_POWERON_TMR);
+        return getUShort(INDEX_POWERON_TMR);
     }
 
     public int getCustomActionsIndex() {

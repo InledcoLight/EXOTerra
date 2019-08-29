@@ -21,9 +21,11 @@ public class Device {
     private final int INDEX_LONGITUDE           = 2;
     private final int INDEX_LATITUDE            = 3;
     private final int INDEX_DEVICE_DATETIME     = 4;
+    private final int INDEX_UPGRADE_STATE       = 197;
+    private final int INDEX_LOCAL_PSW           = 198;
 
     private XDevice mXDevice;
-    private List<XLinkDataPoint> mDataPointList;
+    private final List<XLinkDataPoint> mDataPointList;
 
     public Device(@NonNull XDevice xDevice) {
         mXDevice = xDevice;
@@ -48,12 +50,13 @@ public class Device {
     }
 
     public void setDataPointList(List<XLinkDataPoint> dataPointList) {
-        mDataPointList = dataPointList;
+        mDataPointList.clear();
+        mDataPointList.addAll(dataPointList);
     }
 
     public void setDataPoint(XLinkDataPoint dataPoint) {
         for (XLinkDataPoint dp : mDataPointList) {
-            if (dp.getIndex() == dataPoint.getIndex() && dp.getType() == dataPoint.getType()) {
+            if (dp.getIndex() == dataPoint.getIndex()) {
                 dp.setValue(dataPoint.getValue());
                 return;
             }
@@ -331,5 +334,18 @@ public class Device {
 
     public int getDeviceDatetimeIndex() {
         return INDEX_DEVICE_DATETIME;
+    }
+
+    public byte getUpgradeState() {
+        return getByte(INDEX_UPGRADE_STATE);
+    }
+
+    public int getLocalPsw() {
+        int psw = getUInt(INDEX_LOCAL_PSW);
+        return psw;
+    }
+
+    public XLinkDataPoint setLocalPsw(int psw) {
+        return setUInt(INDEX_LOCAL_PSW, psw);
     }
 }

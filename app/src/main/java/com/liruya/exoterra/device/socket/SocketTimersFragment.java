@@ -14,13 +14,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
-import android.widget.Switch;
 import android.widget.TimePicker;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
-import com.liruya.base.BaseFragment;
 import com.liruya.exoterra.R;
+import com.liruya.exoterra.base.BaseFragment;
 import com.liruya.exoterra.bean.EXOSocket;
 import com.liruya.exoterra.bean.EXOSocketTimer;
 
@@ -80,6 +79,24 @@ public class SocketTimersFragment extends BaseFragment {
             protected void onLongClickItem(int position) {
                 showRemoveDialog(position);
             }
+
+            @Override
+            protected void onEnableTimer(int position) {
+                if (position >= 0 && position < mTimers.size()) {
+                    EXOSocketTimer tmr = new EXOSocketTimer(mTimers.get(position).getValue());
+                    tmr.setEnable(true);
+                    mSocketViewModel.setTimer(position, tmr);
+                }
+            }
+
+            @Override
+            protected void onDisableTimer(int position) {
+                if (position >= 0 && position < mTimers.size()) {
+                    EXOSocketTimer tmr = new EXOSocketTimer(mTimers.get(position).getValue());
+                    tmr.setEnable(false);
+                    mSocketViewModel.setTimer(position, tmr);
+                }
+            }
         };
         socket_timers_rv.setAdapter(mAdapter);
     }
@@ -133,7 +150,6 @@ public class SocketTimersFragment extends BaseFragment {
             cb_week[4] = view.findViewById(R.id.dialog_socket_thu);
             cb_week[5] = view.findViewById(R.id.dialog_socket_fri);
             cb_week[6] = view.findViewById(R.id.dialog_socket_sat);
-            final Switch sw_enable = view.findViewById(R.id.dialog_socket_enable);
             tp_tmr.setIs24HourView(true);
             tp_tmr.setCurrentHour(timer.getTimer() / 60);
             tp_tmr.setCurrentMinute(timer.getTimer() % 60);
@@ -141,7 +157,6 @@ public class SocketTimersFragment extends BaseFragment {
             for (int i = 0; i < 7; i++) {
                 cb_week[i].setChecked(timer.getWeek(i));
             }
-            sw_enable.setChecked(timer.isEnable());
             builder.setNegativeButton(R.string.cancel, null);
             builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                 @Override
@@ -151,7 +166,6 @@ public class SocketTimersFragment extends BaseFragment {
                     for (int i = 0; i < 7; i++) {
                         timer.setWeek(i, cb_week[i].isChecked());
                     }
-                    timer.setEnable(sw_enable.isChecked());
                     mSocketViewModel.setTimer(idx, timer);
                 }
             });
@@ -182,9 +196,7 @@ public class SocketTimersFragment extends BaseFragment {
         cb_week[4] = view.findViewById(R.id.dialog_socket_thu);
         cb_week[5] = view.findViewById(R.id.dialog_socket_fri);
         cb_week[6] = view.findViewById(R.id.dialog_socket_sat);
-        final Switch sw_enable = view.findViewById(R.id.dialog_socket_enable);
         tp_tmr.setIs24HourView(true);
-        sw_enable.setChecked(true);
         builder.setNegativeButton(R.string.cancel, null);
         builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
             @Override
@@ -195,7 +207,7 @@ public class SocketTimersFragment extends BaseFragment {
                 for (int i = 0; i < 7; i++) {
                     timer.setWeek(i, cb_week[i].isChecked());
                 }
-                timer.setEnable(sw_enable.isChecked());
+                timer.setEnable(true);
                 mSocketViewModel.addTimer(timer);
             }
         });

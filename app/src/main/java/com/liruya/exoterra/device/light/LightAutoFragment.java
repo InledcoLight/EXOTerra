@@ -12,6 +12,7 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.BottomSheetDialog;
 import android.support.design.widget.CheckableImageButton;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.SwitchCompat;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.style.ImageSpan;
@@ -23,6 +24,7 @@ import android.widget.Button;
 import android.widget.CheckedTextView;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.NumberPicker;
 import android.widget.SeekBar;
@@ -36,16 +38,19 @@ import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
-import com.liruya.base.BaseFragment;
 import com.liruya.exoterra.R;
+import com.liruya.exoterra.base.BaseFragment;
 import com.liruya.exoterra.bean.EXOLedstrip;
-import com.liruya.exoterra.device.LocationFragment;
 import com.liruya.exoterra.util.LightUtil;
+import com.liruya.exoterra.xlink.XlinkCloudManager;
+import com.liruya.exoterra.xlink.XlinkRequestCallback;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import cn.xlink.restful.api.app.DeviceApi;
 
 public class LightAutoFragment extends BaseFragment {
     private LineChart auto_line_chart;
@@ -56,6 +61,8 @@ public class LightAutoFragment extends BaseFragment {
     private TextView auto_tv_day;
     private TextView auto_tv_night;
     private CheckedTextView auto_ctv_gis;
+    private LinearLayout auto_ll;
+    private SwitchCompat auto_sw_gis;
 
     private LightViewModel mLightViewModel;
     private EXOLedstrip mLight;
@@ -97,7 +104,9 @@ public class LightAutoFragment extends BaseFragment {
         auto_tv_turnoff = view.findViewById(R.id.auto_tv_turnoff);
         auto_tv_day = view.findViewById(R.id.auto_tv_day);
         auto_tv_night = view.findViewById(R.id.auto_tv_night);
-        auto_ctv_gis = view.findViewById(R.id.auto_ctv_gis);
+        auto_ll = view.findViewById(R.id.auto_ll);
+        auto_sw_gis = view.findViewById(R.id.auto_sw_gis);
+//        auto_ctv_gis = view.findViewById(R.id.auto_ctv_gis);
 
         LineChartHelper.init(auto_line_chart);
     }
@@ -120,17 +129,17 @@ public class LightAutoFragment extends BaseFragment {
 
     @Override
     protected void initEvent() {
-        auto_ctv_gis.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (auto_ctv_gis.isChecked()) {
-                    showDisableGisDialog();
-                }
-                else {
-                    showEnableGisDialog();
-                }
-            }
-        });
+//        auto_ctv_gis.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                if (auto_ctv_gis.isChecked()) {
+//                    showDisableGisDialog();
+//                }
+//                else {
+//                    showEnableGisDialog();
+//                }
+//            }
+//        });
         auto_tv_sunrise.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -159,6 +168,17 @@ public class LightAutoFragment extends BaseFragment {
             @Override
             public void onClick(View v) {
                 showEditDayNightDialog(true);
+            }
+        });
+        auto_ll.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (auto_sw_gis.isChecked()) {
+                    showDisableGisDialog();
+                }
+                else {
+                    showEnableGisDialog();
+                }
             }
         });
     }
@@ -308,8 +328,10 @@ public class LightAutoFragment extends BaseFragment {
         else {
             auto_tv_turnoff.setText(R.string.disabled);
         }
-        auto_ctv_gis.setChecked(mLight.getGisEnable());
-        auto_ctv_gis.setText(mLight.getGisEnable() ? "Gis Enabled" : "Gis Disabled");
+        auto_sw_gis.setChecked(mLight.getGisEnable());
+        auto_sw_gis.setText(mLight.getGisEnable() ? R.string.sync_func_enabled : R.string.sync_func_disabled);
+//        auto_ctv_gis.setChecked(mLight.getGisEnable());
+//        auto_ctv_gis.setText(mLight.getGisEnable() ? "Gis Enabled" : "Gis Disabled");
     }
 
     private void showDisableGisDialog() {
@@ -320,16 +342,8 @@ public class LightAutoFragment extends BaseFragment {
         int sunrise = mLight.getSunrise();
         int sunset = mLight.getSunset();
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-        builder.setTitle("Disable Gis")
-               .setMessage("关闭定位功能后按照手动设置的日出日落时间运行. 当前设置的日出日落时间为：" +
-                           df.format(sunrise / 60) +
-                           ":" +
-                           df.format(sunrise % 60) +
-                           "~" +
-                           df.format(sunset / 60) +
-                           ":" +
-                           df.format(sunset % 60) +
-                           ".")
+        builder.setTitle("Disable Synchro Function")
+               .setMessage("Once disable, device will run the sunrise and sunset settings of manual settings. ")
                .setNegativeButton(R.string.cancel, null)
                .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                    @Override
@@ -345,34 +359,27 @@ public class LightAutoFragment extends BaseFragment {
             return;
         }
         DecimalFormat df = new DecimalFormat("00");
-        int sunrise = mLight.getGisSunrise();
-        int sunset = mLight.getGisSunset();
+//        int sunrise = mLight.getGisSunrise();
+//        int sunset = mLight.getGisSunset();
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-        builder.setTitle("Enable Gis")
-               .setMessage("开启定位功能将会根据地理位置和当前日期自动获得日出和日落时间. 今天的日出日落时间为： " +
-                           df.format(sunrise / 60) +
-                           ":" +
-                           df.format(sunrise % 60) +
-                           "~" +
-                           df.format(sunset / 60) +
-                           ":" +
-                           df.format(sunset % 60) +
-                           ".")
-               .setNeutralButton(R.string.location, new DialogInterface.OnClickListener() {
-                   @Override
-                   public void onClick(DialogInterface dialog, int which) {
-                       getActivity().getSupportFragmentManager()
-                                    .beginTransaction()
-                                    .add(R.id.device_root, new LocationFragment(), "device_set")
-                                    .addToBackStack("")
-                                    .commit();
-                   }
-               })
+        builder.setTitle("Enable Synchro Function")
+               .setMessage("Once enable, device will run according to local sunrise and sunset time.")
                .setNegativeButton(R.string.cancel, null)
                .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                    @Override
                    public void onClick(DialogInterface dialog, int which) {
-                       mLightViewModel.setGisEnable(true);
+                       XlinkCloudManager.getInstance().getDeviceLocation(mLight.getXDevice(), new XlinkRequestCallback<DeviceApi.DeviceGeographyResponse>() {
+                           @Override
+                           public void onError(String error) {
+                               Toast.makeText(getContext(), error, Toast.LENGTH_SHORT)
+                                    .show();
+                           }
+
+                           @Override
+                           public void onSuccess(DeviceApi.DeviceGeographyResponse response) {
+                               mLightViewModel.setGisEnable(true, (float) response.lon, (float) response.lat);
+                           }
+                       });
                    }
                })
                .show();

@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               xmlns:app="http://schemas.android.com/apk/res-auto"
               android:layout_width="match_parent"
-              android:layout_height="match_parent"
+              android:layout_height="wrap_content"
               android:orientation="vertical">
 
     <LinearLayout
@@ -15,7 +15,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:srcCompat="@drawable/ic_alarm_white_32dp"
-            android:tint="#000000"
             android:background="@android:color/transparent"/>
         <Space
             android:layout_width="0dp"
@@ -25,14 +24,13 @@
             android:id="@+id/dialog_monsoon_timer"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_margin="4dp"
             android:timePickerMode="spinner"/>
     </LinearLayout>
 
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="@color/colorGray"/>
+        android:background="@color/colorDivider"/>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -43,7 +41,6 @@
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:tint="#000000"
             app:srcCompat="@mipmap/ic_monsoon_pulse_64"
             android:background="@android:color/transparent"/>
         <Space
@@ -59,7 +56,7 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="@color/colorGray"/>
+        android:background="@color/colorDivider"/>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -70,7 +67,6 @@
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:tint="#000000"
             app:srcCompat="@drawable/ic_date_white_32dp"
             android:background="@android:color/transparent"/>
         <Space
@@ -145,15 +141,6 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="@color/colorGray"/>
-
-    <Switch
-        android:id="@+id/dialog_monsoon_enable"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="right"
-        android:padding="8dp"
-        android:layout_margin="8dp"
-        android:checked="true"/>
+        android:background="@color/colorDivider"/>
 
 </LinearLayout>

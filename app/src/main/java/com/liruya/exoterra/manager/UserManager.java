@@ -55,7 +55,7 @@ public class UserManager {
     }
 
     public static void setAccount(Context context, String account) {
-        PrefUtil.putString(context, PREF_FILE_USER, PREF_KEY_USER_ACCOUNT, account);
+        PrefUtil.put(context, PREF_FILE_USER, PREF_KEY_USER_ACCOUNT, account);
     }
 
     public static String getAccount(Context context) {
@@ -67,7 +67,7 @@ public class UserManager {
     }
 
     public static void setPassword(Context context, String password) {
-        PrefUtil.putString(context, PREF_FILE_USER, PREF_KEY_USER_PASSWORD, password);
+        PrefUtil.put(context, PREF_FILE_USER, PREF_KEY_USER_PASSWORD, password);
     }
 
     public static String getPassword(Context context) {
@@ -79,7 +79,7 @@ public class UserManager {
     }
 
     public static void setUserId(Context context, int userid) {
-        PrefUtil.putInt(context, PREF_FILE_USER, PREF_KEY_USER_ID, userid);
+        PrefUtil.put(context, PREF_FILE_USER, PREF_KEY_USER_ID, userid);
     }
 
     public static int getUserId(Context context) {
@@ -91,7 +91,7 @@ public class UserManager {
     }
 
     public static void setAuthorize(Context context, String authorize) {
-        PrefUtil.putString(context, PREF_FILE_USER, PREF_KEY_USER_AUTHORIZE, authorize);
+        PrefUtil.put(context, PREF_FILE_USER, PREF_KEY_USER_AUTHORIZE, authorize);
     }
 
     public static String getAuthorize(Context context) {
@@ -103,7 +103,7 @@ public class UserManager {
     }
 
     public static void setRefreshToken(Context context, String refresh_token) {
-        PrefUtil.putString(context, PREF_FILE_USER, PREF_KEY_USER_REFRESH_TOKEN, refresh_token);
+        PrefUtil.put(context, PREF_FILE_USER, PREF_KEY_USER_REFRESH_TOKEN, refresh_token);
     }
 
     public static String getRefreshToken(Context context) {

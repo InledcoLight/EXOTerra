@@ -2,7 +2,6 @@ package com.liruya.exoterra.manager;
 
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
-import android.util.Log;
 
 import com.liruya.exoterra.bean.Device;
 import com.liruya.exoterra.xlink.XlinkCloudManager;
@@ -34,7 +33,7 @@ public class DeviceManager {
         return xDevice.getProductId() + "_" +xDevice.getMacAddress();
     }
 
-    public void addDevice(XDevice xDevice) {
+    private void addDevice(XDevice xDevice) {
         if (xDevice != null) {
             String key = getDeviceTag(xDevice);
             if (!TextUtils.isEmpty(key)) {
@@ -43,7 +42,7 @@ public class DeviceManager {
         }
     }
 
-    public void addDevice(Device device) {
+    private void addDevice(Device device) {
         if (device != null) {
             addDevice(device.getXDevice());
         }
@@ -129,7 +128,6 @@ public class DeviceManager {
     }
 
     public void updateDevice(XDevice xDevice) {
-        Log.e(TAG, "updateDevice: ");
         Device device = getDevice(xDevice);
         if (device == null) {
             addDevice(xDevice);
@@ -139,7 +137,6 @@ public class DeviceManager {
     }
 
     public void refreshSubcribeDevices(final XlinkTaskCallback<List<Device>> listener) {
-        Log.e(TAG, "refreshSubcribeDevices: ");
         XlinkCloudManager.getInstance().syncSubscribedDevices(new XlinkTaskCallback<List<XDevice>>() {
             @Override
             public void onError(String error) {
@@ -157,21 +154,11 @@ public class DeviceManager {
 
             @Override
             public void onComplete(List<XDevice> xDevices) {
-                if (xDevices == null || xDevices.size() == 0) {
-                    mSubcribedDevices.clear();
-                }
-                else {
-                    mSubcribedDevices.clear();
-                    Set<String> keys = new HashSet<>();
+                mSubcribedDevices.clear();
+                if (xDevices != null) {
                     for (XDevice xDevice : xDevices) {
                         if (xDevice != null) {
-                            keys.add(getDeviceTag(xDevice));
                             updateDevice(xDevice);
-                        }
-                    }
-                    for (String key : getAllDeviceAddress()) {
-                        if (!keys.contains(key)) {
-                            removeDevice(key);
                         }
                     }
                 }

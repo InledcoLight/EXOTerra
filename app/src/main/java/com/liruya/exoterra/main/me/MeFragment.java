@@ -15,8 +15,8 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.liruya.base.BaseFragment;
 import com.liruya.exoterra.R;
+import com.liruya.exoterra.base.BaseFragment;
 import com.liruya.exoterra.login.LoginActivity;
 import com.liruya.exoterra.manager.UserManager;
 import com.liruya.exoterra.xlink.XlinkCloudManager;
@@ -121,11 +121,7 @@ public class MeFragment extends BaseFragment {
             public boolean onMenuItemClick(MenuItem menuItem) {
                 switch (menuItem.getItemId()) {
                     case R.id.menu_me_msg:
-                        getActivity().getSupportFragmentManager()
-                                     .beginTransaction()
-                                     .add(R.id.main_fl, new MessagesFragment())
-                                     .addToBackStack("")
-                                     .commit();
+                        addFragmentToStack(R.id.main_fl, new MessagesFragment());
                         break;
                 }
                 return true;

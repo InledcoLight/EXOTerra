@@ -1,6 +1,6 @@
 package com.liruya.exoterra.device;
 
-import com.liruya.exoterra.BaseViewModel;
+import com.liruya.exoterra.base.BaseViewModel;
 import com.liruya.exoterra.bean.Device;
 import com.liruya.exoterra.xlink.XlinkCloudManager;
 import com.liruya.exoterra.xlink.XlinkRequestCallback;

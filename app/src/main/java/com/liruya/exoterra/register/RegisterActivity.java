@@ -9,8 +9,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
-import com.liruya.base.BaseImmersiveActivity;
 import com.liruya.exoterra.R;
+import com.liruya.exoterra.base.BaseActivity;
 import com.liruya.exoterra.util.RegexUtil;
 import com.liruya.exoterra.view.AdvancedTextInputEditText;
 import com.liruya.exoterra.view.MessageDialog;
@@ -20,7 +20,7 @@ import com.liruya.loaddialog.LoadDialog;
 
 import cn.xlink.restful.api.app.UserAuthApi;
 
-public class RegisterActivity extends BaseImmersiveActivity {
+public class RegisterActivity extends BaseActivity {
     private Toolbar register_toolbar;
     private TextInputLayout register_til_email;
     private AdvancedTextInputEditText register_et_email;
@@ -30,7 +30,6 @@ public class RegisterActivity extends BaseImmersiveActivity {
     private AdvancedTextInputEditText register_et_password;
     private Button register_btn_send;
     private Button register_btn_signup;
-    private Button register_btn_signin;
     private LoadDialog mLoadDialog;
     private ProgressDialog mProgressDialog;
 
@@ -61,7 +60,6 @@ public class RegisterActivity extends BaseImmersiveActivity {
         register_et_password = findViewById(R.id.register_et_password);
         register_btn_send = findViewById(R.id.register_btn_send);
         register_btn_signup = findViewById(R.id.register_btn_signup);
-        register_btn_signin = findViewById(R.id.register_btn_signin);
 
         setSupportActionBar(register_toolbar);
         register_et_email.bindTextInputLayout(register_til_email);
@@ -77,20 +75,19 @@ public class RegisterActivity extends BaseImmersiveActivity {
 
         mVerifycodeCallback = new XlinkRequestCallback<String>() {
             @Override
-            public void onStart() {
-
-            }
-
-            @Override
             public void onError(String error) {
-                Toast.makeText(RegisterActivity.this, "发送邮箱验证码失败", Toast.LENGTH_SHORT)
+                Toast.makeText(RegisterActivity.this, error, Toast.LENGTH_SHORT)
                      .show();
             }
 
             @Override
             public void onSuccess(String s) {
-                Toast.makeText(RegisterActivity.this, "发送邮箱验证码成功. " + s, Toast.LENGTH_SHORT)
-                     .show();
+//                Toast.makeText(RegisterActivity.this, "发送邮箱验证码成功. " + s, Toast.LENGTH_SHORT)
+//                     .show();
+                MessageDialog dialog = new MessageDialog(RegisterActivity.this, true);
+                dialog.setTitle(R.string.title_verifycode_sent)
+                      .setMessage(R.string.msg_get_verifycode)
+                      .show();
             }
         };
 
@@ -160,13 +157,6 @@ public class RegisterActivity extends BaseImmersiveActivity {
                     return;
                 }
                 XlinkCloudManager.getInstance().registerEmailByVerifycode(email, password, verifycode, mRegisterCallback);
-            }
-        });
-
-        register_btn_signin.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                backtoLoginActivity(false);
             }
         });
     }

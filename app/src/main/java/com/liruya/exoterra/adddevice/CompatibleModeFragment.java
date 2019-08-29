@@ -11,9 +11,10 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.github.lzyzsd.circleprogress.DonutProgress;
-import com.liruya.base.BaseFragment;
 import com.liruya.exoterra.R;
+import com.liruya.exoterra.base.BaseFragment;
 import com.liruya.exoterra.event.SubscribeChangedEvent;
+import com.liruya.exoterra.util.RouterUtil;
 
 import org.greenrobot.eventbus.EventBus;
 
@@ -41,6 +42,7 @@ public class CompatibleModeFragment extends BaseFragment {
         super.onDestroyView();
         if (mAPConfigLinker != null) {
             mAPConfigLinker.stopTask();
+            mConnectNetViewModel.getData().setRunning(false);
         }
     }
 
@@ -91,6 +93,7 @@ public class CompatibleModeFragment extends BaseFragment {
                 mConnectNetBean.setRunning(false);
                 mConnectNetViewModel.postValue();
                 showAPConfigSuccessDialog();
+                RouterUtil.putRouterPassword(getContext(), mConnectNetViewModel.getData().getSsid(), mConnectNetViewModel.getData().getPassword());
             }
 
             @Override
@@ -126,14 +129,21 @@ public class CompatibleModeFragment extends BaseFragment {
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         builder.setTitle("Config Failed")
                .setMessage(error)
-               .setCancelable(false)
                .setPositiveButton(R.string.close, new DialogInterface.OnClickListener() {
                    @Override
                    public void onClick(DialogInterface dialog, int which) {
-                       getActivity().getSupportFragmentManager()
-                                    .popBackStack();
+                       getActivity().getSupportFragmentManager().popBackStack();
                    }
                })
+               .setNeutralButton("Change config mode", new DialogInterface.OnClickListener() {
+                   @Override
+                   public void onClick(DialogInterface dialog, int which) {
+                       mConnectNetViewModel.getData().setCompatibleMode(false);
+                       mConnectNetViewModel.postValue();
+                       getActivity().getSupportFragmentManager().popBackStack();
+                   }
+               })
+               .setCancelable(false)
                .show();
     }
 }

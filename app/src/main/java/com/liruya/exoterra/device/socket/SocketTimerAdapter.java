@@ -9,6 +9,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CompoundButton;
 import android.widget.Switch;
 import android.widget.TextView;
 
@@ -67,6 +68,19 @@ public abstract class SocketTimerAdapter extends RecyclerView.Adapter<SocketTime
                 return true;
             }
         });
+        holder.sw_enable.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (buttonView.isPressed()) {
+                    buttonView.setChecked(!isChecked);
+                    if (isChecked) {
+                        onEnableTimer(position);
+                    } else {
+                        onDisableTimer(position);
+                    }
+                }
+            }
+        });
     }
 
     @Override
@@ -92,4 +106,8 @@ public abstract class SocketTimerAdapter extends RecyclerView.Adapter<SocketTime
     protected abstract void onClickItem(int position);
 
     protected abstract void onLongClickItem(int position);
+
+    protected abstract void onEnableTimer(int position);
+
+    protected abstract void onDisableTimer(int position);
 }

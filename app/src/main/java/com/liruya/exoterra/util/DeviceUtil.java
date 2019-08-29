@@ -35,19 +35,42 @@ public class DeviceUtil {
     }
 
     public static @DrawableRes int getProductIcon(String pid) {
-        if (TextUtils.isEmpty(pid)) {
-            return R.drawable.ic_device_default_white_64dp;
-        }
         if (XlinkConstants.PRODUCT_ID_LEDSTRIP.equals(pid)) {
-            return R.drawable.ic_light_white_64dp;
+            return R.drawable.ic_strip;
         }
         if (XlinkConstants.PRODUCT_ID_MONSOON.equals(pid)) {
-            return R.mipmap.ic_monsoon_on_128;
+            return R.drawable.ic_monsoon;
         }
         if (XlinkConstants.PRODUCT_ID_SOCKET.equals(pid)) {
-            return R.drawable.ic_socket_white_64dp;
+            return R.drawable.ic_socket;
         }
         return R.drawable.ic_device_default_white_64dp;
+    }
+
+    public static @DrawableRes int getProductLedoffIcon(String pid) {
+        if (XlinkConstants.PRODUCT_ID_LEDSTRIP.equals(pid)) {
+            return R.mipmap.ic_strip_off_256;
+        }
+        if (XlinkConstants.PRODUCT_ID_MONSOON.equals(pid)) {
+            return R.mipmap.ic_monsoon_off_256;
+        }
+        if (XlinkConstants.PRODUCT_ID_SOCKET.equals(pid)) {
+            return R.mipmap.ic_socket_off_256;
+        }
+        return 0;
+    }
+
+    public static @DrawableRes int getProductLedonIcon(String pid) {
+        if (XlinkConstants.PRODUCT_ID_LEDSTRIP.equals(pid)) {
+            return R.mipmap.ic_strip_on_256;
+        }
+        if (XlinkConstants.PRODUCT_ID_MONSOON.equals(pid)) {
+            return R.mipmap.ic_monsoon_on_256;
+        }
+        if (XlinkConstants.PRODUCT_ID_SOCKET.equals(pid)) {
+            return R.mipmap.ic_socket_on_256;
+        }
+        return 0;
     }
 
     public static String getProductType(String pid) {

@@ -16,8 +16,8 @@ import android.widget.CompoundButton;
 import android.widget.RadioButton;
 
 import com.github.mikephil.charting.charts.LineChart;
-import com.liruya.base.BaseFragment;
 import com.liruya.exoterra.R;
+import com.liruya.exoterra.base.BaseFragment;
 import com.liruya.exoterra.bean.Profile;
 
 public class SelectProfileFragment extends BaseFragment {

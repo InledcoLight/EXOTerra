@@ -79,31 +79,6 @@ public class XlinkCloudManager {
         XLinkSDK.startTask(task);
     }
 
-//    public void register(final String email, String nickname, String password, final XlinkRequestCallback<UserAuthApi.EmailRegisterResponse> callback) {
-//        UserAuthApi.EmailRegisterRequest request = new UserAuthApi.EmailRegisterRequest();
-//        request.corpId = mCorpId;
-//        request.email = email;
-//        if (!TextUtils.isEmpty(nickname)) {
-//            request.nickname = nickname;
-//        }
-//        request.password = password;
-//        request.localLang = XLinkRestfulEnum.LocalLang.EN_US;
-//        request.source = XLinkRestfulEnum.UserSource.ANDROID;
-//        XLinkRestful.getApplicationApi()
-//                    .registEmailAccount(request)
-//                    .enqueue(callback);
-//        if (callback != null) {
-//            callback.onStart();
-//        }
-//
-//        UserAuthApi.EmailVerifyCodeRegisterRequest rq;
-//        UserAuthApi.RegisterEmailVerifyCodeRequest req = new UserAuthApi.RegisterEmailVerifyCodeRequest();
-//        req.corpId = mCorpId;
-//        req.email = email;
-//        req.localLang = XLinkRestfulEnum.LocalLang.EN_US;
-//        XLinkRestful.getApplicationApi().registerEmailVerifyCode(req).enqueue(null);
-//    }
-
     public void requestRegisterEmailVerifycode(@NonNull final String email, final XlinkRequestCallback<String> callback) {
         UserAuthApi.RegisterEmailVerifyCodeRequest request = new UserAuthApi.RegisterEmailVerifyCodeRequest();
         request.corpId = mCorpId;
@@ -431,6 +406,7 @@ public class XlinkCloudManager {
 
     public void getDeviceMetaDatapoints(@NonNull XDevice device, XLinkTaskListener<List<XLinkDataPoint>> listener) {
         XLinkGetDataPointMetaInfoTask task = XLinkGetDataPointMetaInfoTask.newBuilder()
+                                                                          .setForceRefresh(true)
                                                                           .setProductId(device.getProductId())
                                                                           .setListener(listener)
                                                                           .build();
@@ -698,6 +674,17 @@ public class XlinkCloudManager {
         request.name = homeName;
         XLinkRestful.getApplicationApi()
                     .createHome(request)
+                    .enqueue(callback);
+        if (callback != null) {
+            callback.onStart();
+        }
+    }
+
+    public void renameHome(@NonNull final String homeid, @NonNull final String newName, final XlinkRequestCallback<String> callback) {
+        HomeApi.HomeRequest request = new HomeApi.HomeRequest();
+        request.name = newName;
+        XLinkRestful.getApplicationApi()
+                    .updateHome(homeid, request)
                     .enqueue(callback);
         if (callback != null) {
             callback.onStart();

@@ -9,13 +9,16 @@
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/device_toolbar"
-        android:layout_width="0dp"
-        android:layout_height="?attr/actionBarSize"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minHeight="?attr/actionBarSize"
         android:theme="?attr/actionBarTheme"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:navigationIcon="@drawable/ic_arrow_back_white_32dp"/>
+        app:navigationIcon="@drawable/ic_arrow_back_white_32dp">
+
+    </android.support.v7.widget.Toolbar>
 
     <FrameLayout
         android:id="@+id/device_fl_show"

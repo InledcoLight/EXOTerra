@@ -103,7 +103,7 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:scaleType="centerCrop"
-        android:src="@mipmap/ic_night"
+        android:src="@mipmap/ic_turnoff"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/light_auto_gl5"
         app:layout_constraintStart_toEndOf="@+id/auto_iv_sunset"
@@ -263,12 +263,18 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/auto_tv_sunset">
-        <CheckedTextView
-            android:id="@+id/auto_ctv_gis"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="#FFFFFF"
-            android:text="Gis Enable"/>
+        <android.support.v7.widget.SwitchCompat
+            android:id="@+id/auto_sw_gis"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="8dp"
+            android:clickable="false"/>
+<!--        <CheckedTextView-->
+<!--            android:id="@+id/auto_ctv_gis"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:textColor="@color/textColorPrimary"-->
+<!--            android:text="Gis Enable"/>-->
     </LinearLayout>
 
 </android.support.constraint.ConstraintLayout>

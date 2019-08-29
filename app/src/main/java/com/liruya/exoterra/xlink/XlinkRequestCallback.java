@@ -16,7 +16,9 @@ public abstract class XlinkRequestCallback<T> extends XLinkCallback<T> {
         onError(XLinkErrorCodeHelper.getErrorCodeName(error.code));
     }
 
-    public abstract void onStart();
+    public void onStart() {
+
+    }
 
     public abstract void onError(String error);
 }

@@ -15,7 +15,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:srcCompat="@drawable/ic_alarm_white_32dp"
-            android:tint="#000000"
             android:background="@android:color/transparent"/>
         <Space
             android:layout_width="0dp"
@@ -25,14 +24,13 @@
             android:id="@+id/dialog_socket_timer"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_margin="4dp"
             android:timePickerMode="spinner"/>
     </LinearLayout>
 
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="@color/colorGray"/>
+        android:background="@color/colorDivider"/>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -43,8 +41,7 @@
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:tint="#000000"
-            app:srcCompat="@drawable/ic_socket_black_32dp"
+            app:srcCompat="@drawable/ic_power_white_32dp"
             android:background="@android:color/transparent"/>
         <Space
             android:layout_width="0dp"
@@ -75,7 +72,6 @@
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:tint="#000000"
             app:srcCompat="@drawable/ic_date_white_32dp"
             android:background="@android:color/transparent"/>
         <Space
@@ -151,14 +147,5 @@
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:background="@color/colorGray"/>
-
-    <Switch
-        android:id="@+id/dialog_socket_enable"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="right"
-        android:padding="8dp"
-        android:layout_margin="4dp"
-        android:checked="true"/>
 
 </LinearLayout>
