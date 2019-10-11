@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "95153791332",
+    "firebase_url": "https://exoterra-d7d60.firebaseio.com",
+    "project_id": "exoterra-d7d60",
+    "storage_bucket": "exoterra-d7d60.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:95153791332:android:a534ad2c27dc9546c59a71",
+        "android_client_info": {
+          "package_name": "com.inledco.exoterra"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "95153791332-bfdjjtebhhuhsjbkl7808oh3m2tdl94f.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD84bs6UAo54JPVaL5JtRUJY56VroxU2gw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "95153791332-bfdjjtebhhuhsjbkl7808oh3m2tdl94f.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">EXOTerra</string>
+    <string name="app_name">Microtope</string>
 
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
@@ -132,7 +132,7 @@
     <string name="device_users">Device users</string>
     <string name="firmware_version">Firmware Version</string>
     <string name="share_to_me">Share to me</string>
-    <string name="message">Message</string>
+    <string name="msg">Message</string>
     <string name="home_invite">Home Invite</string>
     <string name="denied">Denied</string>
     <string name="accepted">Accepted</string>
@@ -198,4 +198,43 @@
     <string name="msg_get_verifycode">Verifycode has been sent to the email.</string>
     <string name="title_verifycode_sent">Verifycode sent success</string>
     <string name="rename_group">Rename group</string>
+    <string name="device_location">Device location</string>
+    <string name="remove_device">Remove device</string>
+    <string name="msg_remove_device">Confirm remove device?</string>
+    <string name="linkage">Linkage</string>
+    <string name="linkage_enable">Linkage Enable</string>
+    <string name="january">January</string>
+    <string name="february">February</string>
+    <string name="march">March</string>
+    <string name="april">April</string>
+    <string name="may">May</string>
+    <string name="june">June</string>
+    <string name="july">July</string>
+    <string name="august">August</string>
+    <string name="september">September</string>
+    <string name="october">October</string>
+    <string name="november">November</string>
+    <string name="december">December</string>
+    <string name="temperature">Temperature</string>
+    <string name="notification_enable">Notification Enable</string>
+    <string name="threshold">Threshold</string>
+    <string name="notification">Notification</string>
+    <string name="humidity">Humidity</string>
+    <string name="spectrum">Spectrum</string>
+    <string name="title_add_timer">Add Timer</string>
+    <string name="spray_water_for">Spray water for</string>
+    <string name="fcm_default_notification_channel_id">fcm_default</string>
+    <string name="notify_chnid_share">share</string>
+    <string name="notify_chnid_share_receipt">share_receipt</string>
+    <string name="notify_chnid_invite">invite</string>
+    <string name="notify_chnid_home_member_changed">home_member_changed</string>
+    <string name="notify_chnid_delete_home">delete_home</string>
+    <string name="notify_chnid_alarm">alarm</string>
+    <string name="notify_chn_share">Share</string>
+    <string name="notify_chn_share_receipt">Share Receipt</string>
+    <string name="notify_chn_invite">Invite</string>
+    <string name="notify_chn_home_member_changed">Home Member Changed</string>
+    <string name="notify_chn_delete_home">Delete Home</string>
+    <string name="notify_chn_alarm">Alarm</string>
+    <string name="error_regdev_failed">Register device failed</string>
 </resources>

@@ -1,7 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.liruya.exoterra">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.inledco.exoterra">
     <!-- 存储权限为日志文件需要,如果不需要提供日志的文件存储功能,也可以不提供此权限 -->
-    <application android:name=".EXOTerraApplication" android:allowBackup="true" android:icon="@mipmap/ic_launcher" android:label="@string/app_name" android:roundIcon="@mipmap/ic_launcher_round" android:supportsRtl="true" android:theme="@style/AppTheme">
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <!-- wIFI权限用于本地及云端状态切换及网络状态的检测需要 -->
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_MULTICAST_STATE" />
+    <!-- 网络权限用于云端连接的需要 -->
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+
+    <uses-permission android:name="android.permission.CAMERA" />
+
+    <application android:name=".EXOTerraApplication"
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme">
         <activity android:name=".splash.SplashActivity" android:screenOrientation="portrait" android:theme="@style/LaunchTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -17,16 +37,38 @@
         <activity android:name=".scan.ScanActivity" android:screenOrientation="portrait" />
         <activity android:name=".adddevice.AddDeviceActivity" android:screenOrientation="portrait" android:windowSoftInputMode="adjustPan" />
         <activity android:name=".device.DeviceActivity" android:screenOrientation="portrait" android:windowSoftInputMode="adjustPan" />
-    </application> <!-- wIFI权限用于本地及云端状态切换及网络状态的检测需要 -->
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
-    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" /> <!-- 网络权限用于云端连接的需要 -->
-    <uses-permission android:name="android.permission.CHANGE_WIFI_MULTICAST_STATE" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
-    <uses-permission android:name="android.permission.CAMERA" />
+        <service android:name=".push.FCMMessageService"
+            android:exported="false"
+            android:stopWithTask="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
 
+<!--        <service android:name=".push.AlipushService"-->
+<!--            android:exported="false"-->
+<!--            android:stopWithTask="false">-->
+<!--            <intent-filter>-->
+<!--                <action android:name="com.alibaba.push2.action.NOTIFICATION_OPENED" />-->
+<!--            </intent-filter>-->
+<!--            <intent-filter>-->
+<!--                <action android:name="com.alibaba.push2.action.NOTIFICATION_REMOVED" />-->
+<!--            </intent-filter>-->
+<!--            <intent-filter>-->
+<!--                <action android:name="com.alibaba.sdk.android.push.RECEIVE" />-->
+<!--            </intent-filter>-->
+<!--        </service>-->
+
+<!--        <receiver android:name=".push.AlipushMessageReceiver"-->
+<!--            android:exported="false">-->
+<!--            <intent-filter>-->
+<!--                <action android:name="com.alibaba.push2.action.NOTIFICATION_OPENED"/>-->
+<!--            </intent-filter>-->
+<!--        </receiver>-->
+
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_channel_id"
+            android:value="@string/fcm_default_notification_channel_id" />
+    </application>
 </manifest>

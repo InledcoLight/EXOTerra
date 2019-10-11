@@ -38,7 +38,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/register_gl1">
 
-        <com.liruya.exoterra.view.AdvancedTextInputEditText
+        <com.inledco.exoterra.view.AdvancedTextInputEditText
             android:id="@+id/register_et_email"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -71,7 +71,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/register_til_email">
 
-        <com.liruya.exoterra.view.AdvancedTextInputEditText
+        <com.inledco.exoterra.view.AdvancedTextInputEditText
             android:id="@+id/register_et_verifycode"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -94,7 +94,7 @@
         app:layout_constraintTop_toBottomOf="@+id/register_til_verifycode"
         app:passwordToggleEnabled="true">
 
-        <com.liruya.exoterra.view.AdvancedTextInputEditText
+        <com.inledco.exoterra.view.AdvancedTextInputEditText
             android:id="@+id/register_et_password"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

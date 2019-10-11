@@ -6,12 +6,12 @@
               android:layout_width="wrap_content"
               android:layout_height="match_parent">
 
-    <com.liruya.exoterra.view.VerticalSeekBarWrapper
+    <com.inledco.exoterra.view.VerticalSeekBarWrapper
         android:layout_width="wrap_content"
         android:layout_height="0dp"
         android:layout_weight="1">
 
-        <com.liruya.exoterra.view.VerticalSeekBar
+        <com.inledco.exoterra.view.VerticalSeekBar
             android:id="@+id/item_slider_vertical_progress"
             android:layout_width="wrap_content"
             android:layout_height="0dp"
@@ -23,10 +23,10 @@
             android:max="1000"
             android:progress="0"
             android:splitTrack="false"
-            android:progressDrawable="@drawable/custom_seekbar_white"
-            android:thumb="@drawable/custom_thumb_white"
+            android:progressDrawable="@drawable/custom_seekbar"
+            android:thumb="@drawable/custom_seekbar_thumb"
             app:seekBarRotation="CW270"/>
-    </com.liruya.exoterra.view.VerticalSeekBarWrapper>
+    </com.inledco.exoterra.view.VerticalSeekBarWrapper>
 
     <TextView
         android:id="@+id/item_slider_vertical_percent"

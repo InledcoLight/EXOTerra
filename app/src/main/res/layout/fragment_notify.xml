@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:clickable="true"
+    android:background="@mipmap/ic_background">
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/notify_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minHeight="?attr/actionBarSize"
+        android:theme="?attr/actionBarTheme"
+        app:title="@string/notification"
+        app:navigationIcon="@drawable/ic_clear_white_32dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Switch
+        android:id="@+id/notify_sw_enable"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:textSize="@dimen/textSizePrimary"
+        android:text="@string/notification_enable"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/notify_toolbar" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/notify_sw_enable">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/textSizePrimary"
+            android:textColor="@color/textColorPrimary"
+            android:text="@string/threshold"/>
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"/>
+        <android.support.design.widget.TextInputEditText
+            android:id="@+id/notify_thrd_lower"
+            android:layout_width="64dp"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:lines="1"
+            android:maxLines="1"
+            android:inputType="number" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            android:textSize="@dimen/textSizeSecondary"
+            android:textColor="@color/textColorSencondary"
+            android:text=" - "/>
+        <android.support.design.widget.TextInputEditText
+            android:id="@+id/notify_thrd_upper"
+            android:layout_width="64dp"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:lines="1"
+            android:maxLines="1"
+            android:inputType="number"/>
+    </LinearLayout>
+</android.support.constraint.ConstraintLayout>

@@ -26,7 +26,7 @@
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent">
 
-        <com.liruya.exoterra.view.MultiCircleProgress
+        <com.inledco.exoterra.view.MultiCircleProgress
             android:id="@+id/light_manual_custom1"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -42,7 +42,7 @@
             app:startAngle="-225"
             app:sweepAngle="270"/>
 
-        <com.liruya.exoterra.view.MultiCircleProgress
+        <com.inledco.exoterra.view.MultiCircleProgress
             android:id="@+id/light_manual_custom2"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -66,7 +66,7 @@
             android:background="?attr/selectableItemBackground"
             app:srcCompat="@drawable/selector_power"/>
 
-        <com.liruya.exoterra.view.MultiCircleProgress
+        <com.inledco.exoterra.view.MultiCircleProgress
             android:id="@+id/light_manual_custom3"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -82,7 +82,7 @@
             app:startAngle="-225"
             app:sweepAngle="270" />
 
-        <com.liruya.exoterra.view.MultiCircleProgress
+        <com.inledco.exoterra.view.MultiCircleProgress
             android:id="@+id/light_manual_custom4"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -99,21 +99,44 @@
             app:sweepAngle="270" />
     </LinearLayout>
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/light_manual_rv"
+    <FrameLayout
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:background="@drawable/shape_rect_corner"
         android:layout_marginStart="16dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="8dp"
-        android:orientation="horizontal"
-        app:layoutManager="android.support.v7.widget.LinearLayoutManager"
         app:layout_constraintBottom_toTopOf="@+id/linearLayout"
         app:layout_constraintEnd_toStartOf="@+id/linearLayout3"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/light_manual_gl1"
-        app:layout_constraintVertical_bias="0.0" />
+        app:layout_constraintVertical_bias="0.0">
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/light_manual_rv"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:orientation="horizontal"
+            app:layoutManager="android.support.v7.widget.LinearLayoutManager"/>
+    </FrameLayout>
+
+<!--    <android.support.v7.widget.RecyclerView-->
+<!--        android:id="@+id/light_manual_rv"-->
+<!--        android:layout_width="0dp"-->
+<!--        android:layout_height="0dp"-->
+<!--        android:layout_marginStart="16dp"-->
+<!--        android:layout_marginTop="8dp"-->
+<!--        android:layout_marginEnd="16dp"-->
+<!--        android:layout_marginBottom="8dp"-->
+<!--        android:orientation="horizontal"-->
+<!--        app:layoutManager="android.support.v7.widget.LinearLayoutManager"-->
+<!--        app:layout_constraintBottom_toTopOf="@+id/linearLayout"-->
+<!--        app:layout_constraintEnd_toStartOf="@+id/linearLayout3"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintTop_toTopOf="@+id/light_manual_gl1"-->
+<!--        app:layout_constraintVertical_bias="0.0" />-->
 
     <TextView
         android:id="@+id/light_manual_desc"
@@ -144,12 +167,12 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@+id/light_manual_gl1">
 
-        <com.liruya.exoterra.view.VerticalSeekBarWrapper
+        <com.inledco.exoterra.view.VerticalSeekBarWrapper
             android:layout_width="wrap_content"
             android:layout_height="0dp"
             android:layout_weight="1">
 
-            <com.liruya.exoterra.view.VerticalSeekBar
+            <com.inledco.exoterra.view.VerticalSeekBar
                 android:id="@+id/light_manual_slider_all"
                 android:layout_width="wrap_content"
                 android:layout_height="0dp"
@@ -160,11 +183,11 @@
                 android:paddingTop="16dp"
                 android:paddingBottom="16dp"
                 android:progress="0"
-                android:progressDrawable="@drawable/custom_seekbar_white"
                 android:splitTrack="false"
-                android:thumb="@drawable/custom_thumb_white"
+                android:progressDrawable="@drawable/custom_seekbar"
+                android:thumb="@drawable/custom_seekbar_thumb"
                 app:seekBarRotation="CW270" />
-        </com.liruya.exoterra.view.VerticalSeekBarWrapper>
+        </com.inledco.exoterra.view.VerticalSeekBarWrapper>
 
         <TextView
             android:id="@+id/light_manual_progress"
@@ -175,19 +198,14 @@
             android:textSize="12sp"/>
     </LinearLayout>
 
-    <ImageView
-        android:id="@+id/imageView5"
+    <com.github.mikephil.charting.charts.BarChart
+        android:id="@+id/light_manual_spectrum"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginBottom="8dp"
         android:scaleType="centerCrop"
         app:layout_constraintBottom_toTopOf="@+id/light_manual_gl1"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@mipmap/ic_guangpu" />
+        app:layout_constraintTop_toTopOf="parent" />
 
 </android.support.constraint.ConstraintLayout>

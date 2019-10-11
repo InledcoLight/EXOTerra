@@ -1,71 +1,128 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                                             xmlns:app="http://schemas.android.com/apk/res-auto"
-                                             xmlns:tools="http://schemas.android.com/tools"
-                                             android:clickable="true"
-                                             android:layout_width="match_parent"
-                                             android:layout_height="match_parent">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:clickable="true">
 
     <LinearLayout
-        android:id="@+id/socket_ll_sensor"
+        android:id="@+id/socket_control_ll"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
         android:background="?attr/selectableItemBackground"
-        android:orientation="horizontal"
         android:gravity="center_vertical"
-        android:padding="8dp"
+        android:orientation="horizontal"
         android:visibility="visible"
+        app:layout_constraintBottom_toTopOf="@+id/socket_control_gl1"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
-        <ImageView
-            android:id="@+id/socket_iv_sensor"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="8dp"
-            app:srcCompat="@drawable/ic_temperature"/>
+
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:orientation="vertical"
-            android:gravity="center_vertical">
+            android:layout_margin="2dp">
+
             <TextView
-                android:id="@+id/socket_tv_s1value"
+                android:id="@+id/socket_control_s1value"
                 android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:layout_gravity="center_horizontal"
+                android:gravity="center"
+                android:textColor="@color/textColorPrimary"
+                android:textSize="@dimen/textSizePrimary" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textSize="24sp"
-                android:text="value1"/>
-            <TextView
-                android:id="@+id/socket_tv_s2value"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:visibility="gone"
-                android:text="value2"/>
+                android:gravity="center_vertical|right"
+                android:orientation="horizontal">
+
+                <ImageButton
+                    android:id="@+id/socket_control_s1notify"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="8dp"
+                    android:background="?attr/selectableItemBackground"
+                    app:srcCompat="@drawable/ic_notifications_white_24dp" />
+                <ImageButton
+                    android:id="@+id/socket_control_s1linkage"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="8dp"
+                    android:background="?attr/selectableItemBackground"
+                    app:srcCompat="@drawable/ic_settings_white_24dp" />
+            </LinearLayout>
         </LinearLayout>
-        <ImageButton
-            android:id="@+id/socket_ib_setting"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="8dp"
-            android:background="?attr/selectableItemBackground"
-            app:srcCompat="@drawable/ic_settings_white_32dp"/>
+
+        <View
+            android:id="@+id/socket_control_div"
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            android:background="@color/colorWhite"/>
+
+        <LinearLayout
+            android:id="@+id/socket_control_ll2"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:layout_margin="2dp">
+
+            <TextView
+                android:id="@+id/socket_control_s2value"
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:layout_gravity="center_horizontal"
+                android:gravity="center"
+                android:textColor="@color/textColorPrimary"
+                android:textSize="@dimen/textSizePrimary" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical|right"
+                android:orientation="horizontal">
+
+                <ImageButton
+                    android:id="@+id/socket_control_s2notify"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="8dp"
+                    android:background="?attr/selectableItemBackground"
+                    app:srcCompat="@drawable/ic_notifications_white_24dp" />
+            </LinearLayout>
+        </LinearLayout>
 
     </LinearLayout>
 
-    <android.support.design.widget.CheckableImageButton
-        android:id="@+id/socket_cib_power"
+    <android.support.constraint.Guideline
+        android:id="@+id/socket_control_gl1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:padding="8dp"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.20519836" />
+
+    <android.support.v7.widget.AppCompatImageButton
+        android:id="@+id/socket_control_power"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="8dp"
         android:background="?attr/selectableItemBackground"
+        android:padding="8dp"
         android:src="@drawable/selector_socket_onoff"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/socket_ll_sensor"/>
+        app:layout_constraintTop_toBottomOf="@+id/socket_control_gl1" />
 </android.support.constraint.ConstraintLayout>

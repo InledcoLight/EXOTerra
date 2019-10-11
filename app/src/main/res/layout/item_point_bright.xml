@@ -13,7 +13,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="4dp"
-        app:srcCompat="@drawable/ic_square_white"/>
+        android:src="@drawable/ic_square"/>
 
     <SeekBar
         android:id="@+id/item_point_bright_seekbar"
@@ -23,7 +23,8 @@
         android:max="100"
         android:maxHeight="6dp"
         android:padding="4dp"
-        android:progress="0"/>
+        android:progress="0"
+        android:thumb="@drawable/custom_seekbar_thumb"/>
 
     <TextView
         android:id="@+id/item_point_bright_percent"

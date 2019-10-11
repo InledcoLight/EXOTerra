@@ -269,12 +269,6 @@
             android:layout_height="match_parent"
             android:padding="8dp"
             android:clickable="false"/>
-<!--        <CheckedTextView-->
-<!--            android:id="@+id/auto_ctv_gis"-->
-<!--            android:layout_width="match_parent"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:textColor="@color/textColorPrimary"-->
-<!--            android:text="Gis Enable"/>-->
     </LinearLayout>
 
 </android.support.constraint.ConstraintLayout>

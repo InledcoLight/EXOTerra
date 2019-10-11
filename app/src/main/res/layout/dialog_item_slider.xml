@@ -13,7 +13,7 @@
         android:layout_marginLeft="16dp"
         android:layout_marginRight="8dp"
         android:scaleType="centerCrop"
-        app:srcCompat="@drawable/ic_square_white"/>
+        android:src="@drawable/ic_square"/>
 
     <SeekBar
         android:id="@+id/dialog_item_slider_progress"
@@ -27,8 +27,7 @@
         android:maxHeight="6dp"
         android:max="100"
         android:progress="0"
-        android:progressDrawable="@drawable/custom_seekbar_white"
-        android:thumb="@drawable/custom_thumb_white"/>
+        android:thumb="@drawable/custom_seekbar_thumb"/>
 
     <TextView
         android:id="@+id/dialog_item_slider_percent"

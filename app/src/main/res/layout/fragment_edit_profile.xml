@@ -29,7 +29,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/edit_profile_toolbar"/>
 
-    <com.liruya.exoterra.view.MultiPointSeekbar
+    <com.inledco.exoterra.view.MultiPointSeekbar
         android:id="@+id/edit_pro_mps"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

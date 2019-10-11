@@ -33,9 +33,15 @@
             android:textSize="12sp"
             android:text="xxxxxxx"/>
     </LinearLayout>
-    <Switch
-        android:id="@+id/item_monsoon_timer_enable"
+    <FrameLayout
+        android:id="@+id/item_monsoon_timer_fl"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:padding="16dp"/>
+        android:layout_height="wrap_content">
+        <Switch
+            android:id="@+id/item_monsoon_timer_enable"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:clickable="false"
+            android:padding="16dp"/>
+    </FrameLayout>
 </LinearLayout>

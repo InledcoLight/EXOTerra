@@ -6,7 +6,7 @@
     android:background="@mipmap/ic_splash"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".splash.SplashActivity">
+    tools:context="com.inledco.exoterra.splash.SplashActivity">
 
     <VideoView
         android:id="@+id/splash_vv"

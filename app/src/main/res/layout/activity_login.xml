@@ -63,7 +63,7 @@
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent">
 
-        <com.liruya.exoterra.view.AdvancedTextInputEditText
+        <com.inledco.exoterra.view.AdvancedTextInputEditText
             android:id="@+id/login_et_email"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -87,7 +87,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:passwordToggleEnabled="true">
 
-        <com.liruya.exoterra.view.AdvancedTextInputEditText
+        <com.inledco.exoterra.view.AdvancedTextInputEditText
             android:id="@+id/login_et_password"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
