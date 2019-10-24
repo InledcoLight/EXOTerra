@@ -1,17 +1,15 @@
 package com.inledco.exoterra.event;
 
+import android.support.annotation.NonNull;
+
 public class DatapointChangedEvent {
     private String mDeviceTag;
 
-    public DatapointChangedEvent(String deviceTag) {
+    public DatapointChangedEvent(@NonNull String deviceTag) {
         mDeviceTag = deviceTag;
     }
 
     public String getDeviceTag() {
         return mDeviceTag;
-    }
-
-    public void setDeviceTag(String deviceTag) {
-        mDeviceTag = deviceTag;
     }
 }

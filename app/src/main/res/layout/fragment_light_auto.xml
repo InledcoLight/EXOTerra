@@ -103,7 +103,7 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:scaleType="centerCrop"
-        android:src="@mipmap/ic_turnoff"
+        android:src="@mipmap/ic_night"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/light_auto_gl5"
         app:layout_constraintStart_toEndOf="@+id/auto_iv_sunset"

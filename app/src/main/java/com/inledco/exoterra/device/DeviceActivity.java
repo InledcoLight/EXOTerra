@@ -39,6 +39,7 @@ import com.inledco.exoterra.device.light.LightViewModel;
 import com.inledco.exoterra.device.socket.SocketFragment;
 import com.inledco.exoterra.device.socket.SocketViewModel;
 import com.inledco.exoterra.event.DatapointChangedEvent;
+import com.inledco.exoterra.event.DevicePropertyChangedEvent;
 import com.inledco.exoterra.event.DeviceStateChangedEvent;
 import com.inledco.exoterra.manager.DeviceManager;
 import com.inledco.exoterra.util.DeviceUtil;
@@ -298,6 +299,13 @@ public class DeviceActivity extends BaseActivity {
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onDevicePropertyChangedEvent(DevicePropertyChangedEvent event) {
+        if (event != null && mDevice != null && mDevice.getXDevice().getDeviceId() == event.getDeviceId()) {
+            device_toolbar.setTitle(event.getDeviceName());
+        }
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
     public void onDatapointChangedEvent(DatapointChangedEvent event) {
         if (event != null && mDevice != null
             && TextUtils.equals(event.getDeviceTag(), mDevice.getDeviceTag())) {
@@ -318,11 +326,6 @@ public class DeviceActivity extends BaseActivity {
             public void onError(String error) {
                 Toast.makeText(DeviceActivity.this, error, Toast.LENGTH_SHORT)
                      .show();
-            }
-
-            @Override
-            public void onStart() {
-
             }
 
             @Override

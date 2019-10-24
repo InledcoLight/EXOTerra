@@ -31,9 +31,23 @@ public class SocketControlFragment extends BaseFragment {
     private ImageButton socket_control_s1linkage;
     private ImageButton socket_control_s2notify;
     private AppCompatImageButton socket_control_power;
+    private TextView socket_control_status;
+    private TextView socket_control_life;
 
     private SocketViewModel mSocketViewModel;
     private EXOSocket mSocket;
+
+    private CountDownTimer mTimer = new CountDownTimer(200000, 2000) {
+        @Override
+        public void onTick(long millisUntilFinished) {
+            mSocketViewModel.setPower(!mSocket.getPower());
+        }
+
+        @Override
+        public void onFinish() {
+
+        }
+    };
 
     @Nullable
     @Override
@@ -43,6 +57,13 @@ public class SocketControlFragment extends BaseFragment {
         initData();
         initEvent();
         return view;
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        mTimer.cancel();
+        mTimer = null;
     }
 
     @Override
@@ -61,6 +82,8 @@ public class SocketControlFragment extends BaseFragment {
         socket_control_s2value = view.findViewById(R.id.socket_control_s2value);
         socket_control_s2notify = view.findViewById(R.id.socket_control_s2notify);
         socket_control_power = view.findViewById(R.id.socket_control_power);
+        socket_control_status = view.findViewById(R.id.socket_control_status);
+        socket_control_life = view.findViewById(R.id.socket_control_life);
     }
 
     @Override
@@ -122,17 +145,7 @@ public class SocketControlFragment extends BaseFragment {
         socket_control_power.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-                new CountDownTimer(150000, 1500) {
-                    @Override
-                    public void onTick(long millisUntilFinished) {
-                        mSocketViewModel.setPower(!mSocket.getPower());
-                    }
-
-                    @Override
-                    public void onFinish() {
-
-                    }
-                }.start();
+                mTimer.start();
                 return true;
             }
         });
@@ -157,7 +170,9 @@ public class SocketControlFragment extends BaseFragment {
             socket_control_ll.setVisibility(View.INVISIBLE);
         }
 
-        socket_control_power.setImageResource(mSocket.getPower() ? R.drawable.ic_power_blue : R.drawable.ic_power_gray);
+        socket_control_power.setImageResource(mSocket.getPower() ? R.drawable.ic_power_blue : R.drawable.ic_power_red);
+        socket_control_status.setText(getString(R.string.current_status) + (mSocket.getPower() ? getString(R.string.on) : getString(R.string.off)));
+        socket_control_life.setText("" + mSocket.getSwitchCount() + "/" + mSocket.getSwitchCountMax());
     }
 
     private String getSensorValueText(int type, int value) {

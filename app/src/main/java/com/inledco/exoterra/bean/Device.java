@@ -25,6 +25,7 @@ public class Device {
     private final int INDEX_LOCAL_PSW           = 198;
 
     private XDevice mXDevice;
+    private String mProperty;
     private final List<XLinkDataPoint> mDataPointList;
 
     public Device(@NonNull XDevice xDevice) {
@@ -40,8 +41,12 @@ public class Device {
         mXDevice = XDevice;
     }
 
+    public void setProperty(String property) {
+        mProperty = property;
+    }
+
     public String getDeviceTag() {
-//        return mXDevice.getDeviceTag();
+//        return mXDevice.getDeviceId();
         return mXDevice.getProductId() + "_" + mXDevice.getMacAddress();
     }
 
@@ -336,6 +341,10 @@ public class Device {
 
     public String getDeviceDatetime() {
         return getString(INDEX_DEVICE_DATETIME);
+    }
+
+    public int getDeviceZoneIndex() {
+        return INDEX_ZONE;
     }
 
     public int getDeviceDatetimeIndex() {

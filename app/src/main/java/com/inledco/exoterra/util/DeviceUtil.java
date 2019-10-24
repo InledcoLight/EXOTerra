@@ -16,6 +16,14 @@ public class DeviceUtil {
     public static final String EXO_SOCKET_REGEX = "^EXOTerraSocket_[0-9A-Fa-f]{6}$";
     public static final String EXO_MONSOON_REGEX = "^EXOTerraMonsoon_[0-9A-Fa-f]{6}$";
 
+    public static final String  EXO_STRIP_45CM = "Microtope Strip 45cm";
+    public static final String  EXO_STRIP_60CM = "Microtope Strip 60cm";
+    public static final String  EXO_STRIP_90CM = "Microtope Strip 90cm";
+    public static final String  EXO_SOCKET_NA = "Microtope Socket NA";
+    public static final String  EXO_SOCKET_EU = "Microtope Socket EU";
+    public static final String  EXO_MONSOON_SOLO = "Microtope Monsoon Solo";
+    public static final String  EXO_MONSOON_MULTI = "Microtope Monsoon Multi";
+
     public static final int ESP8266_GATEWAY = 0x0104A8C0;
 
     public static String getDefaultName(String pid) {
@@ -23,13 +31,13 @@ public class DeviceUtil {
             return "";
         }
         if (XlinkConstants.PRODUCT_ID_LEDSTRIP.equals(pid)) {
-            return "Light Strip";
+            return "EXOTerraStrip";
         }
         if (XlinkConstants.PRODUCT_ID_MONSOON.equals(pid)) {
-            return "Monsoon";
+            return "EXOTerraMonsoon";
         }
         if (XlinkConstants.PRODUCT_ID_SOCKET.equals(pid)) {
-            return "Socket";
+            return "EXOTerraSocket";
         }
         return "";
     }

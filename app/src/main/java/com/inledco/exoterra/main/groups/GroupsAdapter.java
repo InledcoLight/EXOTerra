@@ -9,16 +9,15 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.inledco.exoterra.R;
+import com.inledco.exoterra.xlink.HomeExtendApi;
 
 import java.util.List;
 
-import cn.xlink.restful.api.app.HomeApi;
-
 public abstract class GroupsAdapter extends RecyclerView.Adapter<GroupsAdapter.GroupViewHolder> {
     private Context mContext;
-    private List<HomeApi.HomesResponse.Home> mHomes;
+    private List<HomeExtendApi.HomesResponse.Home> mHomes;
 
-    public GroupsAdapter(@NonNull Context context, final List<HomeApi.HomesResponse.Home> homes) {
+    public GroupsAdapter(@NonNull Context context, final List<HomeExtendApi.HomesResponse.Home> homes) {
         mContext = context;
         mHomes = homes;
     }
@@ -32,7 +31,7 @@ public abstract class GroupsAdapter extends RecyclerView.Adapter<GroupsAdapter.G
 
     @Override
     public void onBindViewHolder(@NonNull final GroupViewHolder holder, int i) {
-        HomeApi.HomesResponse.Home home = mHomes.get(i);
+        HomeExtendApi.HomesResponse.Home home = mHomes.get(i);
         holder.home_name.setText(home.name);
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override

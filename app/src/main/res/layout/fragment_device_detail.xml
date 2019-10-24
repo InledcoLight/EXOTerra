@@ -264,6 +264,6 @@
         android:layout_height="wrap_content"
         android:theme="@style/DangerButtonTheme"
         android:layout_margin="8dp"
-        android:text="@string/unsubscribe"/>
+        android:text="@string/delete"/>
 
 </LinearLayout>

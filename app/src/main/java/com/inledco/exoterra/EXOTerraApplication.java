@@ -248,6 +248,7 @@ public class EXOTerraApplication extends Application {
                     case EventNotify.MSG_TYPE_DEVICE_PROP_CHANGE:       //5
                         final EventNotifyHelper.DevicePropChangeNotify devicePropChangeNotify = EventNotifyHelper.parseDevicePropChangeNotify(notify.payload);
                         Log.e(TAG, "onEventNotify: devicePropChanged - " + devicePropChangeNotify.toString());
+//                        EventBus.getDefault().post(new DevicePropertyChangedEvent(devicePropChangeNotify.));
                         break;
                     case EventNotify.MSG_TYPE_SUBSCRIPTION_CHANGE:      //6
                         final EventNotifyHelper.SubscriptionChangeNotify subscriptionChangeNotify = EventNotifyHelper.parseSubscriptionChangeNotify(notify.payload);

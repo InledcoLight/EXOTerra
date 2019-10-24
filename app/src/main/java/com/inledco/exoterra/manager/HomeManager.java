@@ -1,16 +1,17 @@
 package com.inledco.exoterra.manager;
 
+import com.inledco.exoterra.xlink.HomeExtendApi;
 import com.inledco.exoterra.xlink.XlinkCloudManager;
 import com.inledco.exoterra.xlink.XlinkRequestCallback;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import cn.xlink.restful.api.app.HomeApi;
-
 public class HomeManager {
 
-    private final List<HomeApi.HomesResponse.Home> mHomeList;
+//    private final List<HomeApi.HomesResponse.Home> mHomeList;
+    private final List<HomeExtendApi.HomesResponse.Home> mHomeList;
+    private String mCurrentHomeId;
 
     private HomeManager() {
         mHomeList = new ArrayList<>();
@@ -24,12 +25,22 @@ public class HomeManager {
         mHomeList.clear();
     }
 
-    public List<HomeApi.HomesResponse.Home> getHomeList() {
+    public String getCurrentHomeId() {
+        return mCurrentHomeId;
+    }
+
+    public void setCurrentHomeId(String currentHomeId) {
+        mCurrentHomeId = currentHomeId;
+    }
+
+    //    public List<HomeApi.HomesResponse.Home> getHomeList() {
+    public List<HomeExtendApi.HomesResponse.Home> getHomeList() {
         return mHomeList;
     }
 
-    public void syncHomeList(final XlinkRequestCallback<List<HomeApi.HomesResponse.Home>> callback) {
-        XlinkCloudManager.getInstance().getHomeList(new XlinkRequestCallback<HomeApi.HomesResponse>() {
+    public void syncHomeList(final XlinkRequestCallback<List<HomeExtendApi.HomesResponse.Home>> callback) {
+//        XlinkCloudManager.getInstance().getHomeList(new XlinkRequestCallback<HomeApi.HomesResponse>() {
+        XlinkCloudManager.getInstance().getHomeList(new XlinkRequestCallback<HomeExtendApi.HomesResponse>() {
             @Override
             public void onStart() {
                 if (callback != null) {
@@ -45,7 +56,7 @@ public class HomeManager {
             }
 
             @Override
-            public void onSuccess(HomeApi.HomesResponse response) {
+            public void onSuccess(HomeExtendApi.HomesResponse response) {
                 mHomeList.clear();
                 mHomeList.addAll(response.list);
                 if (callback != null) {

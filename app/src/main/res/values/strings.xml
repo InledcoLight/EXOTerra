@@ -237,4 +237,8 @@
     <string name="notify_chn_delete_home">Delete Home</string>
     <string name="notify_chn_alarm">Alarm</string>
     <string name="error_regdev_failed">Register device failed</string>
+    <string name="current_status">Current Status:</string>
+    <string name="on">ON</string>
+    <string name="off">OFF</string>
+    <string name="retry">Retry</string>
 </resources>

@@ -15,7 +15,7 @@ public class AppConstants {
     public static final String  LONGITUDE               = "longitude";
     public static final String  LATITUDE                = "latitude";
 
-
+    public static final String  SPECIFICATION           = "spec";
 
     public static final byte    MONSOON_POWERON         = (byte) 0xFB;
     public static final byte    MONSOON_POWEROFF        = 0x00;

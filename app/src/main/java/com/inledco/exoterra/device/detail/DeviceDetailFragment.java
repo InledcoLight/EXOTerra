@@ -28,6 +28,7 @@ import com.inledco.exoterra.base.BaseFragment;
 import com.inledco.exoterra.base.BaseViewModel;
 import com.inledco.exoterra.bean.Device;
 import com.inledco.exoterra.device.LocationFragment;
+import com.inledco.exoterra.event.DevicePropertyChangedEvent;
 import com.inledco.exoterra.event.SubscribeChangedEvent;
 import com.inledco.exoterra.manager.DeviceManager;
 import com.inledco.exoterra.util.DeviceUtil;
@@ -167,7 +168,7 @@ public class DeviceDetailFragment extends BaseFragment {
         });
 
         if (mDevice != null) {
-            getDeviceDatetime();
+            getDeviceZoneDatetime();
             String name = mDevice.getXDevice().getDeviceName();
             if (TextUtils.isEmpty(name)) {
                 name = DeviceUtil.getDefaultName(mDevice.getXDevice().getProductId());
@@ -351,13 +352,14 @@ public class DeviceDetailFragment extends BaseFragment {
         });
     }
 
-    private void getDeviceDatetime() {
+    private void getDeviceZoneDatetime() {
         if (mDevice == null) {
             return;
         }
 //        mTask.cancel();
 //        mTimer.cancel();
         List<Integer> ids = new ArrayList<>();
+        ids.add(mDevice.getDeviceZoneIndex());
         ids.add(mDevice.getDeviceDatetimeIndex());
         XlinkCloudManager.getInstance().probeDevice(mDevice.getXDevice(), ids, new XlinkTaskCallback<List<XLinkDataPoint>>() {
             @Override
@@ -370,6 +372,7 @@ public class DeviceDetailFragment extends BaseFragment {
                 for (XLinkDataPoint dp : dataPoints) {
                     mDevice.setDataPoint(dp);
                 }
+                device_detail_zone.setText(getTimezoneDesc(mDevice.getZone()));
                 String time = mDevice.getDeviceDatetime();
                 DateFormat df = new SimpleDateFormat(DEVICE_DATE_FORMAT);
                 try {
@@ -412,19 +415,16 @@ public class DeviceDetailFragment extends BaseFragment {
                 int devid = mDevice.getXDevice().getDeviceId();
                 XlinkCloudManager.getInstance().renameDevice(pid, devid, name, new XlinkRequestCallback<DeviceApi.DeviceResponse>() {
                     @Override
-                    public void onStart() {
-
-                    }
-
-                    @Override
                     public void onError(String error) {
                         Toast.makeText(getContext(), error, Toast.LENGTH_SHORT)
                              .show();
                     }
 
                     @Override
-                    public void onSuccess(DeviceApi.DeviceResponse deviceResponse) {
+                    public void onSuccess(DeviceApi.DeviceResponse response) {
                         dialog.dismiss();
+                        device_detail_name.setText(response.name);
+                        EventBus.getDefault().post(new DevicePropertyChangedEvent(response.id, response.name));
                     }
                 });
             }

@@ -1,6 +1,7 @@
 package com.inledco.exoterra.main.devices;
 
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -9,31 +10,40 @@ import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.inledco.exoterra.AppConstants;
 import com.inledco.exoterra.R;
 import com.inledco.exoterra.adddevice.AddDeviceActivity;
 import com.inledco.exoterra.base.BaseFragment;
 import com.inledco.exoterra.bean.Device;
 import com.inledco.exoterra.device.DeviceActivity;
+import com.inledco.exoterra.event.DevicePropertyChangedEvent;
 import com.inledco.exoterra.event.DeviceStateChangedEvent;
 import com.inledco.exoterra.event.SubscribeChangedEvent;
 import com.inledco.exoterra.manager.DeviceManager;
 import com.inledco.exoterra.scan.ScanActivity;
 import com.inledco.exoterra.smartconfig.SmartconfigActivity;
+import com.inledco.exoterra.xlink.XlinkCloudManager;
 import com.inledco.exoterra.xlink.XlinkTaskCallback;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
+import org.json.JSONException;
+import org.json.JSONObject;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import cn.xlink.sdk.v5.manager.XLinkUserManager;
+import cn.xlink.sdk.v5.model.XDevice;
 
 public class DevicesFragment extends BaseFragment {
     private Toolbar devices_toolbar;
@@ -42,6 +52,8 @@ public class DevicesFragment extends BaseFragment {
 
     private final List<Device> mSubscribedDevices = DeviceManager.getInstance().getAllDevices();
     private DevicesAdapter mAdapter;
+
+    private AsyncTask<Void, Void, Void> mGetPropertyTask;
 
     @Nullable
     @Override
@@ -66,6 +78,20 @@ public class DevicesFragment extends BaseFragment {
     @Subscribe (threadMode = ThreadMode.MAIN)
     public void onSubscribeChangedEvent(SubscribeChangedEvent event) {
         refreshSubcribeDevices();
+    }
+
+    @Subscribe (threadMode = ThreadMode.MAIN)
+    public void onDevicePropertyChangedEvent(DevicePropertyChangedEvent event) {
+        if (event != null) {
+            for (int i = 0; i < mSubscribedDevices.size(); i++) {
+                XDevice device = mSubscribedDevices.get(i).getXDevice();
+                if (device.getDeviceId() == event.getDeviceId()) {
+                    device.setDeviceName(event.getDeviceName());
+                    mAdapter.notifyItemChanged(i);
+                    return;
+                }
+            }
+        }
     }
 
     @Subscribe (threadMode = ThreadMode.MAIN)
@@ -164,12 +190,65 @@ public class DevicesFragment extends BaseFragment {
 
             @Override
             public void onComplete(List<Device> devices) {
-                devices_swipe_refresh.setRefreshing(false);
+//                devices_swipe_refresh.setRefreshing(false);
+                Collections.sort(devices, new Comparator<Device>() {
+                    @Override
+                    public int compare(Device o1, Device o2) {
+                        if (o1.getXDevice().isOnline() && !o2.getXDevice().isOnline()) {
+                            return -1;
+                        }
+                        if (!o1.getXDevice().isOnline() && o2.getXDevice().isOnline()) {
+                            return 1;
+                        }
+                        return 0;
+                    }
+                });
                 mSubscribedDevices.clear();
                 mSubscribedDevices.addAll(devices);
-                mAdapter.notifyDataSetChanged();
+                getProperty();
+//                mAdapter.notifyDataSetChanged();
             }
         });
+    }
+
+    private void getProperty() {
+        if (mGetPropertyTask != null) {
+            mGetPropertyTask.cancel(true);
+            mGetPropertyTask = null;
+        }
+        mGetPropertyTask = new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... voids) {
+                for (int i = 0; i < mSubscribedDevices.size(); i++) {
+                    Device device = mSubscribedDevices.get(i);
+                    String result = XlinkCloudManager.getInstance().getDeviceProperty(device.getXDevice());
+                    Log.e(TAG, "doInBackground: " + result);
+                    if (!TextUtils.isEmpty(result)) {
+                        try {
+                            JSONObject jsonObject = new JSONObject(result);
+                            if (jsonObject.has(AppConstants.SPECIFICATION)) {
+                                String spec = jsonObject.getString(AppConstants.SPECIFICATION);
+                                device.setProperty(spec);
+                                DeviceManager.getInstance().getDevice(device.getDeviceTag()).setProperty(spec);
+                                continue;
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    device.setProperty(null);
+                }
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Void aVoid) {
+                super.onPostExecute(aVoid);
+                devices_swipe_refresh.setRefreshing(false);
+                mAdapter.notifyDataSetChanged();
+            }
+        };
+        mGetPropertyTask.execute();
     }
 
     private void gotoDeviceActivity(String deviceTag) {

@@ -130,10 +130,16 @@ public class CompatibleModeFragment extends BaseFragment {
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         builder.setTitle("Config Failed")
                .setMessage(error)
-               .setPositiveButton(R.string.close, new DialogInterface.OnClickListener() {
+               .setPositiveButton(R.string.retry, new DialogInterface.OnClickListener() {
                    @Override
                    public void onClick(DialogInterface dialog, int which) {
                        getActivity().getSupportFragmentManager().popBackStack();
+                   }
+               })
+               .setNegativeButton(R.string.close, new DialogInterface.OnClickListener() {
+                   @Override
+                   public void onClick(DialogInterface dialog, int which) {
+                       getActivity().finish();
                    }
                })
                .setNeutralButton("Change config mode", new DialogInterface.OnClickListener() {

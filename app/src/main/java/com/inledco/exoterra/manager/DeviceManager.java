@@ -8,6 +8,8 @@ import com.inledco.exoterra.xlink.XlinkCloudManager;
 import com.inledco.exoterra.xlink.XlinkTaskCallback;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -129,7 +131,20 @@ public class DeviceManager {
     }
 
     public List<Device> getAllDevices() {
-        return new ArrayList<>(mSubcribedDevices.values());
+        List<Device> list = new ArrayList<>(mSubcribedDevices.values());
+        Collections.sort(list, new Comparator<Device>() {
+            @Override
+            public int compare(Device o1, Device o2) {
+                if (o1.getXDevice().isOnline() && !o2.getXDevice().isOnline()) {
+                    return -1;
+                }
+                if (!o1.getXDevice().isOnline() && o2.getXDevice().isOnline()) {
+                    return 1;
+                }
+                return 0;
+            }
+        });
+        return list;
     }
 
     public Set<String> getAllDeviceAddress() {

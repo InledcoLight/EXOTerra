@@ -61,14 +61,22 @@ import cn.xlink.sdk.v5.module.subscription.XLinkAddDeviceTask;
 import okhttp3.Headers;
 import retrofit2.Call;
 import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
+import retrofit2.converter.scalars.ScalarsConverterFactory;
 
 public class XlinkCloudManager {
     private static final String TAG = "XlinkCloudManager";
 
     private String mCorpId;
+    private final Retrofit mRetrofit;
 
     private XlinkCloudManager() {
-
+        mRetrofit = new Retrofit.Builder().baseUrl(XLinkRestful.getBaseRetrofit().baseUrl())
+                                          .client(XLinkRestful.getApiHttpClient().newBuilder().build())
+                                          .addConverterFactory(ScalarsConverterFactory.create())
+                                          .addConverterFactory(GsonConverterFactory.create())
+                                          .build();
     }
 
     public static XlinkCloudManager getInstance() {
@@ -387,6 +395,26 @@ public class XlinkCloudManager {
         XLinkSDK.startTask(task);
     }
 
+    public XlinkResult<DeviceApi.DeviceResponse> getDeviceInfo(String pid, int devid) {
+        try {
+            Response<DeviceApi.DeviceResponse> response = XLinkRestful.getApplicationApi()
+                                                                      .getDeviceInfo(pid, devid)
+                                                                      .execute();
+            if (response.isSuccessful()) {
+                return new XlinkResult<>(response.body());
+            } else {
+                XLinkRestfulError.ErrorWrapper.Error error = XLinkRestfulError.parseError(XLinkRestful.getBaseRetrofit(), response);
+                if (error == null) {
+                    error = new XLinkRestfulError.ErrorWrapper.Error(response.message(), response.code());
+                }
+                return new XlinkResult<>(XLinkErrorCodeHelper.getErrorCodeName(error.code));
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            return new XlinkResult<>(e.getMessage());
+        }
+    }
+
     public void renameDevice(String pid, int devid, String newName, XlinkRequestCallback<DeviceApi.DeviceResponse> callback) {
         DeviceApi.DeviceRequest request = new DeviceApi.DeviceRequest();
         request.name = newName;
@@ -496,11 +524,6 @@ public class XlinkCloudManager {
         Call<String> call = XLinkRestful.getApplicationApi()
                                         .setDeviceDataPoint(device.getDeviceId(), request);
         call.enqueue(new XlinkRequestCallback<String>() {
-            @Override
-            public void onStart() {
-
-            }
-
             @Override
             public void onError(String error) {
                 if (callback != null) {
@@ -649,6 +672,28 @@ public class XlinkCloudManager {
         }
     }
 
+    public void setDeviceProperty(@NonNull final XDevice device, Map<String, Object> request, XlinkRequestCallback<String> callback) {
+        setDeviceProperty(device.getProductId(), device.getDeviceId(), request, callback);
+    }
+
+    public String getDeviceProperty(@NonNull final String pid, final int devid) {
+        try {
+            Response<String> response = XLinkRestful.getApplicationApi()
+                                                    .getDeviceProperty(pid, devid)
+                                                    .execute();
+            if (response.isSuccessful()) {
+                return response.body();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public String getDeviceProperty(@NonNull final XDevice device) {
+        return getDeviceProperty(device.getProductId(), device.getDeviceId());
+    }
+
     public void getDeviceProperty(@NonNull final String pid, final int devid, final XlinkRequestCallback<String> callback) {
         XLinkRestful.getApplicationApi()
                     .getDeviceProperty(pid, devid)
@@ -658,6 +703,9 @@ public class XlinkCloudManager {
         }
     }
 
+    public void getDeviceProperty(@NonNull final XDevice device, XlinkRequestCallback<String> callback) {
+        getDeviceProperty(device.getProductId(), device.getDeviceId(), callback);
+    }
     public void checkUpgradeTask(final XDevice xDevice, XlinkTaskCallback<Boolean> callback) {
         XLinkLocalSendTriggerUpgradeTask task = XLinkLocalSendTriggerUpgradeTask.newBuilder()
                                                                                 .setFirmwareType(CoreConstant.FIRMWARE_TYPE_WIFI)
@@ -705,7 +753,7 @@ public class XlinkCloudManager {
         }
     }
 
-    public void createHome(@NonNull final String homeName, final XlinkRequestCallback<HomeApi.HomeResponse> callback) {
+    private void createHome(@NonNull final String homeName, final XlinkRequestCallback<HomeApi.HomeResponse> callback) {
         HomeApi.HomeRequest request = new HomeApi.HomeRequest();
         request.name = homeName;
         XLinkRestful.getApplicationApi()
@@ -716,7 +764,27 @@ public class XlinkCloudManager {
         }
     }
 
+    public void createDefaultHome(final XlinkRequestCallback<HomeApi.HomeResponse> callback) {
+        createHome(XlinkConstants.DEFAULT_HOME_NAME, callback);
+    }
+
+    public void addHome(@NonNull final String homeName, final XlinkRequestCallback<HomeApi.HomeResponse> callback) {
+        if (TextUtils.equals(homeName, XlinkConstants.DEFAULT_HOME_NAME)) {
+            if (callback != null) {
+                callback.onError("Invalid Input");
+            }
+            return;
+        }
+        createHome(homeName, callback);
+    }
+
     public void renameHome(@NonNull final String homeid, @NonNull final String newName, final XlinkRequestCallback<String> callback) {
+        if (TextUtils.equals(newName, XlinkConstants.DEFAULT_HOME_NAME)) {
+            if (callback != null) {
+                callback.onError("Invalid input");
+            }
+            return;
+        }
         HomeApi.HomeRequest request = new HomeApi.HomeRequest();
         request.name = newName;
         XLinkRestful.getApplicationApi()
@@ -727,12 +795,24 @@ public class XlinkCloudManager {
         }
     }
 
-    public void getHomeList(final XlinkRequestCallback<HomeApi.HomesResponse> callback) {
+//    public void getHomeList(final XlinkRequestCallback<HomeApi.HomesResponse> callback) {
+//        Map<String, Object> requestMap = new HashMap<>();
+//        requestMap.put("user_id", XLinkUserManager.getInstance().getUid());
+//        XLinkRestful.getApplicationApi()
+//                    .getHomeList(requestMap)
+//                    .enqueue(callback);
+//        if (callback != null) {
+//            callback.onStart();
+//        }
+//    }
+
+    public void getHomeList(final XlinkRequestCallback<HomeExtendApi.HomesResponse> callback) {
         Map<String, Object> requestMap = new HashMap<>();
         requestMap.put("user_id", XLinkUserManager.getInstance().getUid());
-        XLinkRestful.getApplicationApi()
-                    .getHomeList(requestMap)
-                    .enqueue(callback);
+        requestMap.put("field", "room,zone");
+        HomeExtendApi homeExtendApi = mRetrofit.create(HomeExtendApi.class);
+        homeExtendApi.getHomes(requestMap)
+                     .enqueue(callback);
         if (callback != null) {
             callback.onStart();
         }
@@ -809,14 +889,16 @@ public class XlinkCloudManager {
         }
     }
 
-    public void deleteHome(@NonNull final HomeApi.HomesResponse.Home home, final XlinkRequestCallback<String> callback) {
+    public void deleteHome(@NonNull final HomeExtendApi.HomesResponse.Home home, final XlinkRequestCallback<String> callback) {
         boolean isHomeAdmin = false;
-        for (HomeApi.HomesResponse.Home.User user : home.userList) {
+        Log.e(TAG, "deleteHome: " + XLinkUserManager.getInstance().getUid());
+        for (HomeExtendApi.HomesResponse.Home.User user : home.userList) {
             if (user.userId == XLinkUserManager.getInstance().getUid()) {
-                isHomeAdmin = (user.role == XLinkRestfulEnum.HomeUserType.ADMIN || user.role == XLinkRestfulEnum.HomeUserType.SUPER_ADMIN);
+                isHomeAdmin = (user.role == XLinkRestfulEnum.HomeUserType.ADMIN.getValue() || user.role == XLinkRestfulEnum.HomeUserType.SUPER_ADMIN.getValue());
                 break;
             }
         }
+        Log.e(TAG, "deleteHome: " + isHomeAdmin);
         if (isHomeAdmin) {
             XLinkRestful.getApplicationApi()
                         .deleteHome(home.id)
@@ -849,8 +931,35 @@ public class XlinkCloudManager {
         }
     }
 
-    public boolean isHomeAdmin(@NonNull final String homeid) {
-        return false;
+    public void createRoom(@NonNull final String homeid, final String name, final XlinkRequestCallback<RoomApi.RoomResponse> callback) {
+        RoomApi roomApi = mRetrofit.create(RoomApi.class);
+        RoomApi.RoomRequest request = new RoomApi.RoomRequest();
+        request.name = name;
+        roomApi.postRoom(homeid, request)
+               .enqueue(callback);
+        if (callback != null) {
+            callback.onStart();
+        }
+    }
+
+    public void renameRoom(@NonNull final String homeid, @NonNull final String roomid, final String name, final XlinkRequestCallback<RoomApi.RoomResponse> callback) {
+        RoomApi roomApi = mRetrofit.create(RoomApi.class);
+        RoomApi.RoomRequest request = new RoomApi.RoomRequest();
+        request.name = name;
+        roomApi.putRoom(homeid, roomid, request)
+               .enqueue(callback);
+        if (callback != null) {
+            callback.onStart();
+        }
+    }
+
+    public void deleteRoom(@NonNull final String homeid, @NonNull final String roomid, final XlinkRequestCallback<String> callback) {
+        RoomApi roomApi = mRetrofit.create(RoomApi.class);
+        roomApi.deleteRoom(homeid, roomid)
+               .enqueue(callback);
+        if (callback != null) {
+            callback.onStart();
+        }
     }
 
     public void registerFCMMessageService(@NonNull final String token, final XlinkRequestCallback<String> callback) {
