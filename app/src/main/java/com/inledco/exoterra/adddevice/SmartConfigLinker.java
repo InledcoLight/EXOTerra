@@ -55,6 +55,7 @@ public class SmartConfigLinker {
     private final String mBssid;
     private final String mPassword;
     private XDevice mXDevice;
+    private int mDeviceId;
 
     private WeakReference<AppCompatActivity> mActivity;
 
@@ -195,7 +196,14 @@ public class SmartConfigLinker {
     }
 
     private Result subscribe() {
-        XlinkTaskHandler<XDevice> listener = new XlinkTaskHandler<>();
+        XlinkTaskHandler<XDevice> listener = new XlinkTaskHandler<XDevice>() {
+            @Override
+            public void onComplete(XDevice device) {
+                super.onComplete(device);
+                mDeviceId = device.getDeviceId();
+                Log.e(TAG, "onComplete: " + mDeviceId);
+            }
+        };
         XlinkCloudManager.getInstance().subscribeDevice(mXDevice, null, SUBSCRIBE_DEVICE_TIMEOUT, listener);
         while (!listener.isOver());
         Result res = new Result(listener.isSuccess(), listener.getError());
@@ -215,6 +223,7 @@ public class SmartConfigLinker {
 
     public void startTask() {
         mProgress = 0;
+        mDeviceId = 0;
         mTask = new AsyncTask<Void, Integer, Result>() {
             @Override
             protected Result doInBackground(Void... voids) {
@@ -253,6 +262,13 @@ public class SmartConfigLinker {
                 publishProgress(PROGRESS_SET_ZONE);
 
                 result = subscribe();
+//                if (!result.isSuccess()) {
+//                    return result;
+//                }
+//                delay(2000);
+//                Log.e(TAG, "doInBackground: " + mXDevice.getDeviceId());
+//                XlinkResult<String> xlinkResult = XlinkCloudManager.getInstance().addDeviceToHome(HomeManager.getInstance().getCurrentHomeId(), mDeviceId);
+//                result = new Result(xlinkResult.isSuccess(), xlinkResult.getError());
                 return result;
             }
 

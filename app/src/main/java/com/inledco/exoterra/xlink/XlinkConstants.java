@@ -25,7 +25,8 @@ public class XlinkConstants {
     public static final String LEDSOCKET_AP_SSID = "EXOTerraSocket_XXXXXX";
     public static final String LEDMONSOON_AP_SSID = "EXOTerraMonsoon_XXXXXX";
 
-    public static final String DEFAULT_HOME_NAME = "Default_Home";
+    public static final String DEFAULT_HOME_NAME = "My Home";
+    public static final String CURRENT_HOME_ID = "current_homeid";
 
     public static final List<String> XLINK_PRODUCTS;
 

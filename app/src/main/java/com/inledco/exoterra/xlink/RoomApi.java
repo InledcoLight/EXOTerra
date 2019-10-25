@@ -53,6 +53,6 @@ public interface RoomApi {
     }
 
     class RoomDeviceRequest {
-        public String device_id;
+        public int device_id;
     }
 }

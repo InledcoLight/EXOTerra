@@ -28,6 +28,7 @@ import com.inledco.exoterra.main.groups.GroupsFragment;
 import com.inledco.exoterra.main.home.HomeFragment;
 import com.inledco.exoterra.main.me.MeFragment;
 import com.inledco.exoterra.manager.DeviceManager;
+import com.inledco.exoterra.manager.HomeManager;
 import com.inledco.exoterra.manager.UserManager;
 import com.inledco.exoterra.push.AlipushService;
 import com.inledco.exoterra.push.FCMMessageService;
@@ -96,7 +97,10 @@ public class MainActivity extends BaseActivity {
 //            scanQrCode();
 //            test();
 //        }
-        test();
+
+        HomeManager.getInstance().checkHome();
+//
+//        test();
     }
 
     @Override
@@ -236,33 +240,5 @@ public class MainActivity extends BaseActivity {
     }
 
     private void test() {
-//        "^mac:[0-9A-Fa-f]{12}\nsn:*\n$"
-//        String value = "mac:84F3EB905D0F\nsn:84f3eb905d0f\n";
-//        String value = "mac:84F3EB905D0F\nsn:84f3eb905d0f\n";
-//        Log.e(TAG, "test: " + value.matches("^mac:[0-9A-Fa-f]{12}\nsn:[0-9a-zA-Z]{6,32}\n$") );
-//        XLinkDataPoint dp0 = new XLinkDataPoint(0, DataPointValueType.BOOL, false);
-//        XLinkDataPoint dp1 = new XLinkDataPoint(1, DataPointValueType.BYTE, (byte) 0x5A);
-//        XLinkDataPoint dp2 = new XLinkDataPoint(2, DataPointValueType.SHORT, (short) 0x1234);
-//        XLinkDataPoint dp3 = new XLinkDataPoint(3, DataPointValueType.USHORT, (short) 0x4321);
-//        XLinkDataPoint dp4 = new XLinkDataPoint(4, DataPointValueType.INT, 0x1234);
-//        XLinkDataPoint dp5 = new XLinkDataPoint(5, DataPointValueType.UINT, 0x4321);
-//        XLinkDataPoint dp6 = new XLinkDataPoint(6, DataPointValueType.LONG, (long) 0x1234);
-//        XLinkDataPoint dp7 = new XLinkDataPoint(7, DataPointValueType.ULONG, (long) 0x4321);
-//        XLinkDataPoint dp8 = new XLinkDataPoint(8, DataPointValueType.FLOAT, (float) 0.1234);
-//        XLinkDataPoint dp9 = new XLinkDataPoint(9, DataPointValueType.DOUBLE, 0.1234);
-//        XLinkDataPoint dp10 = new XLinkDataPoint(10, DataPointValueType.BYTE_ARRAY, new byte[]{0x12, 0x34});
-//        XLinkDataPoint dp11 = new XLinkDataPoint(11, DataPointValueType.STRING, "1234");
-//        Log.e(TAG, "test: 0 " + dp0.getAsBoolean() + "  " + dp0.getAsByte() + " " + dp0.getRawValue());
-//        Log.e(TAG, "test: 1 " + String.valueOf(dp1.getValue()) + " " + dp1.getRawValue());
-//        Log.e(TAG, "test: 2 " + String.valueOf(dp2.getValue()) + " " + dp2.getRawValue());
-//        Log.e(TAG, "test: 3 " + String.valueOf(dp3.getValue()) + " " + dp3.getRawValue());
-//        Log.e(TAG, "test: 4 " + String.valueOf(dp4.getValue()) + " " + dp4.getRawValue());
-//        Log.e(TAG, "test: 5 " + String.valueOf(dp5.getValue()) + " " + dp5.getRawValue());
-//        Log.e(TAG, "test: 6 " + String.valueOf(dp6.getValue()) + " " + dp6.getRawValue());
-//        Log.e(TAG, "test: 7 " + String.valueOf(dp7.getValue()) + " " + dp7.getRawValue());
-//        Log.e(TAG, "test: 8 " + String.valueOf(dp8.getValue()) + " " + dp8.getRawValue());
-//        Log.e(TAG, "test: 9 " + String.valueOf(dp9.getValue()) + " " + dp9.getRawValue());
-//        Log.e(TAG, "test: 10 " + ByteUtil.bytesToHex((byte[]) dp10.getValue()) + " " + dp10.getRawValue());
-//        Log.e(TAG, "test: 11 " + dp11.getValue() + " " + dp11.getRawValue());
     }
 }

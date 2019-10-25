@@ -26,7 +26,7 @@ import android.widget.Toast;
 import com.inledco.exoterra.R;
 import com.inledco.exoterra.base.BaseFragment;
 import com.inledco.exoterra.event.HomeChangedEvent;
-import com.inledco.exoterra.group.GourpFragment;
+import com.inledco.exoterra.group.GroupFragment;
 import com.inledco.exoterra.manager.HomeManager;
 import com.inledco.exoterra.xlink.HomeExtendApi;
 import com.inledco.exoterra.xlink.RoomApi;
@@ -56,9 +56,6 @@ public class GroupsFragment extends BaseFragment {
         @Override
         public void onSuccess(List<HomeExtendApi.HomesResponse.Home> homes) {
             mAdapter.notifyDataSetChanged();
-            if (homes.size() > 0) {
-                Log.e(TAG, "onSuccess: " + homes.get(0).userList.get(0).email);
-            }
         }
     };
 
@@ -114,7 +111,7 @@ public class GroupsFragment extends BaseFragment {
             protected void onItemClick(int position) {
                 String homeid = mHomes.get(position).id;
                 String homename = mHomes.get(position).name;
-                addFragmentToStack(R.id.main_fl, GourpFragment.newInstance(homeid, homename));
+                addFragmentToStack(R.id.main_fl, GroupFragment.newInstance(homeid, homename));
             }
 
             @Override
@@ -179,7 +176,7 @@ public class GroupsFragment extends BaseFragment {
                                     Log.e(TAG, "onSuccess: " + roomResponse.id + " " + roomResponse.name);
                                 }
                             });
-//                            HomeManager.getInstance().syncHomeList(mHomesResponseCallback);
+                            HomeManager.getInstance().syncHomeList(mHomesResponseCallback);
                         }
                     });
                     dialog.dismiss();

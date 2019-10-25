@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputLayout;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
@@ -13,24 +12,16 @@ import com.inledco.exoterra.R;
 import com.inledco.exoterra.base.BaseActivity;
 import com.inledco.exoterra.foundback.FoundbackActivity;
 import com.inledco.exoterra.main.MainActivity;
-import com.inledco.exoterra.manager.HomeManager;
 import com.inledco.exoterra.manager.UserManager;
 import com.inledco.exoterra.register.RegisterActivity;
 import com.inledco.exoterra.util.RegexUtil;
 import com.inledco.exoterra.view.AdvancedTextInputEditText;
 import com.inledco.exoterra.view.MessageDialog;
-import com.inledco.exoterra.xlink.HomeExtendApi;
 import com.inledco.exoterra.xlink.XlinkCloudManager;
-import com.inledco.exoterra.xlink.XlinkConstants;
-import com.inledco.exoterra.xlink.XlinkRequestCallback;
 import com.inledco.exoterra.xlink.XlinkTaskCallback;
 import com.liruya.loaddialog.LoadDialog;
 
-import java.util.List;
-
-import cn.xlink.restful.api.app.HomeApi;
 import cn.xlink.restful.api.app.UserAuthApi;
-import cn.xlink.sdk.v5.manager.XLinkUserManager;
 import cn.xlink.sdk.v5.module.main.XLinkSDK;
 
 public class LoginActivity extends BaseActivity {
@@ -181,41 +172,41 @@ public class LoginActivity extends BaseActivity {
         return login_et_password.getText().toString();
     }
 
-    private void checkHome() {
-        HomeManager.getInstance().syncHomeList(new XlinkRequestCallback<List<HomeExtendApi.HomesResponse.Home>>() {
-            @Override
-            public void onError(String error) {
-                Log.e(TAG, "onError: " + error);
-            }
-
-            @Override
-            public void onSuccess(List<HomeExtendApi.HomesResponse.Home> homes) {
-                if (homes != null && homes.size() > 0) {
-                    for (int i = 0; i < homes.size(); i++) {
-                        HomeExtendApi.HomesResponse.Home home = homes.get(i);
-                        if (home.creator == XLinkUserManager.getInstance().getUid() && home.name == XlinkConstants.DEFAULT_HOME_NAME)     {
-                            return;
-                        }
-                    }
-                }
-                createDefaultHome();
-            }
-        });
-    }
-
-    private void createDefaultHome() {
-        XlinkCloudManager.getInstance().createDefaultHome(new XlinkRequestCallback<HomeApi.HomeResponse>() {
-            @Override
-            public void onError(String error) {
-                Log.e(TAG, "onError: " + error);
-            }
-
-            @Override
-            public void onSuccess(HomeApi.HomeResponse response) {
-                Log.e(TAG, "onSuccess: " + response.id + " " + response.name);
-            }
-        });
-    }
+//    private void checkHome() {
+//        HomeManager.getInstance().syncHomeList(new XlinkRequestCallback<List<HomeExtendApi.HomesResponse.Home>>() {
+//            @Override
+//            public void onError(String error) {
+//                Log.e(TAG, "onError: " + error);
+//            }
+//
+//            @Override
+//            public void onSuccess(List<HomeExtendApi.HomesResponse.Home> homes) {
+//                if (homes != null && homes.size() > 0) {
+//                    for (int i = 0; i < homes.size(); i++) {
+//                        HomeExtendApi.HomesResponse.Home home = homes.get(i);
+//                        if (home.creator == XLinkUserManager.getInstance().getUid() && home.name == XlinkConstants.DEFAULT_HOME_NAME)     {
+//                            return;
+//                        }
+//                    }
+//                }
+//                createDefaultHome();
+//            }
+//        });
+//    }
+//
+//    private void createDefaultHome() {
+//        XlinkCloudManager.getInstance().createDefaultHome(new XlinkRequestCallback<HomeApi.HomeResponse>() {
+//            @Override
+//            public void onError(String error) {
+//                Log.e(TAG, "onError: " + error);
+//            }
+//
+//            @Override
+//            public void onSuccess(HomeApi.HomeResponse response) {
+//                Log.e(TAG, "onSuccess: " + response.id + " " + response.name);
+//            }
+//        });
+//    }
 
     public void showLoading() {
 //        mLoadDialog.show();

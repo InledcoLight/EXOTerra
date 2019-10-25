@@ -13,6 +13,9 @@ import com.inledco.exoterra.bean.QueryDeviceResponse;
 import com.inledco.exoterra.manager.OKHttpManager;
 import com.inledco.exoterra.util.DeviceUtil;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -827,6 +830,34 @@ public class XlinkCloudManager {
         }
     }
 
+    public XlinkResult<String> addDeviceToHome(@NonNull final String homeid, final int deviceid) {
+        XlinkResult<String> result = new XlinkResult<>();
+        HomeApi.DeviceAddRequest request = new HomeApi.DeviceAddRequest();
+        request.deviceId = deviceid;
+        request.authority = XLinkRestfulEnum.DeviceAuthority.RW;
+        request.subRole = XLinkRestfulEnum.DeviceSubscribeRole.USER;
+        try {
+            Response<String> response = XLinkRestful.getApplicationApi()
+                                                    .addHomeDevice(homeid, request)
+                                                    .execute();
+            if (response.isSuccessful()) {
+                result.setResult(response.body());
+                result.setSuccess(true);
+            } else {
+                XLinkRestfulError.ErrorWrapper.Error error = XLinkRestfulError.parseError(response);
+                if (error == null) {
+                    error = new XLinkRestfulError.ErrorWrapper.Error(response.message(), response.code());
+                }
+                result.setError(XLinkErrorCodeHelper.getErrorCodeName(error.code));
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            result.setError(e.getMessage());
+        }
+        Log.e(TAG, "addDeviceToHome: " + result.getError() + " " + result.getResult());
+        return result;
+    }
+
     public void addDeviceToHome(@NonNull final String homeid, final int deviceid, final XlinkRequestCallback<String> callback) {
         HomeApi.DeviceAddRequest request = new HomeApi.DeviceAddRequest();
         request.deviceId = deviceid;
@@ -956,6 +987,99 @@ public class XlinkCloudManager {
     public void deleteRoom(@NonNull final String homeid, @NonNull final String roomid, final XlinkRequestCallback<String> callback) {
         RoomApi roomApi = mRetrofit.create(RoomApi.class);
         roomApi.deleteRoom(homeid, roomid)
+               .enqueue(callback);
+        if (callback != null) {
+            callback.onStart();
+        }
+    }
+
+    public void getRoomInfo(@NonNull final String homeid, @NonNull final String roomid, final XlinkRequestCallback<RoomApi.RoomInfoResponse> callback) {
+        RoomApi roomApi = mRetrofit.create(RoomApi.class);
+        roomApi.getRoomInfo(homeid, roomid)
+               .enqueue(callback);
+        if (callback != null) {
+            callback.onStart();
+        }
+    }
+
+    public void addRoomDevice(@NonNull final String homeid, @NonNull final String roomid, final int device_id, final XlinkRequestCallback<String> callback) {
+        RoomApi roomApi = mRetrofit.create(RoomApi.class);
+        RoomApi.RoomDeviceRequest request = new RoomApi.RoomDeviceRequest();
+        request.device_id = device_id;
+        roomApi.addRoomDevice(homeid, roomid, request)
+               .enqueue(callback);
+        if (callback != null) {
+            callback.onStart();
+        }
+    }
+
+    public void removeRoomDevice(@NonNull final String homeid, @NonNull final String roomid, final int device_id, final XlinkRequestCallback<String> callback) {
+        RoomApi roomApi = mRetrofit.create(RoomApi.class);
+        RoomApi.RoomDeviceRequest request = new RoomApi.RoomDeviceRequest();
+        request.device_id = device_id;
+        roomApi.removeRoomDevice(homeid, roomid, request)
+               .enqueue(callback);
+        if (callback != null) {
+            callback.onStart();
+        }
+    }
+
+    public void createZone(@NonNull final String homeid, @NonNull final String name, final XlinkRequestCallback<ZoneApi.ZoneResponse> callback) {
+        ZoneApi zoneApi = mRetrofit.create(ZoneApi.class);
+        ZoneApi.ZoneRequest request = new ZoneApi.ZoneRequest();
+        request.name = name;
+        zoneApi.postZone(homeid, request)
+               .enqueue(callback);
+        if (callback != null) {
+            callback.onStart();
+        }
+    }
+
+    public void renameZone(@NonNull final String homeid, @NonNull final String zoneid, @NonNull final String name, final XlinkRequestCallback<ZoneApi.ZoneResponse> callback) {
+        ZoneApi zoneApi = mRetrofit.create(ZoneApi.class);
+        ZoneApi.ZoneRequest request = new ZoneApi.ZoneRequest();
+        request.name = name;
+        zoneApi.putZone(homeid, zoneid, request)
+               .enqueue(callback);
+        if (callback != null) {
+            callback.onStart();
+        }
+    }
+
+    public void deleteZone(@NonNull final String homeid, @NonNull final String zoneid, final XlinkRequestCallback<String> callback) {
+        ZoneApi zoneApi = mRetrofit.create(ZoneApi.class);
+        zoneApi.deleteZone(homeid, zoneid)
+               .enqueue(callback);
+        if (callback != null) {
+            callback.onStart();
+        }
+    }
+
+    public void getZoneOnfo(@NonNull final String homeid, @NonNull final String zoneid, final XlinkRequestCallback<ZoneApi.ZoneInfoResponse> callback) {
+        ZoneApi zoneApi = mRetrofit.create(ZoneApi.class);
+        zoneApi.getzoneInfo(homeid, zoneid)
+               .enqueue(callback);
+        if (callback != null) {
+            callback.onStart();
+        }
+    }
+
+    public void addZoneRoom(@NonNull final String homeid, @NonNull final String zoneid, @NonNull final String roomid, final XlinkRequestCallback<String> callback) {
+        ZoneApi zoneApi = mRetrofit.create(ZoneApi.class);
+        ZoneApi.ZoneRoomRequest request = new ZoneApi.ZoneRoomRequest();
+        request.room_id = roomid;
+        zoneApi.addZoneRoom(homeid, zoneid, request)
+               .enqueue(callback);
+        if (callback != null) {
+            callback.onStart();
+        }
+    }
+
+    public void removeZoneRoom(@NonNull final String homeid, @NonNull final String zoneid, @NonNull final String roomid, final XlinkRequestCallback<String> callback) {
+        ZoneApi zoneApi = mRetrofit.create(ZoneApi.class);
+        ZoneApi.ZoneRoomRequest request = new ZoneApi.ZoneRoomRequest();
+        request.room_id = roomid;
+        zoneApi.removeZoneRoom(homeid, zoneid, request)
                .enqueue(callback);
         if (callback != null) {
             callback.onStart();
@@ -1132,6 +1256,70 @@ public class XlinkCloudManager {
         Headers headers = new Headers.Builder().add("Access-Token", AppConstants.XCP_ACCESS_TOKEN_ADMIN).build();
         String json = getImportDeviceJson(name, mac, sn);
         return OKHttpManager.getInstance().blockPost(url, headers, json, ImportDeviceResponse.class);
+    }
+
+    public void getCurrentHomeId(final XlinkRequestCallback<String> callback) {
+        XLinkRestful.getApplicationApi()
+                    .getUserProperty(XLinkUserManager.getInstance().getUid(), XlinkConstants.CURRENT_HOME_ID)
+                    .enqueue(new XlinkRequestCallback<String>() {
+                        @Override
+                        public void onError(String error) {
+                            if (callback != null) {
+                                callback.onError(error);
+                            }
+                        }
+
+                        @Override
+                        public void onSuccess(String s) {
+                            String homeid = null;
+                            try {
+                                JSONObject jsonObject = new JSONObject(s);
+                                homeid = jsonObject.getString(XlinkConstants.CURRENT_HOME_ID);
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                            if (callback != null) {
+                                callback.onSuccess(homeid);
+                            }
+                        }
+                    });
+        if (callback != null) {
+            callback.onStart();
+        }
+    }
+
+    public void setCurrentHomeId(final String homeid, final XlinkRequestCallback<String> callback) {
+        JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty(XlinkConstants.CURRENT_HOME_ID, homeid);
+        XLinkRestful.getApplicationApi()
+                    .setUserProperty(XLinkUserManager.getInstance().getUid(), jsonObject.toString())
+                    .enqueue(new XlinkRequestCallback<String>() {
+                        @Override
+                        public void onError(String error) {
+                            if (callback != null) {
+                                callback.onError(error);
+                            }
+                        }
+
+                        @Override
+                        public void onSuccess(String s) {
+                            if (callback != null) {
+                                callback.onSuccess(homeid);
+                            }
+                        }
+                    });
+        if (callback != null) {
+            callback.onStart();
+        }
+    }
+
+    public void deleteCurrentHomeId(final XlinkRequestCallback<String> callback) {
+        XLinkRestful.getApplicationApi()
+                    .deleteUserProperty(XLinkUserManager.getInstance().getUid(), XlinkConstants.CURRENT_HOME_ID)
+                    .enqueue(callback);
+        if (callback != null) {
+            callback.onStart();
+        }
     }
 
     private static class LazyHolder {

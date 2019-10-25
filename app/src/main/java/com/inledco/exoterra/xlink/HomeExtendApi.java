@@ -1,5 +1,8 @@
 package com.inledco.exoterra.xlink;
 
+import android.support.annotation.NonNull;
+
+import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
@@ -33,7 +36,13 @@ public interface HomeExtendApi {
             public String createTime;
             public String version;
             public List<Room> rooms;
-            public List<Room> zones;
+            public List<Zone> zones;
+
+            @NonNull
+            @Override
+            public String toString() {
+                return new Gson().toJson(this);
+            }
 
             public static class User {
                 @SerializedName("user_id")
