@@ -12,7 +12,7 @@ import android.view.ViewGroup;
 
 import com.inledco.exoterra.R;
 import com.inledco.exoterra.base.BaseFragment;
-import com.inledco.exoterra.base.SimpleAdapter;
+import com.inledco.exoterra.common.SimpleAdapter;
 
 import java.util.ArrayList;
 import java.util.Comparator;

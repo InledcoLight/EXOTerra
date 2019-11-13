@@ -2,6 +2,7 @@ package com.inledco.exoterra.main;
 
 import android.Manifest;
 import android.annotation.TargetApi;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
@@ -15,6 +16,7 @@ import android.text.TextUtils;
 import android.util.Base64;
 import android.util.Log;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.alibaba.sdk.android.push.CloudPushService;
 import com.alibaba.sdk.android.push.noonesdk.PushServiceFactory;
@@ -24,8 +26,9 @@ import com.inledco.exoterra.R;
 import com.inledco.exoterra.adddevice.AddDeviceActivity;
 import com.inledco.exoterra.base.BaseActivity;
 import com.inledco.exoterra.main.devices.DevicesFragment;
-import com.inledco.exoterra.main.groups.GroupsFragment;
 import com.inledco.exoterra.main.home.HomeFragment;
+import com.inledco.exoterra.main.homedevices.HomeDevicesFragment;
+import com.inledco.exoterra.main.homezones.HomeZonesFragment;
 import com.inledco.exoterra.main.me.MeFragment;
 import com.inledco.exoterra.manager.DeviceManager;
 import com.inledco.exoterra.manager.HomeManager;
@@ -48,6 +51,8 @@ public class MainActivity extends BaseActivity {
     private BottomNavigationView main_bnv;
     private BottomNavigationItemView main_me;
     private Badge badge;
+
+    private HomeViewModel mHomeViewModel;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -83,7 +88,7 @@ public class MainActivity extends BaseActivity {
         main_me = main_bnv.findViewById(R.id.main_bnv_me);
 
         main_bnv.getMenu()
-                .findItem(R.id.main_bnv_group)
+                .findItem(R.id.main_bnv_habitat)
                 .setVisible(XLinkUserManager.getInstance().isUserAuthorized());
     }
 
@@ -98,7 +103,42 @@ public class MainActivity extends BaseActivity {
 //            test();
 //        }
 
-        HomeManager.getInstance().checkHome();
+        mHomeViewModel = ViewModelProviders.of(this).get(HomeViewModel.class);
+        mHomeViewModel.setGetHomeInfoCallback(new XlinkRequestCallback<String>() {
+            @Override
+            public void onError(String error) {
+                Log.e(TAG, "onError: get home info " + error);
+                Toast.makeText(MainActivity.this, error, Toast.LENGTH_SHORT)
+                     .show();
+//                getMessageDialog().setTitle("Get home failed")
+//                                  .setMessage(error)
+//                                  .show();
+            }
+
+            @Override
+            public void onSuccess(String s) {
+                Log.e(TAG, "onSuccess: get home " + s);
+            }
+        });
+
+        HomeManager.getInstance().checkHome(new XlinkRequestCallback<String>() {
+            @Override
+            public void onError(String error) {
+                Log.e(TAG, "onError: check home " + error);
+                Toast.makeText(MainActivity.this, error, Toast.LENGTH_SHORT)
+                     .show();
+                getMessageDialog().setTitle("Check home failed")
+                                  .setMessage(error)
+                                  .show();
+            }
+
+            @Override
+            public void onSuccess(final String s) {
+                Log.e(TAG, "onSuccess: check home " + s);
+                mHomeViewModel.refreshHomeInfo();
+            }
+        });
+
 //
 //        test();
     }
@@ -121,10 +161,10 @@ public class MainActivity extends BaseActivity {
                         replaceFragment(R.id.main_fl_show, new HomeFragment());
                         break;
                     case R.id.main_bnv_devices:
-                        replaceFragment(R.id.main_fl_show, new DevicesFragment());
+                        replaceFragment(R.id.main_fl_show, new  HomeDevicesFragment());
                         break;
-                    case R.id.main_bnv_group:
-                        replaceFragment(R.id.main_fl_show, new GroupsFragment());
+                    case R.id.main_bnv_habitat:
+                        replaceFragment(R.id.main_fl_show, new HomeZonesFragment());
                         break;
                     case R.id.main_bnv_me:
                         replaceFragment(R.id.main_fl_show, new MeFragment());

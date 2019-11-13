@@ -3,7 +3,9 @@ package com.inledco.exoterra.bean;
 import android.support.annotation.NonNull;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
+import java.util.TimeZone;
 
 import cn.xlink.sdk.core.model.DataPointValueType;
 import cn.xlink.sdk.core.model.XLinkDataPoint;
@@ -21,6 +23,15 @@ public class Device {
     private final int INDEX_LONGITUDE           = 2;
     private final int INDEX_LATITUDE            = 3;
     private final int INDEX_DEVICE_DATETIME     = 4;
+    private final int INDEX_SYNC_DATETIME       = 5;
+    private final int INDEX_DAYTIME_START       = 6;
+    private final int INDEX_DAYTIME_END         = 7;
+    private final int INDEX_LOCATION_ENABLE     = 191;
+    private final int INDEX_LOCATION_SUNRISE    = 192;
+    private final int INDEX_LOCATION_SUNSET     = 193;
+    private final int INDEX_LOCATION_VALID      = 194;
+    private final int INDEX_CLOUDZONE           = 195;
+    private final int INDEX_RSSI                = 196;
     private final int INDEX_UPGRADE_STATE       = 197;
     private final int INDEX_LOCAL_PSW           = 198;
 
@@ -343,6 +354,61 @@ public class Device {
         return getString(INDEX_DEVICE_DATETIME);
     }
 
+    public XLinkDataPoint setSyncDatetime() {
+        final byte[] array = new byte[10];
+        Calendar calendar = Calendar.getInstance();
+        int year = calendar.get(Calendar.YEAR);
+        array[0] = (byte) (year & 0xFF);
+        array[1] = (byte) ((year >> 8) & 0xFF);
+        array[2] = (byte) calendar.get(Calendar.MONTH);
+        array[3] = (byte) calendar.get(Calendar.DATE);
+        array[4] = (byte) calendar.get(Calendar.DAY_OF_WEEK);
+        array[5] = (byte) calendar.get(Calendar.HOUR_OF_DAY);
+        array[6] = (byte) calendar.get(Calendar.MINUTE);
+        array[7] = (byte) calendar.get(Calendar.SECOND);
+        final int rawZone = TimeZone.getDefault().getRawOffset() / 60000;
+        final int zone = (rawZone/60)*100 + (rawZone%60);
+        array[8] = (byte) (zone & 0xFF);
+        array[9] = (byte) ((zone>>8) & 0xFF);
+        return setByteArray(INDEX_SYNC_DATETIME, array);
+    }
+
+    public XLinkDataPoint setDaytimeStart(int dayStart) {
+        return setUShort(INDEX_DAYTIME_START, (short) dayStart);
+    }
+
+    public int getDaytimeStart() {
+        return getUShort(INDEX_DAYTIME_START);
+    }
+
+    public XLinkDataPoint setDaytimeEnd(int dayEnd) {
+        return setUShort(INDEX_DAYTIME_END, (short) dayEnd);
+    }
+
+    public int getDaytimeEnd() {
+        return getUShort(INDEX_DAYTIME_END);
+    }
+
+    public XLinkDataPoint setLocationEnable(boolean enable) {
+        return setBoolean(INDEX_LOCATION_ENABLE, enable);
+    }
+
+    public boolean getLocationEnable() {
+        return getBoolean(INDEX_LOCATION_ENABLE);
+    }
+
+    public int getLocationSunrise() {
+        return getUShort(INDEX_LOCATION_SUNRISE);
+    }
+
+    public int getLocationSunset() {
+        return getUShort(INDEX_LOCATION_SUNSET);
+    }
+
+    public boolean getLocationValid() {
+        return getBoolean(INDEX_LOCATION_VALID);
+    }
+
     public int getDeviceZoneIndex() {
         return INDEX_ZONE;
     }
@@ -358,6 +424,14 @@ public class Device {
     public int getLocalPsw() {
         int psw = getUInt(INDEX_LOCAL_PSW);
         return psw;
+    }
+
+    public int getCloudZone() {
+        return getShort(INDEX_CLOUDZONE);
+    }
+
+    public int getRssi() {
+        return getShort(INDEX_RSSI);
     }
 
     public XLinkDataPoint setLocalPsw(int psw) {

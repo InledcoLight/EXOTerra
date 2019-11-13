@@ -18,7 +18,6 @@ import com.inledco.exoterra.R;
 import com.inledco.exoterra.base.BaseActivity;
 import com.inledco.exoterra.util.RegexUtil;
 import com.inledco.exoterra.view.AdvancedTextInputEditText;
-import com.inledco.exoterra.view.MessageDialog;
 import com.inledco.exoterra.xlink.XlinkCloudManager;
 import com.inledco.exoterra.xlink.XlinkRequestCallback;
 import com.liruya.loaddialog.LoadDialog;
@@ -118,10 +117,9 @@ public class FoundbackActivity extends BaseActivity {
                 dismissLoading();
                 foundback_btn_send.setEnabled(false);
                 mSendVerifycodeTimer.start();
-                MessageDialog dialog = new MessageDialog(FoundbackActivity.this, true);
-                dialog.setTitle(R.string.title_verifycode_sent)
-                      .setMessage(R.string.msg_get_verifycode)
-                      .show();
+                getMessageDialog().setTitle(R.string.title_verifycode_sent)
+                                  .setMessage(R.string.msg_get_verifycode)
+                                  .show();
             }
         };
         mFoundbackPasswordCallback = new XlinkRequestCallback<String>() {
@@ -133,10 +131,9 @@ public class FoundbackActivity extends BaseActivity {
             @Override
             public void onError(String error) {
                 dismissLoading();
-                new MessageDialog(FoundbackActivity.this).setTitle(R.string.signin_failed)
-                                                     .setMessage(error)
-                                                     .setButton(getString(R.string.ok), null)
-                                                     .show();
+                getMessageDialog().setTitle(R.string.foundback_failed)
+                                  .setMessage(error)
+                                  .show();
             }
 
             @Override

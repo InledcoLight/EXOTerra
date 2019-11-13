@@ -4,7 +4,6 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.StringRes;
 import android.support.v7.widget.RecyclerView;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
@@ -13,92 +12,20 @@ import android.widget.TextView;
 
 import com.inledco.exoterra.R;
 import com.inledco.exoterra.bean.EXOMonsoonTimer;
+import com.inledco.exoterra.common.SimpleAdapter;
 
 import java.text.DecimalFormat;
 import java.util.List;
 
-public abstract class MonsoonTimerAdapter extends RecyclerView.Adapter<MonsoonTimerAdapter.MonsoonTimerViewHolder> {
+public abstract class MonsoonTimerAdapter extends SimpleAdapter<EXOMonsoonTimer, MonsoonTimerAdapter.MonsoonTimerViewHolder> {
 
-    private Context mContext;
-    private List<EXOMonsoonTimer> mTimers;
-
-    public MonsoonTimerAdapter(Context context, List<EXOMonsoonTimer> timers) {
-        mContext = context;
-        mTimers = timers;
+    public MonsoonTimerAdapter(@NonNull Context context, List<EXOMonsoonTimer> data) {
+        super(context, data);
     }
 
     public void setTimers(List<EXOMonsoonTimer> timers) {
-        mTimers = timers;
+        mData = timers;
         notifyDataSetChanged();
-    }
-
-    @NonNull
-    @Override
-    public MonsoonTimerViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
-        MonsoonTimerViewHolder holder = new MonsoonTimerViewHolder(LayoutInflater.from(mContext)
-                                                                                 .inflate(R.layout.item_monsoon_timer, viewGroup, false));
-        return holder;
-    }
-
-    @Override
-    public void onBindViewHolder(@NonNull final MonsoonTimerViewHolder holder, final int position) {
-        final EXOMonsoonTimer timer = mTimers.get(holder.getAdapterPosition());
-        DecimalFormat df = new DecimalFormat("00");
-        holder.tv_action.setText(getDurationDesc(timer.getDuration()));
-        holder.tv_time.setText(df.format(timer.getTimer()/60) + ":" + df.format(timer.getTimer()%60));
-        @StringRes int[] week = new int[]{R.string.week_sun, R.string.week_mon, R.string.week_tue, R.string.week_wed,
-                                          R.string.week_thu, R.string.week_fri, R.string.week_sat};
-        String wk = "";
-        for (int i = 0; i < 7; i++) {
-            if (timer.getWeeks()[i]) {
-                wk += mContext.getString(week[i]) + "  ";
-            }
-        }
-        wk = wk.trim();
-        holder.tv_week.setText(wk);
-        holder.sw_enable.setChecked(timer.isEnable());
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onClickItem(position);
-            }
-        });
-        holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                onLongClickItem(position);
-                return true;
-            }
-        });
-
-        holder.sw_fl.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (holder.sw_enable.isChecked()) {
-                    onDisableTimer(position);
-                } else {
-                    onEnableTimer(position);
-                }
-            }
-        });
-//        holder.sw_enable.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-//            @Override
-//            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-//                if (buttonView.isPressed()) {
-//                    buttonView.setChecked(!isChecked);
-//                    if (isChecked) {
-//                        onEnableTimer(position);
-//                    } else {
-//                        onDisableTimer(position);
-//                    }
-//                }
-//            }
-//        });
-    }
-
-    @Override
-    public int getItemCount() {
-        return mTimers == null ? 0 : mTimers.size();
     }
 
     private String getDurationDesc(int value) {
@@ -135,6 +62,64 @@ public abstract class MonsoonTimerAdapter extends RecyclerView.Adapter<MonsoonTi
         return "Invalid";
     }
 
+    @Override
+    protected int getItemLayoutResId() {
+        return R.layout.item_monsoon_timer;
+    }
+
+    @NonNull
+    @Override
+    public MonsoonTimerViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
+        return new MonsoonTimerViewHolder(createView(viewGroup));
+    }
+
+    @Override
+    public void onBindViewHolder(@NonNull final MonsoonTimerViewHolder holder, final int position) {
+        final EXOMonsoonTimer timer = mData.get(holder.getAdapterPosition());
+        DecimalFormat df = new DecimalFormat("00");
+        holder.tv_action.setText(getDurationDesc(timer.getDuration()));
+        holder.tv_time.setText(df.format(timer.getTimer()/60) + ":" + df.format(timer.getTimer()%60));
+        @StringRes int[] week = new int[]{R.string.week_sun, R.string.week_mon, R.string.week_tue, R.string.week_wed,
+                                          R.string.week_thu, R.string.week_fri, R.string.week_sat};
+        String wk = "";
+        for (int i = 0; i < 7; i++) {
+            if (timer.getWeeks()[i]) {
+                wk += mContext.getString(week[i]) + "  ";
+            }
+        }
+        wk = wk.trim();
+        holder.tv_week.setText(wk);
+        holder.sw_enable.setChecked(timer.isEnable());
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mItemClickListener != null) {
+                    mItemClickListener.onItemClick(position);
+                }
+            }
+        });
+        holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                if (mItemLongClickListener != null) {
+                    return mItemLongClickListener.onItemLongClick(position);
+                }
+                return false;
+            }
+        });
+
+        holder.sw_fl.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (holder.sw_enable.isChecked()) {
+                    onDisableTimer(position);
+                } else {
+                    onEnableTimer(position);
+                }
+            }
+        });
+    }
+
     class MonsoonTimerViewHolder extends RecyclerView.ViewHolder {
         private TextView tv_action;
         private TextView tv_time;
@@ -151,10 +136,6 @@ public abstract class MonsoonTimerAdapter extends RecyclerView.Adapter<MonsoonTi
             sw_enable = itemView.findViewById(R.id.item_monsoon_timer_enable);
         }
     }
-
-    protected abstract void onClickItem(int position);
-
-    protected abstract void onLongClickItem(int position);
 
     protected abstract void onEnableTimer(int position);
 

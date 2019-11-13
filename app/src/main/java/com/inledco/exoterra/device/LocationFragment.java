@@ -17,7 +17,6 @@ import android.widget.Toast;
 
 import com.inledco.exoterra.R;
 import com.inledco.exoterra.base.BaseFragment;
-import com.inledco.exoterra.base.BaseViewModel;
 import com.inledco.exoterra.bean.Device;
 import com.inledco.exoterra.xlink.XlinkCloudManager;
 import com.inledco.exoterra.xlink.XlinkRequestCallback;
@@ -36,7 +35,7 @@ public class LocationFragment extends BaseFragment {
     private TextInputEditText location_latitude;
     private ImageButton location_position;
 
-    private BaseViewModel<Device> mDeviceViewModel;
+    private DeviceBaseViewModel mDeviceViewModel;
     private Device mDevice;
 
     @Nullable
@@ -72,7 +71,7 @@ public class LocationFragment extends BaseFragment {
 
     @Override
     protected void initData() {
-        mDeviceViewModel = ViewModelProviders.of(getActivity()).get(BaseViewModel.class);
+        mDeviceViewModel = ViewModelProviders.of(getActivity()).get(DeviceBaseViewModel.class);
         mDevice = mDeviceViewModel.getData();
         if (mDevice != null) {
             location_longitude.setText("" + mDevice.getLongitude());

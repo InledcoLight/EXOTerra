@@ -4,11 +4,14 @@ import android.os.AsyncTask;
 import android.os.CountDownTimer;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 
 import com.inledco.exoterra.R;
 import com.inledco.exoterra.bean.ImportDeviceResponse;
 import com.inledco.exoterra.bean.QueryDeviceResponse;
 import com.inledco.exoterra.bean.Result;
+import com.inledco.exoterra.manager.HomeManager;
+import com.inledco.exoterra.xlink.RoomApi;
 import com.inledco.exoterra.xlink.XlinkCloudManager;
 import com.inledco.exoterra.xlink.XlinkResult;
 
@@ -44,6 +47,7 @@ public class APConfigLinker{
     private final String mPassword;
     private String mAddress;
     private String mSN;
+    private int mDeviceId;
 
     private int mProgress;
     private APConfigListener mListener;
@@ -163,7 +167,49 @@ public class APConfigLinker{
 
     private Result subscribeBySn() {
         XlinkResult<DeviceApi.SnSubscribeResponse> result = XlinkCloudManager.getInstance().subscribeDeviceBySn(mProductId, mSN);
+        if (result.isSuccess()) {
+            mDeviceId = result.getResult().id;
+        }
         return new Result(result.isSuccess(), result.getError());
+    }
+
+    private Result addDeviceToHomeAndRoom() {
+        Result result = new Result();
+        final String homeid = HomeManager.getInstance().getCurrentHomeId();
+
+        // 将设备添加到当前Home
+        XlinkResult<String> result1 = XlinkCloudManager.getInstance().addDeviceToHome(homeid, mDeviceId);
+        Log.e(TAG, "addDeviceToHomeAndRoom: addtohome " + result1.isSuccess() + " " + result1.getError());
+        if (!result1.isSuccess()) {
+            // 如果添加设备失败 取消订阅设备 避免重新添加时报错
+            XlinkCloudManager.getInstance().unsubscribeDevice(mDeviceId);
+            result.setError(result1.getError());
+            return result;
+        }
+
+        // 创建Room name = 设备id
+        XlinkResult<RoomApi.RoomResponse> result2 = XlinkCloudManager.getInstance().createRoom(homeid, String.valueOf(mDeviceId));
+        Log.e(TAG, "addDeviceToHomeAndRoom: addroom " + result2.isSuccess() + " " + result2.getError());
+        if (!result2.isSuccess()) {
+            // 如果创建Room失败 从Home中删除设备 避免重新添加时报错
+            XlinkCloudManager.getInstance().deleteDeviceFromHome(homeid, mDeviceId);
+            result.setError(result2.getError());
+            return result;
+        }
+
+        // 将设备添加到Room
+        final String roomid = result2.getResult().id;
+        XlinkResult<String> result3 = XlinkCloudManager.getInstance().addRoomDevice(homeid, roomid, mDeviceId);
+        Log.e(TAG, "addDeviceToHomeAndRoom: addtoroom " + result3.isSuccess() + " " + result3.getError());
+        if (!result3.isSuccess()) {
+            // 如果添加到Room失败 从Home删除设备 并删除Room 避免重新添加时报错
+            XlinkCloudManager.getInstance().deleteDeviceFromHome(homeid, mDeviceId);
+            XlinkCloudManager.getInstance().deleteRoom(homeid, roomid);
+            result.setError(result3.getError());
+            return result;
+        }
+        result.setSuccess(true);
+        return result;
     }
 
     private void delay(long ms) {
@@ -234,7 +280,12 @@ public class APConfigLinker{
                     delay(3000);
                 }
                 //通过设备SN订阅设备
-                return subscribeBySn();
+                Result result = subscribeBySn();
+                if (!result.isSuccess()) {
+                    return result;
+                }
+                delay(1000);
+                return addDeviceToHomeAndRoom();
             }
 
             @Override

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:clickable="true">
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/homezones_toolbar"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:minHeight="?attr/actionBarSize"
+        android:theme="?attr/actionBarTheme"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <CheckedTextView
+            android:id="@+id/homezones_homename"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="?attr/selectableItemBackground"
+            android:drawableRight="@drawable/selector_updown"
+            android:drawablePadding="8dp"
+            android:gravity="center_vertical"
+            android:padding="8dp"
+            android:textColor="@color/textColorPrimary"
+            android:textSize="@dimen/textSizeTitle" />
+    </android.support.v7.widget.Toolbar>
+
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/homezones_swipe"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/homezones_toolbar">
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/homezones_rv"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:orientation="vertical"
+            android:padding="8dp"
+            app:layoutManager="android.support.v7.widget.GridLayoutManager"
+            app:spanCount="2" />
+    </android.support.v4.widget.SwipeRefreshLayout>
+
+</android.support.constraint.ConstraintLayout>

@@ -9,7 +9,7 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.inledco.exoterra.R;
-import com.inledco.exoterra.base.SimpleAdapter;
+import com.inledco.exoterra.common.SimpleAdapter;
 import com.inledco.exoterra.xlink.XlinkCloudManager;
 import com.inledco.exoterra.xlink.XlinkRequestCallback;
 
@@ -62,16 +62,6 @@ public abstract class InviteMsgAdapter extends SimpleAdapter<HomeApi.InviteeList
     @Override
     protected int getItemLayoutResId() {
         return R.layout.item_msg;
-    }
-
-    @Override
-    protected void onItemClick(int position) {
-
-    }
-
-    @Override
-    protected boolean onItemLongClick(int position) {
-        return false;
     }
 
     @NonNull

@@ -11,10 +11,13 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.AppCompatDelegate;
 
 import com.inledco.exoterra.R;
+import com.inledco.exoterra.view.MessageDialog;
 
 public abstract class BaseActivity extends AppCompatActivity {
 
     protected final String TAG = this.getClass().getSimpleName();
+
+    private MessageDialog mDialog;
 
     static {
         AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
@@ -55,6 +58,28 @@ public abstract class BaseActivity extends AppCompatActivity {
                                    .addToBackStack(name)
                                    .commitAllowingStateLoss();
     }
+
+    protected MessageDialog getMessageDialog() {
+        if (mDialog == null) {
+            mDialog = new MessageDialog(this, true);
+        }
+        return mDialog;
+    }
+
+    //    protected void showMessageDialog(final String title, final String msg) {
+//        if (mDialog == null) {
+//            mDialog = new MessageDialog(this);
+//        }
+//        mDialog.setTitle(title)
+//               .setMessage(msg)
+//               .show();
+//    }
+//
+//    protected void dismissMessageDialog() {
+//        if (mDialog != null) {
+//            mDialog.dismiss();
+//        }
+//    }
 
     protected abstract @LayoutRes int getLayoutRes();
 

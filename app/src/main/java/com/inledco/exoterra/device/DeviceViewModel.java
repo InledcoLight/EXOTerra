@@ -14,6 +14,8 @@ import cn.xlink.sdk.core.model.XLinkDataPoint;
 import cn.xlink.sdk.v5.model.XDevice;
 
 public class DeviceViewModel<T extends Device> extends BaseViewModel<T> {
+    private String mRoomId;
+
     private XlinkTaskCallback<XDevice> mSetCallback;
     private XlinkTaskCallback<List<XLinkDataPoint>> mGetCallback;
 
@@ -24,65 +26,6 @@ public class DeviceViewModel<T extends Device> extends BaseViewModel<T> {
     public void setGetCallback(XlinkTaskCallback<List<XLinkDataPoint>> callback) {
         mGetCallback = callback;
     }
-
-//    protected void setDeviceDatapoint(DeviceApi.DeviceDataPointRequest.Command cmd) {
-//        if (cmd != null) {
-//            List<DeviceApi.DeviceDataPointRequest.Command> commands = new ArrayList<>();
-//            commands.add(cmd);
-//            XlinkCloudManager.getInstance().setDeviceDatapoints(getData().getXDevice(), commands, new XlinkRequestCallback<String>() {
-//                @Override
-//                public void onStart() {
-//                    if (mSetCallback != null) {
-//                        mSetCallback.onStart();
-//                    }
-//                }
-//
-//                @Override
-//                public void onError(String error) {
-//                    if (mSetCallback != null) {
-//                        mSetCallback.onError(error);
-//                    }
-//                }
-//
-//                @Override
-//                public void onSubscribeSuccess(String s) {
-//                    Log.e(TAG, "onSubscribeSuccess: " + s);
-//                    if (mSetCallback != null) {
-//                        mSetCallback.onComplete(getData().getXDevice());
-//                    }
-//                    getDatapoints();
-//                }
-//            });
-//        }
-//    }
-//
-//    protected void setDeviceDatapoints(ArrayList<DeviceApi.DeviceDataPointRequest.Command> commands) {
-//        if (commands != null) {
-//            XlinkCloudManager.getInstance().setDeviceDatapoints(getData().getXDevice(), commands, new XlinkRequestCallback<String>() {
-//                @Override
-//                public void onStart() {
-//                    if (mSetCallback != null) {
-//                        mSetCallback.onStart();
-//                    }
-//                }
-//
-//                @Override
-//                public void onError(String error) {
-//                    if (mSetCallback != null) {
-//                        mSetCallback.onError(error);
-//                    }
-//                }
-//
-//                @Override
-//                public void onSubscribeSuccess(String s) {
-//                    if (mSetCallback != null) {
-//                        mSetCallback.onComplete(getData().getXDevice());
-//                    }
-//                    getDatapoints();
-//                }
-//            });
-//        }
-//    }
 
     protected void setDeviceDatapoint(XLinkDataPoint dp) {
         setDeviceDatapoint(dp, mSetCallback);

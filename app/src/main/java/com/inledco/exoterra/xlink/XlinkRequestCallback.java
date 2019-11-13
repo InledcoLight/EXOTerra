@@ -13,7 +13,7 @@ public abstract class XlinkRequestCallback<T> extends XLinkCallback<T> {
 
     @Override
     public void onApiError(XLinkRestfulError.ErrorWrapper.Error error) {
-        onError(XLinkErrorCodeHelper.getErrorCodeName(error.code));
+        onError("error code: " + error.code + " " + error.msg + " " + XLinkErrorCodeHelper.getErrorCodeName(error.code));
     }
 
     public void onStart() {

@@ -47,4 +47,14 @@
             <!--android:text=""/>-->
     </LinearLayout>
 
+    <CheckBox
+        android:id="@+id/item_device_select"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="8dp"
+        android:layout_margin="8dp"
+        android:visibility="gone"
+        android:drawableLeft="@drawable/selector_check"
+        android:button="@null"/>
+
 </LinearLayout>

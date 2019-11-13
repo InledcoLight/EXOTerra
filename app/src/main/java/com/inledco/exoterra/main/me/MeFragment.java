@@ -74,11 +74,6 @@ public class MeFragment extends BaseFragment {
                              .getUserInfo(XLinkUserManager.getInstance()
                                                           .getUid(), new XlinkRequestCallback<UserApi.UserInfoResponse>() {
                                  @Override
-                                 public void onStart() {
-
-                                 }
-
-                                 @Override
                                  public void onError(String error) {
                                      Log.e(TAG, "getUserInfoError: " + error);
                                  }

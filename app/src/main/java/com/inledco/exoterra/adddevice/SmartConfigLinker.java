@@ -13,7 +13,10 @@ import com.inledco.exoterra.R;
 import com.inledco.exoterra.bean.ImportDeviceResponse;
 import com.inledco.exoterra.bean.QueryDeviceResponse;
 import com.inledco.exoterra.bean.Result;
+import com.inledco.exoterra.manager.HomeManager;
+import com.inledco.exoterra.xlink.RoomApi;
 import com.inledco.exoterra.xlink.XlinkCloudManager;
+import com.inledco.exoterra.xlink.XlinkResult;
 import com.inledco.exoterra.xlink.XlinkTaskHandler;
 
 import java.lang.ref.WeakReference;
@@ -37,8 +40,6 @@ public class SmartConfigLinker {
     private final int SUBSCRIBE_DEVICE_TIMEOUT  = 15000;
 
     private final int INDEX_ZONE                = 1;
-    private final int INDEX_LONGITUDE           = 2;
-    private final int INDEX_LATITUDE            = 3;
 
     private final int PROGRESS_ESPTOUCH         = 60;
     private final int PROGRESS_SCAN             = 68;
@@ -55,7 +56,6 @@ public class SmartConfigLinker {
     private final String mBssid;
     private final String mPassword;
     private XDevice mXDevice;
-    private int mDeviceId;
 
     private WeakReference<AppCompatActivity> mActivity;
 
@@ -200,14 +200,53 @@ public class SmartConfigLinker {
             @Override
             public void onComplete(XDevice device) {
                 super.onComplete(device);
-                mDeviceId = device.getDeviceId();
-                Log.e(TAG, "onComplete: " + mDeviceId);
+                mXDevice = device;
             }
         };
         XlinkCloudManager.getInstance().subscribeDevice(mXDevice, null, SUBSCRIBE_DEVICE_TIMEOUT, listener);
         while (!listener.isOver());
         Result res = new Result(listener.isSuccess(), listener.getError());
         return res;
+    }
+
+    private Result addDeviceToHomeAndRoom() {
+        Result result = new Result();
+        final String homeid = HomeManager.getInstance().getCurrentHomeId();
+        final int devid = mXDevice.getDeviceId();
+
+        // 将设备添加到当前Home
+        XlinkResult<String> result1 = XlinkCloudManager.getInstance().addDeviceToHome(homeid, devid);
+        Log.e(TAG, "addDeviceToHomeAndRoom: addtohome " + result1.isSuccess() + " " + result1.getError());
+        if (!result1.isSuccess()) {
+            // 如果添加设备失败 取消订阅设备 避免重新添加时报错
+            XlinkCloudManager.getInstance().unsubscribeDevice(devid);
+            result.setError(result1.getError());
+            return result;
+        }
+
+        // 创建Room name = 设备id
+        XlinkResult<RoomApi.RoomResponse> result2 = XlinkCloudManager.getInstance().createRoom(homeid, String.valueOf(devid));
+        Log.e(TAG, "addDeviceToHomeAndRoom: addroom " + result2.isSuccess() + " " + result2.getError());
+        if (!result2.isSuccess()) {
+            // 如果创建Room失败 从Home中删除设备 避免重新添加时报错
+            XlinkCloudManager.getInstance().deleteDeviceFromHome(homeid, devid);
+            result.setError(result2.getError());
+            return result;
+        }
+
+        // 将设备添加到Room
+        final String roomid = result2.getResult().id;
+        XlinkResult<String> result3 = XlinkCloudManager.getInstance().addRoomDevice(homeid, roomid, devid);
+        Log.e(TAG, "addDeviceToHomeAndRoom: addtoroom " + result3.isSuccess() + " " + result3.getError());
+        if (!result3.isSuccess()) {
+            // 如果添加到Room失败 从Home删除设备 并删除Room 避免重新添加时报错
+            XlinkCloudManager.getInstance().deleteDeviceFromHome(homeid, devid);
+            XlinkCloudManager.getInstance().deleteRoom(homeid, roomid);
+            result.setError(result3.getError());
+            return result;
+        }
+        result.setSuccess(true);
+        return result;
     }
 
     private void delay(long ms) {
@@ -222,8 +261,8 @@ public class SmartConfigLinker {
     }
 
     public void startTask() {
+        mXDevice = null;
         mProgress = 0;
-        mDeviceId = 0;
         mTask = new AsyncTask<Void, Integer, Result>() {
             @Override
             protected Result doInBackground(Void... voids) {
@@ -262,14 +301,11 @@ public class SmartConfigLinker {
                 publishProgress(PROGRESS_SET_ZONE);
 
                 result = subscribe();
-//                if (!result.isSuccess()) {
-//                    return result;
-//                }
-//                delay(2000);
-//                Log.e(TAG, "doInBackground: " + mXDevice.getDeviceId());
-//                XlinkResult<String> xlinkResult = XlinkCloudManager.getInstance().addDeviceToHome(HomeManager.getInstance().getCurrentHomeId(), mDeviceId);
-//                result = new Result(xlinkResult.isSuccess(), xlinkResult.getError());
-                return result;
+                if (!result.isSuccess()) {
+                    return result;
+                }
+                delay(1000);
+                return addDeviceToHomeAndRoom();
             }
 
             @Override
@@ -278,7 +314,6 @@ public class SmartConfigLinker {
                 mTimer.cancel();
                 mEsptouchTask.interrupt();
                 mEsptouchTask = null;
-                Log.e(TAG, "onPostExecute: " + result.isSuccess() + " " + result.getError());
                 if (mListener != null) {
                     if (result.isSuccess()) {
                         mProgress = PROGRESS_SUCCESS;

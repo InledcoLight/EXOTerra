@@ -1,81 +1,94 @@
 package com.inledco.exoterra.bean;
 
 public class EXOSocketTimer {
-    private int mTimer;
-    private boolean mAction;
-    private boolean[] mWeeks;
+    public static final byte ACTION_TURNOFF            = 0;
+    public static final byte ACTION_TURNON             = 1;
+    public static final byte ACTION_TURNON_PERIOD      = 2;
+
     private boolean mEnable;
-
-    public EXOSocketTimer() {
-        mWeeks = new boolean[7];
-    }
-
-    public EXOSocketTimer(int timer) {
-        mWeeks = new boolean[7];
-        mTimer = timer&0xFFFF;
-        mAction = (timer&0x010000) == 0 ? false : true;
-        for (int i = 0; i < 7; i++) {
-            mWeeks[i] = ((timer & (1 << (24 + i))) == 0 ? false : true);
-        }
-        mEnable = (timer&0x80000000) == 0 ? false : true;
-    }
+    private byte    mAction;
+    private byte    mRepeat;
+    private byte    mHour;
+    private byte    mMinute;
+    private byte    mSecond;
+    private byte    mEndHour;
+    private byte    mEndMinute;
+    private byte    mEndSecond;
 
     public boolean isValid() {
-        if (mTimer < 0 || mTimer > 1439) {
+        if (mAction < ACTION_TURNOFF || mAction > ACTION_TURNON_PERIOD) {
+            return false;
+        }
+        if ((mRepeat&0x80) != 0) {
+            return false;
+        }
+        if (mHour > 23 || mMinute > 59 || mSecond > 59) {
+            return false;
+        }
+        if (mEndHour > 23 || mEndMinute > 59 || mEndSecond > 59) {
             return false;
         }
         return true;
     }
 
-    public int getValue() {
-        int result = mTimer&0xFFFF;
-        if (mAction) {
-            result |= 0x010000;
-        }
-        for (int i = 0; i < 7; i++) {
-            if (mWeeks[i]) {
-                result |= (1<<(24+i));
-            }
-        }
-        if (mEnable) {
-            result |= 0x80000000;
-        }
-        return result;
-    }
-
-    public int getTimer() {
-        return mTimer;
-    }
-
-    public void setTimer(int timer) {
-        if (timer >= 0 && timer <= 1439) {
-            mTimer = timer;
-        }
-    }
-
-    public boolean getAction() {
-        return mAction;
-    }
-
-    public void setAction(boolean action) {
+    public void setAction(byte action) {
         mAction = action;
     }
 
-    public boolean[] getWeeks() {
-        return mWeeks;
+    public byte getRepeat() {
+        return mRepeat;
     }
 
-    public boolean getWeek(int idx) {
-        if (idx >= 0 && idx < mWeeks.length) {
-            return mWeeks[idx];
-        }
-        return false;
+    public void setRepeat(byte repeat) {
+        mRepeat = repeat;
     }
 
-    public void setWeek(int idx, boolean value) {
-        if (idx >= 0 && idx < mWeeks.length) {
-            mWeeks[idx] = value;
-        }
+    public byte getHour() {
+        return mHour;
+    }
+
+    public void setHour(byte hour) {
+        mHour = hour;
+    }
+
+    public byte getMinute() {
+        return mMinute;
+    }
+
+    public void setMinute(byte minute) {
+        mMinute = minute;
+    }
+
+    public byte getSecond() {
+        return mSecond;
+    }
+
+    public void setSecond(byte second) {
+        mSecond = second;
+    }
+
+    public byte getEndHour() {
+        return mEndHour;
+    }
+
+    public void setEndHour(byte endHour) {
+        mEndHour = endHour;
+    }
+
+    public byte getEndMinute() {
+        return mEndMinute;
+    }
+
+    public void setEndMinute(byte endMinute) {
+        mEndMinute = endMinute;
+    }
+
+    public byte getEndSecond() {
+        return mEndSecond;
+    }
+
+    public void setEndSecond(byte endSecond) {
+        mEndSecond = endSecond;
     }
 
     public boolean isEnable() {
@@ -84,5 +97,56 @@ public class EXOSocketTimer {
 
     public void setEnable(boolean enable) {
         mEnable = enable;
+    }
+
+    public byte[] toArray() {
+        byte[] array = new byte[12];
+        array[0] = (byte) (mEnable ? 0x01 : 0x00);
+        array[1] = mAction;
+        array[2] = mRepeat;
+        array[3] = mHour;
+        array[4] = mMinute;
+        array[5] = mSecond;
+        array[6] = mEndHour;
+        array[7] = mEndMinute;
+        array[8] = mEndSecond;
+        array[9] = 0;
+        array[10] = 0;
+        array[11] = 0;
+        return array;
+    }
+
+    public static class Builder {
+        public static EXOSocketTimer createFromArray(final byte[] array) {
+            if (array == null || array.length != 12) {
+                return null;
+            }
+            if (array[0] != 0 || array[0] != 1) {
+                return null;
+            }
+            if (array[1] < ACTION_TURNOFF || array[1] > ACTION_TURNON_PERIOD) {
+                return null;
+            }
+            if ((array[2]&0x80) != 0) {
+                return null;
+            }
+            if (array[3] > 23 || array[4] > 59 || array[5] > 59) {
+                return null;
+            }
+            if (array[6] > 23 || array[7] > 59 || array[8] > 59) {
+                return null;
+            }
+            EXOSocketTimer timer = new EXOSocketTimer();
+            timer.setEnable(array[0] == 1);
+            timer.setAction(array[1]);
+            timer.setRepeat(array[2]);
+            timer.setHour(array[3]);
+            timer.setMinute(array[4]);
+            timer.setSecond(array[5]);
+            timer.setEndHour(array[6]);
+            timer.setEndMinute(array[7]);
+            timer.setEndSecond(array[8]);
+            return timer;
+        }
     }
 }

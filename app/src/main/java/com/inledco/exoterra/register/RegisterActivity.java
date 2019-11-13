@@ -78,16 +78,16 @@ public class RegisterActivity extends BaseActivity {
             public void onError(String error) {
                 Toast.makeText(RegisterActivity.this, error, Toast.LENGTH_SHORT)
                      .show();
+                getMessageDialog().setTitle(R.string.title_verifycode_sent_failed)
+                                  .setMessage(error)
+                                  .show();
             }
 
             @Override
             public void onSuccess(String s) {
-//                Toast.makeText(RegisterActivity.this, "发送邮箱验证码成功. " + s, Toast.LENGTH_SHORT)
-//                     .show();
-                MessageDialog dialog = new MessageDialog(RegisterActivity.this, true);
-                dialog.setTitle(R.string.title_verifycode_sent)
-                      .setMessage(R.string.msg_get_verifycode)
-                      .show();
+                getMessageDialog().setTitle(R.string.title_verifycode_sent)
+                                  .setMessage(R.string.msg_get_verifycode)
+                                  .show();
             }
         };
 

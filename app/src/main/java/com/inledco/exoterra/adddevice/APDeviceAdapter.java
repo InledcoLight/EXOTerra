@@ -10,7 +10,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.inledco.exoterra.R;
-import com.inledco.exoterra.base.SimpleAdapter;
+import com.inledco.exoterra.common.SimpleAdapter;
 import com.inledco.exoterra.util.DeviceUtil;
 import com.inledco.exoterra.xlink.XlinkConstants;
 
@@ -25,11 +25,6 @@ public abstract class APDeviceAdapter extends SimpleAdapter<ScanResult, APDevice
     @Override
     protected int getItemLayoutResId() {
         return R.layout.item_apdevice;
-    }
-
-    @Override
-    protected boolean onItemLongClick(int position) {
-        return false;
     }
 
     @NonNull
@@ -52,7 +47,7 @@ public abstract class APDeviceAdapter extends SimpleAdapter<ScanResult, APDevice
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                onItemClick(holder.getAdapterPosition());
+                mItemClickListener.onItemClick(holder.getAdapterPosition());
             }
         });
     }

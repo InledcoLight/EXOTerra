@@ -10,7 +10,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.inledco.exoterra.R;
-import com.inledco.exoterra.base.SimpleAdapter;
+import com.inledco.exoterra.common.SimpleAdapter;
 
 import java.util.List;
 
@@ -27,16 +27,6 @@ public class DeviceUserAdapter extends SimpleAdapter<DeviceApi.DeviceSubscribeUs
     @Override
     protected int getItemLayoutResId() {
         return R.layout.item_device_user;
-    }
-
-    @Override
-    protected void onItemClick(int position) {
-
-    }
-
-    @Override
-    protected boolean onItemLongClick(int position) {
-        return false;
     }
 
     @NonNull

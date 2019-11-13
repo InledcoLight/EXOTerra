@@ -4,6 +4,7 @@
     <item
         android:id="@+id/menu_group_add_room"
         android:icon="@drawable/ic_add_white_64dp"
+        android:visible="false"
         android:title="@string/add_device"
         app:showAsAction="always"/>
     <item

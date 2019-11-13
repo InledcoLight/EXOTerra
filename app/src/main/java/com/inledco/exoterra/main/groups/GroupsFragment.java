@@ -8,7 +8,6 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputEditText;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
@@ -25,10 +24,10 @@ import android.widget.Toast;
 
 import com.inledco.exoterra.R;
 import com.inledco.exoterra.base.BaseFragment;
+import com.inledco.exoterra.bean.Home;
 import com.inledco.exoterra.event.HomeChangedEvent;
 import com.inledco.exoterra.group.GroupFragment;
 import com.inledco.exoterra.manager.HomeManager;
-import com.inledco.exoterra.xlink.HomeExtendApi;
 import com.inledco.exoterra.xlink.RoomApi;
 import com.inledco.exoterra.xlink.XlinkCloudManager;
 import com.inledco.exoterra.xlink.XlinkRequestCallback;
@@ -45,16 +44,16 @@ public class GroupsFragment extends BaseFragment {
     private Toolbar groups_toolbar;
     private RecyclerView groups_rv;
 
-    private final List<HomeExtendApi.HomesResponse.Home> mHomes = HomeManager.getInstance().getHomeList();
+    private final List<Home> mHomes = HomeManager.getInstance().getHomeList();
     private GroupsAdapter mAdapter;
-    private final XlinkRequestCallback<List<HomeExtendApi.HomesResponse.Home>> mHomesResponseCallback = new XlinkRequestCallback<List<HomeExtendApi.HomesResponse.Home>>() {
+    private final XlinkRequestCallback<List<HomeApi.HomesResponse.Home>> mHomesResponseCallback = new XlinkRequestCallback<List<HomeApi.HomesResponse.Home>>() {
         @Override
         public void onError(String error) {
 
         }
 
         @Override
-        public void onSuccess(List<HomeExtendApi.HomesResponse.Home> homes) {
+        public void onSuccess(List<HomeApi.HomesResponse.Home> homes) {
             mAdapter.notifyDataSetChanged();
         }
     };
@@ -73,7 +72,6 @@ public class GroupsFragment extends BaseFragment {
     @Override
     public void onResume() {
         super.onResume();
-        GridLayoutManager layoutManager = (GridLayoutManager) groups_rv.getLayoutManager();
     }
 
     @Override
@@ -137,9 +135,9 @@ public class GroupsFragment extends BaseFragment {
 
     private void showCreateGroupDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-        View view = LayoutInflater.from(getContext()).inflate(R.layout.dialog_create_group, null, false);
-        final TextInputLayout til = view.findViewById(R.id.dialog_create_group_til);
-        final TextInputEditText et_name = view.findViewById(R.id.dialog_create_group_name);
+        View view = LayoutInflater.from(getContext()).inflate(R.layout.dialog_add, null, false);
+        final TextInputLayout til = view.findViewById(R.id.dialog_add_til);
+        final TextInputEditText et_name = view.findViewById(R.id.dialog_add_name);
         builder.setTitle(R.string.create_group);
         builder.setView(view);
         builder.setNegativeButton(R.string.cancel, null);
@@ -187,9 +185,9 @@ public class GroupsFragment extends BaseFragment {
 
     private void showRenameGroupDialog(@NonNull final String homeid) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-        View view = LayoutInflater.from(getContext()).inflate(R.layout.dialog_create_group, null, false);
-        final TextInputLayout til = view.findViewById(R.id.dialog_create_group_til);
-        final TextInputEditText et_name = view.findViewById(R.id.dialog_create_group_name);
+        View view = LayoutInflater.from(getContext()).inflate(R.layout.dialog_add, null, false);
+        final TextInputLayout til = view.findViewById(R.id.dialog_add_til);
+        final TextInputEditText et_name = view.findViewById(R.id.dialog_add_name);
         builder.setTitle(R.string.rename_group);
         builder.setView(view);
         builder.setNegativeButton(R.string.cancel, null);
@@ -223,7 +221,7 @@ public class GroupsFragment extends BaseFragment {
         });
     }
 
-    private void showItemActionDialog(@NonNull final HomeExtendApi.HomesResponse.Home home) {
+    private void showItemActionDialog(@NonNull final Home home) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), R.style.BottomDialogTheme);
         View view = LayoutInflater.from(getContext()).inflate(R.layout.dialog_action, null, false);
         Button btn_rename = view.findViewById(R.id.dialog_action_act1);
@@ -255,19 +253,19 @@ public class GroupsFragment extends BaseFragment {
         btn_delete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                XlinkCloudManager.getInstance().deleteHome(home, new XlinkRequestCallback<String>() {
-                    @Override
-                    public void onError(String error) {
-                        Toast.makeText(getContext(), error, Toast.LENGTH_SHORT)
-                             .show();
-                    }
-
-                    @Override
-                    public void onSuccess(String s) {
-                        mHomes.remove(home);
-                        mAdapter.notifyDataSetChanged();
-                    }
-                });
+//                XlinkCloudManager.getInstance().deleteHome(home, new XlinkRequestCallback<String>() {
+//                    @Override
+//                    public void onError(String error) {
+//                        Toast.makeText(getContext(), error, Toast.LENGTH_SHORT)
+//                             .show();
+//                    }
+//
+//                    @Override
+//                    public void onSuccess(String s) {
+//                        mHomes.remove(home);
+//                        mAdapter.notifyDataSetChanged();
+//                    }
+//                });
                 dialog.dismiss();
             }
         });

@@ -16,7 +16,6 @@
     <item
         android:id="@+id/menu_devices_add"
         android:title=""
-        android:visible="false"
         android:icon="@drawable/ic_add_white_64dp"
         app:showAsAction="always"/>
 </menu>

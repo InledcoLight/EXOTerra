@@ -24,10 +24,11 @@ import com.inledco.exoterra.bean.Device;
 import com.inledco.exoterra.device.DeviceActivity;
 import com.inledco.exoterra.event.DatapointChangedEvent;
 import com.inledco.exoterra.event.DeviceStateChangedEvent;
-import com.inledco.exoterra.event.HomeChangedEvent;
 import com.inledco.exoterra.event.HomeDeviceChangedEvent;
+import com.inledco.exoterra.event.HomeMemberChangedEvent;
 import com.inledco.exoterra.event.SubscribeChangedEvent;
 import com.inledco.exoterra.manager.DeviceManager;
+import com.inledco.exoterra.manager.HomeManager;
 import com.inledco.exoterra.manager.UserManager;
 import com.inledco.exoterra.splash.SplashActivity;
 import com.inledco.exoterra.util.DeviceUtil;
@@ -347,7 +348,7 @@ public class EXOTerraApplication extends Application {
                                         .setCloudServer(XlinkConstants.HOST_CM_FORMAL, XlinkConstants.PORT_CM_FORMAL)
                                         .setEnableSSL(true)
                                         .setLocalNetworkAutoConnection(false)
-                                        .setLogConfig(XLinkAndroidSDK.defaultLogConfig(this).setDebugLevel(Loggable.ERROR).setEnableLogFile(false))
+                                        .setLogConfig(XLinkAndroidSDK.defaultLogConfig(this).setDebugLevel(Loggable.DEBUG).setEnableLogFile(true))
                                         .setSendDataPolicy(XLinkSendDataPolicy.AUTO)
                                         .setDebug(false)
                                         .setDebugMqtt(false)
@@ -415,11 +416,6 @@ public class EXOTerraApplication extends Application {
             public void onError(String error) {
                 Toast.makeText(mCurrentActivity.get(), error, Toast.LENGTH_SHORT)
                      .show();
-            }
-
-            @Override
-            public void onStart() {
-
             }
 
             @Override
@@ -501,11 +497,6 @@ public class EXOTerraApplication extends Application {
         }
         XlinkCloudManager.getInstance().acceptHomeInvite(homeid, inviteid, new XlinkRequestCallback<String>() {
             @Override
-            public void onStart() {
-
-            }
-
-            @Override
             public void onError(String error) {
                 Toast.makeText(mCurrentActivity.get(), error, Toast.LENGTH_SHORT)
                      .show();
@@ -515,7 +506,8 @@ public class EXOTerraApplication extends Application {
             public void onSuccess(String s) {
                 Toast.makeText(mCurrentActivity.get(), "Join home success.", Toast.LENGTH_SHORT)
                      .show();
-                EventBus.getDefault().post(new HomeChangedEvent());
+//                EventBus.getDefault().post(new HomeChangedEvent());
+                HomeManager.getInstance().refreshHomeList();
             }
         });
     }
@@ -526,11 +518,6 @@ public class EXOTerraApplication extends Application {
         }
         XlinkCloudManager.getInstance().denyHomeInvite(homeid, inviteid, new XlinkRequestCallback<String>() {
             @Override
-            public void onStart() {
-
-            }
-
-            @Override
             public void onError(String error) {
                 Toast.makeText(mCurrentActivity.get(), error, Toast.LENGTH_SHORT)
                      .show();
@@ -540,7 +527,8 @@ public class EXOTerraApplication extends Application {
             public void onSuccess(String s) {
                 Toast.makeText(mCurrentActivity.get(), "Deny home share success.", Toast.LENGTH_SHORT)
                      .show();
-                EventBus.getDefault().post(new HomeChangedEvent());
+//                EventBus.getDefault().post(new HomeChangedEvent());
+                HomeManager.getInstance().refreshHomeList();
             }
         });
     }
@@ -549,7 +537,8 @@ public class EXOTerraApplication extends Application {
         Log.e(TAG, "handleHomeMessageNotify: " + notify.toString());
         if (notify.type.equalsIgnoreCase(EventNotifyHelper.HomeMessageNotify.TYPE_DELETE)) {
             showDeleteHomeMessage(notify);
-            EventBus.getDefault().post(new HomeChangedEvent());
+//            EventBus.getDefault().post(new HomeChangedEvent());
+            HomeManager.getInstance().refreshHomeList();
         }
     }
 
@@ -557,8 +546,12 @@ public class EXOTerraApplication extends Application {
         Log.e(TAG, "handleHomeMemberChangedNotify: " + notify.toString());
         if (notify.type.equalsIgnoreCase(EventNotifyHelper.HomeMemberChangedNotify.TYPE_ADD)) {
             showJoinHomeMessage(notify);
+            EventBus.getDefault().post(new HomeMemberChangedEvent(notify.home_id));
         } else if (notify.type.equalsIgnoreCase(EventNotifyHelper.HomeMemberChangedNotify.TYPE_REMOVE)) {
             showLeaveHomeMessage(notify);
+            EventBus.getDefault().post(new HomeMemberChangedEvent(notify.home_id));
+//            EventBus.getDefault().post(new HomeChangedEvent());
+            HomeManager.getInstance().refreshHomeList();
         }
     }
 

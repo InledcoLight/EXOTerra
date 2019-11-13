@@ -121,13 +121,13 @@ public class ConfigGuideFragment extends BaseFragment {
 //            SpannableStringBuilder ssb = new SpannableStringBuilder();
 //            String ssid;
 //            if (TextUtils.equals(XlinkConstants.PRODUCT_ID_LEDSTRIP, mConnectNetBean.getProductId())) {
-//                ssid = XlinkConstants.LEDSTRIP_AP_SSID;
+//                ssid = XlinkConstants.STRIP_AP_SSID;
 //                ssb.append(getString(R.string.apconfig_guide_strip, ssid));
 //            } else if (TextUtils.equals(XlinkConstants.PRODUCT_ID_SOCKET, mConnectNetBean.getProductId())) {
-//                ssid = XlinkConstants.LEDSOCKET_AP_SSID;
+//                ssid = XlinkConstants.SOCKET_AP_SSID;
 //                ssb.append(getString(R.string.apconfig_guide_default, ssid));
 //            } else if (TextUtils.equals(XlinkConstants.PRODUCT_ID_MONSOON, mConnectNetBean.getProductId())) {
-//                ssid = XlinkConstants.LEDMONSOON_AP_SSID;
+//                ssid = XlinkConstants.MONSOON_AP_SSID;
 //                ssb.append(getString(R.string.apconfig_guide_default, ssid));
 //            } else {
 //                return;
@@ -205,13 +205,13 @@ public class ConfigGuideFragment extends BaseFragment {
             SpannableStringBuilder ssb = new SpannableStringBuilder();
             String ssid;
             if (TextUtils.equals(XlinkConstants.PRODUCT_ID_LEDSTRIP, mConnectNetBean.getProductId())) {
-                ssid = XlinkConstants.LEDSTRIP_AP_SSID;
+                ssid = XlinkConstants.STRIP_AP_SSID;
                 ssb.append(getString(R.string.apconfig_guide_strip, ssid));
             } else if (TextUtils.equals(XlinkConstants.PRODUCT_ID_SOCKET, mConnectNetBean.getProductId())) {
-                ssid = XlinkConstants.LEDSOCKET_AP_SSID;
+                ssid = XlinkConstants.SOCKET_AP_SSID;
                 ssb.append(getString(R.string.apconfig_guide_default, ssid));
             } else if (TextUtils.equals(XlinkConstants.PRODUCT_ID_MONSOON, mConnectNetBean.getProductId())) {
-                ssid = XlinkConstants.LEDMONSOON_AP_SSID;
+                ssid = XlinkConstants.MONSOON_AP_SSID;
                 ssb.append(getString(R.string.apconfig_guide_default, ssid));
             } else {
                 return;

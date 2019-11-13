@@ -4,11 +4,14 @@ import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.net.wifi.WifiManager;
 import android.os.Bundle;
+import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 import android.support.design.widget.TextInputEditText;
+import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
@@ -25,12 +28,12 @@ import android.widget.Toast;
 
 import com.inledco.exoterra.R;
 import com.inledco.exoterra.base.BaseFragment;
-import com.inledco.exoterra.base.BaseViewModel;
 import com.inledco.exoterra.bean.Device;
-import com.inledco.exoterra.device.LocationFragment;
+import com.inledco.exoterra.device.DeviceBaseViewModel;
 import com.inledco.exoterra.event.DevicePropertyChangedEvent;
 import com.inledco.exoterra.event.SubscribeChangedEvent;
 import com.inledco.exoterra.manager.DeviceManager;
+import com.inledco.exoterra.manager.HomeManager;
 import com.inledco.exoterra.util.DeviceUtil;
 import com.inledco.exoterra.view.MessageDialog;
 import com.inledco.exoterra.xlink.XlinkCloudManager;
@@ -62,19 +65,23 @@ public class DeviceDetailFragment extends BaseFragment {
     private LinearLayout device_detail_ll_location;
     private TextView device_detail_location;
     private TextView device_detail_datetime;
+    private TextView device_detail_rssi;
     private TextView device_detail_user_list;
-    private TextView device_detail_home;
+    private TextView device_detail_habitat;
     private TextView device_detail_devid;
     private TextView device_detail_mac;
     private TextView device_detail_upgrade;
     private TextView device_detail_fwversion;
-    private Button device_detail_unsubscribe;
+    private TextView device_detail_cloudzone;
+    private Button device_detail_delete;
 
     private UpdateDialog mUpgradeDialog;
 
+    private boolean isDestroyed;
+
     private long mCurrentTime;
-    private final Timer mTimer = new Timer();
-    private final TimerTask mTask = new TimerTask() {
+    private Timer mTimer = new Timer();
+    private TimerTask mTask = new TimerTask() {
         @Override
         public void run() {
             mCurrentTime += 1000;
@@ -89,7 +96,7 @@ public class DeviceDetailFragment extends BaseFragment {
         }
     };
 
-    private BaseViewModel<Device> mDeviceViewModel;
+    private DeviceBaseViewModel mDeviceViewModel;
     private Device mDevice;
 
     @Nullable
@@ -105,6 +112,7 @@ public class DeviceDetailFragment extends BaseFragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
+        isDestroyed = true;
         mTimer.cancel();
         mTask.cancel();
     }
@@ -123,21 +131,24 @@ public class DeviceDetailFragment extends BaseFragment {
         device_detail_ll_location = view.findViewById(R.id.device_detail_ll_location);
         device_detail_location = view.findViewById(R.id.device_detail_location);
         device_detail_datetime = view.findViewById(R.id.device_detail_datetime);
+        device_detail_rssi = view.findViewById(R.id.device_detail_rssi);
         device_detail_user_list = view.findViewById(R.id.device_detail_user_list);
-        device_detail_home = view.findViewById(R.id.device_detail_home);
+        device_detail_habitat = view.findViewById(R.id.device_detail_habitat);
         device_detail_devid = view.findViewById(R.id.device_detail_devid);
         device_detail_mac = view.findViewById(R.id.device_detail_mac);
         device_detail_fwversion = view.findViewById(R.id.device_detail_fwversion);
         device_detail_upgrade = view.findViewById(R.id.device_detail_upgrade);
-        device_detail_unsubscribe = view.findViewById(R.id.device_detail_unsubscribe);
+        device_detail_cloudzone = view.findViewById(R.id.device_detail_cloudzone);
+        device_detail_delete = view.findViewById(R.id.device_detail_delete);
 
         device_detail_user_list.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_arrow_right_white_32dp, 0);
+        device_detail_habitat.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_arrow_right_white_32dp, 0);
         device_detail_upgrade.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_arrow_right_white_32dp, 0);
     }
 
     @Override
     protected void initData() {
-        mDeviceViewModel = ViewModelProviders.of(getActivity()).get(BaseViewModel.class);
+        mDeviceViewModel = ViewModelProviders.of(getActivity()).get(DeviceBaseViewModel.class);
         mDevice = mDeviceViewModel.getData();
         mDeviceViewModel.observe(this, new Observer<Device>() {
             @Override
@@ -168,6 +179,13 @@ public class DeviceDetailFragment extends BaseFragment {
         });
 
         if (mDevice != null) {
+            Log.e(TAG, "initData: " + mDevice.getZone() + "  " + mDevice.getRssi());
+            @DrawableRes int[] wifi_signals = new int[] {R.drawable.ic_signal_wifi_0_bar_white_24dp,
+                                                         R.drawable.ic_signal_wifi_1_bar_white_24dp,
+                                                         R.drawable.ic_signal_wifi_2_bar_white_24dp,
+                                                         R.drawable.ic_signal_wifi_3_bar_white_24dp,
+                                                         R.drawable.ic_signal_wifi_4_bar_white_24dp};
+            device_detail_delete.setEnabled(mDevice.getXDevice().getRole() == 0);
             getDeviceZoneDatetime();
             String name = mDevice.getXDevice().getDeviceName();
             if (TextUtils.isEmpty(name)) {
@@ -178,9 +196,16 @@ public class DeviceDetailFragment extends BaseFragment {
             String fwversion = mDevice.getXDevice().getFirmwareVersion();
             device_detail_name.setText(name);
             device_detail_zone.setText(getTimezoneDesc(mDevice.getZone()));
+            if (mDevice.getRssi() < 0) {
+                device_detail_rssi.setText("" + mDevice.getRssi() + " dB");
+                int level = WifiManager.calculateSignalLevel(mDevice.getRssi(), 5);
+                device_detail_rssi.setCompoundDrawablesWithIntrinsicBounds(0, 0, wifi_signals[level], 0);
+            }
+            device_detail_cloudzone.setText("Cloud Zone: " + getTimezoneDesc(mDevice.getCloudZone()));
             device_detail_devid.setText(String.valueOf(devid));
             device_detail_mac.setText(mac);
             device_detail_fwversion.setText(fwversion);
+
 
             XlinkCloudManager.getInstance().getDeviceLocation(mDevice.getXDevice(), new XlinkRequestCallback<DeviceApi.DeviceGeographyResponse>() {
                 @Override
@@ -216,7 +241,13 @@ public class DeviceDetailFragment extends BaseFragment {
         device_detail_ll_location.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                addFragmentToStack(R.id.device_root, new LocationFragment());
+//                addFragmentToStack(R.id.device_root, new LocationFragment());
+            }
+        });
+        device_detail_habitat.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                addFragmentToStack(R.id.device_root, new DeviceZonesFragment());
             }
         });
         device_detail_user_list.setOnClickListener(new View.OnClickListener() {
@@ -237,13 +268,13 @@ public class DeviceDetailFragment extends BaseFragment {
                 getNewestVersion();
             }
         });
-        device_detail_unsubscribe.setOnClickListener(new View.OnClickListener() {
+        device_detail_delete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (mDevice == null) {
                     return;
                 }
-                showUnsubscribeDialog();
+                showDeleteDialog();
             }
         });
     }
@@ -259,30 +290,46 @@ public class DeviceDetailFragment extends BaseFragment {
         return zoneDesc;
     }
 
-    private void showUnsubscribeDialog() {
+    private void deleteDevice() {
+        final String homeid = HomeManager.getInstance().getCurrentHomeId();
+        final String roomid = mDeviceViewModel.getRoomId();
+        final int devid = mDevice.getXDevice().getDeviceId();
+        XlinkCloudManager.getInstance().deleteDeviceFromHome(homeid, devid, new XlinkRequestCallback<String>() {
+            @Override
+            public void onError(String error) {
+                Toast.makeText(getContext(), error, Toast.LENGTH_SHORT)
+                     .show();
+            }
+
+            @Override
+            public void onSuccess(String s) {
+                XlinkCloudManager.getInstance().deleteRoom(homeid, roomid, new XlinkRequestCallback<String>() {
+                    @Override
+                    public void onError(String error) {
+                        Toast.makeText(getContext(), error, Toast.LENGTH_SHORT)
+                             .show();
+                    }
+
+                    @Override
+                    public void onSuccess(String s) {
+                        DeviceManager.getInstance().removeDevice(mDevice);
+                        EventBus.getDefault().post(new SubscribeChangedEvent());
+                        getActivity().finish();
+                    }
+                });
+            }
+        });
+    }
+
+    private void showDeleteDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-        builder.setTitle(R.string.remove_device)
-               .setMessage(R.string.msg_remove_device)
+        builder.setTitle(R.string.delete_device)
+               .setMessage(R.string.msg_delete_device)
                .setNegativeButton(R.string.cancel, null)
                .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                    @Override
                    public void onClick(DialogInterface dialog, int which) {
-                       XlinkCloudManager.getInstance().unsubscribeDevice(mDevice.getXDevice(), new XlinkTaskCallback<String>() {
-                           @Override
-                           public void onError(String error) {
-                               Toast.makeText(getContext(), error, Toast.LENGTH_LONG)
-                                    .show();
-                           }
-
-                           @Override
-                           public void onComplete(String s) {
-                               Toast.makeText(getContext(), "Unsubscribe success", Toast.LENGTH_LONG)
-                                    .show();
-                               DeviceManager.getInstance().removeDevice(mDevice);
-                               EventBus.getDefault().post(new SubscribeChangedEvent());
-                               getActivity().finish();
-                           }
-                       });
+                       deleteDevice();
                    }
                })
                .setCancelable(false)
@@ -356,8 +403,6 @@ public class DeviceDetailFragment extends BaseFragment {
         if (mDevice == null) {
             return;
         }
-//        mTask.cancel();
-//        mTimer.cancel();
         List<Integer> ids = new ArrayList<>();
         ids.add(mDevice.getDeviceZoneIndex());
         ids.add(mDevice.getDeviceDatetimeIndex());
@@ -369,7 +414,11 @@ public class DeviceDetailFragment extends BaseFragment {
 
             @Override
             public void onComplete(List<XLinkDataPoint> dataPoints) {
+                if (isDestroyed) {
+                    return;
+                }
                 for (XLinkDataPoint dp : dataPoints) {
+                    Log.e(TAG, "onComplete: " + dp.getIndex() + " " + dp.getName() + " " + dp.getValue());
                     mDevice.setDataPoint(dp);
                 }
                 device_detail_zone.setText(getTimezoneDesc(mDevice.getZone()));
@@ -393,7 +442,9 @@ public class DeviceDetailFragment extends BaseFragment {
 
     private void showRenameDialog() {
         View view = LayoutInflater.from(getContext()).inflate(R.layout.dialog_rename, null, false);
+        final TextInputLayout til = view.findViewById(R.id.dialog_rename_til);
         final TextInputEditText et_name = view.findViewById(R.id.dialog_rename_et);
+        til.setHint(getString(R.string.device_name));
         et_name.setText(mDevice.getXDevice().getDeviceName());
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         final AlertDialog dialog = builder.setTitle(R.string.rename_device)

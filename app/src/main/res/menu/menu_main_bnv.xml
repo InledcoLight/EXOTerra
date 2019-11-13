@@ -9,10 +9,10 @@
         android:icon="@drawable/ic_device"
         android:title="@string/devices"/>
     <item
-        android:id="@+id/main_bnv_group"
+        android:id="@+id/main_bnv_habitat"
         android:icon="@drawable/ic_group"
         android:visible="false"
-        android:title="@string/group"/>
+        android:title="@string/habitat"/>
     <item
         android:id="@+id/main_bnv_me"
         android:icon="@drawable/ic_settings"

@@ -28,9 +28,7 @@ import com.inledco.exoterra.R;
 import com.inledco.exoterra.base.BaseFragment;
 import com.inledco.exoterra.device.DeviceActivity;
 import com.inledco.exoterra.event.HomeDeviceChangedEvent;
-import com.inledco.exoterra.manager.HomeManager;
 import com.inledco.exoterra.util.RegexUtil;
-import com.inledco.exoterra.xlink.HomeExtendApi;
 import com.inledco.exoterra.xlink.XlinkCloudManager;
 import com.inledco.exoterra.xlink.XlinkRequestCallback;
 import com.inledco.exoterra.xlink.ZoneApi;
@@ -149,13 +147,6 @@ public class GroupFragment extends BaseFragment {
                 group_toolbar.setTitle(homename);
                 XlinkCloudManager.getInstance().getHomeDeviceList(mHomeId, mHomeDevicesCallback);
             }
-
-            for (HomeExtendApi.HomesResponse.Home home : HomeManager.getInstance().getHomeList()) {
-                if (TextUtils.equals(home.id, mHomeId)) {
-                    Log.e(TAG, "initData: " + home.toString());
-                    break;
-                }
-            }
         }
     }
 
@@ -173,7 +164,7 @@ public class GroupFragment extends BaseFragment {
             public boolean onMenuItemClick(MenuItem menuItem) {
                 switch (menuItem.getItemId()) {
                     case R.id.menu_group_add_room:
-                        XlinkCloudManager.getInstance().getZoneOnfo(mHomeId, mZoneId, new XlinkRequestCallback<ZoneApi.ZoneInfoResponse>() {
+                        XlinkCloudManager.getInstance().getZoneInfo(mHomeId, mZoneId, new XlinkRequestCallback<ZoneApi.ZoneInfoResponse>() {
                             @Override
                             public void onError(String error) {
                                 Log.e(TAG, "onError: " + mZoneId + " " + error);
@@ -184,7 +175,7 @@ public class GroupFragment extends BaseFragment {
                                 Log.e(TAG, "onSuccess: " + response.id + " " + response.name + " " +  response.room_ids.toString());
                             }
                         });
-                        XlinkCloudManager.getInstance().getZoneOnfo(mHomeId, mZoneId2, new XlinkRequestCallback<ZoneApi.ZoneInfoResponse>() {
+                        XlinkCloudManager.getInstance().getZoneInfo(mHomeId, mZoneId2, new XlinkRequestCallback<ZoneApi.ZoneInfoResponse>() {
                             @Override
                             public void onError(String error) {
                                 Log.e(TAG, "onError: " + mZoneId + " " + error);
@@ -287,7 +278,7 @@ public class GroupFragment extends BaseFragment {
         final TextInputLayout til = view.findViewById(R.id.dialog_share_til);
         final TextInputEditText et_email = view.findViewById(R.id.dialog_share_email);
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-        final AlertDialog dialog = builder.setTitle(R.string.invite_join_home)
+        final AlertDialog dialog = builder.setTitle(R.string.invite_member)
                                           .setView(view)
                                           .setNegativeButton(R.string.cancel, null)
                                           .setPositiveButton(R.string.share, null)
@@ -308,7 +299,7 @@ public class GroupFragment extends BaseFragment {
     }
 
     private void shareHome(@NonNull final String email) {
-        XlinkCloudManager.getInstance().shareHome(mHomeId, email, new XlinkRequestCallback<HomeApi.UserInviteResponse>() {
+        XlinkCloudManager.getInstance().inviteHomeMember(mHomeId, email, new XlinkRequestCallback<HomeApi.UserInviteResponse>() {
             @Override
             public void onStart() {
 
@@ -357,7 +348,7 @@ public class GroupFragment extends BaseFragment {
         btn_delete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                XlinkCloudManager.getInstance().removeDeviceFromHome(mHomeId, device.id, new XlinkRequestCallback<String>() {
+                XlinkCloudManager.getInstance().deleteDeviceFromHome(mHomeId, device.id, new XlinkRequestCallback<String>() {
                     @Override
                     public void onError(String error) {
                         Toast.makeText(getContext(), error, Toast.LENGTH_SHORT)

@@ -55,6 +55,19 @@ public class DeviceUtil {
         return R.drawable.ic_device_default_white_64dp;
     }
 
+    public static @DrawableRes int getProductIconSmall(String pid) {
+        if (XlinkConstants.PRODUCT_ID_LEDSTRIP.equals(pid)) {
+            return R.drawable.ic_strip_24dp;
+        }
+        if (XlinkConstants.PRODUCT_ID_MONSOON.equals(pid)) {
+            return R.drawable.ic_monsoon_24dp;
+        }
+        if (XlinkConstants.PRODUCT_ID_SOCKET.equals(pid)) {
+            return R.drawable.ic_socket_24dp;
+        }
+        return R.drawable.ic_device_default_white_24dp;
+    }
+
     public static @DrawableRes int getProductLedoffIcon(String pid) {
         if (XlinkConstants.PRODUCT_ID_LEDSTRIP.equals(pid)) {
             return R.mipmap.ic_strip_off_256;

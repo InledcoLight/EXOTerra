@@ -8,6 +8,7 @@ import android.util.Log;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.inledco.exoterra.AppConstants;
+import com.inledco.exoterra.bean.Home;
 import com.inledco.exoterra.bean.ImportDeviceResponse;
 import com.inledco.exoterra.bean.QueryDeviceResponse;
 import com.inledco.exoterra.manager.OKHttpManager;
@@ -349,8 +350,18 @@ public class XlinkCloudManager {
         }
     }
 
+    public void unsubscribeDevice(final int devid) {
+        final int userid = XLinkUserManager.getInstance().getUid();
+        DeviceApi.UnSubscribeRequest request = new DeviceApi.UnSubscribeRequest();
+        request.deviceId = devid;
+        try {
+            Response<String> response = XLinkRestful.getApplicationApi().unSubscribeDevice(userid, request).execute();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     public void unsubscribeDevice(@NonNull XDevice device, XLinkTaskListener<String> listener) {
-        //setUserId??
         XLinkRemoveDeviceTask task = XLinkRemoveDeviceTask.newBuilder()
                                                           .setXDevice(device)
                                                           .setListener(listener)
@@ -762,32 +773,49 @@ public class XlinkCloudManager {
         XLinkRestful.getApplicationApi()
                     .createHome(request)
                     .enqueue(callback);
+    }
+
+    public void createDefaultHome(final XlinkRequestCallback<HomeApi.HomeResponse> callback) {
+        final int userid = XLinkUserManager.getInstance().getUid();
+        getUserInfo(userid, new XlinkRequestCallback<UserApi.UserInfoResponse>() {
+            @Override
+            public void onError(String error) {
+                if (callback != null) {
+                    callback.onError(error);
+                }
+            }
+
+            @Override
+            public void onSuccess(UserApi.UserInfoResponse response) {
+                String nickname = response.nickname;
+                if (TextUtils.isEmpty(nickname)) {
+                    nickname = "" + userid;
+                }
+                createHome(nickname + "'s Home", callback);
+            }
+        });
         if (callback != null) {
             callback.onStart();
         }
     }
 
-    public void createDefaultHome(final XlinkRequestCallback<HomeApi.HomeResponse> callback) {
-        createHome(XlinkConstants.DEFAULT_HOME_NAME, callback);
-    }
-
     public void addHome(@NonNull final String homeName, final XlinkRequestCallback<HomeApi.HomeResponse> callback) {
-        if (TextUtils.equals(homeName, XlinkConstants.DEFAULT_HOME_NAME)) {
-            if (callback != null) {
-                callback.onError("Invalid Input");
-            }
-            return;
-        }
+//        if (TextUtils.equals(homeName, XlinkConstants.DEFAULT_HOME_NAME)) {
+//            if (callback != null) {
+//                callback.onError("Invalid Input");
+//            }
+//            return;
+//        }
         createHome(homeName, callback);
     }
 
     public void renameHome(@NonNull final String homeid, @NonNull final String newName, final XlinkRequestCallback<String> callback) {
-        if (TextUtils.equals(newName, XlinkConstants.DEFAULT_HOME_NAME)) {
-            if (callback != null) {
-                callback.onError("Invalid input");
-            }
-            return;
-        }
+//        if (TextUtils.equals(newName, XlinkConstants.DEFAULT_HOME_NAME)) {
+//            if (callback != null) {
+//                callback.onError("Invalid input");
+//            }
+//            return;
+//        }
         HomeApi.HomeRequest request = new HomeApi.HomeRequest();
         request.name = newName;
         XLinkRestful.getApplicationApi()
@@ -798,24 +826,24 @@ public class XlinkCloudManager {
         }
     }
 
-//    public void getHomeList(final XlinkRequestCallback<HomeApi.HomesResponse> callback) {
-//        Map<String, Object> requestMap = new HashMap<>();
-//        requestMap.put("user_id", XLinkUserManager.getInstance().getUid());
-//        XLinkRestful.getApplicationApi()
-//                    .getHomeList(requestMap)
-//                    .enqueue(callback);
-//        if (callback != null) {
-//            callback.onStart();
-//        }
-//    }
+    public void getHomeList(final XlinkRequestCallback<HomeApi.HomesResponse> callback) {
+        Map<String, Object> requestMap = new HashMap<>();
+        requestMap.put("user_id", XLinkUserManager.getInstance().getUid());
+        XLinkRestful.getApplicationApi()
+                    .getHomeList(requestMap)
+                    .enqueue(callback);
+        if (callback != null) {
+            callback.onStart();
+        }
+    }
 
-    public void getHomeList(final XlinkRequestCallback<HomeExtendApi.HomesResponse> callback) {
+    public void getHomes(final XlinkRequestCallback<HomesExtendApi.HomesResponse> callback) {
         Map<String, Object> requestMap = new HashMap<>();
         requestMap.put("user_id", XLinkUserManager.getInstance().getUid());
         requestMap.put("field", "room,zone");
-        HomeExtendApi homeExtendApi = mRetrofit.create(HomeExtendApi.class);
-        homeExtendApi.getHomes(requestMap)
-                     .enqueue(callback);
+        HomesExtendApi homesExtendApi = mRetrofit.create(HomesExtendApi.class);
+        homesExtendApi.getHomes(requestMap)
+                      .enqueue(callback);
         if (callback != null) {
             callback.onStart();
         }
@@ -825,6 +853,29 @@ public class XlinkCloudManager {
         XLinkRestful.getApplicationApi()
                     .getHomeDeviceList(homeid)
                     .enqueue(callback);
+        if (callback != null) {
+            callback.onStart();
+        }
+    }
+
+//    public void getHomeInfo(@NonNull final String homeid, final XlinkRequestCallback<Home> callback) {
+//        Map<String, Object> requestMap = new HashMap<>();
+//        requestMap.put("user_id", XLinkUserManager.getInstance().getUid());
+//        HomeExtendApi homeExtendApi = mRetrofit.create(HomeExtendApi.class);
+//        homeExtendApi.getHomeInfo(homeid, requestMap)
+//                     .enqueue(callback);
+//        if (callback != null) {
+//            callback.onStart();
+//        }
+//        HomeApi.HomeRequest request = new HomeApi.HomeRequest();
+//    }
+
+    public void getHomeInfo(@NonNull final String homeid, final XlinkRequestCallback<Home> callback) {
+        Map<String, Object> requestMap = new HashMap<>();
+        requestMap.put("user_id", XLinkUserManager.getInstance().getUid());
+        HomeExtendApi homeExtendApi = mRetrofit.create(HomeExtendApi.class);
+        homeExtendApi.getHomeInfo(homeid, requestMap)
+                     .enqueue(callback);
         if (callback != null) {
             callback.onStart();
         }
@@ -854,7 +905,6 @@ public class XlinkCloudManager {
             e.printStackTrace();
             result.setError(e.getMessage());
         }
-        Log.e(TAG, "addDeviceToHome: " + result.getError() + " " + result.getResult());
         return result;
     }
 
@@ -871,7 +921,17 @@ public class XlinkCloudManager {
         }
     }
 
-    public void removeDeviceFromHome(@NonNull final String homeid, final int deviceid, final XlinkRequestCallback<String> callback) {
+    public void deleteDeviceFromHome(@NonNull final String homeid, final int deviceid) {
+        try {
+            XLinkRestful.getApplicationApi()
+                        .deleteHomeDevice(homeid, deviceid)
+                        .execute();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void deleteDeviceFromHome(@NonNull final String homeid, final int deviceid, final XlinkRequestCallback<String> callback) {
         XLinkRestful.getApplicationApi()
                     .deleteHomeDevice(homeid, deviceid)
                     .enqueue(callback);
@@ -880,7 +940,7 @@ public class XlinkCloudManager {
         }
     }
 
-    public void shareHome(@NonNull final String homeid, @NonNull final String account, final XlinkRequestCallback<HomeApi.UserInviteResponse> callback) {
+    public void inviteHomeMember(@NonNull final String homeid, @NonNull final String account, final XlinkRequestCallback<HomeApi.UserInviteResponse> callback) {
         HomeApi.UserInviteRequest request = new HomeApi.UserInviteRequest();
         request.account = account;
         request.authority = XLinkRestfulEnum.DeviceAuthority.RW;
@@ -920,16 +980,18 @@ public class XlinkCloudManager {
         }
     }
 
-    public void deleteHome(@NonNull final HomeExtendApi.HomesResponse.Home home, final XlinkRequestCallback<String> callback) {
+    public void deleteHomeUser(final String homeid, final int userid, final XlinkRequestCallback<String> callback) {
+        XLinkRestful.getApplicationApi().deleteHomeUser(homeid, userid).enqueue(callback);
+    }
+
+    public void deleteHome(@NonNull final HomeApi.HomesResponse.Home home, final XlinkRequestCallback<String> callback) {
         boolean isHomeAdmin = false;
-        Log.e(TAG, "deleteHome: " + XLinkUserManager.getInstance().getUid());
-        for (HomeExtendApi.HomesResponse.Home.User user : home.userList) {
+        for (HomeApi.HomesResponse.Home.User user : home.userList) {
             if (user.userId == XLinkUserManager.getInstance().getUid()) {
-                isHomeAdmin = (user.role == XLinkRestfulEnum.HomeUserType.ADMIN.getValue() || user.role == XLinkRestfulEnum.HomeUserType.SUPER_ADMIN.getValue());
+                isHomeAdmin = (user.role == XLinkRestfulEnum.HomeUserType.ADMIN || user.role == XLinkRestfulEnum.HomeUserType.SUPER_ADMIN);
                 break;
             }
         }
-        Log.e(TAG, "deleteHome: " + isHomeAdmin);
         if (isHomeAdmin) {
             XLinkRestful.getApplicationApi()
                         .deleteHome(home.id)
@@ -939,6 +1001,25 @@ public class XlinkCloudManager {
                         .deleteHomeUser(home.id, XLinkUserManager.getInstance().getUid())
                         .enqueue(callback);
         }
+        if (callback != null) {
+            callback.onStart();
+        }
+    }
+
+    public void deleteHome(@NonNull final String homeid) {
+        try {
+            XLinkRestful.getApplicationApi()
+                        .deleteHome(homeid)
+                        .execute();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void deleteHome(@NonNull final String homeid, final XlinkRequestCallback<String> callback) {
+        XLinkRestful.getApplicationApi()
+                    .deleteHome(homeid)
+                    .enqueue(callback);
         if (callback != null) {
             callback.onStart();
         }
@@ -960,6 +1041,30 @@ public class XlinkCloudManager {
         if (callback != null) {
             callback.onStart();
         }
+    }
+
+    public XlinkResult<RoomApi.RoomResponse> createRoom(@NonNull final String homeid, final String name) {
+        XlinkResult<RoomApi.RoomResponse> result = new XlinkResult<>();
+        RoomApi roomApi = mRetrofit.create(RoomApi.class);
+        RoomApi.RoomRequest request = new RoomApi.RoomRequest();
+        request.name = name;
+        try {
+            Response<RoomApi.RoomResponse> response = roomApi.postRoom(homeid, request).execute();
+            if (response.isSuccessful()) {
+                result.setResult(response.body());
+                result.setSuccess(true);
+            } else {
+                XLinkRestfulError.ErrorWrapper.Error error = XLinkRestfulError.parseError(response);
+                if (error == null) {
+                    error = new XLinkRestfulError.ErrorWrapper.Error(response.message(), response.code());
+                }
+                result.setError(XLinkErrorCodeHelper.getErrorCodeName(error.code));
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            result.setError(e.getMessage());
+        }
+        return result;
     }
 
     public void createRoom(@NonNull final String homeid, final String name, final XlinkRequestCallback<RoomApi.RoomResponse> callback) {
@@ -984,6 +1089,16 @@ public class XlinkCloudManager {
         }
     }
 
+    public void deleteRoom(@NonNull final String homeid, @NonNull final String roomid) {
+        RoomApi roomApi = mRetrofit.create(RoomApi.class);
+        try {
+            roomApi.deleteRoom(homeid, roomid)
+                   .execute();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     public void deleteRoom(@NonNull final String homeid, @NonNull final String roomid, final XlinkRequestCallback<String> callback) {
         RoomApi roomApi = mRetrofit.create(RoomApi.class);
         roomApi.deleteRoom(homeid, roomid)
@@ -1000,6 +1115,30 @@ public class XlinkCloudManager {
         if (callback != null) {
             callback.onStart();
         }
+    }
+
+    public XlinkResult<String> addRoomDevice(@NonNull final String homeid, @NonNull final String roomid, final int device_id) {
+        XlinkResult<String> result = new XlinkResult<>();
+        RoomApi roomApi = mRetrofit.create(RoomApi.class);
+        RoomApi.RoomDeviceRequest request = new RoomApi.RoomDeviceRequest();
+        request.device_id = device_id;
+        try {
+            Response<String> response = roomApi.addRoomDevice(homeid, roomid, request).execute();
+            if (response.isSuccessful()) {
+                result.setResult(response.body());
+                result.setSuccess(true);
+            } else {
+                XLinkRestfulError.ErrorWrapper.Error error = XLinkRestfulError.parseError(response);
+                if (error == null) {
+                    error = new XLinkRestfulError.ErrorWrapper.Error(response.message(), response.code());
+                }
+                result.setError(XLinkErrorCodeHelper.getErrorCodeName(error.code));
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            result.setError(e.getMessage());
+        }
+        return result;
     }
 
     public void addRoomDevice(@NonNull final String homeid, @NonNull final String roomid, final int device_id, final XlinkRequestCallback<String> callback) {
@@ -1055,13 +1194,26 @@ public class XlinkCloudManager {
         }
     }
 
-    public void getZoneOnfo(@NonNull final String homeid, @NonNull final String zoneid, final XlinkRequestCallback<ZoneApi.ZoneInfoResponse> callback) {
+    public void getZoneInfo(@NonNull final String homeid, @NonNull final String zoneid, final XlinkRequestCallback<ZoneApi.ZoneInfoResponse> callback) {
         ZoneApi zoneApi = mRetrofit.create(ZoneApi.class);
         zoneApi.getzoneInfo(homeid, zoneid)
                .enqueue(callback);
         if (callback != null) {
             callback.onStart();
         }
+    }
+
+    public boolean addZoneRoom(@NonNull final String homeid, @NonNull final String zoneid, @NonNull final String roomid) {
+        ZoneApi zoneApi = mRetrofit.create(ZoneApi.class);
+        ZoneApi.ZoneRoomRequest request = new ZoneApi.ZoneRoomRequest();
+        request.room_id = roomid;
+        try {
+            Response<String> response = zoneApi.addZoneRoom(homeid, zoneid, request).execute();
+            return response.isSuccessful();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 
     public void addZoneRoom(@NonNull final String homeid, @NonNull final String zoneid, @NonNull final String roomid, final XlinkRequestCallback<String> callback) {
@@ -1073,6 +1225,19 @@ public class XlinkCloudManager {
         if (callback != null) {
             callback.onStart();
         }
+    }
+
+    public boolean removeZoneRoom(@NonNull final String homeid, @NonNull final String zoneid, @NonNull final String roomid) {
+        ZoneApi zoneApi = mRetrofit.create(ZoneApi.class);
+        ZoneApi.ZoneRoomRequest request = new ZoneApi.ZoneRoomRequest();
+        request.room_id = roomid;
+        try {
+            Response<String> response = zoneApi.removeZoneRoom(homeid, zoneid, request).execute();
+            return response.isSuccessful();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 
     public void removeZoneRoom(@NonNull final String homeid, @NonNull final String zoneid, @NonNull final String roomid, final XlinkRequestCallback<String> callback) {

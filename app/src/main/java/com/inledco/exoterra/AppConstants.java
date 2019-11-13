@@ -1,6 +1,6 @@
 package com.inledco.exoterra;
-
 public class AppConstants {
+
     //云平台对应包名生成的appid
     public static final String  APPID                   = "2e0042bafe5fc600";
 
@@ -9,6 +9,16 @@ public class AppConstants {
     //阿里推送辅助FCM通道 对应google-services.json中mobilesdk_app_id
     public static final String  ALIPUSH_APPID           = "1:604700660779:android:d60434ef8e9a18f522c66e";
 
+    public static final String  IS_HOME_ADMIN           = "is_home_admin";
+    public static final String  EMAIL                   = "email";
+    public static final String  USER_ID                 = "user_id";
+    public static final String  ROLE                    = "role";
+    public static final String  NICKNAME                = "nickname";
+    public static final String  HOME_ID                 = "home_id";
+    public static final String  DEVICE_ID               = "device_id";
+    public static final String  ZONE_ID                 = "zone_id";
+    public static final String  ZONE_NAME               = "zone_name";
+    public static final String  ROOM_ID                 = "room_id";
     public static final String  DEVICE_TAG              = "device_tag";
     public static final String  PRODUCT_ID              = "product_id";
     public static final String  TIMEZONE                = "timezone";

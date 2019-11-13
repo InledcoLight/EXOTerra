@@ -22,6 +22,8 @@ import com.inledco.exoterra.R;
 import com.inledco.exoterra.base.BaseFragment;
 import com.inledco.exoterra.bean.EXOSocket;
 import com.inledco.exoterra.bean.EXOSocketTimer;
+import com.inledco.exoterra.common.OnItemClickListener;
+import com.inledco.exoterra.common.OnItemLongClickListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -71,16 +73,6 @@ public class SocketTimersFragment extends BaseFragment {
 
         mAdapter = new SocketTimerAdapter(getContext(), mTimers) {
             @Override
-            protected void onClickItem(int position) {
-                showEditTimerDialog(position);
-            }
-
-            @Override
-            protected void onLongClickItem(int position) {
-                showRemoveDialog(position);
-            }
-
-            @Override
             protected void onEnableTimer(int position) {
                 if (position >= 0 && position < mTimers.size()) {
                     EXOSocketTimer tmr = new EXOSocketTimer(mTimers.get(position).getValue());
@@ -98,6 +90,19 @@ public class SocketTimersFragment extends BaseFragment {
                 }
             }
         };
+        mAdapter.setOnItemClickListener(new OnItemClickListener() {
+            @Override
+            public void onItemClick(int position) {
+                showEditTimerDialog(position);
+            }
+        });
+        mAdapter.setOnItemLongClickListener(new OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(int position) {
+                showRemoveDialog(position);
+                return true;
+            }
+        });
         socket_timers_rv.setAdapter(mAdapter);
     }
 

@@ -10,10 +10,11 @@
         android:id="@+id/menu_device_share"
         android:title="@string/share"
         android:icon="@drawable/ic_share_white_32dp"
+        android:visible="false"
         app:showAsAction="collapseActionView"/>
     <item
         android:id="@+id/menu_device_detail"
         android:title="@string/detail"
-        app:showAsAction="collapseActionView"/>
-
+        android:icon="@drawable/ic_more_horiz_white_24dp"
+        app:showAsAction="always"/>
 </menu>

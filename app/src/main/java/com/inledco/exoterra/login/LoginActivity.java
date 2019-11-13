@@ -14,6 +14,7 @@ import com.inledco.exoterra.foundback.FoundbackActivity;
 import com.inledco.exoterra.main.MainActivity;
 import com.inledco.exoterra.manager.UserManager;
 import com.inledco.exoterra.register.RegisterActivity;
+import com.inledco.exoterra.test.TestActivity;
 import com.inledco.exoterra.util.RegexUtil;
 import com.inledco.exoterra.view.AdvancedTextInputEditText;
 import com.inledco.exoterra.view.MessageDialog;
@@ -34,6 +35,7 @@ public class LoginActivity extends BaseActivity {
     private Button login_btn_forget;
     private Button login_btn_signup;
     private Button login_btn_skip;
+    private Button network_test;
     private LoadDialog mLoadDialog;
     private ProgressDialog mProgressDialog;
 
@@ -77,6 +79,7 @@ public class LoginActivity extends BaseActivity {
         login_btn_forget = findViewById(R.id.login_btn_forget);
         login_btn_signup = findViewById(R.id.login_btn_signup);
         login_btn_skip = findViewById(R.id.login_btn_skip);
+        network_test = findViewById(R.id.network_test);
 
         login_et_email.bindTextInputLayout(login_til_email);
         login_et_password.bindTextInputLayout(login_til_password);
@@ -160,6 +163,14 @@ public class LoginActivity extends BaseActivity {
             @Override
             public void onClick(View v) {
                 gotoMainActivity();
+            }
+        });
+
+        network_test.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(LoginActivity.this, TestActivity.class);
+                startActivity(intent);
             }
         });
     }

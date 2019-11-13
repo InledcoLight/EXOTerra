@@ -1,18 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:orientation="horizontal"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="horizontal"
               android:gravity="center_vertical"
               android:background="?attr/selectableItemBackground"
               android:layout_width="match_parent"
               android:layout_height="wrap_content">
 
-    <android.support.design.widget.CheckableImageButton
+    <ImageView
         android:id="@+id/item_socket_timer_power"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:padding="8dp"
         android:background="@color/colorTransparent"
-        android:src="@drawable/selector_power"/>
+        app:srcCompat="@drawable/ic_power_red"/>
     <LinearLayout
         android:layout_width="0dp"
         android:layout_height="match_parent"
@@ -33,10 +34,16 @@
             android:textSize="12sp"
             android:text="xxxxxxx"/>
     </LinearLayout>
-    <Switch
-        android:id="@+id/item_socket_timer_enable"
+    <FrameLayout
+        android:id="@+id/item_socket_timer_fl"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:padding="16dp"/>
+        android:layout_height="wrap_content">
+        <Switch
+            android:id="@+id/item_socket_timer_enable"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:clickable="false"
+            android:padding="16dp"/>
+    </FrameLayout>
 
 </LinearLayout>

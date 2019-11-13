@@ -7,8 +7,8 @@ import android.support.annotation.StringRes;
 import android.support.v7.app.AlertDialog;
 
 public class MessageDialog {
-    private Context mContext;
-    private AlertDialog mDialog;
+    private final Context mContext;
+    private final AlertDialog mDialog;
 
     public MessageDialog(@NonNull Context context, final boolean cancelable) {
         mContext = context;
@@ -19,6 +19,10 @@ public class MessageDialog {
 
     public MessageDialog(@NonNull Context context) {
         this(context, false);
+    }
+
+    public void setCancelable(boolean cancelable) {
+        mDialog.setCancelable(cancelable);
     }
 
     public MessageDialog setTitle(@NonNull final String title) {
@@ -53,5 +57,9 @@ public class MessageDialog {
 
     public void show() {
         mDialog.show();
+    }
+
+    public void dismiss() {
+        mDialog.dismiss();
     }
 }

@@ -22,6 +22,8 @@ import com.inledco.exoterra.R;
 import com.inledco.exoterra.base.BaseFragment;
 import com.inledco.exoterra.bean.EXOMonsoon;
 import com.inledco.exoterra.bean.EXOMonsoonTimer;
+import com.inledco.exoterra.common.OnItemClickListener;
+import com.inledco.exoterra.common.OnItemLongClickListener;
 
 import java.util.List;
 
@@ -73,16 +75,6 @@ public class MonsoonTimersFragment extends BaseFragment {
         mTimers = mMonsoon.getAllTimers();
         mAdapter = new MonsoonTimerAdapter(getContext(), mTimers) {
             @Override
-            protected void onClickItem(int position) {
-                showEditTimerDialog(position);
-            }
-
-            @Override
-            protected void onLongClickItem(int position) {
-                showRemoveDialog(position);
-            }
-
-            @Override
             protected void onEnableTimer(int position) {
                 if (position >= 0 && position < mTimers.size()) {
                     EXOMonsoonTimer tmr = new EXOMonsoonTimer(mTimers.get(position).getValue());
@@ -100,6 +92,19 @@ public class MonsoonTimersFragment extends BaseFragment {
                 }
             }
         };
+        mAdapter.setOnItemClickListener(new OnItemClickListener() {
+            @Override
+            public void onItemClick(int position) {
+                showEditTimerDialog(position);
+            }
+        });
+        mAdapter.setOnItemLongClickListener(new OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(int position) {
+                showRemoveDialog(position);
+                return true;
+            }
+        });
         monsoon_timers_rv.setAdapter(mAdapter);
     }
 

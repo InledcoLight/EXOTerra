@@ -26,7 +26,6 @@ import android.widget.Toast;
 import com.inledco.exoterra.AppConstants;
 import com.inledco.exoterra.R;
 import com.inledco.exoterra.base.BaseActivity;
-import com.inledco.exoterra.base.BaseViewModel;
 import com.inledco.exoterra.bean.Device;
 import com.inledco.exoterra.bean.EXOLedstrip;
 import com.inledco.exoterra.bean.EXOMonsoon;
@@ -69,7 +68,7 @@ public class DeviceActivity extends BaseActivity {
 
     private Device mDevice;
     private DeviceViewModel mDeviceViewModel;
-    private BaseViewModel<Device> mDeviceBaseViewModel;
+    private DeviceBaseViewModel mDeviceBaseViewModel;
 
     private Fragment mDeviceFragment;
 
@@ -146,12 +145,14 @@ public class DeviceActivity extends BaseActivity {
         if (intent == null) {
             return;
         }
+        final String roomid = intent.getStringExtra(AppConstants.ROOM_ID);
         final String deviceTag = intent.getStringExtra(AppConstants.DEVICE_TAG);
         final Device device = DeviceManager.getInstance().getDevice(deviceTag);
         if (device == null) {
             return;
         }
-        mDeviceBaseViewModel = ViewModelProviders.of(this).get(BaseViewModel.class);
+        mDeviceBaseViewModel = ViewModelProviders.of(this).get(DeviceBaseViewModel.class);
+        mDeviceBaseViewModel.setRoomId(roomid);
         mDeviceBaseViewModel.setData(device);
 
         final String pid = device.getXDevice().getProductId();
@@ -196,7 +197,7 @@ public class DeviceActivity extends BaseActivity {
         mGetCallback = new XlinkTaskCallback<List<XLinkDataPoint>>() {
             @Override
             public void onError(String error) {
-                Log.e(TAG, "onError: getDataPoints- " + error );
+                Log.e(TAG, "onError: getDataPoints- " + error);
             }
 
             @Override

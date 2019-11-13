@@ -1,4 +1,4 @@
-package com.inledco.exoterra.base;
+package com.inledco.exoterra.common;
 
 import android.content.Context;
 import android.support.annotation.LayoutRes;
@@ -10,7 +10,7 @@ import android.view.ViewGroup;
 
 import java.util.List;
 
-public abstract class SimpleAdapter<T, VH extends RecyclerView.ViewHolder> extends RecyclerView.Adapter<VH> {
+public abstract class SimpleAdapter<T, VH extends RecyclerView.ViewHolder> extends BaseAdapter<VH> {
     protected Context mContext;
     protected List<T> mData;
 
@@ -29,8 +29,4 @@ public abstract class SimpleAdapter<T, VH extends RecyclerView.ViewHolder> exten
     }
 
     protected abstract @LayoutRes int getItemLayoutResId();
-
-    protected abstract void onItemClick(int position);
-
-    protected abstract boolean onItemLongClick(int position);
 }
