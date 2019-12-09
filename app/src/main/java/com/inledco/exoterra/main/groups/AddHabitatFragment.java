@@ -1,20 +1,22 @@
 package com.inledco.exoterra.main.groups;
 
 import android.app.TimePickerDialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputLayout;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.SeekBar;
 import android.widget.Switch;
-import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
@@ -30,6 +32,7 @@ import org.greenrobot.eventbus.EventBus;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
 
@@ -43,6 +46,19 @@ public class AddHabitatFragment extends BaseFragment {
     private AdvancedTextInputEditText add_habitat_sunrise;
     private AdvancedTextInputEditText add_habitat_sunset;
     private Switch add_habitat_favourite;
+
+    private final int mRawZone = TimeZone.getDefault().getRawOffset()/60000;
+    private final BroadcastReceiver mTimeChangeReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            switch (intent.getAction()) {
+                case Intent.ACTION_TIME_TICK:
+                    Log.e(TAG, "onReceive: ");
+                    refreshTime();
+                    break;
+            }
+        }
+    };
 
     private final String DATETIME_FORMAT = "yyyy-MM-dd HH:mm";
 
@@ -59,6 +75,12 @@ public class AddHabitatFragment extends BaseFragment {
         initData();
         initEvent();
         return view;
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        getActivity().unregisterReceiver(mTimeChangeReceiver);
     }
 
     @Override
@@ -87,9 +109,11 @@ public class AddHabitatFragment extends BaseFragment {
     @Override
     protected void initData() {
         mZone = TimeZone.getDefault().getRawOffset()/60000;
-        long time = System.currentTimeMillis();
-        DateFormat df = new SimpleDateFormat(DATETIME_FORMAT);
-        add_habitat_time.setText(df.format(new Date(time)));
+        refreshTime();
+
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(Intent.ACTION_TIME_TICK);
+        getActivity().registerReceiver(mTimeChangeReceiver, filter);
     }
 
     @Override
@@ -121,7 +145,23 @@ public class AddHabitatFragment extends BaseFragment {
         add_habitat_time.setDrawableRightClickListener(new AdvancedTextInputEditText.DrawableRightClickListener() {
             @Override
             public void onDrawableRightClick() {
-                showZoneDialog();
+                int hour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY);
+                int minute = Calendar.getInstance().get(Calendar.MINUTE);
+                showTimePickerDialog(hour * 60 + minute, new TimePickerDialog.OnTimeSetListener() {
+                    @Override
+                    public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+                        int currTime = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)*60 + Calendar.getInstance().get(Calendar.MINUTE);
+                        int setTime = hourOfDay*60 + minute;
+                        int zone = mRawZone + (setTime - currTime);
+                        if (zone < -720) {
+                            zone += 1440;
+                        } else if (zone > 720) {
+                            zone -= 1440;
+                        }
+                        mZone = zone;
+                        refreshTime();
+                    }
+                });
             }
         });
 
@@ -154,52 +194,16 @@ public class AddHabitatFragment extends BaseFragment {
         });
     }
 
+    private void refreshTime() {
+        long time = System.currentTimeMillis() + (mZone - mRawZone)*60000;
+        Date date = new Date(time);
+        DateFormat df = new SimpleDateFormat(DATETIME_FORMAT);
+        add_habitat_time.setText(df.format(date));
+    }
+
     private void showTimePickerDialog(int time, final TimePickerDialog.OnTimeSetListener listener) {
         TimePickerDialog  dialog = new TimePickerDialog(getContext(), listener, time/60, time%60, is24Hour);
         dialog.show();
-    }
-
-    private void showZoneDialog() {
-        DecimalFormat format = new DecimalFormat("00");
-        final String[] hours = new String[26];
-        final String[] minutes = new String[60];
-        for (int i = 0; i < 13; i++) {
-            hours[i] = "-" + format.format(i-12);
-            hours[i+13] = "+" + format.format(i);
-        }
-        for (int i = 0; i < 60; i++) {
-            minutes[i] = format.format(i);
-        }
-        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-        final int rawZone = TimeZone.getDefault().getRawOffset() / 60000;
-        long time = System.currentTimeMillis() + (mZone - rawZone)*60000;
-        final DateFormat df = new SimpleDateFormat(DATETIME_FORMAT);
-        View view = LayoutInflater.from(getContext()).inflate(R.layout.dialog_zone, null, false);
-        final SeekBar sb = view.findViewById(R.id.dialog_zone_sb);
-        final TextView tv_time = view.findViewById(R.id.dialog_zone_time);
-        sb.setProgress(720+mZone);
-        tv_time.setText(df.format(new Date(time)));
-
-        sb.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                int zone = progress - 720;
-                tv_time.setText(df.format(new Date(System.currentTimeMillis() + (zone-rawZone)*60000)));
-            }
-
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-
-            }
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-
-            }
-        });
-        builder.setTitle(R.string.habitat_time)
-               .setView(view)
-               .show();
     }
 
     private void createHome(final String name, final int zone, final int sunrise, final int sunset) {

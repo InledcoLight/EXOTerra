@@ -11,6 +11,7 @@ import android.widget.TextView;
 
 import com.inledco.exoterra.R;
 import com.inledco.exoterra.bean.Home;
+import com.inledco.exoterra.bean.HomeProperty;
 import com.inledco.exoterra.common.SimpleAdapter;
 
 import java.text.DateFormat;
@@ -21,7 +22,7 @@ import java.util.List;
 import java.util.TimeZone;
 
 public class GroupsAdapter extends SimpleAdapter<Home, GroupsAdapter.GroupViewHolder> {
-    private final String DATETIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
+    private final String DATETIME_FORMAT = "yyyy-MM-dd HH:mm";
     private GroupViewHolder mSelectedHolder;
 
     private final int defaultZone;
@@ -50,20 +51,21 @@ public class GroupsAdapter extends SimpleAdapter<Home, GroupsAdapter.GroupViewHo
         final boolean selected = (mSelectedHolder == holder);
         DecimalFormat df = new DecimalFormat("00");
         final Home home = mData.get(positon);
-        int zone = defaultZone;
-        int sunrise = defaultSunrise;
-        int sunset = defaultSunset;
+        final int zone;
+        final int sunrise;
+        final int sunset;
         if (home.getProperty() != null) {
             zone = home.getProperty().getZone();
             sunrise = home.getProperty().getSunrise();
             sunset = home.getProperty().getSunset();
+        } else {
+            zone = defaultZone;
+            sunrise = defaultSunrise;
+            sunset = defaultSunset;
         }
         holder.name.setText(home.getHome().name);
         holder.set.setVisibility(selected ? View.VISIBLE : View.INVISIBLE);
         holder.more.setVisibility(selected ? View.VISIBLE : View.GONE);
-        long time = System.currentTimeMillis() + (zone-defaultZone)*60000;
-        DateFormat format = new SimpleDateFormat(DATETIME_FORMAT);
-        holder.time.setText(format.format(new Date(time)));
         holder.sunrise.setText(df.format(sunrise/60) + ":" + df.format(sunrise%60));
         holder.sunset.setText(df.format(sunset/60) + ":" + df.format(sunset%60));
         holder.devcnt.setText(mContext.getString(R.string.habitat_devcnt, home.getDeviceCount()));
@@ -80,6 +82,10 @@ public class GroupsAdapter extends SimpleAdapter<Home, GroupsAdapter.GroupViewHo
                         mSelectedHolder.more.setVisibility(View.GONE);
                     }
                     mSelectedHolder = holder;
+                    long time = System.currentTimeMillis() + (zone-defaultZone)*60000;
+                    DateFormat format = new SimpleDateFormat(DATETIME_FORMAT);
+                    Date date = new Date(time);
+                    mSelectedHolder.time.setText(format.format(date));
                     holder.set.setVisibility(View.VISIBLE);
                     holder.more.setVisibility(View.VISIBLE);
                 }
@@ -103,6 +109,21 @@ public class GroupsAdapter extends SimpleAdapter<Home, GroupsAdapter.GroupViewHo
 //                });
 //            }
 //        });
+    }
+
+    public void updateTime() {
+        if (mSelectedHolder != null) {
+            int zone = defaultZone;
+            int position = mSelectedHolder.getAdapterPosition();
+            HomeProperty property = mData.get(position).getProperty();
+            if (property != null) {
+                zone = property.getZone();
+            }
+            long time = System.currentTimeMillis() + (zone-defaultZone)*60000;
+            DateFormat format = new SimpleDateFormat(DATETIME_FORMAT);
+            Date date = new Date(time);
+            mSelectedHolder.time.setText(format.format(date));
+        }
     }
 
     class GroupViewHolder extends RecyclerView.ViewHolder {
