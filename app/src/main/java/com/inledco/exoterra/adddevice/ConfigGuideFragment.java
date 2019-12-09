@@ -38,7 +38,7 @@ import com.inledco.exoterra.xlink.XlinkConstants;
 
 public class ConfigGuideFragment extends BaseFragment {
     private TextView config_guide_title;
-    private TextView config_guide_confirm;
+    private ImageView config_guide_prdt;
     private ImageView config_guide_icon;
     private TextView config_guide_step;
     private ImageView config_guide_led;
@@ -89,7 +89,7 @@ public class ConfigGuideFragment extends BaseFragment {
     @Override
     protected void initView(View view) {
         config_guide_title = view.findViewById(R.id.config_guide_title);
-        config_guide_confirm = view.findViewById(R.id.config_guide_confirm);
+        config_guide_prdt = view.findViewById(R.id.config_guide_prdt);
         config_guide_icon = view.findViewById(R.id.config_guide_icon);
         config_guide_step = view.findViewById(R.id.config_guide_step);
 //        config_guide_led = view.findViewById(R.id.config_guide_led);
@@ -192,6 +192,7 @@ public class ConfigGuideFragment extends BaseFragment {
 
     private void refreshData() {
         unregisterWifiReceiver();
+        config_guide_prdt.setImageResource(DeviceUtil.getProductIcon(mConnectNetBean.getProductId()));
         config_guide_next.setEnabled(!mConnectNetBean.isCompatibleMode());
         if (mAnimator != null) {
             mAnimator.cancel();
@@ -199,8 +200,7 @@ public class ConfigGuideFragment extends BaseFragment {
         }
         int duration = 500;
         if (mConnectNetBean.isCompatibleMode()) {
-            config_guide_title.setText(R.string.compatible_mode);
-            config_guide_confirm.setText(R.string.apconfig_confirm);
+            config_guide_title.setText(R.string.set_device_compatiblemode );
             duration = 1500;
             SpannableStringBuilder ssb = new SpannableStringBuilder();
             String ssid;
@@ -232,13 +232,12 @@ public class ConfigGuideFragment extends BaseFragment {
 
             registerWifiReceiver();
         } else {
-            config_guide_title.setText(R.string.smartconfig);
-            config_guide_confirm.setText(R.string.smartconfig_confirm);
+            config_guide_title.setText(R.string.set_device_smartconfig_mode);
             if (TextUtils.equals(XlinkConstants.PRODUCT_ID_LEDSTRIP, mConnectNetBean.getProductId())) {
                 config_guide_step.setText(R.string.smartconfig_guide_strip);
+            } else {
+                config_guide_step.setText(R.string.smartconfig_guide_default);
             }
-
-            unregisterWifiReceiver();
         }
 
         mAnimator = ObjectAnimator.ofInt(0-duration/2, duration/2);

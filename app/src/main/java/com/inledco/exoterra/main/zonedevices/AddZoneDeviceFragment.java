@@ -19,7 +19,7 @@ import android.view.ViewGroup;
 import com.inledco.exoterra.AppConstants;
 import com.inledco.exoterra.R;
 import com.inledco.exoterra.base.BaseFragment;
-import com.inledco.exoterra.bean.Home;
+import com.inledco.exoterra.bean.Home2;
 import com.inledco.exoterra.bean.RoomDevice;
 import com.inledco.exoterra.bean.XHome;
 import com.inledco.exoterra.main.HomeViewModel;
@@ -42,7 +42,7 @@ public class AddZoneDeviceFragment extends BaseFragment {
 
     private String mZoneId;
     private final List<RoomDevice> mDevices = new ArrayList<>();
-    private Home.Zone mZone;
+    private Home2.Zone mZone;
     private AddZoneDeviceAdapter mAdapter;
 
     private boolean mProcessing;
@@ -102,7 +102,7 @@ public class AddZoneDeviceFragment extends BaseFragment {
                 add_zone_device_swipe.setRefreshing(false);
             }
         });
-        if (mXHome == null || mXHome.getHome() == null) {
+        if (mXHome == null || mXHome.getHome2() == null) {
             return;
         }
         Bundle args = getArguments();
@@ -111,7 +111,7 @@ public class AddZoneDeviceFragment extends BaseFragment {
         }
         mZoneId = args.getString(AppConstants.ZONE_ID);
 
-        for (Home.Zone zone : mXHome.getHome().zones) {
+        for (Home2.Zone zone : mXHome.getHome2().zones) {
             if (TextUtils.equals(mZoneId, zone.id)) {
                 mZone = zone;
                 add_zone_device_toolbar.setTitle(zone.name);
@@ -165,15 +165,15 @@ public class AddZoneDeviceFragment extends BaseFragment {
 
     private void refreshData() {
         mDevices.clear();
-        if (mXHome != null && mXHome.getHome() != null) {
-            for (Home.Zone zone : mXHome.getHome().zones) {
+        if (mXHome != null && mXHome.getHome2() != null) {
+            for (Home2.Zone zone : mXHome.getHome2().zones) {
                 if (TextUtils.equals(mZoneId, zone.id)) {
                     add_zone_device_toolbar.setTitle(zone.name);
                     break;
                 }
             }
 
-            List<Home.Room> rooms = mXHome.getHome().rooms;
+            List<Home2.Room> rooms = mXHome.getHome2().rooms;
             if (rooms != null) {
                 for (int i = 0; i < rooms.size(); i++) {
                     List<String> devids = rooms.get(i).device_ids;
@@ -202,10 +202,10 @@ public class AddZoneDeviceFragment extends BaseFragment {
     }
 
     private void changeDevices() {
-        if (mAdapter == null || mXHome == null || mXHome.getHome() == null) {
+        if (mAdapter == null || mXHome == null || mXHome.getHome2() == null) {
             return;
         }
-        final String homeid = mXHome.getHome().id;
+        final String homeid = mXHome.getHome2().id;
         final Set<String> addRoomIds = mAdapter.getAddRoomIds();
         final Set<String> removeRoomIds = mAdapter.getRemoveRoomIds();
         mChangeDevicesTask = new AsyncTask<Void, Void, Boolean>() {

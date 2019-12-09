@@ -13,7 +13,7 @@ import com.inledco.exoterra.R;
 import com.inledco.exoterra.bean.ImportDeviceResponse;
 import com.inledco.exoterra.bean.QueryDeviceResponse;
 import com.inledco.exoterra.bean.Result;
-import com.inledco.exoterra.manager.HomeManager;
+import com.inledco.exoterra.manager.Home2Manager;
 import com.inledco.exoterra.xlink.RoomApi;
 import com.inledco.exoterra.xlink.XlinkCloudManager;
 import com.inledco.exoterra.xlink.XlinkResult;
@@ -40,12 +40,15 @@ public class SmartConfigLinker {
     private final int SUBSCRIBE_DEVICE_TIMEOUT  = 15000;
 
     private final int INDEX_ZONE                = 1;
+    private final int INDEX_SYNC_DATETIME       = 5;
 
     private final int PROGRESS_ESPTOUCH         = 60;
     private final int PROGRESS_SCAN             = 68;
     private final int PROGRESS_ADDDEVICE        = 78;
-    private final int PROGRESS_SET_ZONE         = 85;
+    private final int PROGRESS_SYNC_DEVICE = 85;
     private final int PROGRESS_SUCCESS          = 100;
+
+    private final boolean mSubscribe;
 
     private int mProgress;
     private final CountDownTimer mTimer;
@@ -67,7 +70,8 @@ public class SmartConfigLinker {
 
     private AsyncTask<Void, Integer, Result> mTask;
 
-    public SmartConfigLinker(AppCompatActivity activity, String pid, String ssid, String bssid, String psw) {
+    public SmartConfigLinker(AppCompatActivity activity, boolean subscribe, String pid, String ssid, String bssid, String psw) {
+        mSubscribe = subscribe;
         mProductId = pid;
         mSsid = ssid;
         mBssid = bssid;
@@ -182,13 +186,30 @@ public class SmartConfigLinker {
         return res;
     }
 
-    private Result setZone() {
+    private Result syncDevice() {
         XlinkTaskHandler<XDevice> listener = new XlinkTaskHandler<>();
         final int rawZone = TimeZone.getDefault().getRawOffset()/60000;
         final int zone = (rawZone/60)*100 + (rawZone%60);
         final List<XLinkDataPoint> dps = new ArrayList<>();
         final XLinkDataPoint dp1 = new XLinkDataPoint(INDEX_ZONE, DataPointValueType.SHORT, (short) zone);
         dps.add(dp1);
+//        if (mSubscribe) {
+//            final byte[] array = new byte[10];
+//            Calendar calendar = Calendar.getInstance();
+//            int year = calendar.get(Calendar.YEAR);
+//            array[0] = (byte) (year & 0xFF);
+//            array[1] = (byte) ((year >> 8) & 0xFF);
+//            array[2] = (byte) calendar.get(Calendar.MONTH);
+//            array[3] = (byte) calendar.get(Calendar.DATE);
+//            array[4] = (byte) calendar.get(Calendar.DAY_OF_WEEK);
+//            array[5] = (byte) calendar.get(Calendar.HOUR_OF_DAY);
+//            array[6] = (byte) calendar.get(Calendar.MINUTE);
+//            array[7] = (byte) calendar.get(Calendar.SECOND);
+//            array[8] = (byte) (zone & 0xFF);
+//            array[9] = (byte) ((zone>>8) & 0xFF);
+//            final XLinkDataPoint dp2 = new XLinkDataPoint(INDEX_SYNC_DATETIME, DataPointValueType.BYTE_ARRAY, array);
+//            dps.add(dp2);
+//        }
         XlinkCloudManager.getInstance().setDeviceDatapoints(mXDevice, dps, SET_ZONE_TIMEOUT, listener);
         while (!listener.isOver());
         Result res = new Result(listener.isSuccess(), listener.getError());
@@ -211,7 +232,7 @@ public class SmartConfigLinker {
 
     private Result addDeviceToHomeAndRoom() {
         Result result = new Result();
-        final String homeid = HomeManager.getInstance().getCurrentHomeId();
+        final String homeid = Home2Manager.getInstance().getCurrentHomeId();
         final int devid = mXDevice.getDeviceId();
 
         // 将设备添加到当前Home
@@ -278,13 +299,7 @@ public class SmartConfigLinker {
                 }
                 publishProgress(PROGRESS_SCAN);
 
-                if (!checkDeviceRegistered()) {
-                    result = registerDevice();
-                    if (!result.isSuccess()) {
-                        return result;
-                    }
-                }
-
+                delay(1000);
                 result = addDevice();
                 if (!result.isSuccess()) {
                     return result;
@@ -293,19 +308,31 @@ public class SmartConfigLinker {
 
                 delay(2000);
 
-                result = setZone();
+                result = syncDevice();
+                if (!mSubscribe) {
+                    return result;
+                }
                 if (!result.isSuccess()) {
                     return result;
                 }
-                while (mProgress < PROGRESS_SET_ZONE);
-                publishProgress(PROGRESS_SET_ZONE);
+                while (mProgress < PROGRESS_SYNC_DEVICE);
+                publishProgress(PROGRESS_SYNC_DEVICE);
 
-                result = subscribe();
-                if (!result.isSuccess()) {
-                    return result;
+                if (!checkDeviceRegistered()) {
+                    result = registerDevice();
+                    if (!result.isSuccess()) {
+                        return result;
+                    }
                 }
-                delay(1000);
-                return addDeviceToHomeAndRoom();
+
+                return subscribe();
+
+//                result = subscribe();
+//                if (!result.isSuccess()) {
+//                    return result;
+//                }
+//                delay(1000);
+//                return addDeviceToHomeAndRoom();
             }
 
             @Override
@@ -318,7 +345,7 @@ public class SmartConfigLinker {
                     if (result.isSuccess()) {
                         mProgress = PROGRESS_SUCCESS;
                         mListener.onProgressUpdate(mProgress);
-                        mListener.onSuccess();
+                        mListener.onSuccess(mXDevice.getDeviceId(), mAddress);
                     } else {
                         mListener.onError(result.getError());
                     }
@@ -339,7 +366,7 @@ public class SmartConfigLinker {
                         mListener.onEsptouchSuccess();
                     } else if (values[0] == PROGRESS_SCAN) {
                         mListener.onDeviceScanned();
-                    } else if (values[0] == PROGRESS_SET_ZONE) {
+                    } else if (values[0] == PROGRESS_SYNC_DEVICE) {
                         mListener.onDeviceInitialized();
                     }
                     mListener.onProgressUpdate(mProgress);

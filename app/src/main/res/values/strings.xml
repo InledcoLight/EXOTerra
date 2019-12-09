@@ -15,7 +15,7 @@
     <string name="stop">Stop</string>
 
     <string name="hint_email">Email</string>
-    <string name="hint_password">Password</string>
+    <string name="password">Password</string>
     <string name="error_email">Invalid email</string>
     <string name="error_password">Password length 6 ~ 16</string>
     <string name="error_nickname">Nickname can not be empty</string>
@@ -111,7 +111,7 @@
     <string name="upgrade">Upgrade</string>
     <string name="devices">Devices</string>
     <string name="me">Me</string>
-    <string name="home">Home</string>
+    <string name="home2">Home</string>
     <string name="invalid_profile">Invalid Profile</string>
     <string name="imort_from_default">Import profile from default</string>
     <string name="msg_import_from_default">Invalid profile, import from default?</string>
@@ -157,28 +157,27 @@
     <string name="device_zone">Device zone</string>
 
     <string name="smartconfig_guide_default">
-        1.  Press and hold the device key until the green led flash quickly(1s)\n
+        1.  Press and hold the device key until the green led flashes once every second\n
 
     </string>
     <string name="smartconfig_guide_strip">
         1.  Press the touch key to change the led to green\n
 
-
-        2.  Press and hold the touch key until the green led flash quickly(1s)
+        2.  Press and hold the touch key until the green led flashes once every second\n
     </string>
     <string name="apconfig_guide_default">
-        1.  Press and hold the device key until the green led flash quickly(1s)\n
+        1.  Press and hold the device key until the green led flashes once every second\n
 
-        2.  Again press and hold the device key until the green led flash slowly(3s)\n
+        2.  Again press and hold the device key until the green led flashes once every three seconds\n
 
         3.  Connect your phone to %1$s\n
     </string>
     <string name="apconfig_guide_strip">
         1.  Press the touch key to change the led to green\n
 
-        2.  Press and hold the device key until the green led flash quickly(1s)\n
+        2.  Press and hold the touch key until the green led flashes once every second\n
 
-        3.  Again press and hold the device key until the green led flash slowly(3s)\n
+        3.  Again press and hold the touch key until the green led flashes once every three second\n
 
         4.  Connect your phone to %1$s\n
     </string>
@@ -248,19 +247,30 @@
     <string name="rename_habitat">Rename habitat</string>
     <string name="delete_device">Delete device</string>
     <string name="msg_delete">Confirm delete %1$s?</string>
-    <string name="homes">Homes</string>
-    <string name="add_home">Add home</string>
+    <string name="home2s">Homes</string>
+    <string name="add_home">Add home2</string>
     <string name="home_members">Home members</string>
     <string name="admin">Administrator</string>
     <string name="user">User</string>
-    <string name="rename_home">Rename home</string>
-    <string name="delete_home">Delete home</string>
+    <string name="rename_home">Rename home2</string>
+    <string name="delete_home">Delete home2</string>
     <string name="invite">Invite</string>
     <string name="user_id">User ID</string>
     <string name="role">Role</string>
     <string name="email">Email</string>
-    <string name="error_cant_delete_current_home">Can not delete current home.</string>
+    <string name="error_cant_delete_current_home">Can not delete current home2.</string>
     <string name="manage_homes">Manage Homes</string>
     <string name="rssi">RSSI</string>
     <string name="foundback_failed">Reset password failed</string>
+    <string name="local_offline">Local offline</string>
+    <string name="local_online">Local online</string>
+    <string name="connect_to_router">Connect to WIFI 2.4G network</string>
+    <string name="set_device_smartconfig_mode">Set device to SmartConfig mode</string>
+    <string name="set_device_compatiblemode">Set device to Compatible mode</string>
+    <string name="config_device">Configure the device</string>
+    <string name="local_mode">Local Mode</string>
+    <string name="habitat_devcnt">Connected devices: %1$d</string>
+    <string name="create_habitat">Create habitat</string>
+    <string name="habitat_time">Habitat time</string>
+    <string name="favourite_habitat">Favourite habitat</string>
 </resources>

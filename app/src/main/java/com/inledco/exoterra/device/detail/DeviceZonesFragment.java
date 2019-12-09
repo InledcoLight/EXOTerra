@@ -24,9 +24,9 @@ import android.widget.Toast;
 
 import com.inledco.exoterra.R;
 import com.inledco.exoterra.base.BaseFragment;
-import com.inledco.exoterra.bean.Home;
+import com.inledco.exoterra.bean.Home2;
 import com.inledco.exoterra.device.DeviceBaseViewModel;
-import com.inledco.exoterra.manager.HomeManager;
+import com.inledco.exoterra.manager.Home2Manager;
 import com.inledco.exoterra.xlink.XlinkCloudManager;
 import com.inledco.exoterra.xlink.XlinkRequestCallback;
 import com.inledco.exoterra.xlink.ZoneApi;
@@ -43,9 +43,9 @@ public class DeviceZonesFragment extends BaseFragment {
     private TextView device_zones_add;
 
     private DeviceBaseViewModel mDeviceBaseViewModel;
-    private List<Home.Zone> mZones = new ArrayList<>();
+    private List<Home2.Zone> mZones = new ArrayList<>();
     private DeviceZonesAdapter mAdapter;
-    private final XlinkRequestCallback<Home> mGetHomeCallback = new XlinkRequestCallback<Home>() {
+    private final XlinkRequestCallback<Home2> mGetHomeCallback = new XlinkRequestCallback<Home2>() {
         @Override
         public void onError(String error) {
             Toast.makeText(getContext(), error, Toast.LENGTH_SHORT)
@@ -54,9 +54,9 @@ public class DeviceZonesFragment extends BaseFragment {
         }
 
         @Override
-        public void onSuccess(Home home) {
+        public void onSuccess(Home2 home2) {
             mZones.clear();
-            mZones.addAll(home.zones);
+            mZones.addAll(home2.zones);
             mAdapter.refreshData();
             device_zones_swipe.setRefreshing(false);
         }
@@ -109,7 +109,7 @@ public class DeviceZonesFragment extends BaseFragment {
         device_zones_rv.setAdapter(mAdapter);
 
         device_zones_swipe.setRefreshing(true);
-        XlinkCloudManager.getInstance().getHomeInfo(HomeManager.getInstance().getCurrentHomeId(), mGetHomeCallback);
+        XlinkCloudManager.getInstance().getHomeInfo(Home2Manager.getInstance().getCurrentHomeId(), mGetHomeCallback);
     }
 
     @Override
@@ -143,7 +143,7 @@ public class DeviceZonesFragment extends BaseFragment {
         device_zones_swipe.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                XlinkCloudManager.getInstance().getHomeInfo(HomeManager.getInstance().getCurrentHomeId(), mGetHomeCallback);
+                XlinkCloudManager.getInstance().getHomeInfo(Home2Manager.getInstance().getCurrentHomeId(), mGetHomeCallback);
             }
         });
 
@@ -156,7 +156,7 @@ public class DeviceZonesFragment extends BaseFragment {
     }
 
     private void changeZones(@NonNull final Set<String> removeZoneIds, @NonNull final Set<String> addZoneIds) {
-        final String homeid = HomeManager.getInstance().getCurrentHomeId();
+        final String homeid = Home2Manager.getInstance().getCurrentHomeId();
         final String roomid = mDeviceBaseViewModel.getRoomId();
         mChangeZonesTask = new AsyncTask<Void, Void, Boolean>() {
             @Override
@@ -184,7 +184,7 @@ public class DeviceZonesFragment extends BaseFragment {
                 if (result) {
                     getActivity().getSupportFragmentManager().popBackStack();
                 } else {
-                    XlinkCloudManager.getInstance().getHomeInfo(HomeManager.getInstance().getCurrentHomeId(), mGetHomeCallback);
+                    XlinkCloudManager.getInstance().getHomeInfo(Home2Manager.getInstance().getCurrentHomeId(), mGetHomeCallback);
                 }
             }
         };
@@ -211,7 +211,7 @@ public class DeviceZonesFragment extends BaseFragment {
                 if (TextUtils.isEmpty(name)) {
                     til.setError(getString(R.string.input_empty));
                 } else {
-                    XlinkCloudManager.getInstance().createZone(HomeManager.getInstance().getCurrentHomeId(), name, new XlinkRequestCallback<ZoneApi.ZoneResponse>() {
+                    XlinkCloudManager.getInstance().createZone(Home2Manager.getInstance().getCurrentHomeId(), name, new XlinkRequestCallback<ZoneApi.ZoneResponse>() {
                         @Override
                         public void onError(String error) {
                             Toast.makeText(getContext(), error, Toast.LENGTH_SHORT)
@@ -220,7 +220,7 @@ public class DeviceZonesFragment extends BaseFragment {
 
                         @Override
                         public void onSuccess(ZoneApi.ZoneResponse response) {
-                            XlinkCloudManager.getInstance().getHomeInfo(HomeManager.getInstance().getCurrentHomeId(), mGetHomeCallback);
+                            XlinkCloudManager.getInstance().getHomeInfo(Home2Manager.getInstance().getCurrentHomeId(), mGetHomeCallback);
                         }
                     });
                     dialog.dismiss();

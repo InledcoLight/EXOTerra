@@ -5,6 +5,8 @@ import android.content.Intent;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputLayout;
 import android.text.TextUtils;
+import android.text.method.HideReturnsTransformationMethod;
+import android.text.method.PasswordTransformationMethod;
 import android.view.View;
 import android.widget.Button;
 
@@ -14,7 +16,6 @@ import com.inledco.exoterra.foundback.FoundbackActivity;
 import com.inledco.exoterra.main.MainActivity;
 import com.inledco.exoterra.manager.UserManager;
 import com.inledco.exoterra.register.RegisterActivity;
-import com.inledco.exoterra.test.TestActivity;
 import com.inledco.exoterra.util.RegexUtil;
 import com.inledco.exoterra.view.AdvancedTextInputEditText;
 import com.inledco.exoterra.view.MessageDialog;
@@ -35,9 +36,10 @@ public class LoginActivity extends BaseActivity {
     private Button login_btn_forget;
     private Button login_btn_signup;
     private Button login_btn_skip;
-    private Button network_test;
     private LoadDialog mLoadDialog;
     private ProgressDialog mProgressDialog;
+
+    private boolean showPassword;
 
     @Override
     protected void onStart() {
@@ -79,8 +81,9 @@ public class LoginActivity extends BaseActivity {
         login_btn_forget = findViewById(R.id.login_btn_forget);
         login_btn_signup = findViewById(R.id.login_btn_signup);
         login_btn_skip = findViewById(R.id.login_btn_skip);
-        network_test = findViewById(R.id.network_test);
 
+        login_et_email.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_email_white_24dp, 0, 0, 0);
+        login_et_password.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_lock_white_24dp, 0, R.drawable.design_ic_visibility_off, 0);
         login_et_email.bindTextInputLayout(login_til_email);
         login_et_password.bindTextInputLayout(login_til_password);
     }
@@ -104,6 +107,19 @@ public class LoginActivity extends BaseActivity {
 
     @Override
     protected void initEvent() {
+        login_et_password.setDrawableRightClickListener(new AdvancedTextInputEditText.DrawableRightClickListener() {
+            @Override
+            public void onDrawableRightClick() {
+                showPassword = !showPassword;
+                if (showPassword) {
+                    login_et_password.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_lock_white_24dp, 0, R.drawable.design_ic_visibility, 0);
+                    login_et_password.setTransformationMethod(HideReturnsTransformationMethod.getInstance());
+                } else {
+                    login_et_password.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_lock_white_24dp, 0, R.drawable.design_ic_visibility_off, 0);
+                    login_et_password.setTransformationMethod(PasswordTransformationMethod.getInstance());
+                }
+            }
+        });
         login_btn_signin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -165,14 +181,6 @@ public class LoginActivity extends BaseActivity {
                 gotoMainActivity();
             }
         });
-
-        network_test.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(LoginActivity.this, TestActivity.class);
-                startActivity(intent);
-            }
-        });
     }
 
     private String getEmailText() {
@@ -184,17 +192,17 @@ public class LoginActivity extends BaseActivity {
     }
 
 //    private void checkHome() {
-//        HomeManager.getInstance().syncHomeList(new XlinkRequestCallback<List<HomeExtendApi.HomesResponse.Home>>() {
+//        Home2Manager.getInstance().syncHomeList(new XlinkRequestCallback<List<HomeExtendApi.HomesResponse.Home2>>() {
 //            @Override
 //            public void onError(String error) {
 //                Log.e(TAG, "onError: " + error);
 //            }
 //
 //            @Override
-//            public void onSuccess(List<HomeExtendApi.HomesResponse.Home> homes) {
+//            public void onSuccess(List<HomeExtendApi.HomesResponse.Home2> homes) {
 //                if (homes != null && homes.size() > 0) {
 //                    for (int i = 0; i < homes.size(); i++) {
-//                        HomeExtendApi.HomesResponse.Home home = homes.get(i);
+//                        HomeExtendApi.HomesResponse.Home2 home = homes.get(i);
 //                        if (home.creator == XLinkUserManager.getInstance().getUid() && home.name == XlinkConstants.DEFAULT_HOME_NAME)     {
 //                            return;
 //                        }

@@ -3,7 +3,7 @@
     <item
         android:id="@+id/main_bnv_home"
         android:icon="@drawable/ic_home"
-        android:title="@string/home"/>
+        android:title="@string/home2"/>
     <item
         android:id="@+id/main_bnv_devices"
         android:icon="@drawable/ic_device"
@@ -12,7 +12,7 @@
         android:id="@+id/main_bnv_habitat"
         android:icon="@drawable/ic_group"
         android:visible="false"
-        android:title="@string/habitat"/>
+        android:title="@string/habitats"/>
     <item
         android:id="@+id/main_bnv_me"
         android:icon="@drawable/ic_settings"

@@ -23,10 +23,10 @@ import android.widget.Toast;
 import com.inledco.exoterra.AppConstants;
 import com.inledco.exoterra.R;
 import com.inledco.exoterra.base.BaseFragment;
-import com.inledco.exoterra.bean.Home;
+import com.inledco.exoterra.bean.Home2;
 import com.inledco.exoterra.common.OnItemClickListener;
 import com.inledco.exoterra.event.HomeMemberChangedEvent;
-import com.inledco.exoterra.manager.HomeManager;
+import com.inledco.exoterra.manager.Home2Manager;
 import com.inledco.exoterra.util.RegexUtil;
 import com.inledco.exoterra.xlink.XlinkCloudManager;
 import com.inledco.exoterra.xlink.XlinkRequestCallback;
@@ -54,9 +54,9 @@ public class HomeDetailFragment extends BaseFragment {
     private Button home_detail_delete;
 
     private String mHomeId;
-    private Home mHome;
+    private Home2 mHome2;
     private boolean mIsHomeAdmin;
-    private final List<Home.User> mUsers = new ArrayList<>();
+    private final List<Home2.User> mUsers = new ArrayList<>();
     private HomeMembersAdapter mAdapter;
 
     public static HomeDetailFragment newInstance(final String homeid) {
@@ -116,7 +116,7 @@ public class HomeDetailFragment extends BaseFragment {
         mAdapter.setOnItemClickListener(new OnItemClickListener() {
             @Override
             public void onItemClick(int position) {
-                Home.User user = mUsers.get(position);
+                Home2.User user = mUsers.get(position);
                 addFragmentToStack(R.id.main_fl, HomeMemberFragment.newInstance(mIsHomeAdmin, mHomeId, user.user_id, user.role, user.nickname, user.email));
             }
         });
@@ -151,7 +151,7 @@ public class HomeDetailFragment extends BaseFragment {
         home_detail_delete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String currentHomeId = HomeManager.getInstance().getCurrentHomeId();
+                String currentHomeId = Home2Manager.getInstance().getCurrentHomeId();
                 if (TextUtils.equals(currentHomeId, mHomeId)) {
                     Toast.makeText(getContext(), R.string.error_cant_delete_current_home, Toast.LENGTH_SHORT)
                          .show();
@@ -170,7 +170,7 @@ public class HomeDetailFragment extends BaseFragment {
     }
 
     private void getHomeInfo() {
-        XlinkCloudManager.getInstance().getHomeInfo(mHomeId, new XlinkRequestCallback<Home>() {
+        XlinkCloudManager.getInstance().getHomeInfo(mHomeId, new XlinkRequestCallback<Home2>() {
             @Override
             public void onError(String error) {
                 Toast.makeText(getContext(), error, Toast.LENGTH_SHORT)
@@ -178,26 +178,26 @@ public class HomeDetailFragment extends BaseFragment {
             }
 
             @Override
-            public void onSuccess(Home home) {
-                mHome = home;
+            public void onSuccess(Home2 home2) {
+                mHome2 = home2;
                 refreshData();
             }
         });
     }
 
     private void refreshData() {
-        home_detail_toolbar.setTitle(mHome.name);
-        home_detail_name.setText(mHome.name);
-        home_detail_devcnt.setText("" + mHome.rooms.size() + " " + getString(R.string.devices).toLowerCase());
-        home_detail_zonecnt.setText("" + mHome.zones.size() + " " + getString(R.string.habitats).toLowerCase());
+        home_detail_toolbar.setTitle(mHome2.name);
+        home_detail_name.setText(mHome2.name);
+        home_detail_devcnt.setText("" + mHome2.rooms.size() + " " + getString(R.string.devices).toLowerCase());
+        home_detail_zonecnt.setText("" + mHome2.zones.size() + " " + getString(R.string.habitats).toLowerCase());
         mUsers.clear();
-        mUsers.addAll(mHome.user_list);
+        mUsers.addAll(mHome2.user_list);
         mAdapter.notifyDataSetChanged();
 
         int suAdmin = XLinkRestfulEnum.HomeUserType.SUPER_ADMIN.getValue();
         int admin = XLinkRestfulEnum.HomeUserType.ADMIN.getValue();
         boolean isHomeAdmin = false;
-        for (Home.User usr : mUsers) {
+        for (Home2.User usr : mUsers) {
             if (usr.user_id == XLinkUserManager.getInstance().getUid()) {
                 if (usr.role == suAdmin || usr.role == admin) {
                     isHomeAdmin = true;
@@ -294,7 +294,7 @@ public class HomeDetailFragment extends BaseFragment {
     private void showDeleteHomeDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         builder.setTitle(R.string.delete_home)
-               .setMessage(getString(R.string.msg_delete, mHome.name))
+               .setMessage(getString(R.string.msg_delete, mHome2.name))
                .setNegativeButton(R.string.cancel, null)
                .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                    @Override

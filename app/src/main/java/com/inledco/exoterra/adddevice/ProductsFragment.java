@@ -12,10 +12,12 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.Toast;
 
 import com.inledco.exoterra.R;
 import com.inledco.exoterra.base.BaseFragment;
+import com.inledco.exoterra.common.OnItemClickListener;
 import com.inledco.exoterra.helper.LocationHelper;
 import com.inledco.exoterra.util.DeviceUtil;
 
@@ -26,6 +28,7 @@ public class ProductsFragment extends BaseFragment {
     private final int REQUEST_LOCATION_CODE = 1;
 
     private RecyclerView products_rv;
+    private Button products_exit;
     private final List<String> mProducts = DeviceUtil.getAllProducts();
     private ProductAdapter mAdapter;
 
@@ -74,15 +77,17 @@ public class ProductsFragment extends BaseFragment {
     @Override
     protected void initView(View view) {
         products_rv = view.findViewById(R.id.products_rv);
+        products_exit = view.findViewById(R.id.products_exit);
     }
 
     @Override
     protected void initData() {
         mConnectNetViewModel = ViewModelProviders.of(getActivity()).get(ConnectNetViewModel.class);
-        mAdapter = new ProductAdapter(getContext(), mProducts) {
+        mAdapter = new ProductAdapter(getContext(), mProducts);
+        mAdapter.setOnItemClickListener(new OnItemClickListener() {
             @Override
-            protected void onClickItem(String prdt) {
-                mProductId = prdt;
+            public void onItemClick(int position) {
+                mProductId = mProducts.get(position);
                 if (mLocationHelper == null) {
                     mLocationHelper = new LocationHelper(ProductsFragment.this);
                 }
@@ -94,14 +99,18 @@ public class ProductsFragment extends BaseFragment {
                     addFragmentToStack(R.id.adddevice_fl, new ConnectNetFragment());
                 }
             }
-        };
-
+        });
         products_rv.setAdapter(mAdapter);
     }
 
     @Override
     protected void initEvent() {
-
+        products_exit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getActivity().onBackPressed();
+            }
+        });
     }
 
     private void showLocationPermissionDialog() {

@@ -20,10 +20,10 @@ import android.widget.Toast;
 
 import com.inledco.exoterra.R;
 import com.inledco.exoterra.base.BaseFragment;
-import com.inledco.exoterra.bean.Home;
+import com.inledco.exoterra.bean.Home2;
 import com.inledco.exoterra.common.OnItemClickListener;
 import com.inledco.exoterra.event.HomeChangedEvent;
-import com.inledco.exoterra.manager.HomeManager;
+import com.inledco.exoterra.manager.Home2Manager;
 import com.inledco.exoterra.xlink.XlinkCloudManager;
 import com.inledco.exoterra.xlink.XlinkRequestCallback;
 
@@ -43,7 +43,7 @@ public class HomesFragment extends BaseFragment {
     private RecyclerView homes_rv;
     private FloatingActionButton homes_fab_add;
 
-    private final List<Home> mHomes = new ArrayList<>();
+    private final List<Home2> mHome2s = new ArrayList<>();
     private HomesAdapter mAdapter;
 
 //    private final XlinkRequestCallback<HomeApi.HomesResponse> mGetHomesCallback = new XlinkRequestCallback<HomeApi.HomesResponse>() {
@@ -56,8 +56,8 @@ public class HomesFragment extends BaseFragment {
 //
 //        @Override
 //        public void onSuccess(HomeApi.HomesResponse response) {
-//            mHomes.clear();
-//            mHomes.addAll(response.list);
+//            mHome2s.clear();
+//            mHome2s.addAll(response.list);
 //            mAdapter.notifyDataSetChanged();
 //            homes_swipe.setRefreshing(false);
 //        }
@@ -99,19 +99,20 @@ public class HomesFragment extends BaseFragment {
 
     @Override
     protected void initData() {
-        mHomes.addAll(HomeManager.getInstance().getHomeList());
-        mAdapter = new HomesAdapter(getContext(), mHomes, HomeManager.getInstance().getCurrentHomeId());
+        mHome2s.addAll(Home2Manager.getInstance().getHome2List());
+        mAdapter = new HomesAdapter(getContext(),
+                                    mHome2s, Home2Manager.getInstance().getCurrentHomeId());
         mAdapter.setOnItemClickListener(new OnItemClickListener() {
             @Override
             public void onItemClick(int position) {
-                String homeid = mHomes.get(position).id;
+                String homeid = mHome2s.get(position).id;
                 addFragmentToStack(R.id.main_fl, HomeDetailFragment.newInstance(homeid));
             }
         });
         homes_rv.setAdapter(mAdapter);
 
 //        homes_swipe.setRefreshing(true);
-//        XlinkCloudManager.getInstance().getHomeList(mGetHomesCallback);
+//        XlinkCloudManager.getInstance().getHome2List(mGetHomesCallback);
     }
 
     @Override
@@ -126,7 +127,7 @@ public class HomesFragment extends BaseFragment {
 //        homes_swipe.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
 //            @Override
 //            public void onRefresh() {
-//                XlinkCloudManager.getInstance().getHomeList(mGetHomesCallback);
+//                XlinkCloudManager.getInstance().getHome2List(mGetHomesCallback);
 //            }
 //        });
 
@@ -140,9 +141,9 @@ public class HomesFragment extends BaseFragment {
 
     @Subscribe (threadMode = ThreadMode.MAIN)
     public void onHomeChangedEvent(HomeChangedEvent event) {
-//        XlinkCloudManager.getInstance().getHomeList(mGetHomesCallback);
-        mHomes.clear();
-        mHomes.addAll(HomeManager.getInstance().getHomeList());
+//        XlinkCloudManager.getInstance().getHome2List(mGetHomesCallback);
+        mHome2s.clear();
+        mHome2s.addAll(Home2Manager.getInstance().getHome2List());
         mAdapter.notifyDataSetChanged();
     }
 
@@ -168,8 +169,8 @@ public class HomesFragment extends BaseFragment {
                     XlinkCloudManager.getInstance().addHome(name, new XlinkRequestCallback<HomeApi.HomeResponse>() {
                         @Override
                         public void onSuccess(HomeApi.HomeResponse response) {
-                            HomeManager.getInstance().refreshHomeList();
-//                            XlinkCloudManager.getInstance().getHomeList(mGetHomesCallback);
+                            Home2Manager.getInstance().refreshHomeList();
+//                            XlinkCloudManager.getInstance().getHome2List(mGetHomesCallback);
                         }
 
                         @Override

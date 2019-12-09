@@ -31,7 +31,7 @@ import com.inledco.exoterra.R;
 import com.inledco.exoterra.adddevice.AddDeviceActivity;
 import com.inledco.exoterra.base.BaseFragment;
 import com.inledco.exoterra.bean.Device;
-import com.inledco.exoterra.bean.Home;
+import com.inledco.exoterra.bean.Home2;
 import com.inledco.exoterra.bean.RoomDevice;
 import com.inledco.exoterra.bean.XHome;
 import com.inledco.exoterra.common.OnItemClickListener;
@@ -44,7 +44,7 @@ import com.inledco.exoterra.main.HomeViewModel;
 import com.inledco.exoterra.main.homes.HomesAdapter;
 import com.inledco.exoterra.main.homes.HomesFragment;
 import com.inledco.exoterra.manager.DeviceManager;
-import com.inledco.exoterra.manager.HomeManager;
+import com.inledco.exoterra.manager.Home2Manager;
 import com.inledco.exoterra.scan.ScanActivity;
 import com.inledco.exoterra.smartconfig.SmartconfigActivity;
 import com.inledco.exoterra.xlink.XlinkCloudManager;
@@ -170,10 +170,10 @@ public class HomeDevicesFragment extends BaseFragment {
         });
         homedevices_rv.setAdapter(mAdapter);
 
-        if (mXHome != null && mXHome.getHome() != null) {
+        if (mXHome != null && mXHome.getHome2() != null) {
             homedevices_swipe.setRefreshing(true);
             DeviceManager.getInstance().refreshSubcribeDevices(mRefreshSubDevicesCallback);
-            homedevices_homename.setText(mXHome.getHome().name);
+            homedevices_homename.setText(mXHome.getHome2().name);
         }
     }
 
@@ -202,7 +202,7 @@ public class HomeDevicesFragment extends BaseFragment {
         homedevices_homename.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (mXHome == null || mXHome.getHome() == null) {
+                if (mXHome == null || mXHome.getHome2() == null) {
                     return;
                 }
                 if (!homedevices_homename.isChecked()) {
@@ -215,7 +215,7 @@ public class HomeDevicesFragment extends BaseFragment {
         homedevices_swipe.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                if (mXHome == null || mXHome.getHome() == null) {
+                if (mXHome == null || mXHome.getHome2() == null) {
                     return;
                 }
                 if (XLinkUserManager.getInstance().isUserAuthorized()) {
@@ -229,10 +229,10 @@ public class HomeDevicesFragment extends BaseFragment {
 
     private void refreshData() {
         mDevices.clear();
-        if (mXHome != null && mXHome.getHome() != null) {
-            homedevices_homename.setText(mXHome.getHome().name);
+        if (mXHome != null && mXHome.getHome2() != null) {
+            homedevices_homename.setText(mXHome.getHome2().name);
 
-            List<Home.Room> rooms = mXHome.getHome().rooms;
+            List<Home2.Room> rooms = mXHome.getHome2().rooms;
             if (rooms != null) {
                 for (int i = 0; i < rooms.size(); i++) {
                     List<String> devids = rooms.get(i).device_ids;
@@ -283,9 +283,9 @@ public class HomeDevicesFragment extends BaseFragment {
     }
 
     private void showHomeManageDialog() {
-//        final String current_homeid = mXHome.getHome().id;
-        final List<Home> homes = HomeManager.getInstance().getHomeList();
-        HomesAdapter adapter = new HomesAdapter(getContext(), homes, mXHome.getHome().id, false);
+//        final String current_homeid = mXHome.getHome2().id;
+        final List<Home2> home2s = Home2Manager.getInstance().getHome2List();
+        HomesAdapter adapter = new HomesAdapter(getContext(), home2s, mXHome.getHome2().id, false);
         View view = LayoutInflater.from(getContext()).inflate(R.layout.dialog_home_management, null, false);
         RecyclerView rv = view.findViewById(R.id.dialog_home_management_rv);
         TextView manage = view.findViewById(R.id.dialog_home_management_manage);
@@ -303,8 +303,8 @@ public class HomeDevicesFragment extends BaseFragment {
         adapter.setOnItemClickListener(new OnItemClickListener() {
             @Override
             public void onItemClick(int position) {
-                final String homeid = homes.get(position).id;
-                if (!TextUtils.equals(mXHome.getHome().id, homeid)) {
+                final String homeid = home2s.get(position).id;
+                if (!TextUtils.equals(mXHome.getHome2().id, homeid)) {
                     XlinkCloudManager.getInstance()
                                      .setCurrentHomeId(homeid, new XlinkRequestCallback<String>() {
                                          @Override
@@ -315,7 +315,7 @@ public class HomeDevicesFragment extends BaseFragment {
 
                                          @Override
                                          public void onSuccess(String s) {
-                                             HomeManager.getInstance().setCurrentHomeId(homeid);
+                                             Home2Manager.getInstance().setCurrentHomeId(homeid);
                                              mHomeViewModel.refreshHomeInfo();
                                          }
                                      });
@@ -384,9 +384,9 @@ public class HomeDevicesFragment extends BaseFragment {
         }
 
         Set<String> homeids = new HashSet<>();
-        for (Home home : HomeManager.getInstance().getHomeList()) {
-            if (!TextUtils.equals(home.id, HomeManager.getInstance().getCurrentHomeId())) {
-                homeids.add(home.id);
+        for (Home2 home2 : Home2Manager.getInstance().getHome2List()) {
+            if (!TextUtils.equals(home2.id, Home2Manager.getInstance().getCurrentHomeId())) {
+                homeids.add(home2.id);
             }
         }
         for (String homeid : homeids) {

@@ -69,29 +69,31 @@ public class DeviceUtil {
     }
 
     public static @DrawableRes int getProductLedoffIcon(String pid) {
-        if (XlinkConstants.PRODUCT_ID_LEDSTRIP.equals(pid)) {
-            return R.mipmap.ic_strip_off_256;
-        }
-        if (XlinkConstants.PRODUCT_ID_MONSOON.equals(pid)) {
-            return R.mipmap.ic_monsoon_off_256;
-        }
-        if (XlinkConstants.PRODUCT_ID_SOCKET.equals(pid)) {
-            return R.mipmap.ic_socket_off_256;
-        }
-        return 0;
+//        if (XlinkConstants.PRODUCT_ID_LEDSTRIP.equals(pid)) {
+//            return R.mipmap.ic_strip_off_256;
+//        }
+//        if (XlinkConstants.PRODUCT_ID_MONSOON.equals(pid)) {
+//            return R.mipmap.ic_monsoon_off_256;
+//        }
+//        if (XlinkConstants.PRODUCT_ID_SOCKET.equals(pid)) {
+//            return R.mipmap.ic_socket_off_256;
+//        }
+//        return 0;
+        return R.drawable.ic_power_gray;
     }
 
     public static @DrawableRes int getProductLedonIcon(String pid) {
-        if (XlinkConstants.PRODUCT_ID_LEDSTRIP.equals(pid)) {
-            return R.mipmap.ic_strip_on_256;
-        }
-        if (XlinkConstants.PRODUCT_ID_MONSOON.equals(pid)) {
-            return R.mipmap.ic_monsoon_on_256;
-        }
-        if (XlinkConstants.PRODUCT_ID_SOCKET.equals(pid)) {
-            return R.mipmap.ic_socket_on_256;
-        }
-        return 0;
+//        if (XlinkConstants.PRODUCT_ID_LEDSTRIP.equals(pid)) {
+//            return R.mipmap.ic_strip_on_256;
+//        }
+//        if (XlinkConstants.PRODUCT_ID_MONSOON.equals(pid)) {
+//            return R.mipmap.ic_monsoon_on_256;
+//        }
+//        if (XlinkConstants.PRODUCT_ID_SOCKET.equals(pid)) {
+//            return R.mipmap.ic_socket_on_256;
+//        }
+//        return 0;
+        return R.drawable.ic_power_green;
     }
 
     public static String getProductType(String pid) {
@@ -99,13 +101,13 @@ public class DeviceUtil {
             return "";
         }
         if (XlinkConstants.PRODUCT_ID_LEDSTRIP.equals(pid)) {
-            return "EXO Led Strip";
+            return "Microtope Led Strip";
         }
         if (XlinkConstants.PRODUCT_ID_MONSOON.equals(pid)) {
-            return "EXO Monsoon";
+            return "Microtope Monsoon";
         }
         if (XlinkConstants.PRODUCT_ID_SOCKET.equals(pid)) {
-            return "EXO Socket";
+            return "Microtope Socket";
         }
         return pid;
     }

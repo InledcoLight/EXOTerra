@@ -8,7 +8,8 @@ import android.util.Log;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.inledco.exoterra.AppConstants;
-import com.inledco.exoterra.bean.Home;
+import com.inledco.exoterra.bean.Home2;
+import com.inledco.exoterra.bean.HomeProperty;
 import com.inledco.exoterra.bean.ImportDeviceResponse;
 import com.inledco.exoterra.bean.QueryDeviceResponse;
 import com.inledco.exoterra.manager.OKHttpManager;
@@ -379,9 +380,9 @@ public class XlinkCloudManager {
         return task;
     }
 
-    public XLinkScanDeviceTask createScanDeviceTask(@NonNull final List<String> pid, final int timeout, final int retryInterval, final XLinkScanDeviceListener listener) {
+    public XLinkScanDeviceTask createScanDeviceTask(@NonNull final List<String> pids, final int timeout, final int retryInterval, final XLinkScanDeviceListener listener) {
         XLinkScanDeviceTask task = XLinkScanDeviceTask.newBuilder()
-                                                      .setProductIds(pid)
+                                                      .setProductIds(pids)
                                                       .setTotalTimeout(timeout)
                                                       .setRetryInterval(retryInterval)
                                                       .setScanDeviceListener(listener)
@@ -399,9 +400,9 @@ public class XlinkCloudManager {
         XLinkSDK.startTask(task);
     }
 
-    public void scanDevice(@NonNull List<String> pid, final int timeout, final int retryInterval, final XLinkScanDeviceListener listener) {
+    public void scanDevice(@NonNull List<String> pids, final int timeout, final int retryInterval, final XLinkScanDeviceListener listener) {
         XLinkScanDeviceTask task = XLinkScanDeviceTask.newBuilder()
-                                                      .setProductIds(pid)
+                                                      .setProductIds(pids)
                                                       .setTotalTimeout(timeout)
                                                       .setRetryInterval(retryInterval)
                                                       .setScanDeviceListener(listener)
@@ -739,15 +740,19 @@ public class XlinkCloudManager {
         DeviceApi.DeviceNewestVersionRequest request = new DeviceApi.DeviceNewestVersionRequest();
         request.productId = xDevice.getProductId();
         request.deviceId = xDevice.getDeviceId();
-        int version = Integer.parseInt(xDevice.getFirmwareVersion());
-        if (version >= 2) {
-            request.identify = (version & 0x01) == 0x01 ? 1 : 2;
-        }
-        XLinkRestful.getApplicationApi()
-                    .getDeviceNewestVersion(request)
-                    .enqueue(callback);
-        if (callback != null) {
-            callback.onStart();
+        try {
+            int version = Integer.parseInt(xDevice.getFirmwareVersion());
+            if (version >= 2) {
+                request.identify = (version & 0x01) == 0x01 ? 1 : 2;
+            }
+            XLinkRestful.getApplicationApi()
+                        .getDeviceNewestVersion(request)
+                        .enqueue(callback);
+            if (callback != null) {
+                callback.onStart();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
@@ -755,19 +760,24 @@ public class XlinkCloudManager {
         DeviceApi.UpgradeDeviceRequest request = new DeviceApi.UpgradeDeviceRequest();
         request.productId = xDevice.getProductId();
         request.deviceId = xDevice.getDeviceId();
-        int version = Integer.parseInt(xDevice.getFirmwareVersion());
-        if (version >= 2) {
-            request.identify = (version & 0x01) == 0x01 ? 1 : 2;
+        try {
+            int version = Integer.parseInt(xDevice.getFirmwareVersion());
+            if (version >= 2) {
+                request.identify = (version & 0x01) == 0x01 ? 1 : 2;
+            }
+            XLinkRestful.getApplicationApi()
+                        .upgradeDevice(request)
+                        .enqueue(callback);
+            if (callback != null) {
+                callback.onStart();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        XLinkRestful.getApplicationApi()
-                    .upgradeDevice(request)
-                    .enqueue(callback);
-        if (callback != null) {
-            callback.onStart();
-        }
+
     }
 
-    private void createHome(@NonNull final String homeName, final XlinkRequestCallback<HomeApi.HomeResponse> callback) {
+    public void createHome(@NonNull final String homeName, final XlinkRequestCallback<HomeApi.HomeResponse> callback) {
         HomeApi.HomeRequest request = new HomeApi.HomeRequest();
         request.name = homeName;
         XLinkRestful.getApplicationApi()
@@ -791,7 +801,7 @@ public class XlinkCloudManager {
                 if (TextUtils.isEmpty(nickname)) {
                     nickname = "" + userid;
                 }
-                createHome(nickname + "'s Home", callback);
+                createHome(nickname + "'s Home2", callback);
             }
         });
         if (callback != null) {
@@ -807,6 +817,138 @@ public class XlinkCloudManager {
 //            return;
 //        }
         createHome(homeName, callback);
+    }
+
+    public void setHomeProperty(final String homeid, final int zone, final int sunrise, final int sunset, final XlinkRequestCallback<String> callback) {
+        if (zone < -720 || zone > 720) {
+            return;
+        }
+        if (sunrise < 0 || sunrise > 1439) {
+            return;
+        }
+        if (sunset < 0 || sunset > 1439) {
+            return;
+        }
+        Map<String, HomeApi.HomeProperty> params = new HashMap<>();
+        HomeApi.HomeProperty<String> zoneProperty = new HomeApi.HomeProperty<>();
+        HomeApi.HomeProperty<String> sunriseProperty = new HomeApi.HomeProperty<>();
+        HomeApi.HomeProperty<String> sunsetProperty = new HomeApi.HomeProperty<>();
+        zoneProperty.name = "zone";
+        zoneProperty.value = String.valueOf(zone);
+        sunriseProperty.name = "sunrise";
+        sunriseProperty.value = String.valueOf(sunrise);
+        sunsetProperty.name = "sunset";
+        sunsetProperty.value = String.valueOf(sunset);
+        params.put("zone", zoneProperty);
+        params.put("sunrise", sunriseProperty);
+        params.put("sunset", sunsetProperty);
+        XLinkRestful.getApplicationApi()
+                    .setHomeProperty(homeid, params)
+                    .enqueue(callback);
+        if (callback != null) {
+            callback.onStart();
+        }
+    }
+
+    public XlinkResult<HomeProperty> getHomeProperty(final String homeid) {
+        XlinkResult<HomeProperty> result = new XlinkResult<>();
+        try {
+            Response<Map<String, HomeApi.HomeProperty>> response = XLinkRestful.getApplicationApi()
+                                                                               .getHomeProperty(homeid)
+                                                                               .execute();
+            if (response.isSuccessful()) {
+                result.setSuccess(true);
+                Map<String, HomeApi.HomeProperty> map = response.body();
+                if (map != null && map.containsKey("zone") && map.containsKey("sunrise") && map.containsKey("sunset")) {
+                    String rawZone = String.valueOf(map.get("zone").value);
+                    String rawSunrise = String.valueOf(map.get("sunrise").value);
+                    String rawSunset = String.valueOf(map.get("sunset").value);
+                    Log.e(TAG, "getHomeProperty: " + rawZone + " " + rawSunrise + " " + rawSunset);
+                    try {
+                        int zone = Integer.parseInt(rawZone);
+                        int sunrise = Integer.parseInt(rawSunrise);
+                        int sunset = Integer.parseInt(rawSunset);
+                        HomeProperty property = new HomeProperty(zone, sunrise, sunset);
+                        result.setResult(property);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            } else {
+                XLinkRestfulError.ErrorWrapper.Error error = XLinkRestfulError.parseError(response);
+                if (error == null) {
+                    error = new XLinkRestfulError.ErrorWrapper.Error(response.message(), response.code());
+                }
+                result.setError(XLinkErrorCodeHelper.getErrorCodeName(error.code));
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            result.setError(e.getMessage());
+        }
+        return result;
+    }
+
+    public void getHomeProperty(final String homeid, final XlinkRequestCallback<HomeProperty> callback) {
+        XLinkRestful.getApplicationApi().getHomeProperty(homeid).enqueue(new XlinkRequestCallback<Map<String, HomeApi.HomeProperty>>() {
+            @Override
+            public void onError(String error) {
+                Log.e(TAG, "onError: " + homeid + " " + error);
+                if (callback != null) {
+                    callback.onError(error);
+                }
+            }
+
+            @Override
+            public void onSuccess(Map<String, HomeApi.HomeProperty> map) {
+                Log.e(TAG, "onSuccess: " + map);
+                if (map.containsKey("zone") && map.containsKey("sunrise") && map.containsKey("sunset")) {
+                    Object zone = map.get("zone").value;
+                    Object sunrise = map.get("sunrise").value;
+                    Object sunset = map.get("sunset").value;
+                    if (zone instanceof Integer && sunrise instanceof Integer && sunset instanceof Integer) {
+                        HomeProperty property = new HomeProperty((Integer) zone, (Integer) sunrise, (Integer) sunset);
+                        if (callback != null) {
+                            callback.onSuccess(property);
+                        }
+                    }
+                }
+            }
+        });
+        if (callback != null) {
+            callback.onStart();
+        }
+    }
+
+    public void createHomeWithRoom(@NonNull final String homeName, final XlinkRequestCallback<HomeApi.HomeResponse> callback) {
+        final HomeApi.HomeRequest request = new HomeApi.HomeRequest();
+        request.name = homeName;
+        XLinkRestful.getApplicationApi()
+                    .createHome(request)
+                    .enqueue(new XlinkRequestCallback<HomeApi.HomeResponse>() {
+                        @Override
+                        public void onError(String error) {
+                            if (callback != null) {
+                                callback.onError(error);
+                            }
+                        }
+
+                        @Override
+                        public void onSuccess(HomeApi.HomeResponse homeResponse) {
+                            createRoom(homeResponse.id, homeResponse.id, new XlinkRequestCallback<RoomApi.RoomResponse>() {
+                                @Override
+                                public void onError(String error) {
+                                    if (callback != null) {
+                                        callback.onError(error);
+                                    }
+                                }
+
+                                @Override
+                                public void onSuccess(RoomApi.RoomResponse roomResponse) {
+
+                                }
+                            });
+                        }
+                    });
     }
 
     public void renameHome(@NonNull final String homeid, @NonNull final String newName, final XlinkRequestCallback<String> callback) {
@@ -849,6 +991,29 @@ public class XlinkCloudManager {
         }
     }
 
+    public XlinkResult<HomeApi.HomeDevicesResponse> getHomeDeviceList(@NonNull final String homeid) {
+        XlinkResult<HomeApi.HomeDevicesResponse> result = new XlinkResult<>();
+        try {
+            Response<HomeApi.HomeDevicesResponse> response = XLinkRestful.getApplicationApi()
+                                                                         .getHomeDeviceList(homeid)
+                                                                         .execute();
+            if (response.isSuccessful()) {
+                result.setSuccess(true);
+                result.setResult(response.body());
+            } else {
+                XLinkRestfulError.ErrorWrapper.Error error = XLinkRestfulError.parseError(response);
+                if (error == null) {
+                    error = new XLinkRestfulError.ErrorWrapper.Error(response.message(), response.code());
+                }
+                result.setError(XLinkErrorCodeHelper.getErrorCodeName(error.code));
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            result.setError(e.getMessage());
+        }
+        return result;
+    }
+
     public void getHomeDeviceList(@NonNull final String homeid, final XlinkRequestCallback<HomeApi.HomeDevicesResponse> callback) {
         XLinkRestful.getApplicationApi()
                     .getHomeDeviceList(homeid)
@@ -858,7 +1023,7 @@ public class XlinkCloudManager {
         }
     }
 
-//    public void getHomeInfo(@NonNull final String homeid, final XlinkRequestCallback<Home> callback) {
+//    public void getHomeInfo(@NonNull final String homeid, final XlinkRequestCallback<Home2> callback) {
 //        Map<String, Object> requestMap = new HashMap<>();
 //        requestMap.put("user_id", XLinkUserManager.getInstance().getUid());
 //        HomeExtendApi homeExtendApi = mRetrofit.create(HomeExtendApi.class);
@@ -870,7 +1035,7 @@ public class XlinkCloudManager {
 //        HomeApi.HomeRequest request = new HomeApi.HomeRequest();
 //    }
 
-    public void getHomeInfo(@NonNull final String homeid, final XlinkRequestCallback<Home> callback) {
+    public void getHomeInfo(@NonNull final String homeid, final XlinkRequestCallback<Home2> callback) {
         Map<String, Object> requestMap = new HashMap<>();
         requestMap.put("user_id", XLinkUserManager.getInstance().getUid());
         HomeExtendApi homeExtendApi = mRetrofit.create(HomeExtendApi.class);

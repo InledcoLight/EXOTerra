@@ -33,7 +33,7 @@ import com.inledco.exoterra.device.DeviceBaseViewModel;
 import com.inledco.exoterra.event.DevicePropertyChangedEvent;
 import com.inledco.exoterra.event.SubscribeChangedEvent;
 import com.inledco.exoterra.manager.DeviceManager;
-import com.inledco.exoterra.manager.HomeManager;
+import com.inledco.exoterra.manager.Home2Manager;
 import com.inledco.exoterra.util.DeviceUtil;
 import com.inledco.exoterra.view.MessageDialog;
 import com.inledco.exoterra.xlink.XlinkCloudManager;
@@ -179,14 +179,13 @@ public class DeviceDetailFragment extends BaseFragment {
         });
 
         if (mDevice != null) {
-            Log.e(TAG, "initData: " + mDevice.getZone() + "  " + mDevice.getRssi());
             @DrawableRes int[] wifi_signals = new int[] {R.drawable.ic_signal_wifi_0_bar_white_24dp,
                                                          R.drawable.ic_signal_wifi_1_bar_white_24dp,
                                                          R.drawable.ic_signal_wifi_2_bar_white_24dp,
                                                          R.drawable.ic_signal_wifi_3_bar_white_24dp,
                                                          R.drawable.ic_signal_wifi_4_bar_white_24dp};
             device_detail_delete.setEnabled(mDevice.getXDevice().getRole() == 0);
-            getDeviceZoneDatetime();
+            getDeviceDatetime();
             String name = mDevice.getXDevice().getDeviceName();
             if (TextUtils.isEmpty(name)) {
                 name = DeviceUtil.getDefaultName(mDevice.getXDevice().getProductId());
@@ -291,7 +290,7 @@ public class DeviceDetailFragment extends BaseFragment {
     }
 
     private void deleteDevice() {
-        final String homeid = HomeManager.getInstance().getCurrentHomeId();
+        final String homeid = Home2Manager.getInstance().getCurrentHomeId();
         final String roomid = mDeviceViewModel.getRoomId();
         final int devid = mDevice.getXDevice().getDeviceId();
         XlinkCloudManager.getInstance().deleteDeviceFromHome(homeid, devid, new XlinkRequestCallback<String>() {
@@ -399,12 +398,11 @@ public class DeviceDetailFragment extends BaseFragment {
         });
     }
 
-    private void getDeviceZoneDatetime() {
+    private void getDeviceDatetime() {
         if (mDevice == null) {
             return;
         }
         List<Integer> ids = new ArrayList<>();
-        ids.add(mDevice.getDeviceZoneIndex());
         ids.add(mDevice.getDeviceDatetimeIndex());
         XlinkCloudManager.getInstance().probeDevice(mDevice.getXDevice(), ids, new XlinkTaskCallback<List<XLinkDataPoint>>() {
             @Override
@@ -418,10 +416,8 @@ public class DeviceDetailFragment extends BaseFragment {
                     return;
                 }
                 for (XLinkDataPoint dp : dataPoints) {
-                    Log.e(TAG, "onComplete: " + dp.getIndex() + " " + dp.getName() + " " + dp.getValue());
                     mDevice.setDataPoint(dp);
                 }
-                device_detail_zone.setText(getTimezoneDesc(mDevice.getZone()));
                 String time = mDevice.getDeviceDatetime();
                 DateFormat df = new SimpleDateFormat(DEVICE_DATE_FORMAT);
                 try {

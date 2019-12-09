@@ -9,6 +9,9 @@ public class AppConstants {
     //阿里推送辅助FCM通道 对应google-services.json中mobilesdk_app_id
     public static final String  ALIPUSH_APPID           = "1:604700660779:android:d60434ef8e9a18f522c66e";
 
+    public static final String  FILE_VERIFYCODE_REGISTER    = "verifycode_register";
+    public static final String  FILE_VERIFYCODE_RESET       = "verifycode_reset";
+
     public static final String  IS_HOME_ADMIN           = "is_home_admin";
     public static final String  EMAIL                   = "email";
     public static final String  USER_ID                 = "user_id";

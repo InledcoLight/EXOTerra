@@ -32,11 +32,6 @@ public class AddGroupDeviceFragment extends BaseFragment {
 
     private final XlinkRequestCallback<String> mCallback = new XlinkRequestCallback<String>() {
         @Override
-        public void onStart() {
-
-        }
-
-        @Override
         public void onError(final String error) {
             getActivity().runOnUiThread(new Runnable() {
                 @Override

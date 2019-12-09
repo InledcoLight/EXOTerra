@@ -10,16 +10,16 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.inledco.exoterra.R;
-import com.inledco.exoterra.bean.Home;
+import com.inledco.exoterra.bean.Home2;
 import com.inledco.exoterra.common.SimpleAdapter;
 
 import java.util.List;
 
 import cn.xlink.restful.XLinkRestfulEnum;
 
-public class HomeMembersAdapter extends SimpleAdapter<Home.User, HomeMembersAdapter.HomeMemberViewHolder> {
+public class HomeMembersAdapter extends SimpleAdapter<Home2.User, HomeMembersAdapter.HomeMemberViewHolder> {
 
-    public HomeMembersAdapter(@NonNull Context context, List<Home.User> data) {
+    public HomeMembersAdapter(@NonNull Context context, List<Home2.User> data) {
         super(context, data);
     }
 
@@ -36,7 +36,7 @@ public class HomeMembersAdapter extends SimpleAdapter<Home.User, HomeMembersAdap
 
     @Override
     public void onBindViewHolder(@NonNull HomeMemberViewHolder holder, final int position) {
-        Home.User user = mData.get(position);
+        Home2.User user = mData.get(position);
         int suAdmin = XLinkRestfulEnum.HomeUserType.SUPER_ADMIN.getValue();
         int admin = XLinkRestfulEnum.HomeUserType.ADMIN.getValue();
         int usr = XLinkRestfulEnum.HomeUserType.USER.getValue();

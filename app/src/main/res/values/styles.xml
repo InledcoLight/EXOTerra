@@ -27,7 +27,6 @@
         <item name="alertDialogTheme">@style/DialogCornerTheme</item>
 
         <item name="android:windowAnimationStyle">@style/ActivityAnimation</item>
-
     </style>
 
     <style name="ActivityAnimation">
@@ -58,4 +57,8 @@
         <item name="colorButtonNormal">@color/selector_button_danger</item>
     </style>
 
+    <style name="TextInputLayoutTheme" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense">
+<!--        <item name="passwordToggleDrawable"></item>-->
+    </style>
+    
 </resources>

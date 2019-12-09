@@ -5,6 +5,8 @@ public class ConnectNetBean {
     private String mSsid;
     private String mBssid;
     private String mPassword;
+    private int mResultDevid;
+    private String mResultAddress;
     private boolean mConflict;
     private boolean mCompatibleMode;
     private boolean mRunning;
@@ -39,6 +41,22 @@ public class ConnectNetBean {
 
     public void setPassword(String password) {
         mPassword = password;
+    }
+
+    public int getResultDevid() {
+        return mResultDevid;
+    }
+
+    public void setResultDevid(int resultDevid) {
+        mResultDevid = resultDevid;
+    }
+
+    public String getResultAddress() {
+        return mResultAddress;
+    }
+
+    public void setResultAddress(String resultAddress) {
+        mResultAddress = resultAddress;
     }
 
     public boolean isConflict() {

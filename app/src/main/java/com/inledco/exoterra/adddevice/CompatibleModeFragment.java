@@ -10,17 +10,24 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.github.lzyzsd.circleprogress.DonutProgress;
 import com.inledco.exoterra.R;
 import com.inledco.exoterra.base.BaseFragment;
 import com.inledco.exoterra.event.SubscribeChangedEvent;
+import com.inledco.exoterra.util.DeviceUtil;
 import com.inledco.exoterra.util.RouterUtil;
 
 import org.greenrobot.eventbus.EventBus;
 
+import cn.xlink.sdk.v5.manager.XLinkUserManager;
+
 public class CompatibleModeFragment extends BaseFragment {
-    private DonutProgress apconfig_pb;
+    private ImageView netconfig_prdt;
+    private TextView netconfig_title;
+    private DonutProgress netconfig_pb;
 
     private ConnectNetViewModel mConnectNetViewModel;
     private ConnectNetBean mConnectNetBean;
@@ -49,12 +56,14 @@ public class CompatibleModeFragment extends BaseFragment {
 
     @Override
     protected int getLayoutRes() {
-        return R.layout.fragment_compatible_mode;
+        return R.layout.fragment_netconfig;
     }
 
     @Override
     protected void initView(View view) {
-        apconfig_pb = view.findViewById(R.id.apconfig_pb);
+        netconfig_prdt = view.findViewById(R.id.netconfig_prdt);
+        netconfig_title = view.findViewById(R.id.netconfig_title);
+        netconfig_pb = view.findViewById(R.id.netconfig_pb);
     }
 
     @Override
@@ -64,15 +73,19 @@ public class CompatibleModeFragment extends BaseFragment {
         if (mConnectNetBean == null) {
             return;
         }
+        netconfig_prdt.setImageResource(DeviceUtil.getProductIcon(mConnectNetBean.getProductId()));
+        netconfig_title.setText(R.string.compatible_mode);
+
         mConnectNetBean.setRunning(true);
         mConnectNetViewModel.postValue();
-        mAPConfigLinker = new APConfigLinker(mConnectNetBean.getProductId(), mConnectNetBean.getSsid(), mConnectNetBean.getBssid(),
+        boolean subscribe = XLinkUserManager.getInstance().isUserAuthorized();
+        mAPConfigLinker = new APConfigLinker(subscribe, mConnectNetBean.getProductId(), mConnectNetBean.getSsid(), mConnectNetBean.getBssid(),
                                              mConnectNetBean.getPassword(), (AppCompatActivity) getActivity());
         mListener = new APConfigLinker.APConfigListener() {
             @Override
             public void onProgressUpdate(int progress) {
-                apconfig_pb.setProgress(progress);
-                apconfig_pb.setText("" + progress + " %");
+                netconfig_pb.setProgress(progress);
+                netconfig_pb.setText("" + progress + " %");
             }
 
 //            @Override
@@ -90,11 +103,14 @@ public class CompatibleModeFragment extends BaseFragment {
             }
 
             @Override
-            public void onAPConfigSuccess() {
+            public void onAPConfigSuccess(int devid, String mac) {
                 mConnectNetBean.setRunning(false);
+                mConnectNetBean.setResultDevid(devid);
+                mConnectNetBean.setResultAddress(mac);
                 mConnectNetViewModel.postValue();
-                showAPConfigSuccessDialog();
+//                showAPConfigSuccessDialog();
                 RouterUtil.putRouterPassword(getContext(), mConnectNetViewModel.getData().getSsid(), mConnectNetViewModel.getData().getPassword());
+                addFragmentToStack(R.id.adddevice_fl, new ConfigDeviceFragment());
             }
 
             @Override

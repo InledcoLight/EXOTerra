@@ -4,18 +4,21 @@ import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.CountDownTimer;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
+import android.text.method.HideReturnsTransformationMethod;
+import android.text.method.PasswordTransformationMethod;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
 import com.inledco.exoterra.R;
 import com.inledco.exoterra.base.BaseActivity;
+import com.inledco.exoterra.manager.VerifycodeManager;
+import com.inledco.exoterra.register.RegisterActivity;
 import com.inledco.exoterra.util.RegexUtil;
 import com.inledco.exoterra.view.AdvancedTextInputEditText;
 import com.inledco.exoterra.xlink.XlinkCloudManager;
@@ -33,14 +36,18 @@ public class FoundbackActivity extends BaseActivity {
     private AdvancedTextInputEditText foundback_et_password;
     private TextInputLayout foundback_til_verifycode;
     private AdvancedTextInputEditText foundback_et_verifycode;
-    private Button foundback_btn_send;
+//    private Button foundback_btn_send;
     private Button foundback_btn_found;
     private LoadDialog mLoadDialog;
     private ProgressDialog mProgressDialog;
 
-    private CountDownTimer mSendVerifycodeTimer;
+//    private CountDownTimer mSendVerifycodeTimer;
     private XlinkRequestCallback<String> mRequestVerifycodeCallback;
     private XlinkRequestCallback<String> mFoundbackPasswordCallback;
+
+    private boolean showPassword;
+
+    private VerifycodeManager mVerifycodeManager;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -64,10 +71,13 @@ public class FoundbackActivity extends BaseActivity {
         foundback_et_password = findViewById(R.id.foundback_et_password);
         foundback_til_verifycode = findViewById(R.id.foundback_til_verifycode);
         foundback_et_verifycode = findViewById(R.id.foundback_et_verifycode);
-        foundback_btn_send = findViewById(R.id.foundback_btn_send);
+//        foundback_btn_send = findViewById(R.id.foundback_btn_send);
         foundback_btn_found = findViewById(R.id.foundback_btn_found);
 
         setSupportActionBar(foundback_toolbar);
+        foundback_et_email.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_email_white_24dp, 0, 0, 0);
+        foundback_et_verifycode.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_verify_white_24dp, 0, R.drawable.ic_send_white_24dp, 0);
+        foundback_et_password.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_lock_white_24dp, 0, R.drawable.design_ic_visibility_off, 0);
         foundback_et_email.bindTextInputLayout(foundback_til_email);
         foundback_et_verifycode.bindTextInputLayout(foundback_til_verifycode);
         foundback_et_password.bindTextInputLayout(foundback_til_password);
@@ -87,18 +97,18 @@ public class FoundbackActivity extends BaseActivity {
                 foundback_et_password.requestFocus();
             }
         }
-        mSendVerifycodeTimer = new CountDownTimer(VERIFY_CODE_SEND_INTERVAL, 1000) {
-            @Override
-            public void onTick(long millisUntilFinished) {
-                foundback_btn_send.setText("" + millisUntilFinished/1000);
-            }
-
-            @Override
-            public void onFinish() {
-                foundback_btn_send.setText(R.string.send_verifycode);
-                foundback_btn_send.setEnabled(true);
-            }
-        };
+//        mSendVerifycodeTimer = new CountDownTimer(VERIFY_CODE_SEND_INTERVAL, 1000) {
+//            @Override
+//            public void onTick(long millisUntilFinished) {
+//                foundback_btn_send.setText("" + millisUntilFinished/1000);
+//            }
+//
+//            @Override
+//            public void onFinish() {
+//                foundback_btn_send.setText(R.string.send_verifycode);
+//                foundback_btn_send.setEnabled(true);
+//            }
+//        };
         mRequestVerifycodeCallback = new XlinkRequestCallback<String>() {
             @Override
             public void onStart() {
@@ -115,8 +125,8 @@ public class FoundbackActivity extends BaseActivity {
             @Override
             public void onSuccess(String s) {
                 dismissLoading();
-                foundback_btn_send.setEnabled(false);
-                mSendVerifycodeTimer.start();
+//                foundback_btn_send.setEnabled(false);
+//                mSendVerifycodeTimer.start();
                 getMessageDialog().setTitle(R.string.title_verifycode_sent)
                                   .setMessage(R.string.msg_get_verifycode)
                                   .show();
@@ -152,18 +162,56 @@ public class FoundbackActivity extends BaseActivity {
                 onBackPressed();
             }
         });
-        foundback_btn_send.setOnClickListener(new View.OnClickListener() {
+
+        foundback_et_verifycode.setDrawableRightClickListener(new AdvancedTextInputEditText.DrawableRightClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onDrawableRightClick() {
                 String email = getEmailText();
-                if (RegexUtil.isEmail(email)) {
-                    XlinkCloudManager.getInstance()
-                                     .requestEmailFoundbackPasswordVerifyCode(email, mRequestVerifycodeCallback);
-                } else {
+                if (!RegexUtil.isEmail(email)) {
                     foundback_til_email.setError(getString(R.string.error_email));
+                    foundback_et_email.requestFocus();
+                    return;
+                }
+                if (mVerifycodeManager == null) {
+                    mVerifycodeManager = new VerifycodeManager(FoundbackActivity.this);
+                }
+                long expired = mVerifycodeManager.getResetExpired(email);
+                if (expired > 0) {
+                    Toast.makeText(FoundbackActivity.this, "Please wait for " + expired + " second.", Toast.LENGTH_SHORT)
+                         .show();
+                    return;
+                }
+                XlinkCloudManager.getInstance().requestEmailFoundbackPasswordVerifyCode(email, mRequestVerifycodeCallback);
+                mVerifycodeManager.addResetVerifycode(email);
+            }
+        });
+
+        foundback_et_password.setDrawableRightClickListener(new AdvancedTextInputEditText.DrawableRightClickListener() {
+            @Override
+            public void onDrawableRightClick() {
+                showPassword = !showPassword;
+                if (showPassword) {
+                    foundback_et_password.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_lock_white_24dp, 0, R.drawable.design_ic_visibility, 0);
+                    foundback_et_password.setTransformationMethod(HideReturnsTransformationMethod.getInstance());
+                } else {
+                    foundback_et_password.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_lock_white_24dp, 0, R.drawable.design_ic_visibility_off, 0);
+                    foundback_et_password.setTransformationMethod(PasswordTransformationMethod.getInstance());
                 }
             }
         });
+
+//        foundback_btn_send.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                String email = getEmailText();
+//                if (RegexUtil.isEmail(email)) {
+//                    XlinkCloudManager.getInstance()
+//                                     .requestEmailFoundbackPasswordVerifyCode(email, mRequestVerifycodeCallback);
+//                } else {
+//                    foundback_til_email.setError(getString(R.string.error_email));
+//                }
+//            }
+//        });
         foundback_btn_found.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

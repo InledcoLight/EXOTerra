@@ -2,7 +2,6 @@ package com.inledco.exoterra.main;
 
 import android.Manifest;
 import android.annotation.TargetApi;
-import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
@@ -16,7 +15,6 @@ import android.text.TextUtils;
 import android.util.Base64;
 import android.util.Log;
 import android.view.MenuItem;
-import android.widget.Toast;
 
 import com.alibaba.sdk.android.push.CloudPushService;
 import com.alibaba.sdk.android.push.noonesdk.PushServiceFactory;
@@ -26,12 +24,10 @@ import com.inledco.exoterra.R;
 import com.inledco.exoterra.adddevice.AddDeviceActivity;
 import com.inledco.exoterra.base.BaseActivity;
 import com.inledco.exoterra.main.devices.DevicesFragment;
+import com.inledco.exoterra.main.devices.LocalDevicesFragment;
+import com.inledco.exoterra.main.groups.GroupsFragment;
 import com.inledco.exoterra.main.home.HomeFragment;
-import com.inledco.exoterra.main.homedevices.HomeDevicesFragment;
-import com.inledco.exoterra.main.homezones.HomeZonesFragment;
 import com.inledco.exoterra.main.me.MeFragment;
-import com.inledco.exoterra.manager.DeviceManager;
-import com.inledco.exoterra.manager.HomeManager;
 import com.inledco.exoterra.manager.UserManager;
 import com.inledco.exoterra.push.AlipushService;
 import com.inledco.exoterra.push.FCMMessageService;
@@ -103,41 +99,35 @@ public class MainActivity extends BaseActivity {
 //            test();
 //        }
 
-        mHomeViewModel = ViewModelProviders.of(this).get(HomeViewModel.class);
-        mHomeViewModel.setGetHomeInfoCallback(new XlinkRequestCallback<String>() {
-            @Override
-            public void onError(String error) {
-                Log.e(TAG, "onError: get home info " + error);
-                Toast.makeText(MainActivity.this, error, Toast.LENGTH_SHORT)
-                     .show();
-//                getMessageDialog().setTitle("Get home failed")
+//        mHomeViewModel = ViewModelProviders.of(this).get(HomeViewModel.class);
+//        mHomeViewModel.setGetHomeInfoCallback(new XlinkRequestCallback<String>() {
+//            @Override
+//            public void onError(String error) {
+//                Toast.makeText(MainActivity.this, error, Toast.LENGTH_SHORT)
+//                     .show();
+//            }
+//
+//            @Override
+//            public void onSuccess(String s) {
+//
+//            }
+//        });
+//
+//        Home2Manager.getInstance().checkHome(new XlinkRequestCallback<String>() {
+//            @Override
+//            public void onError(String error) {
+//                Toast.makeText(MainActivity.this, error, Toast.LENGTH_SHORT)
+//                     .show();
+//                getMessageDialog().setTitle("Check home failed")
 //                                  .setMessage(error)
 //                                  .show();
-            }
-
-            @Override
-            public void onSuccess(String s) {
-                Log.e(TAG, "onSuccess: get home " + s);
-            }
-        });
-
-        HomeManager.getInstance().checkHome(new XlinkRequestCallback<String>() {
-            @Override
-            public void onError(String error) {
-                Log.e(TAG, "onError: check home " + error);
-                Toast.makeText(MainActivity.this, error, Toast.LENGTH_SHORT)
-                     .show();
-                getMessageDialog().setTitle("Check home failed")
-                                  .setMessage(error)
-                                  .show();
-            }
-
-            @Override
-            public void onSuccess(final String s) {
-                Log.e(TAG, "onSuccess: check home " + s);
-                mHomeViewModel.refreshHomeInfo();
-            }
-        });
+//            }
+//
+//            @Override
+//            public void onSuccess(final String s) {
+//                mHomeViewModel.refreshHomeInfo();
+//            }
+//        });
 
 //
 //        test();
@@ -148,9 +138,9 @@ public class MainActivity extends BaseActivity {
         main_bnv.setOnNavigationItemReselectedListener(new BottomNavigationView.OnNavigationItemReselectedListener() {
             @Override
             public void onNavigationItemReselected(@NonNull MenuItem menuItem) {
-                if (menuItem.getItemId() == R.id.main_bnv_devices && DeviceManager.getInstance().getAllDevices().size() == 0) {
-                    replaceFragment(R.id.main_fl_show, new DevicesFragment());
-                }
+//                if (menuItem.getItemId() == R.id.main_bnv_devices && DeviceManager.getInstance().getAllDevices().size() == 0) {
+//                    replaceFragment(R.id.main_fl_show, new LocalDevicesFragment());
+//                }
             }
         });
         main_bnv.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -161,10 +151,14 @@ public class MainActivity extends BaseActivity {
                         replaceFragment(R.id.main_fl_show, new HomeFragment());
                         break;
                     case R.id.main_bnv_devices:
-                        replaceFragment(R.id.main_fl_show, new  HomeDevicesFragment());
+                        if (XLinkUserManager.getInstance().isUserAuthorized()) {
+                            replaceFragment(R.id.main_fl_show, new DevicesFragment());
+                        } else {
+                            replaceFragment(R.id.main_fl_show, new LocalDevicesFragment());
+                        }
                         break;
                     case R.id.main_bnv_habitat:
-                        replaceFragment(R.id.main_fl_show, new HomeZonesFragment());
+                        replaceFragment(R.id.main_fl_show, new GroupsFragment());
                         break;
                     case R.id.main_bnv_me:
                         replaceFragment(R.id.main_fl_show, new MeFragment());

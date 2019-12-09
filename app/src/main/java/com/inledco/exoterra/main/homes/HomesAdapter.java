@@ -10,23 +10,23 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.inledco.exoterra.R;
-import com.inledco.exoterra.bean.Home;
+import com.inledco.exoterra.bean.Home2;
 import com.inledco.exoterra.common.SimpleAdapter;
 
 import java.util.List;
 
-public class HomesAdapter extends SimpleAdapter<Home, HomesAdapter.HomesViewHolder> {
+public class HomesAdapter extends SimpleAdapter<Home2, HomesAdapter.HomesViewHolder> {
 
     private String mCurrentHomeId;
     private boolean mShowEnter;
 
-    public HomesAdapter(@NonNull Context context, List<Home> data, String currentHomeId) {
+    public HomesAdapter(@NonNull Context context, List<Home2> data, String currentHomeId) {
         super(context, data);
         mCurrentHomeId = currentHomeId;
         mShowEnter = true;
     }
 
-    public HomesAdapter(@NonNull Context context, List<Home> data, String currentHomeId, boolean showEnter) {
+    public HomesAdapter(@NonNull Context context, List<Home2> data, String currentHomeId, boolean showEnter) {
         super(context, data);
         mCurrentHomeId = currentHomeId;
         mShowEnter = showEnter;
@@ -50,13 +50,13 @@ public class HomesAdapter extends SimpleAdapter<Home, HomesAdapter.HomesViewHold
 
     @Override
     public void onBindViewHolder(@NonNull HomesViewHolder holder, final int position) {
-        Home home = mData.get(position);
-        if (TextUtils.equals(mCurrentHomeId, home.id)) {
+        Home2 home2 = mData.get(position);
+        if (TextUtils.equals(mCurrentHomeId, home2.id)) {
             holder.item_current.setVisibility(View.VISIBLE);
         } else {
             holder.item_current.setVisibility(View.INVISIBLE);
         }
-        holder.item_name.setText(home.name);
+        holder.item_name.setText(home2.name);
         holder.item_enter.setVisibility(mShowEnter ? View.VISIBLE : View.GONE);
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override

@@ -103,6 +103,10 @@ public class DeviceViewModel<T extends Device> extends BaseViewModel<T> {
         XlinkCloudManager.getInstance().probeDevice(getData().getXDevice(), ids, callback);
     }
 
+    public void syncDeviceDatetime() {
+        setDeviceDatapoint(getData().setSyncDatetime());
+    }
+
     public void getDatapoints() {
         XlinkCloudManager.getInstance().getDeviceDatapoints(getData().getXDevice(), mGetCallback);
     }

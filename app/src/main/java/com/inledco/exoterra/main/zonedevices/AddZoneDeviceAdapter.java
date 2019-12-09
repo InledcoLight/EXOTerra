@@ -8,7 +8,7 @@ import android.view.ViewGroup;
 import android.widget.CompoundButton;
 
 import com.inledco.exoterra.R;
-import com.inledco.exoterra.bean.Home;
+import com.inledco.exoterra.bean.Home2;
 import com.inledco.exoterra.bean.RoomDevice;
 import com.inledco.exoterra.common.DeviceViewHolder;
 import com.inledco.exoterra.common.SimpleAdapter;
@@ -22,11 +22,11 @@ import cn.xlink.restful.api.app.HomeApi;
 
 public class AddZoneDeviceAdapter extends SimpleAdapter<RoomDevice, DeviceViewHolder> {
 
-    private final Home.Zone mZone;
+    private final Home2.Zone mZone;
     private final Set<String> mCurrentRoomIds;
     private final Set<String> mTargetRoomIds;
 
-    public AddZoneDeviceAdapter(@NonNull Context context, List<RoomDevice> data, @NonNull Home.Zone zone) {
+    public AddZoneDeviceAdapter(@NonNull Context context, List<RoomDevice> data, @NonNull Home2.Zone zone) {
         super(context, data);
         mZone = zone;
         mCurrentRoomIds = new HashSet<>();

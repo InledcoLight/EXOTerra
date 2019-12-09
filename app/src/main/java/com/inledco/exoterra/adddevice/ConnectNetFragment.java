@@ -17,20 +17,25 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputLayout;
 import android.text.TextUtils;
+import android.text.method.HideReturnsTransformationMethod;
+import android.text.method.PasswordTransformationMethod;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 
 import com.inledco.exoterra.R;
 import com.inledco.exoterra.base.BaseFragment;
 import com.inledco.exoterra.helper.WifiHelper;
+import com.inledco.exoterra.util.DeviceUtil;
 import com.inledco.exoterra.util.RouterUtil;
 import com.inledco.exoterra.view.AdvancedTextInputEditText;
 
 public class ConnectNetFragment extends BaseFragment {
 
+    private ImageView connect_net_prdt;
     private TextInputLayout connect_net_tl1;
     private AdvancedTextInputEditText connect_net_router;
     private TextInputLayout connect_net_tl2;
@@ -43,6 +48,7 @@ public class ConnectNetFragment extends BaseFragment {
 
     private boolean mRegistered;
     private boolean mOpen;                          //是否开放式热点
+    private boolean showPassword;
 
     private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
         @Override
@@ -93,6 +99,7 @@ public class ConnectNetFragment extends BaseFragment {
 
     @Override
     protected void initView(View view) {
+        connect_net_prdt = view.findViewById(R.id.connect_net_prdt);
         connect_net_tl1 = view.findViewById(R.id.connect_net_tl1);
         connect_net_router = view.findViewById(R.id.connect_net_router);
         connect_net_tl2 = view.findViewById(R.id.connect_net_tl2);
@@ -100,6 +107,8 @@ public class ConnectNetFragment extends BaseFragment {
         connect_net_smartconfig = view.findViewById(R.id.connect_net_smartconfig);
         connect_net_apconfig = view.findViewById(R.id.connect_net_apconfig);
 
+        connect_net_router.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_router_white_24dp, 0, R.drawable.ic_search_white_24dp, 0);
+        connect_net_password.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_lock_white_24dp, 0, R.drawable.design_ic_visibility_off, 0);
         connect_net_router.bindTextInputLayout(connect_net_tl1);
         connect_net_password.bindTextInputLayout(connect_net_tl2);
     }
@@ -108,6 +117,7 @@ public class ConnectNetFragment extends BaseFragment {
     protected void initData() {
         mWifiHelper = new WifiHelper(getContext());
         mConnectNetViewModel = ViewModelProviders.of(getActivity()).get(ConnectNetViewModel.class);
+        connect_net_prdt.setImageResource(DeviceUtil.getProductIcon(mConnectNetViewModel.getData().getProductId()));
     }
 
     @Override
@@ -116,6 +126,20 @@ public class ConnectNetFragment extends BaseFragment {
             @Override
             public void onDrawableRightClick() {
                 gotoSystemWifiSettings();
+            }
+        });
+
+        connect_net_password.setDrawableRightClickListener(new AdvancedTextInputEditText.DrawableRightClickListener() {
+            @Override
+            public void onDrawableRightClick() {
+                showPassword = !showPassword;
+                if (showPassword) {
+                    connect_net_password.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_lock_white_24dp, 0, R.drawable.design_ic_visibility, 0);
+                    connect_net_password.setTransformationMethod(HideReturnsTransformationMethod.getInstance());
+                } else {
+                    connect_net_password.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_lock_white_24dp, 0, R.drawable.design_ic_visibility_off, 0);
+                    connect_net_password.setTransformationMethod(PasswordTransformationMethod.getInstance());
+                }
             }
         });
 

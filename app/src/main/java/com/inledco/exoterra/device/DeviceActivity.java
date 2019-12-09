@@ -58,6 +58,7 @@ import java.util.List;
 import cn.xlink.restful.api.app.DeviceApi;
 import cn.xlink.sdk.core.model.XLinkDataPoint;
 import cn.xlink.sdk.v5.manager.XLinkDeviceManager;
+import cn.xlink.sdk.v5.manager.XLinkUserManager;
 import cn.xlink.sdk.v5.model.XDevice;
 import cn.xlink.sdk.v5.module.main.XLinkSDK;
 
@@ -66,6 +67,7 @@ public class DeviceActivity extends BaseActivity {
     private CheckableImageButton device_cib_cloud;
     private CheckableImageButton device_cib_wifi;
 
+    private Device mBaseDevice;
     private Device mDevice;
     private DeviceViewModel mDeviceViewModel;
     private DeviceBaseViewModel mDeviceBaseViewModel;
@@ -75,12 +77,15 @@ public class DeviceActivity extends BaseActivity {
     private XlinkTaskCallback<XDevice> mSetCallback;
     private XlinkTaskCallback<List<XLinkDataPoint>> mGetCallback;
 
+    private boolean syncDatetime;
+
     private final Handler mHandler = new Handler();
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        EventBus.getDefault().register(this);
         initData();
         initEvent();
     }
@@ -151,18 +156,19 @@ public class DeviceActivity extends BaseActivity {
         if (device == null) {
             return;
         }
-        mDeviceBaseViewModel = ViewModelProviders.of(this).get(DeviceBaseViewModel.class);
-        mDeviceBaseViewModel.setRoomId(roomid);
-        mDeviceBaseViewModel.setData(device);
 
         final String pid = device.getXDevice().getProductId();
         final String name = device.getXDevice().getDeviceName();
         device_toolbar.setTitle(TextUtils.isEmpty(name) ? DeviceUtil.getDefaultName(pid) : name);
         setSupportActionBar(device_toolbar);
 
+        mBaseDevice = new Device(device.getXDevice());
+        mDeviceBaseViewModel = ViewModelProviders.of(this).get(DeviceBaseViewModel.class);
+        mDeviceBaseViewModel.setRoomId(roomid);
+        mDeviceBaseViewModel.setData(mBaseDevice);
+
         XLinkDeviceManager.getInstance().addDeviceConnectionFlags(device.getXDevice().getDeviceTag(), 1);
         XLinkDeviceManager.getInstance().connectDeviceLocal(device.getXDevice().getDeviceTag());
-        EventBus.getDefault().register(this);
 
         if (TextUtils.equals(pid, XlinkConstants.PRODUCT_ID_LEDSTRIP)) {
             mDevice = new EXOLedstrip(device);
@@ -208,30 +214,32 @@ public class DeviceActivity extends BaseActivity {
                         return o1.getIndex() - o2.getIndex();
                     }
                 });
-                device.setDataPointList(dataPoints);
+                mBaseDevice.setDataPointList(dataPoints);
                 mDevice.setDataPointList(dataPoints);
 
-//                StringBuilder sb = new StringBuilder();
-//                for (XLinkDataPoint dp : dataPoints) {
-//                    sb.append(dp.getIndex()).append(" ")
-//                      .append(dp.getName()).append(" ")
-//                      .append(dp.getType()).append(" ")
-//                      .append(dp.getValue()).append(" ").append(dp.getRawValue()).append("\n");
-//                }
-//                Log.e(TAG, "onComplete: " + (dataPoints==null || dataPoints.size() == 0) + "    " + sb);
+                StringBuilder sb = new StringBuilder();
+                for (XLinkDataPoint dp : dataPoints) {
+                    sb.append(dp.getIndex()).append(" ")
+                      .append(dp.getName()).append(" ")
+                      .append(dp.getType()).append(" ")
+                      .append(dp.getValue()).append(" ").append(dp.getRawValue()).append("\n");
+                }
+                Log.e(TAG, "onComplete: " + "    " + sb);
+                mDeviceBaseViewModel.postValue();
                 mDeviceViewModel.postValue();
                 replaceFragment(R.id.device_fl_show, mDeviceFragment);
+
+                if (!XLinkUserManager.getInstance().isUserAuthorized()) {
+                    mDeviceViewModel.syncDeviceDatetime();
+                }
             }
         };
 
         mDeviceViewModel.setGetCallback(mGetCallback);
         mDeviceViewModel.setSetCallback(mSetCallback);
-        mHandler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                mDeviceViewModel.getDatapoints();
-            }
-        }, 100);
+
+        mDeviceViewModel.getDatapoints();
+
 //        mHandler.postDelayed(new Runnable() {
 //            @Override
 //            public void run() {
@@ -292,6 +300,7 @@ public class DeviceActivity extends BaseActivity {
     @SuppressLint ("RestrictedApi")
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onDeviceStateChangedEvent(DeviceStateChangedEvent event) {
+        Log.e(TAG, "onDeviceStateChangedEvent: ");
         if (event != null && mDevice != null
             && TextUtils.equals(event.getDeviceTag(), mDevice.getDeviceTag())) {
             device_cib_cloud.setChecked(mDevice.getXDevice().getCloudConnectionState() == XDevice.State.CONNECTED ? true : false);

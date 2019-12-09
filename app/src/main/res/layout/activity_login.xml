@@ -39,11 +39,11 @@
 
     <android.support.design.widget.TextInputLayout
         android:id="@+id/login_til_email"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
-        android:layout_marginBottom="8dp"
         android:hint="@string/hint_email"
         app:errorEnabled="true"
         app:hintEnabled="true"
@@ -56,94 +56,107 @@
             android:id="@+id/login_et_email"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:drawablePadding="8dp"
+            android:imeOptions="actionNext"
             android:inputType="textEmailAddress"
             android:maxLength="@integer/email_text_length_max"
-            android:maxLines="1"/>
+            android:maxLines="1" />
     </android.support.design.widget.TextInputLayout>
 
     <android.support.design.widget.TextInputLayout
         android:id="@+id/login_til_password"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
-        android:layout_marginBottom="8dp"
-        android:hint="@string/hint_password"
+        android:hint="@string/password"
         app:errorEnabled="true"
-        app:hintEnabled="true"
+        app:counterEnabled="true"
+        app:counterMaxLength="@integer/password_text_length_max"
         app:layout_constraintBottom_toTopOf="@+id/login_gl1"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:passwordToggleEnabled="true">
+        app:layout_constraintStart_toStartOf="parent">
 
         <com.inledco.exoterra.view.AdvancedTextInputEditText
             android:id="@+id/login_et_password"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:drawablePadding="8dp"
+            android:imeOptions="actionDone"
             android:inputType="textPassword"
             android:maxLength="@integer/password_text_length_max"
-            android:maxLines="1"/>
+            android:maxLines="1" />
     </android.support.design.widget.TextInputLayout>
 
-    <Button
+    <com.inledco.exoterra.view.GradientSemiCircleButton
         android:id="@+id/login_btn_signin"
+        style="?attr/buttonStyle"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
+        android:background="?attr/selectableItemBackground"
         android:shadowColor="@color/colorAccent"
         android:text="@string/signin"
+        app:colorEnd="@color/gradientGreen"
+        app:colorStart="@color/gradientYellow"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/login_til_password"/>
+        app:layout_constraintTop_toBottomOf="@+id/login_btn_forget" />
 
     <Button
         android:id="@+id/login_btn_forget"
         style="@style/Widget.AppCompat.Button.Borderless"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginEnd="16dp"
         android:text="@string/forget_password"
         android:textAllCaps="false"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/login_btn_signin"/>
-
-    <Button
-        android:id="@+id/login_btn_signup"
-        style="@style/Widget.AppCompat.Button.Borderless"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="16dp"
-        android:text="@string/signup"
-        android:textAllCaps="false"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/login_btn_signin"/>
+        app:layout_constraintTop_toTopOf="@+id/login_gl1" />
 
-    <Button
+    <com.inledco.exoterra.view.GradientCornerButton
+        android:id="@+id/login_btn_signup"
+        style="?attr/buttonStyle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:background="?attr/selectableItemBackground"
+        android:text="@string/signup"
+        app:gradientStart="@color/gradientYellow"
+        app:gradientEnd="@color/gradientGreen"
+        app:strokeWidth="@dimen/strokeWidth"
+        app:radius="@dimen/cornerRadius"
+        app:direction="horizontal"
+        app:semiCircle="true"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/login_btn_signin" />
+
+    <com.inledco.exoterra.view.GradientCornerButton
         android:id="@+id/login_btn_skip"
-        style="@style/Widget.AppCompat.Button.Borderless"
-        android:layout_width="wrap_content"
+        style="?attr/buttonStyle"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="16dp"
-        android:text="@string/skip"
+        android:text="@string/local_mode"
         android:visibility="visible"
+        android:background="?attr/selectableItemBackground"
+        app:gradientStart="@color/gradientYellow"
+        app:gradientEnd="@color/gradientWhite"
+        app:strokeWidth="@dimen/strokeWidth"
+        app:radius="@dimen/cornerRadius"
+        app:direction="horizontal"
+        app:semiCircle="true"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"/>
-
-    <Button
-        android:id="@+id/network_test"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="16dp"
-        android:layout_marginBottom="16dp"
-        android:text="Network Test"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
 
 </android.support.constraint.ConstraintLayout>

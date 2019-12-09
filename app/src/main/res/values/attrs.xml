@@ -46,4 +46,25 @@
             <enum name="CW270" value="270"/>
         </attr>
     </declare-styleable>
+
+    <declare-styleable name="GradientCornerView">
+        <attr name="strokeWidth" format="dimension|reference"/>
+        <attr name="radiusTopLeft" format="dimension|reference"/>
+        <attr name="radiusTopRight" format="dimension|reference"/>
+        <attr name="radiusBottomLeft" format="dimension|reference"/>
+        <attr name="radiusBottomRight" format="dimension|reference"/>
+        <attr name="radius" format="dimension|reference"/>
+        <attr name="semiCircle" format="boolean"/>
+        <attr name="gradientStart" format="color|reference"/>
+        <attr name="gradientEnd" format="color|reference"/>
+        <attr name="direction">
+            <enum name="horizontal" value="0"/>
+            <enum name="vertical" value="1"/>
+        </attr>
+    </declare-styleable>
+
+    <declare-styleable name="GradientSemiCircleView">
+        <attr name="colorStart" format="color|reference"/>
+        <attr name="colorEnd" format="color|reference"/>
+    </declare-styleable>
 </resources>

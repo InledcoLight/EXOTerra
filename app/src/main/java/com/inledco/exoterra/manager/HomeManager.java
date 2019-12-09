@@ -1,13 +1,15 @@
 package com.inledco.exoterra.manager;
 
-import android.text.TextUtils;
+import android.os.AsyncTask;
 import android.util.Log;
 
 import com.inledco.exoterra.bean.Home;
-import com.inledco.exoterra.event.HomeChangedEvent;
-import com.inledco.exoterra.xlink.HomesExtendApi;
+import com.inledco.exoterra.bean.HomeProperty;
+import com.inledco.exoterra.event.HomeDeviceChangedEvent;
+import com.inledco.exoterra.event.HomePropertyChangedEvent;
 import com.inledco.exoterra.xlink.XlinkCloudManager;
 import com.inledco.exoterra.xlink.XlinkRequestCallback;
+import com.inledco.exoterra.xlink.XlinkResult;
 
 import org.greenrobot.eventbus.EventBus;
 
@@ -15,103 +17,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 import cn.xlink.restful.api.app.HomeApi;
-import cn.xlink.sdk.v5.manager.XLinkUserManager;
 
 public class HomeManager {
     private final String TAG = "HomeManager";
 
-//    private final List<HomeApi.HomesResponse.Home> mHomeList;
     private final List<Home> mHomeList;
-    private String mCurrentHomeId;
 
-//    private final XlinkRequestCallback<HomeApi.HomesResponse> mGetHomesCallback;
-    private final XlinkRequestCallback<HomesExtendApi.HomesResponse> mGetHomesCallback;
-    private final XlinkRequestCallback<String> mGetCurrentHomeidCallback;
-    private final XlinkRequestCallback<HomeApi.HomeResponse> mCreateDefaultHomeCallback;
-    private final XlinkRequestCallback<String> mSetCurrentHomeidCallback;
-
-    private XlinkRequestCallback<String> mCheckHomeCallback;
+    private AsyncTask<Void, Void, Void> mAsyncTask;
 
     private HomeManager() {
         mHomeList = new ArrayList<>();
-
-        mGetHomesCallback = new XlinkRequestCallback<HomesExtendApi.HomesResponse>() {
-            @Override
-            public void onError(String error) {
-                if (mCheckHomeCallback != null) {
-                    mCheckHomeCallback.onError(error);
-                }
-            }
-
-            @Override
-            public void onSuccess(HomesExtendApi.HomesResponse response) {
-                mHomeList.clear();
-                mHomeList.addAll(response.list);
-
-                XlinkCloudManager.getInstance().getCurrentHomeId(mGetCurrentHomeidCallback);
-            }
-        };
-
-        mGetCurrentHomeidCallback = new XlinkRequestCallback<String>() {
-            @Override
-            public void onError(String error) {
-                if (mCheckHomeCallback != null) {
-                    mCheckHomeCallback.onError(error);
-                }
-            }
-
-            @Override
-            public void onSuccess(String s) {
-                Log.e(TAG, "onSuccess: gethomeid " + s);
-                for (int i = 0; i < mHomeList.size(); i++) {
-                    Home home = mHomeList.get(i);
-                    if (TextUtils.equals(s, home.id)) {
-                        mCurrentHomeId = s;
-
-                        if (mCheckHomeCallback != null) {
-                            mCheckHomeCallback.onSuccess(s);
-                        }
-                        return;
-                    }
-                }
-
-                XlinkCloudManager.getInstance().createDefaultHome(mCreateDefaultHomeCallback);
-            }
-        };
-
-        mCreateDefaultHomeCallback = new XlinkRequestCallback<HomeApi.HomeResponse>() {
-            @Override
-            public void onError(String error) {
-                if (mCheckHomeCallback != null) {
-                    mCheckHomeCallback.onError(error);
-                }
-            }
-
-            @Override
-            public void onSuccess(HomeApi.HomeResponse response) {
-                XlinkCloudManager.getInstance().setCurrentHomeId(response.id, mSetCurrentHomeidCallback);
-
-                Log.e(TAG, "onSuccess: createhome" + response.id + " " + response.name);
-            }
-        };
-
-        mSetCurrentHomeidCallback = new XlinkRequestCallback<String>() {
-            @Override
-            public void onError(String error) {
-                if (mCheckHomeCallback != null) {
-                    mCheckHomeCallback.onError(error);
-                }
-            }
-
-            @Override
-            public void onSuccess(String s) {
-                mCurrentHomeId = s;
-
-                if (mCheckHomeCallback != null) {
-                    mCheckHomeCallback.onSuccess(s);
-                }
-            }
-        };
     }
 
     public static HomeManager getInstance() {
@@ -122,35 +37,11 @@ public class HomeManager {
         mHomeList.clear();
     }
 
-    public void setCurrentHomeId(String currentHomeId) {
-        mCurrentHomeId = currentHomeId;
-    }
-
-    public String getCurrentHomeId() {
-        return mCurrentHomeId;
-    }
-
     public List<Home> getHomeList() {
         return mHomeList;
     }
 
-    public void refreshHomeList() {
-        XlinkCloudManager.getInstance().getHomes(new XlinkRequestCallback<HomesExtendApi.HomesResponse>() {
-            @Override
-            public void onError(String error) {
-
-            }
-
-            @Override
-            public void onSuccess(HomesExtendApi.HomesResponse response) {
-                mHomeList.clear();
-                mHomeList.addAll(response.list);
-                EventBus.getDefault().post(new HomeChangedEvent());
-            }
-        });
-    }
-
-    public void syncHomeList(final XlinkRequestCallback<List<HomeApi.HomesResponse.Home>> callback) {
+    public void refreshHomeList(final XlinkRequestCallback<List<Home>> callback) {
         XlinkCloudManager.getInstance().getHomeList(new XlinkRequestCallback<HomeApi.HomesResponse>() {
             @Override
             public void onError(String error) {
@@ -161,25 +52,46 @@ public class HomeManager {
 
             @Override
             public void onSuccess(HomeApi.HomesResponse response) {
-//                mHomeList.clear();
-//                mHomeList.addAll(response.list);
-//                if (callback != null) {
-//                    callback.onSuccess(mHomeList);
-//                }
+                mHomeList.clear();
+                for (HomeApi.HomesResponse.Home home : response.list) {
+                    mHomeList.add(new Home(home));
+                }
+                if (callback != null) {
+                    callback.onSuccess(mHomeList);
+                }
+                getAllHomePropertiesAndDevices();
             }
         });
     }
 
-    /**
-     * 1. 获取homes列表
-     * 2. 获取currentHomeId
-     * 3. 检查currentHomeId是否在homes列表中, 如果不在则创建默认Home并设置为currentHomeId
-     */
-    public void checkHome(final XlinkRequestCallback<String> callback) {
-        if (XLinkUserManager.getInstance().isUserAuthorized()) {
-            mCheckHomeCallback = callback;
-            XlinkCloudManager.getInstance().getHomes(mGetHomesCallback);
+    public void getAllHomePropertiesAndDevices() {
+        if (mHomeList.size() == 0) {
+            return;
         }
+        if (mAsyncTask != null) {
+            mAsyncTask.cancel(true);
+        }
+        mAsyncTask = new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... voids) {
+                for (Home home : mHomeList) {
+                    String homeid = home.getHome().id;
+                    XlinkResult<HomeProperty> result1 = XlinkCloudManager.getInstance().getHomeProperty(homeid);
+                    if (result1.isSuccess()) {
+                        home.setProperty(result1.getResult());
+                        Log.e(TAG, "doInBackground: " + (result1.getResult()==null));
+                        EventBus.getDefault().post(new HomePropertyChangedEvent(homeid));
+                    }
+                    XlinkResult<HomeApi.HomeDevicesResponse> result2 = XlinkCloudManager.getInstance().getHomeDeviceList(homeid);
+                    if (result2.isSuccess()) {
+                        home.setDevices(result2.getResult().list);
+                        EventBus.getDefault().post(new HomeDeviceChangedEvent(homeid));
+                    }
+                }
+                return null;
+            }
+        };
+        mAsyncTask.execute();
     }
 
     private static class LazyHolder {

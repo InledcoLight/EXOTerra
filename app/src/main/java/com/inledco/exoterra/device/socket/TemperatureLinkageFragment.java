@@ -21,7 +21,6 @@ import com.inledco.exoterra.bean.EXOSocket;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
-import java.util.Random;
 
 public class TemperatureLinkageFragment extends BaseFragment {
     private final int TEMPERATURE_SENSOR_TYP = 1;
@@ -105,26 +104,24 @@ public class TemperatureLinkageFragment extends BaseFragment {
 
     private void refreshData() {
         if (mSocket != null) {
-            byte[] args = mSocket.getSV1LinkageArgs();
-            mTempArgs = new byte[12][12];
-            if (args != null && args.length == 256) {
-                for (int i = 0; i < 12; i++) {
-                    for (int j = 0; j < 12; j++) {
-                        mTempArgs[i][j] = args[i*12+j];
-                    }
-                }
-            }
-            Random random = new Random();
-            for (int i = 0; i < 12; i++) {
-                for (int j = 0; j < 12; j++) {
-                    if (mTempArgs[i][j] < TEMPERATURE_THRD_MIN || mTempArgs[i][j] > TEMPERATURE_THRD_MAX) {
-                        mTempArgs[i][j] = TEMPERATURE_ARG_DEFAULT;
-                    }
-//                    mTempArgs[i][j] = (byte) (TEMPERATURE_THRD_MIN + random.nextInt(TEMPERATURE_THRD_MAX - TEMPERATURE_THRD_MIN));
-                }
-            }
-
-            linkage_enable.setChecked(mSocket.getSV1LinkageEnable());
+//            byte[] args = mSocket.getSV1LinkageArgs();
+//            mTempArgs = new byte[12][12];
+//            if (args != null && args.length == 256) {
+//                for (int i = 0; i < 12; i++) {
+//                    for (int j = 0; j < 12; j++) {
+//                        mTempArgs[i][j] = args[i*12+j];
+//                    }
+//                }
+//            }
+//            for (int i = 0; i < 12; i++) {
+//                for (int j = 0; j < 12; j++) {
+//                    if (mTempArgs[i][j] < TEMPERATURE_THRD_MIN || mTempArgs[i][j] > TEMPERATURE_THRD_MAX) {
+//                        mTempArgs[i][j] = TEMPERATURE_ARG_DEFAULT;
+//                    }
+//                }
+//            }
+//
+//            linkage_enable.setChecked(mSocket.getSV1LinkageEnable());
 
             for (int i = 0; i < 12; i++) {
                 mFragments.add(TemperatureFragment.newInstance(mTempArgs[i]));

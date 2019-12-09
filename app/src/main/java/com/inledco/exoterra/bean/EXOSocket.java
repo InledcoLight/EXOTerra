@@ -363,8 +363,8 @@ public class EXOSocket extends Device{
         if (idx < 0 || idx > TIMER_COUNT_MAX) {
             return null;
         }
-        EXOSocketTimer tmr = new EXOSocketTimer(getUInt(INDEX_TIMER1+idx));
-        if (tmr.isValid()) {
+        EXOSocketTimer tmr = new EXOSocketTimer.Builder().createFromArray(getByteArray(INDEX_TIMER1+idx));
+        if (tmr != null && tmr.isValid()) {
             return tmr;
         } else {
             return null;
@@ -374,9 +374,9 @@ public class EXOSocket extends Device{
     public List<EXOSocketTimer> getAllTimers() {
         List<EXOSocketTimer> timers = new ArrayList<>();
         for (int i = 0; i < TIMER_COUNT_MAX; i++) {
-            int t = getUInt(INDEX_TIMER1+i);
-            EXOSocketTimer tmr = new EXOSocketTimer(t);
-            if (!tmr.isValid()) {
+            byte[] array = getByteArray(INDEX_TIMER1+i);
+            EXOSocketTimer tmr = new EXOSocketTimer.Builder().createFromArray(array);
+            if (tmr == null || !tmr.isValid()) {
                 break;
             }
             timers.add(tmr);
@@ -420,22 +420,24 @@ public class EXOSocket extends Device{
         if (idx < 0 || idx >= TIMER_COUNT_MAX || timer == null || !timer.isValid()) {
             return null;
         }
-        return setUInt(INDEX_TIMER1+idx, timer.getValue());
+        return setByteArray(INDEX_TIMER1+idx, timer.toArray());
     }
 
     public List<XLinkDataPoint> setAllTimers(List<EXOSocketTimer> timers) {
         List<XLinkDataPoint> dps = new ArrayList<>();
-        int[] tmrs = new int[TIMER_COUNT_MAX];
+        byte[][] tmrs = new byte[TIMER_COUNT_MAX][12];
         for (int i = 0; i < TIMER_COUNT_MAX; i++) {
-            tmrs[i] = AppConstants.SOCKET_TIMER_INVALID;
+            for (int j = 0; j < 12; j++) {
+                tmrs[i][j] = (byte) 0xFF;
+            }
         }
         if (timers != null && timers.size() <= TIMER_COUNT_MAX) {
             for (int i = 0; i < timers.size(); i++) {
-                tmrs[i] = timers.get(i).getValue();
+                System.arraycopy(timers.get(i).toArray(), 0, tmrs[i], 0, 12);
             }
         }
         for (int i = 0; i < TIMER_COUNT_MAX; i++) {
-            XLinkDataPoint dp = setUInt(INDEX_TIMER1 + i, tmrs[i]);
+            XLinkDataPoint dp = setByteArray(INDEX_TIMER1 + i, tmrs[i]);
             dps.add(dp);
         }
         return dps;

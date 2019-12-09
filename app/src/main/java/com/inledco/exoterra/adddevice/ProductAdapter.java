@@ -3,40 +3,36 @@ package com.inledco.exoterra.adddevice;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.inledco.exoterra.R;
+import com.inledco.exoterra.common.SimpleAdapter;
 import com.inledco.exoterra.util.DeviceUtil;
 
 import java.util.List;
 
-public abstract class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductViewHolder> {
+public class ProductAdapter extends SimpleAdapter<String, ProductAdapter.ProductViewHolder> {
+    public ProductAdapter(@NonNull Context context, List<String> data) {
+        super(context, data);
+    }
 
-    private Context mContext;
-    private List<String> mProducts;
-
-    public ProductAdapter(Context context, List<String> products) {
-        mContext = context;
-        mProducts = products;
+    @Override
+    protected int getItemLayoutResId() {
+        return R.layout.item_product;
     }
 
     @NonNull
     @Override
     public ProductViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
-        ProductViewHolder holder = new ProductViewHolder(LayoutInflater.from(mContext).inflate(R.layout.item_product, viewGroup, false));
-        return holder;
+        return new ProductViewHolder(createView(viewGroup));
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ProductViewHolder holder, int i) {
-        if (mProducts == null || i < 0 || i >= mProducts.size()) {
-            return;
-        }
-        final String prdt = mProducts.get(i);
+    public void onBindViewHolder(@NonNull ProductViewHolder holder, final int position) {
+        final String prdt = mData.get(position);
         if (DeviceUtil.containsProduct(prdt) == false) {
             return;
         }
@@ -45,14 +41,11 @@ public abstract class ProductAdapter extends RecyclerView.Adapter<ProductAdapter
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                onClickItem(prdt);
+                if (mItemClickListener != null) {
+                    mItemClickListener.onItemClick(position);
+                }
             }
         });
-    }
-
-    @Override
-    public int getItemCount() {
-        return mProducts == null ? 0 : mProducts.size();
     }
 
     class  ProductViewHolder extends RecyclerView.ViewHolder {
@@ -64,6 +57,4 @@ public abstract class ProductAdapter extends RecyclerView.Adapter<ProductAdapter
             tv_type = itemView.findViewById(R.id.item_product_type);
         }
     }
-
-    protected abstract void onClickItem(String prdt);
 }

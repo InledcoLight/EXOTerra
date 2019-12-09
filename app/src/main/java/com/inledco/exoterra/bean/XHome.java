@@ -6,20 +6,20 @@ import java.util.List;
 import cn.xlink.restful.api.app.HomeApi;
 
 public class XHome {
-    private Home mHome;
+    private Home2 mHome2;
     private List<HomeApi.HomeDevicesResponse.Device> mDevices;
 
-    public XHome(Home home) {
-        mHome = home;
+    public XHome(Home2 home2) {
+        mHome2 = home2;
         mDevices = new ArrayList<>();
     }
 
-    public Home getHome() {
-        return mHome;
+    public Home2 getHome2() {
+        return mHome2;
     }
 
-    public void setHome(Home home) {
-        mHome = home;
+    public void setHome2(Home2 home2) {
+        mHome2 = home2;
     }
 
     public List<HomeApi.HomeDevicesResponse.Device> getDevices() {

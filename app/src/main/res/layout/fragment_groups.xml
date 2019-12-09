@@ -19,7 +19,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:text="@string/group"
+            android:text="@string/habitats"
             android:textSize="@dimen/textSizeTitle"
             android:textColor="@color/textColorPrimary"/>
     </android.support.v7.widget.Toolbar>
@@ -30,8 +30,7 @@
         android:layout_height="0dp"
         android:orientation="vertical"
         android:padding="8dp"
-        app:layoutManager="android.support.v7.widget.GridLayoutManager"
-        app:spanCount="2"
+        app:layoutManager="android.support.v7.widget.LinearLayoutManager"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

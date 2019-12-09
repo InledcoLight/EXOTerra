@@ -64,16 +64,21 @@ public class AdvancedTextInputEditText extends TextInputEditText {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        if (mDrawableRightClickListener != null) {
-            switch (event.getAction()) {
-                case MotionEvent.ACTION_DOWN:
-                    //Left Top Right Bottom 0-3
-                    Drawable drawable = getCompoundDrawables()[2];
-                    if (drawable != null && event.getRawX() >= getRight() - drawable.getBounds().width()) {
+        switch (event.getAction()) {
+            case MotionEvent.ACTION_DOWN:
+                //Left Top Right Bottom 0-3
+                Drawable drawableLeft = getCompoundDrawables()[0];
+                Drawable drawableRight = getCompoundDrawables()[2];
+                if (drawableLeft != null && event.getX() <= getPaddingLeft() + drawableLeft.getBounds().width()) {
+                    return false;
+                }
+                if (drawableRight != null && event.getX() >= getRight() - getPaddingRight() - drawableRight.getBounds().width()) {
+                    if (mDrawableRightClickListener != null) {
                         mDrawableRightClickListener.onDrawableRightClick();
                     }
-                    break;
-            }
+                    return false;
+                }
+                break;
         }
         return super.onTouchEvent(event);
     }

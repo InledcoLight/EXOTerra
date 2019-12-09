@@ -22,7 +22,7 @@ import android.widget.Toast;
 import com.inledco.exoterra.AppConstants;
 import com.inledco.exoterra.R;
 import com.inledco.exoterra.base.BaseFragment;
-import com.inledco.exoterra.bean.Home;
+import com.inledco.exoterra.bean.Home2;
 import com.inledco.exoterra.bean.XHome;
 import com.inledco.exoterra.main.HomeViewModel;
 import com.inledco.exoterra.xlink.XlinkCloudManager;
@@ -127,8 +127,8 @@ public class ZoneDetailFragment extends BaseFragment {
     }
 
     private void refreshData() {
-        if (mXHome != null && mXHome.getHome() != null) {
-            for (Home.Zone zone : mXHome.getHome().zones) {
+        if (mXHome != null && mXHome.getHome2() != null) {
+            for (Home2.Zone zone : mXHome.getHome2().zones) {
                 if (TextUtils.equals(mZoneid, zone.id)) {
                     zone_detail_toolbar.setTitle(zone.name);
                     zone_detail_name.setText(zone.name);
@@ -160,7 +160,7 @@ public class ZoneDetailFragment extends BaseFragment {
                     et_name.setError(getString(R.string.input_empty));
                     return;
                 }
-                XlinkCloudManager.getInstance().renameZone(mXHome.getHome().id, mZoneid, name, new XlinkRequestCallback<ZoneApi.ZoneResponse>() {
+                XlinkCloudManager.getInstance().renameZone(mXHome.getHome2().id, mZoneid, name, new XlinkRequestCallback<ZoneApi.ZoneResponse>() {
                     @Override
                     public void onError(String error) {
                         Toast.makeText(getContext(), error, Toast.LENGTH_SHORT)
@@ -178,10 +178,10 @@ public class ZoneDetailFragment extends BaseFragment {
     }
 
     private void showDeleteZoneDialog() {
-        if (mXHome == null || mXHome.getHome() == null) {
+        if (mXHome == null || mXHome.getHome2() == null) {
             return;
         }
-        final String homeid = mXHome.getHome().id;
+        final String homeid = mXHome.getHome2().id;
         final CharSequence zonename = zone_detail_toolbar.getTitle();
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         builder.setTitle(R.string.delete_device)

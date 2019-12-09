@@ -24,7 +24,7 @@ import android.widget.Toast;
 import com.inledco.exoterra.AppConstants;
 import com.inledco.exoterra.R;
 import com.inledco.exoterra.base.BaseFragment;
-import com.inledco.exoterra.bean.Home;
+import com.inledco.exoterra.bean.Home2;
 import com.inledco.exoterra.bean.RoomDevice;
 import com.inledco.exoterra.bean.XHome;
 import com.inledco.exoterra.common.OnItemClickListener;
@@ -147,9 +147,9 @@ public class ZoneDevicesFragment extends BaseFragment {
 
     private void refreshData() {
         mDevices.clear();
-        if (mXHome != null && mXHome.getHome() != null && mXHome.getDevices() != null) {
-            for (int i = 0; i < mXHome.getHome().zones.size(); i++) {
-                Home.Zone zone = mXHome.getHome().zones.get(i);
+        if (mXHome != null && mXHome.getHome2() != null && mXHome.getDevices() != null) {
+            for (int i = 0; i < mXHome.getHome2().zones.size(); i++) {
+                Home2.Zone zone = mXHome.getHome2().zones.get(i);
                 if (TextUtils.equals(zone.id, mZoneId)) {
                     zonedevices_toolbar.setTitle(zone.name);
                     for (int j = 0; j < zone.room_ids.size(); j++) {
@@ -169,7 +169,7 @@ public class ZoneDevicesFragment extends BaseFragment {
         mAdapter.notifyDataSetChanged();
     }
     private void showRenameDialog() {
-        if (mXHome == null || mXHome.getHome() == null) {
+        if (mXHome == null || mXHome.getHome2() == null) {
             return;
         }
         View view = LayoutInflater.from(getContext()).inflate(R.layout.dialog_rename, null, false);
@@ -193,7 +193,7 @@ public class ZoneDevicesFragment extends BaseFragment {
                     et_name.setError(getString(R.string.input_empty));
                     return;
                 }
-                XlinkCloudManager.getInstance().renameZone(mXHome.getHome().id, mZoneId, name, new XlinkRequestCallback<ZoneApi.ZoneResponse>() {
+                XlinkCloudManager.getInstance().renameZone(mXHome.getHome2().id, mZoneId, name, new XlinkRequestCallback<ZoneApi.ZoneResponse>() {
                     @Override
                     public void onError(String error) {
                         Toast.makeText(getContext(), error, Toast.LENGTH_SHORT)
@@ -222,8 +222,8 @@ public class ZoneDevicesFragment extends BaseFragment {
     }
 
     private int getDeviceIdByRoomId(final String roomid) {
-        for (int i = 0; i < mXHome.getHome().rooms.size(); i++) {
-            Home.Room room = mXHome.getHome().rooms.get(i);
+        for (int i = 0; i < mXHome.getHome2().rooms.size(); i++) {
+            Home2.Room room = mXHome.getHome2().rooms.get(i);
             if (TextUtils.equals(roomid, room.id)) {
                 if (room.device_ids != null && room.device_ids.size() > 0) {
                     return Integer.parseInt(room.device_ids.get(0));

@@ -10,7 +10,7 @@ import com.inledco.exoterra.R;
 import com.inledco.exoterra.bean.ImportDeviceResponse;
 import com.inledco.exoterra.bean.QueryDeviceResponse;
 import com.inledco.exoterra.bean.Result;
-import com.inledco.exoterra.manager.HomeManager;
+import com.inledco.exoterra.manager.Home2Manager;
 import com.inledco.exoterra.xlink.RoomApi;
 import com.inledco.exoterra.xlink.XlinkCloudManager;
 import com.inledco.exoterra.xlink.XlinkResult;
@@ -49,6 +49,8 @@ public class APConfigLinker{
     private String mSN;
     private int mDeviceId;
 
+    private final boolean mSubscribe;
+
     private int mProgress;
     private APConfigListener mListener;
 
@@ -59,8 +61,9 @@ public class APConfigLinker{
     private String mReceive;
     private AsyncTask<Void, Integer, Result> mTask;
 
-    public APConfigLinker(@NonNull String pid, @NonNull String ssid, String bssid, String password, AppCompatActivity activity) {
+    public APConfigLinker(boolean subscribe, @NonNull String pid, @NonNull String ssid, String bssid, String password, AppCompatActivity activity) {
         mActivity = new WeakReference<>(activity);
+        mSubscribe = subscribe;
         mProductId = pid;
         mSsid = ssid;
         mBssid = bssid;
@@ -175,7 +178,7 @@ public class APConfigLinker{
 
     private Result addDeviceToHomeAndRoom() {
         Result result = new Result();
-        final String homeid = HomeManager.getInstance().getCurrentHomeId();
+        final String homeid = Home2Manager.getInstance().getCurrentHomeId();
 
         // 将设备添加到当前Home
         XlinkResult<String> result1 = XlinkCloudManager.getInstance().addDeviceToHome(homeid, mDeviceId);
@@ -258,6 +261,10 @@ public class APConfigLinker{
                 }
                 //发送配置完成信息，设备开始连接路由
                 sendOK();
+                if (!mSubscribe) {
+                    delay(5000);
+                    return new Result(true, null);
+                }
                 //等待手机联网成功
                 while(true) {
                     try {
@@ -280,12 +287,14 @@ public class APConfigLinker{
                     delay(3000);
                 }
                 //通过设备SN订阅设备
-                Result result = subscribeBySn();
-                if (!result.isSuccess()) {
-                    return result;
-                }
-                delay(1000);
-                return addDeviceToHomeAndRoom();
+                return subscribeBySn();
+
+//                Result result = subscribeBySn();
+//                if (!result.isSuccess()) {
+//                    return result;
+//                }
+//                delay(1000);
+//                return addDeviceToHomeAndRoom();
             }
 
             @Override
@@ -296,7 +305,7 @@ public class APConfigLinker{
                     if (result.isSuccess()) {
                         mProgress = PROGRESS_SUCCESS;
                         mListener.onProgressUpdate(mProgress);
-                        mListener.onAPConfigSuccess();
+                        mListener.onAPConfigSuccess(mDeviceId, mAddress);
                     } else {
                         mListener.onAPConfigFailed(result.getError());
                     }
@@ -336,7 +345,7 @@ public class APConfigLinker{
     private boolean checkNetAvailable() {
         Runtime runtime = Runtime.getRuntime();
         try {
-            Process process = runtime.exec("ping -c 4 api.xlink.cn");
+            Process process = runtime.exec("ping -c 4 api2.xlink.cn");
             int result = process.waitFor();
             return (result==0);
         }
@@ -355,7 +364,7 @@ public class APConfigLinker{
 
         void onTimeout();
 
-        void onAPConfigSuccess();
+        void onAPConfigSuccess(int devid, String mac);
 
         void onAPConfigFailed(String error);
     }

@@ -313,7 +313,7 @@ public class GroupFragment extends BaseFragment {
 
             @Override
             public void onSuccess(HomeApi.UserInviteResponse response) {
-                Toast.makeText(getContext(), "Share Home Success.", Toast.LENGTH_SHORT)
+                Toast.makeText(getContext(), "Share Home2 Success.", Toast.LENGTH_SHORT)
                      .show();
             }
         });

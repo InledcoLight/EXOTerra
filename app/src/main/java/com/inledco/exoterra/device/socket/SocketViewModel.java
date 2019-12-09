@@ -41,7 +41,7 @@ public class SocketViewModel extends DeviceViewModel<EXOSocket> {
     }
 
     public void setSensorLinkage(boolean linkage, byte[] args) {
-        setDeviceDatapoints(getData().setSV1LinkageArgs(linkage, args));
+//        setDeviceDatapoints(getData().setSV1LinkageArgs(linkage, args));
     }
 
     public void setSensor2Notify(boolean enable, int lower, int upper) {
@@ -49,6 +49,6 @@ public class SocketViewModel extends DeviceViewModel<EXOSocket> {
     }
 
     public void setSensor2Args(byte[] args) {
-        setDeviceDatapoints(getData().setSV2LinkageArgs(args));
+//        setDeviceDatapoints(getData().setSV2LinkageArgs(args));
     }
 }

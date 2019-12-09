@@ -3,4 +3,11 @@
     <dimen name="textSizePrimary">18sp</dimen>
     <dimen name="textSizeSecondary">14sp</dimen>
     <dimen name="textSizeTitle">24sp</dimen>
+    <dimen name="textSizeSubTitle">20sp</dimen>
+
+    <dimen name="titleHeight">56dp</dimen>
+    <dimen name="strokeWidth">2dp</dimen>
+    <dimen name="cornerRadius">8dp</dimen>
+
+    <dimen name="dividerWidth">1dp</dimen>
 </resources>

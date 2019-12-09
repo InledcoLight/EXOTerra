@@ -1,6 +1,6 @@
 package com.inledco.exoterra.xlink;
 
-import com.inledco.exoterra.bean.Home;
+import com.inledco.exoterra.bean.Home2;
 
 import java.util.List;
 import java.util.Map;
@@ -17,6 +17,6 @@ public interface HomesExtendApi {
 
     class HomesResponse {
         public int count;
-        public List<Home> list;
+        public List<Home2> list;
     }
 }

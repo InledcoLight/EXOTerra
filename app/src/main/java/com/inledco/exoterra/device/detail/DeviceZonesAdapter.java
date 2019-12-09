@@ -11,19 +11,19 @@ import android.widget.CheckedTextView;
 import com.google.gson.Gson;
 import com.inledco.exoterra.R;
 import com.inledco.exoterra.common.SimpleAdapter;
-import com.inledco.exoterra.bean.Home;
+import com.inledco.exoterra.bean.Home2;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class DeviceZonesAdapter extends SimpleAdapter<Home.Zone, DeviceZonesAdapter.DeviceZoneViewHolder> {
+public class DeviceZonesAdapter extends SimpleAdapter<Home2.Zone, DeviceZonesAdapter.DeviceZoneViewHolder> {
 
     private final String mRoomId;
     private final Set<String> mCurrentZoneIds;
     private final Set<String> mTargetZoneIds;
 
-    public DeviceZonesAdapter(@NonNull Context context, List<Home.Zone> data, String roomId) {
+    public DeviceZonesAdapter(@NonNull Context context, List<Home2.Zone> data, String roomId) {
         super(context, data);
         Log.e("TAG", "DeviceZonesAdapter: " + new Gson().toJson(data));
         mRoomId = roomId;
@@ -35,7 +35,7 @@ public class DeviceZonesAdapter extends SimpleAdapter<Home.Zone, DeviceZonesAdap
     private void refresh() {
         mCurrentZoneIds.clear();
         mTargetZoneIds.clear();
-        for (Home.Zone zone : mData) {
+        for (Home2.Zone zone : mData) {
             if (zone.room_ids.contains(mRoomId)) {
                 mCurrentZoneIds.add(zone.id);
                 mTargetZoneIds.add(zone.id);
@@ -81,7 +81,7 @@ public class DeviceZonesAdapter extends SimpleAdapter<Home.Zone, DeviceZonesAdap
 
     @Override
     public void onBindViewHolder(@NonNull final DeviceZoneViewHolder holder, int i) {
-        final Home.Zone zone = mData.get(i);
+        final Home2.Zone zone = mData.get(i);
         Log.e("TAG", "onBindViewHolder: " + zone.id + " " + zone.name);
         holder.ctv_zone.setText(zone.name);
         holder.ctv_zone.setChecked(mTargetZoneIds.contains(zone.id));

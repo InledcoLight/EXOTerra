@@ -5,7 +5,7 @@ public interface SmartConfigListener {
 
     void onError(String error);
 
-    void onSuccess();
+    void onSuccess(int devid, String mac);
 
     void onEsptouchSuccess();
 

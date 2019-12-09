@@ -9,7 +9,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.inledco.exoterra.R;
-import com.inledco.exoterra.bean.Home;
+import com.inledco.exoterra.bean.Home2;
 import com.inledco.exoterra.bean.RoomDevice;
 import com.inledco.exoterra.common.SimpleAdapter;
 import com.inledco.exoterra.util.DeviceUtil;
@@ -17,10 +17,10 @@ import com.inledco.exoterra.util.DeviceUtil;
 import java.util.ArrayList;
 import java.util.List;
 
-public class HomeZonesAdapter extends SimpleAdapter<Home.Zone, HomeZonesAdapter.ZoneViewHolder> {
+public class HomeZonesAdapter extends SimpleAdapter<Home2.Zone, HomeZonesAdapter.ZoneViewHolder> {
     private List<RoomDevice> mDevices;
 
-    public HomeZonesAdapter(@NonNull Context context, List<Home.Zone> data, List<RoomDevice> devices) {
+    public HomeZonesAdapter(@NonNull Context context, List<Home2.Zone> data, List<RoomDevice> devices) {
         super(context, data);
         mDevices = devices;
     }
@@ -38,7 +38,7 @@ public class HomeZonesAdapter extends SimpleAdapter<Home.Zone, HomeZonesAdapter.
 
     @Override
     public void onBindViewHolder(@NonNull ZoneViewHolder holder, final int position) {
-        Home.Zone zone = mData.get(position);
+        Home2.Zone zone = mData.get(position);
         holder.zone_name.setText(zone.name);
         holder.zone_devcnt.setText("" + zone.room_ids.size() + " devices");
         List<String> pids = new ArrayList<>();
@@ -76,13 +76,13 @@ public class HomeZonesAdapter extends SimpleAdapter<Home.Zone, HomeZonesAdapter.
         private ImageView[] zone_icon;
         public ZoneViewHolder(@NonNull View itemView) {
             super(itemView);
-            zone_name = itemView.findViewById(R.id.item_habitat_name);
-            zone_devcnt = itemView.findViewById(R.id.item_habitat_devcnt);
+            zone_name = itemView.findViewById(R.id.item_group_name);
+            zone_devcnt = itemView.findViewById(R.id.item_group_devcnt);
             zone_icon = new ImageView[4];
-            zone_icon[0] = itemView.findViewById(R.id.item_habitat_icon1);
-            zone_icon[1] = itemView.findViewById(R.id.item_habitat_icon2);
-            zone_icon[2] = itemView.findViewById(R.id.item_habitat_icon3);
-            zone_icon[3] = itemView.findViewById(R.id.item_habitat_icon4);
+            zone_icon[0] = itemView.findViewById(R.id.item_group_icon1);
+            zone_icon[1] = itemView.findViewById(R.id.item_group_icon2);
+            zone_icon[2] = itemView.findViewById(R.id.item_group_icon3);
+            zone_icon[3] = itemView.findViewById(R.id.item_group_icon4);
         }
     }
 }

@@ -1,11 +1,17 @@
 package com.inledco.exoterra.manager;
 
+import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.inledco.exoterra.bean.Device;
+import com.inledco.exoterra.event.DatapointChangedEvent;
 import com.inledco.exoterra.xlink.XlinkCloudManager;
 import com.inledco.exoterra.xlink.XlinkTaskCallback;
+import com.inledco.exoterra.xlink.XlinkTaskHandler;
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -16,12 +22,16 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+import cn.xlink.sdk.core.model.XLinkDataPoint;
 import cn.xlink.sdk.v5.model.XDevice;
 
 public class DeviceManager {
     private static final String TAG = "DeviceManager";
 
     private final Map<String, Device> mSubcribedDevices;
+
+    private boolean mSyncing;
+    private AsyncTask<Void, Void, Void> mAsyncTask;
 
     private DeviceManager() {
         mSubcribedDevices = new ConcurrentHashMap<>();
@@ -151,12 +161,35 @@ public class DeviceManager {
         return new HashSet<>(mSubcribedDevices.keySet());
     }
 
-    public void updateDevice(XDevice xDevice) {
+    public void updateDevice(@NonNull final XDevice xDevice) {
         Device device = getDevice(xDevice);
         if (device == null) {
             addDevice(xDevice);
         } else {
             device.setXDevice(xDevice);
+        }
+    }
+
+    public void updateDevice(@NonNull final Device device) {
+        if (contains(device) && device.getXDevice() != null && device.getXDevice().isOnline()) {
+            XlinkCloudManager.getInstance().getDeviceDatapoints(device.getXDevice(), new XlinkTaskCallback<List<XLinkDataPoint>>() {
+                @Override
+                public void onError(String error) {
+
+                }
+
+                @Override
+                public void onComplete(List<XLinkDataPoint> dataPoints) {
+                    Collections.sort(dataPoints, new Comparator<XLinkDataPoint>() {
+                        @Override
+                        public int compare(XLinkDataPoint o1, XLinkDataPoint o2) {
+                            return o1.getIndex() - o2.getIndex();
+                        }
+                    });
+                    device.setDataPointList(dataPoints);
+                    EventBus.getDefault().post(new DatapointChangedEvent(device.getDeviceTag()));
+                }
+            });
         }
     }
 
@@ -192,6 +225,69 @@ public class DeviceManager {
                 }
             }
         });
+    }
+
+    public void syncSubcribeDevices(final XlinkTaskCallback<List<Device>> listener) {
+        XlinkCloudManager.getInstance().syncSubscribedDevices(new XlinkTaskCallback<List<XDevice>>() {
+            @Override
+            public void onError(String error) {
+                if (listener != null) {
+                    listener.onError(error);
+                }
+            }
+
+            @Override
+            public void onStart() {
+                if (listener != null) {
+                    listener.onStart();
+                }
+            }
+
+            @Override
+            public void onComplete(List<XDevice> xDevices) {
+                mSubcribedDevices.clear();
+                if (xDevices != null) {
+                    for (final XDevice xDevice : xDevices) {
+                        if (xDevice != null) {
+                            updateDevice(xDevice);
+                        }
+                    }
+                }
+                if (listener != null) {
+                    listener.onComplete(getAllDevices());
+                }
+
+                getAllDeviceDatapoints();
+            }
+        });
+    }
+
+    public void getAllDeviceDatapoints() {
+        if (mSubcribedDevices.size() == 0) {
+            return;
+        }
+        if (mAsyncTask != null) {
+            mAsyncTask.cancel(true);
+        }
+        mAsyncTask = new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... voids) {
+                for (Device dev : mSubcribedDevices.values()) {
+                    if (dev.getXDevice().isOnline()) {
+                        XlinkTaskHandler<List<XLinkDataPoint>> callback = new XlinkTaskHandler<>();
+                        XlinkCloudManager.getInstance().getDeviceDatapoints(dev.getXDevice(), callback);
+                        while (!callback.isOver());
+                        Log.e(TAG, "doInBackground: " + callback.isSuccess());
+                        if (callback.isSuccess()) {
+                            dev.setDataPointList(callback.getResult());
+                            EventBus.getDefault().post(new DatapointChangedEvent(dev.getDeviceTag()));
+                        }
+                    }
+                }
+                return null;
+            }
+        };
+        mAsyncTask.execute();
     }
 
     private static class LazyHolder {

@@ -1,34 +1,53 @@
 package com.inledco.exoterra.bean;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import cn.xlink.restful.api.app.HomeApi;
+
 public class Home {
-    public String id;
-    public String name;
-    public int creator;
-    public String create_time;
-    public String update_time;
-    public List<User> user_list;
-    public List<Room> rooms;
-    public List<Zone> zones;
+    private HomeApi.HomesResponse.Home mHome;
+    private HomeProperty mProperty;
+    private final List<HomeApi.HomeDevicesResponse.Device> mDevices;
 
-    public static class User {
-        public int user_id;
-        public int role;
-        public String expire_time;
-        public String email;
-        public String nickname;
+    public Home(HomeApi.HomesResponse.Home home) {
+        this(home, null);
     }
 
-    public static class Room {
-        public String id;
-        public String name;
-        public List<String> device_ids;
+    public Home(HomeApi.HomesResponse.Home home, HomeProperty property) {
+        mHome = home;
+        mProperty = property;
+        mDevices = new ArrayList<>();
     }
 
-    public static class Zone {
-        public String id;
-        public String name;
-        public List<String> room_ids;
+    public HomeApi.HomesResponse.Home getHome() {
+        return mHome;
+    }
+
+    public void setHome(HomeApi.HomesResponse.Home home) {
+        mHome = home;
+    }
+
+    public HomeProperty getProperty() {
+        return mProperty;
+    }
+
+    public void setProperty(HomeProperty property) {
+        mProperty = property;
+    }
+
+    public List<HomeApi.HomeDevicesResponse.Device> getDevices() {
+        return mDevices;
+    }
+
+    public void setDevices(List<HomeApi.HomeDevicesResponse.Device> devices) {
+        mDevices.clear();
+        if (devices != null && devices.size() > 0) {
+            mDevices.addAll(devices);
+        }
+    }
+
+    public int getDeviceCount() {
+        return mDevices.size();
     }
 }
