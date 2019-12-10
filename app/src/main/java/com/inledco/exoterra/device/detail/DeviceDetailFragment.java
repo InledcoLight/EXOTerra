@@ -31,8 +31,6 @@ import com.inledco.exoterra.base.BaseFragment;
 import com.inledco.exoterra.bean.Device;
 import com.inledco.exoterra.device.DeviceBaseViewModel;
 import com.inledco.exoterra.event.DevicePropertyChangedEvent;
-import com.inledco.exoterra.event.SubscribeChangedEvent;
-import com.inledco.exoterra.manager.DeviceManager;
 import com.inledco.exoterra.manager.Home2Manager;
 import com.inledco.exoterra.util.DeviceUtil;
 import com.inledco.exoterra.view.MessageDialog;
@@ -291,7 +289,6 @@ public class DeviceDetailFragment extends BaseFragment {
 
     private void deleteDevice() {
         final String homeid = Home2Manager.getInstance().getCurrentHomeId();
-        final String roomid = mDeviceViewModel.getRoomId();
         final int devid = mDevice.getXDevice().getDeviceId();
         XlinkCloudManager.getInstance().deleteDeviceFromHome(homeid, devid, new XlinkRequestCallback<String>() {
             @Override
@@ -302,20 +299,7 @@ public class DeviceDetailFragment extends BaseFragment {
 
             @Override
             public void onSuccess(String s) {
-                XlinkCloudManager.getInstance().deleteRoom(homeid, roomid, new XlinkRequestCallback<String>() {
-                    @Override
-                    public void onError(String error) {
-                        Toast.makeText(getContext(), error, Toast.LENGTH_SHORT)
-                             .show();
-                    }
 
-                    @Override
-                    public void onSuccess(String s) {
-                        DeviceManager.getInstance().removeDevice(mDevice);
-                        EventBus.getDefault().post(new SubscribeChangedEvent());
-                        getActivity().finish();
-                    }
-                });
             }
         });
     }

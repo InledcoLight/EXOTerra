@@ -1,13 +1,16 @@
 package com.inledco.exoterra.bean;
 
+import android.support.annotation.NonNull;
+
 import com.inledco.exoterra.AppConstants;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import cn.xlink.sdk.core.model.XLinkDataPoint;
+import cn.xlink.sdk.v5.model.XDevice;
 
-public class EXOSocket extends Device{
+public class EXOSocket extends Device {
     private final String TAG = "EXOSocket";
 
     public static final byte MODE_TIMER                = 0;
@@ -53,8 +56,8 @@ public class EXOSocket extends Device{
 
     public static final int TIMER_COUNT_MAX     = 24;
 
-    public EXOSocket(Device device) {
-        super(device.getXDevice());
+    public EXOSocket(@NonNull XDevice xDevice) {
+        super(xDevice);
     }
 
     public int getSwitchCountMax() {

@@ -3,11 +3,14 @@ package com.inledco.exoterra.manager;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
-import android.util.Log;
 
 import com.inledco.exoterra.bean.Device;
+import com.inledco.exoterra.bean.EXOLedstrip;
+import com.inledco.exoterra.bean.EXOMonsoon;
+import com.inledco.exoterra.bean.EXOSocket;
 import com.inledco.exoterra.event.DatapointChangedEvent;
 import com.inledco.exoterra.xlink.XlinkCloudManager;
+import com.inledco.exoterra.xlink.XlinkConstants;
 import com.inledco.exoterra.xlink.XlinkTaskCallback;
 import com.inledco.exoterra.xlink.XlinkTaskHandler;
 
@@ -48,15 +51,14 @@ public class DeviceManager {
     private void addDevice(XDevice xDevice) {
         if (xDevice != null) {
             String key = getDeviceTag(xDevice);
-            if (!TextUtils.isEmpty(key)) {
-                mSubcribedDevices.put(key, new Device(xDevice));
+            String pid = xDevice.getProductId();
+            if (TextUtils.equals(pid, XlinkConstants.PRODUCT_ID_LEDSTRIP)) {
+                mSubcribedDevices.put(key, new EXOLedstrip(xDevice));
+            } else if (TextUtils.equals(pid, XlinkConstants.PRODUCT_ID_SOCKET)) {
+                mSubcribedDevices.put(key, new EXOSocket(xDevice));
+            } else if (TextUtils.equals(pid, XlinkConstants.PRODUCT_ID_MONSOON)) {
+                mSubcribedDevices.put(pid, new EXOMonsoon(xDevice));
             }
-        }
-    }
-
-    private void addDevice(Device device) {
-        if (device != null) {
-            addDevice(device.getXDevice());
         }
     }
 
@@ -277,7 +279,6 @@ public class DeviceManager {
                         XlinkTaskHandler<List<XLinkDataPoint>> callback = new XlinkTaskHandler<>();
                         XlinkCloudManager.getInstance().getDeviceDatapoints(dev.getXDevice(), callback);
                         while (!callback.isOver());
-                        Log.e(TAG, "doInBackground: " + callback.isSuccess());
                         if (callback.isSuccess()) {
                             dev.setDataPointList(callback.getResult());
                             EventBus.getDefault().post(new DatapointChangedEvent(dev.getDeviceTag()));

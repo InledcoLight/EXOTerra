@@ -105,7 +105,7 @@ public class DeviceZonesFragment extends BaseFragment {
     protected void initData() {
         mDeviceBaseViewModel = ViewModelProviders.of(getActivity()).get(DeviceBaseViewModel.class);
 
-        mAdapter = new DeviceZonesAdapter(getContext(), mZones, mDeviceBaseViewModel.getRoomId());
+        mAdapter = new DeviceZonesAdapter(getContext(), mZones, null);
         device_zones_rv.setAdapter(mAdapter);
 
         device_zones_swipe.setRefreshing(true);
@@ -157,7 +157,7 @@ public class DeviceZonesFragment extends BaseFragment {
 
     private void changeZones(@NonNull final Set<String> removeZoneIds, @NonNull final Set<String> addZoneIds) {
         final String homeid = Home2Manager.getInstance().getCurrentHomeId();
-        final String roomid = mDeviceBaseViewModel.getRoomId();
+        final String roomid = null;
         mChangeZonesTask = new AsyncTask<Void, Void, Boolean>() {
             @Override
             protected Boolean doInBackground(Void... voids) {

@@ -9,7 +9,6 @@ import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -23,6 +22,7 @@ import com.inledco.exoterra.common.OnItemClickListener;
 import com.inledco.exoterra.device.DeviceActivity;
 import com.inledco.exoterra.event.DatapointChangedEvent;
 import com.inledco.exoterra.event.DeviceStateChangedEvent;
+import com.inledco.exoterra.event.SubscribeChangedEvent;
 import com.inledco.exoterra.manager.DeviceManager;
 import com.inledco.exoterra.scan.ScanActivity;
 import com.inledco.exoterra.smartconfig.SmartconfigActivity;
@@ -121,6 +121,11 @@ public class DevicesFragment extends BaseFragment {
                 refreshDevices();
             }
         });
+    }
+
+    @Subscribe (threadMode = ThreadMode.MAIN)
+    public void onSubscribeChangedEvent(SubscribeChangedEvent event) {
+        refreshDevices();
     }
 
     @Subscribe (threadMode = ThreadMode.MAIN)

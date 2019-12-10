@@ -54,6 +54,12 @@
             android:orientation="horizontal"
             android:gravity="center_vertical">
 
+            <ImageView
+                android:id="@+id/item_habitat_s1icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@color/colorTransparent"
+                app:srcCompat="@drawable/ic_temperature"/>
             <TextView
                 android:id="@+id/item_habitat_sensor1"
                 android:layout_width="0dp"
@@ -61,6 +67,18 @@
                 android:layout_weight="1"
                 android:textColor="@color/textColorSencondary"
                 android:textSize="@dimen/textSizeSecondary"/>
+            <View
+                android:layout_width="@dimen/dividerWidth"
+                android:layout_height="match_parent"
+                android:background="@color/colorDivider"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp"/>
+            <ImageView
+                android:id="@+id/item_habitat_s2icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@color/colorTransparent"
+                app:srcCompat="@drawable/ic_humidity"/>
             <TextView
                 android:id="@+id/item_habitat_sensor2"
                 android:layout_width="0dp"

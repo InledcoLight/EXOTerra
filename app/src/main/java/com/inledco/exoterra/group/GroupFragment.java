@@ -13,7 +13,6 @@ import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -31,7 +30,6 @@ import com.inledco.exoterra.event.HomeDeviceChangedEvent;
 import com.inledco.exoterra.util.RegexUtil;
 import com.inledco.exoterra.xlink.XlinkCloudManager;
 import com.inledco.exoterra.xlink.XlinkRequestCallback;
-import com.inledco.exoterra.xlink.ZoneApi;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -49,11 +47,6 @@ public class GroupFragment extends BaseFragment {
     private String mHomeId;
     private final List<HomeApi.HomeDevicesResponse.Device> mDevices = new ArrayList<>();
     private GroupDevicesAdapter mAdapter;
-
-    private final String mRoomId = "z1d89kgkcveo";
-    private final String mRoomId2 = "z1cjbli73k74";
-    private final String mZoneId = "104rjw4xfezgg";
-    private final String mZoneId2 = "104s8u3vszn5s";
 
     private final XlinkRequestCallback<HomeApi.HomeDevicesResponse> mHomeDevicesCallback = new XlinkRequestCallback<HomeApi.HomeDevicesResponse>() {
         @Override
@@ -163,101 +156,6 @@ public class GroupFragment extends BaseFragment {
             @Override
             public boolean onMenuItemClick(MenuItem menuItem) {
                 switch (menuItem.getItemId()) {
-                    case R.id.menu_group_add_room:
-                        XlinkCloudManager.getInstance().getZoneInfo(mHomeId, mZoneId, new XlinkRequestCallback<ZoneApi.ZoneInfoResponse>() {
-                            @Override
-                            public void onError(String error) {
-                                Log.e(TAG, "onError: " + mZoneId + " " + error);
-                            }
-
-                            @Override
-                            public void onSuccess(ZoneApi.ZoneInfoResponse response) {
-                                Log.e(TAG, "onSuccess: " + response.id + " " + response.name + " " +  response.room_ids.toString());
-                            }
-                        });
-                        XlinkCloudManager.getInstance().getZoneInfo(mHomeId, mZoneId2, new XlinkRequestCallback<ZoneApi.ZoneInfoResponse>() {
-                            @Override
-                            public void onError(String error) {
-                                Log.e(TAG, "onError: " + mZoneId + " " + error);
-                            }
-
-                            @Override
-                            public void onSuccess(ZoneApi.ZoneInfoResponse response) {
-                                Log.e(TAG, "onSuccess: " + response.id + " " + response.name + " " +  response.room_ids.toString());
-                            }
-                        });
-//                        XlinkCloudManager.getInstance().addZoneRoom(mHomeId, mZoneId, mRoomId, new XlinkRequestCallback<String>() {
-//                            @Override
-//                            public void onError(String error) {
-//                                Log.e(TAG, "onError: addZoneRoom " + error);
-//                            }
-//
-//                            @Override
-//                            public void onSuccess(String s) {
-//                                Log.e(TAG, "onSuccess: addZoneRoom " + s);
-//                            }
-//                        });
-//                        XlinkCloudManager.getInstance().addZoneRoom(mHomeId, mZoneId2, mRoomId, new XlinkRequestCallback<String>() {
-//                            @Override
-//                            public void onError(String error) {
-//                                Log.e(TAG, "onError: addZoneRoom2 " + error);
-//                            }
-//
-//                            @Override
-//                            public void onSuccess(String s) {
-//                                Log.e(TAG, "onSuccess: addZoneRoom2 " + s);
-//                            }
-//                        });
-//                        if (mDevices.size() > 0) {
-//                            XlinkCloudManager.getInstance().addRoomDevice(mHomeId, mRoomId, mDevices.get(0).id, new XlinkRequestCallback<String>() {
-//                                @Override
-//                                public void onError(String error) {
-//                                    Log.e(TAG, "onError: addroom " + error);
-//                                }
-//
-//                                @Override
-//                                public void onSuccess(String s) {
-//                                    Log.e(TAG, "onSuccess: addroom " + s);
-//                                }
-//                            });
-//
-//                            XlinkCloudManager.getInstance().addRoomDevice(mHomeId, mRoomId2, mDevices.get(0).id, new XlinkRequestCallback<String>() {
-//                                @Override
-//                                public void onError(String error) {
-//                                    Log.e(TAG, "onError: addroom2 " + error);
-//                                }
-//
-//                                @Override
-//                                public void onSuccess(String s) {
-//                                    Log.e(TAG, "onSuccess: addroom2 " + s);
-//                                }
-//                            });
-//                        }
-//                        XlinkCloudManager.getInstance().createRoom(mHomeId, "test11", new XlinkRequestCallback<RoomApi.RoomResponse>() {
-//                            @Override
-//                            public void onError(String error) {
-//                                Log.e(TAG, "onError: " + error);
-//                            }
-//
-//                            @Override
-//                            public void onSuccess(RoomApi.RoomResponse response) {
-//                                Log.e(TAG, "onSuccess: " + response.id);
-//                                if (mDevices.size() > 0) {
-//                                }
-//                            }
-//                        });
-//                        XlinkCloudManager.getInstance().createZone(mHomeId, "test11", new XlinkRequestCallback<ZoneApi.ZoneResponse>() {
-//                            @Override
-//                            public void onError(String error) {
-//                                Log.e(TAG, "onError: " + error);
-//                            }
-//
-//                            @Override
-//                            public void onSuccess(ZoneApi.ZoneResponse response) {
-//                                Log.e(TAG, "onSuccess: " + response.id);
-//                            }
-//                        });
-                        break;
                     case R.id.menu_group_add:
                         addFragmentToStack(R.id.main_fl, AddGroupDeviceFragment.newInstance(mHomeId));
                         break;

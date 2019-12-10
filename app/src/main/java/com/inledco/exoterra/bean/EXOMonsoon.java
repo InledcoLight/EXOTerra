@@ -1,11 +1,14 @@
 package com.inledco.exoterra.bean;
 
+import android.support.annotation.NonNull;
+
 import com.inledco.exoterra.AppConstants;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import cn.xlink.sdk.core.model.XLinkDataPoint;
+import cn.xlink.sdk.v5.model.XDevice;
 
 public class EXOMonsoon extends Device {
     private final String TAG = "EXOMonsoon";
@@ -29,11 +32,11 @@ public class EXOMonsoon extends Device {
     private final int ACTION_MAX                = 120;
     private final int ACTION_DEFAULT            = 5;
 
-    public EXOMonsoon(Device device) {
-        super(device.getXDevice());
+    public EXOMonsoon(@NonNull XDevice xDevice) {
+        super(xDevice);
     }
 
-//    public String getProperty() {
+    //    public String getProperty() {
 //        return getString(INDEX_PROPERTY);
 //    }
 //

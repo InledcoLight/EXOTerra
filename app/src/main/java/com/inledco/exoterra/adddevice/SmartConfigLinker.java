@@ -325,6 +325,7 @@ public class SmartConfigLinker {
                     }
                 }
 
+                delay(2000);
                 return subscribe();
 
 //                result = subscribe();

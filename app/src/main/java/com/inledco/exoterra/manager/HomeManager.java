@@ -1,7 +1,6 @@
 package com.inledco.exoterra.manager;
 
 import android.os.AsyncTask;
-import android.util.Log;
 
 import com.inledco.exoterra.bean.Home;
 import com.inledco.exoterra.bean.HomeProperty;
@@ -79,7 +78,6 @@ public class HomeManager {
                     XlinkResult<HomeProperty> result1 = XlinkCloudManager.getInstance().getHomeProperty(homeid);
                     if (result1.isSuccess()) {
                         home.setProperty(result1.getResult());
-                        Log.e(TAG, "doInBackground: " + (result1.getResult()==null));
                         EventBus.getDefault().post(new HomePropertyChangedEvent(homeid));
                     }
                     XlinkResult<HomeApi.HomeDevicesResponse> result2 = XlinkCloudManager.getInstance().getHomeDeviceList(homeid);

@@ -25,11 +25,15 @@ import android.widget.Toast;
 import com.inledco.exoterra.R;
 import com.inledco.exoterra.base.BaseFragment;
 import com.inledco.exoterra.bean.Home;
+import com.inledco.exoterra.common.OnItemClickListener;
+import com.inledco.exoterra.event.DatapointChangedEvent;
 import com.inledco.exoterra.event.HomeChangedEvent;
 import com.inledco.exoterra.event.HomeDeviceChangedEvent;
 import com.inledco.exoterra.event.HomePropertyChangedEvent;
+import com.inledco.exoterra.group.GroupFragment;
 import com.inledco.exoterra.manager.HomeManager;
 import com.inledco.exoterra.xlink.XlinkCloudManager;
+import com.inledco.exoterra.xlink.XlinkConstants;
 import com.inledco.exoterra.xlink.XlinkRequestCallback;
 
 import org.greenrobot.eventbus.EventBus;
@@ -54,7 +58,7 @@ public class GroupsFragment extends BaseFragment {
 
         @Override
         public void onSuccess(List<Home> homes) {
-            mAdapter.notifyDataSetChanged();
+            mAdapter.refreshData();
         }
     };
 
@@ -63,7 +67,6 @@ public class GroupsFragment extends BaseFragment {
         public void onReceive(Context context, Intent intent) {
             switch (intent.getAction()) {
                 case Intent.ACTION_TIME_TICK:
-                    Log.e(TAG, "onReceive: ");
                     mAdapter.updateTime();
                     break;
             }
@@ -105,10 +108,7 @@ public class GroupsFragment extends BaseFragment {
         Log.e(TAG, "onHomePropertyChangedEvent: ");
         for (int i = 0; i < mHomes.size(); i++) {
             if (TextUtils.equals(event.getHomeid(), mHomes.get(i).getHome().id)) {
-                mAdapter.notifyItemChanged(i);
-                if (mHomes.get(i).getProperty() != null) {
-                    Log.e(TAG, "onHomePropertyChangedEvent: " + mHomes.get(i).getProperty().toString());
-                }
+                mAdapter.updateData(i);
             }
         }
     }
@@ -117,7 +117,22 @@ public class GroupsFragment extends BaseFragment {
     public void onHomeDeviceChangedEvent(HomeDeviceChangedEvent event) {
         for (int i = 0; i < mHomes.size(); i++) {
             if (TextUtils.equals(event.getHomeid(), mHomes.get(i).getHome().id)) {
-                mAdapter.notifyItemChanged(i);
+                mAdapter.updateData(i);
+            }
+        }
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onDatapointChangedEvent(DatapointChangedEvent event) {
+        for (int i = 0; i < mHomes.size(); i++) {
+            Home home = mHomes.get(i);
+            for (int j = 0; j < home.getDevices().size(); j++) {
+                HomeApi.HomeDevicesResponse.Device device = home.getDevices().get(j);
+                String tag = device.productId + "_" + device.mac;
+                if (TextUtils.equals(device.productId, XlinkConstants.PRODUCT_ID_SOCKET) && TextUtils.equals(tag, event.getDeviceTag())) {
+                    mAdapter.updateData(i);
+                    return;
+                }
             }
         }
     }
@@ -143,20 +158,15 @@ public class GroupsFragment extends BaseFragment {
         getActivity().registerReceiver(mTimeChangeReceiver, filter);
 
         mAdapter = new GroupsAdapter(getContext(), mHomes);
-//        mAdapter = new GroupsAdapter(getContext(), mHome2s) {
-//            @Override
-//            protected void onItemClick(int position) {
-//                String homeid = mHome2s.get(position).id;
-//                String homename = mHome2s.get(position).name;
-//                addFragmentToStack(R.id.main_fl, GroupFragment.newInstance(homeid, homename));
-//            }
-//
-//            @Override
-//            protected boolean onItemLongClick(int position) {
-//                showItemActionDialog(mHome2s.get(position));
-//                return true;
-//            }
-//        };
+        mAdapter.setOnItemClickListener(new OnItemClickListener() {
+            @Override
+            public void onItemClick(int position) {
+                HomeApi.HomesResponse.Home home = mHomes.get(position).getHome();
+                String homeid = home.id;
+                String homename = home.name;
+                addFragmentToStack(R.id.main_fl, GroupFragment.newInstance(homeid, homename));
+            }
+        });
         groups_rv.setAdapter(mAdapter);
         HomeManager.getInstance().refreshHomeList(mHomesResponseCallback);
     }

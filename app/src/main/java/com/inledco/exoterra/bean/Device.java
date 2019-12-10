@@ -57,7 +57,6 @@ public class Device {
     }
 
     public String getDeviceTag() {
-//        return mXDevice.getDeviceId();
         return mXDevice.getProductId() + "_" + mXDevice.getMacAddress();
     }
 

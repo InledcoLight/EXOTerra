@@ -27,9 +27,6 @@ import com.inledco.exoterra.AppConstants;
 import com.inledco.exoterra.R;
 import com.inledco.exoterra.base.BaseActivity;
 import com.inledco.exoterra.bean.Device;
-import com.inledco.exoterra.bean.EXOLedstrip;
-import com.inledco.exoterra.bean.EXOMonsoon;
-import com.inledco.exoterra.bean.EXOSocket;
 import com.inledco.exoterra.device.Monsoon.MonsoonFragment;
 import com.inledco.exoterra.device.Monsoon.MonsoonViewModel;
 import com.inledco.exoterra.device.detail.DeviceDetailFragment;
@@ -67,7 +64,6 @@ public class DeviceActivity extends BaseActivity {
     private CheckableImageButton device_cib_cloud;
     private CheckableImageButton device_cib_wifi;
 
-    private Device mBaseDevice;
     private Device mDevice;
     private DeviceViewModel mDeviceViewModel;
     private DeviceBaseViewModel mDeviceBaseViewModel;
@@ -150,38 +146,32 @@ public class DeviceActivity extends BaseActivity {
         if (intent == null) {
             return;
         }
-        final String roomid = intent.getStringExtra(AppConstants.ROOM_ID);
         final String deviceTag = intent.getStringExtra(AppConstants.DEVICE_TAG);
-        final Device device = DeviceManager.getInstance().getDevice(deviceTag);
-        if (device == null) {
+        mDevice = DeviceManager.getInstance().getDevice(deviceTag);
+        if (mDevice == null) {
             return;
         }
 
-        final String pid = device.getXDevice().getProductId();
-        final String name = device.getXDevice().getDeviceName();
+        final String pid = mDevice.getXDevice().getProductId();
+        final String name = mDevice.getXDevice().getDeviceName();
         device_toolbar.setTitle(TextUtils.isEmpty(name) ? DeviceUtil.getDefaultName(pid) : name);
         setSupportActionBar(device_toolbar);
 
-        mBaseDevice = new Device(device.getXDevice());
         mDeviceBaseViewModel = ViewModelProviders.of(this).get(DeviceBaseViewModel.class);
-        mDeviceBaseViewModel.setRoomId(roomid);
-        mDeviceBaseViewModel.setData(mBaseDevice);
+        mDeviceBaseViewModel.setData(mDevice);
 
-        XLinkDeviceManager.getInstance().addDeviceConnectionFlags(device.getXDevice().getDeviceTag(), 1);
-        XLinkDeviceManager.getInstance().connectDeviceLocal(device.getXDevice().getDeviceTag());
+        XLinkDeviceManager.getInstance().addDeviceConnectionFlags(mDevice.getXDevice().getDeviceTag(), 1);
+        XLinkDeviceManager.getInstance().connectDeviceLocal(mDevice.getXDevice().getDeviceTag());
 
         if (TextUtils.equals(pid, XlinkConstants.PRODUCT_ID_LEDSTRIP)) {
-            mDevice = new EXOLedstrip(device);
             mDeviceViewModel = ViewModelProviders.of(DeviceActivity.this).get(LightViewModel.class);
             mDeviceViewModel.setData(mDevice);
             mDeviceFragment = new LightFragment();
         } else if (TextUtils.equals(pid, XlinkConstants.PRODUCT_ID_MONSOON)) {
-            mDevice = new EXOMonsoon(device);
             mDeviceViewModel = ViewModelProviders.of(DeviceActivity.this).get(MonsoonViewModel.class);
             mDeviceViewModel.setData(mDevice);
             mDeviceFragment = new MonsoonFragment();
         } else if (TextUtils.equals(pid, XlinkConstants.PRODUCT_ID_SOCKET)) {
-            mDevice = new EXOSocket(device);
             mDeviceViewModel = ViewModelProviders.of(DeviceActivity.this).get(SocketViewModel.class);
             mDeviceViewModel.setData(mDevice);
             mDeviceFragment = new SocketFragment();
@@ -214,7 +204,6 @@ public class DeviceActivity extends BaseActivity {
                         return o1.getIndex() - o2.getIndex();
                     }
                 });
-                mBaseDevice.setDataPointList(dataPoints);
                 mDevice.setDataPointList(dataPoints);
 
                 StringBuilder sb = new StringBuilder();

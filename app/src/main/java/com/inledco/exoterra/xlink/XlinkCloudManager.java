@@ -863,7 +863,6 @@ public class XlinkCloudManager {
                     String rawZone = String.valueOf(map.get("zone").value);
                     String rawSunrise = String.valueOf(map.get("sunrise").value);
                     String rawSunset = String.valueOf(map.get("sunset").value);
-                    Log.e(TAG, "getHomeProperty: " + rawZone + " " + rawSunrise + " " + rawSunset);
                     try {
                         int zone = Integer.parseInt(rawZone);
                         int sunrise = Integer.parseInt(rawSunrise);

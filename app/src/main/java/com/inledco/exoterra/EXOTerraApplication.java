@@ -160,9 +160,14 @@ public class EXOTerraApplication extends Application {
         mXlinkDataListener = new XLinkDataListener() {
             @Override
             public void onDataPointUpdate(XDevice xDevice, List<XLinkDataPoint> list) {
+                if (list == null || list.size() == 0) {
+                    return;
+                }
                 Device device = DeviceManager.getInstance().getDevice(xDevice);
                 if (device != null) {
-                    device.setDataPointList(list);
+                    for (XLinkDataPoint dp : list) {
+                        device.setDataPoint(dp);
+                    }
                     EventBus.getDefault().post(new DatapointChangedEvent(device.getDeviceTag()));
                 }
             }

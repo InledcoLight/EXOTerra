@@ -1,12 +1,14 @@
 package com.inledco.exoterra.bean;
 
 import android.support.annotation.IntDef;
+import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import cn.xlink.sdk.core.model.XLinkDataPoint;
+import cn.xlink.sdk.v5.model.XDevice;
 
 public class EXOLedstrip extends Device {
     private final String TAG = "EXOLedstrip";
@@ -70,11 +72,11 @@ public class EXOLedstrip extends Device {
     @IntDef( {MODE_MANUAL, MODE_AUTO, MODE_PRO} )
     public @interface Mode {}
 
-    public EXOLedstrip(Device device) {
-        super(device.getXDevice());
+    public EXOLedstrip(@NonNull XDevice xDevice) {
+        super(xDevice);
     }
 
-//    public String getProperty() {
+    //    public String getProperty() {
 //        return getString(INDEX_PROPERTY);
 //    }
 //
