@@ -8,7 +8,6 @@ import android.graphics.RectF;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.widget.FrameLayout;
 
@@ -37,13 +36,13 @@ public class CircleSeekbar extends FrameLayout {
 
     private float mCenterX;
     private float mCenterY;
-    private double mAngle;
     private float mThumbX;
     private float mThumbY;
 
     private boolean mSeeking;
 
-    private double mLastAngle;
+    private float mLastX;
+    private int mOverCount;
 
     public CircleSeekbar(@NonNull Context context) {
         this(context, null, 0);
@@ -120,12 +119,12 @@ public class CircleSeekbar extends FrameLayout {
 
         canvas.drawCircle(mCenterX, mCenterY, radius, mWheelPaint);
 
-        mAngle = (double) (mProgress-mMin) / (mMax-mMin) * 2 * Math.PI;
-        double cos = Math.cos(mAngle);
-        double sin = Math.sin(mAngle);
+        double angle = (double) (mProgress-mMin) / (mMax-mMin) * 2 * Math.PI;
+        double cos = Math.cos(angle);
+        double sin = Math.sin(angle);
         //画选中区域
         RectF rectF = new RectF(left, top, right, bottom);
-        canvas.drawArc(rectF, -90, (float) (mAngle * RADIAN), false, mProgressPaint);
+        canvas.drawArc(rectF, -90, (float) (angle * RADIAN), false, mProgressPaint);
 
         //画锚点
         mThumbX = (float) (mCenterX + sin * radius);
@@ -159,34 +158,49 @@ public class CircleSeekbar extends FrameLayout {
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 if (mSeeking) {
-                    mLastAngle = mAngle;
+                    mLastX = mThumbX;
+                    if (mProgress == mMin) {
+                        mOverCount = -1;
+                    }  else if (mProgress == mMax) {
+                        mOverCount = 1;
+                    } else {
+                        mOverCount = 0;
+                    }
                     return true;
                 }
                 break;
             case MotionEvent.ACTION_MOVE:
                 if (mSeeking) {
-                    float dx = x - mCenterX;
-                    float dy = y - mCenterY;
-                    double radius = Math.sqrt(dx * dx + dy * dy);
-                    double cos = dy / radius;
-                    if (dx < 0) {
-                        mAngle = Math.PI + Math.acos(cos);
-                    } else {
-                        mAngle = Math.PI - Math.acos(cos);
-                    }
-                    if (mScrollOnce) {
-                        if (mLastAngle > 3*Math.PI/2 && mAngle < Math.PI/2) {
-                            mAngle = 0;
-                        } else if (mLastAngle < Math.PI/2 && mAngle > 3*Math.PI/2) {
-                            mAngle = 0;
-                        } else {
-                            mLastAngle = mAngle;
+                    //0度溢出检测
+                    if (mScrollOnce && y <= mCenterY) {
+                        if (mLastX < mCenterX && x >= mCenterX) {
+                            mOverCount ++;
+                            if (mOverCount >= 1) {
+                                mOverCount = 1;
+                                mProgress = mMax;
+                            }
+                        } else if (mLastX > mCenterX && x <= mCenterX) {
+                            mOverCount--;
+                            if (mOverCount <= -1) {
+                                mOverCount = -1;
+                                mProgress = mMin;
+                            }
                         }
-                    } else {
-                        mLastAngle = mAngle;
                     }
-                    Log.e(TAG, "onTouchEvent: " + mScrollOnce + " " + mLastAngle + " " + mAngle);
-                    mProgress = (int) (mMin + mAngle / (2 * Math.PI) * (mMax - mMin));
+                    if (mOverCount == 0) {
+                        float dx = x - mCenterX;
+                        float dy = y - mCenterY;
+                        double radius = Math.sqrt(dx * dx + dy * dy);
+                        double cos = dy / radius;
+                        double angle;
+                        if (dx < 0) {
+                            angle = Math.PI + Math.acos(cos);
+                        } else {
+                            angle = Math.PI - Math.acos(cos);
+                        }
+                        mProgress = (int) (mMin + angle / (2 * Math.PI) * (mMax - mMin));
+                    }
+                    mLastX = x;
                     invalidate();
                     return true;
                 }
