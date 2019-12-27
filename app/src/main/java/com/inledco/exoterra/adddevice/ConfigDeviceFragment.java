@@ -88,7 +88,23 @@ public class ConfigDeviceFragment extends BaseFragment {
 
                         @Override
                         public void onSuccess(DeviceApi.DeviceResponse response) {
-                            getActivity().finish();
+                            final String homeid = mConnectNetBean.getHomeid();
+                            if (TextUtils.isEmpty(homeid)) {
+                                addFragmentToStack(R.id.adddevice_fl, new AssignHabitatFragment());
+                            } else {
+                                XlinkCloudManager.getInstance().addDeviceToHome(homeid, devid, new XlinkRequestCallback<String>() {
+                                    @Override
+                                    public void onError(String error) {
+                                        Toast.makeText(getContext(), error, Toast.LENGTH_SHORT)
+                                             .show();
+                                    }
+
+                                    @Override
+                                    public void onSuccess(String s) {
+                                        getActivity().finish();
+                                    }
+                                });
+                            }
                         }
                     });
                 } else {

@@ -14,9 +14,25 @@
         <item>November</item>
         <item>December</item>
     </string-array>
-    
+
+    <string-array name="weeks">
+        <item>Sun</item>
+        <item>Mon</item>
+        <item>Tue</item>
+        <item>Wed</item>
+        <item>Thu</item>
+        <item>Fri</item>
+        <item>Sat</item>
+    </string-array>
+
+    <string-array name="socket_actions">
+        <item>Turnoff</item>
+        <item>Turnon</item>
+        <item>Turnon-Turnoff</item>
+    </string-array>
+
     <integer-array name="spectrum">
-<!--360-379nm same with 380nm-->
+        <!--360-379nm same with 380nm-->
         <item>0xff610061</item>
         <item>0xff610061</item>
         <item>0xff610061</item>
@@ -37,7 +53,7 @@
         <item>0xff610061</item>
         <item>0xff610061</item>
         <item>0xff610061</item>
-<!--380-780nm-->
+        <!--380-780nm-->
         <item>0xff610061</item>
         <item>0xff640066</item>
         <item>0xff67006a</item>
@@ -439,7 +455,7 @@
         <item>0xff660000</item>
         <item>0xff640000</item>
         <item>0xff610000</item>
-<!--781-800nm same with 780nm-->
+        <!--781-800nm same with 780nm-->
         <item>0xff610000</item>
         <item>0xff610000</item>
         <item>0xff610000</item>

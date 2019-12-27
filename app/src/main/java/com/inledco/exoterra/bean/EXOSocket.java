@@ -2,8 +2,6 @@ package com.inledco.exoterra.bean;
 
 import android.support.annotation.NonNull;
 
-import com.inledco.exoterra.AppConstants;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -376,9 +374,10 @@ public class EXOSocket extends Device {
 
     public List<EXOSocketTimer> getAllTimers() {
         List<EXOSocketTimer> timers = new ArrayList<>();
+        EXOSocketTimer.Builder builder = new EXOSocketTimer.Builder();
         for (int i = 0; i < TIMER_COUNT_MAX; i++) {
             byte[] array = getByteArray(INDEX_TIMER1+i);
-            EXOSocketTimer tmr = new EXOSocketTimer.Builder().createFromArray(array);
+            EXOSocketTimer tmr = builder.createFromArray(array);
             if (tmr == null || !tmr.isValid()) {
                 break;
             }
@@ -397,7 +396,7 @@ public class EXOSocket extends Device {
                 dps.add(dp);
             }
             for (int i = timers.size(); i < TIMER_COUNT_MAX; i++) {
-                dps.add(setTimer(i, AppConstants.SOCKET_TIMER_INVALID));
+                dps.add(setTimerInvalid(i));
             }
             return dps;
         }
@@ -412,18 +411,22 @@ public class EXOSocket extends Device {
         return null;
     }
 
-    public XLinkDataPoint setTimer(int idx, int timer) {
-        if (idx < 0 || idx >= TIMER_COUNT_MAX) {
-            return null;
-        }
-        return setUInt(INDEX_TIMER1 + idx, timer);
-    }
-
     public XLinkDataPoint setTimer(int idx, EXOSocketTimer timer) {
         if (idx < 0 || idx >= TIMER_COUNT_MAX || timer == null || !timer.isValid()) {
             return null;
         }
         return setByteArray(INDEX_TIMER1+idx, timer.toArray());
+    }
+
+    public XLinkDataPoint setTimerInvalid(int idx) {
+        if (idx < 0 || idx >= TIMER_COUNT_MAX) {
+            return null;
+        }
+        final byte[] array = new byte[12];
+        for (int i = 0; i < 12; i++) {
+            array[i] = (byte) 0xFF;
+        }
+        return setByteArray(INDEX_TIMER1+idx, array);
     }
 
     public List<XLinkDataPoint> setAllTimers(List<EXOSocketTimer> timers) {

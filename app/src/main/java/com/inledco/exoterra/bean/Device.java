@@ -38,6 +38,7 @@ public class Device {
     private XDevice mXDevice;
     private String mProperty;
     private final List<XLinkDataPoint> mDataPointList;
+    private boolean mSynchronized;
 
     public Device(@NonNull XDevice xDevice) {
         mXDevice = xDevice;
@@ -60,6 +61,10 @@ public class Device {
         return mXDevice.getProductId() + "_" + mXDevice.getMacAddress();
     }
 
+    public boolean isSynchronized() {
+        return mSynchronized;
+    }
+
     public List<XLinkDataPoint> getDataPointList() {
         return mDataPointList;
     }
@@ -67,6 +72,7 @@ public class Device {
     public void setDataPointList(List<XLinkDataPoint> dataPointList) {
         mDataPointList.clear();
         mDataPointList.addAll(dataPointList);
+        mSynchronized = true;
     }
 
     public void setDataPoint(XLinkDataPoint dataPoint) {

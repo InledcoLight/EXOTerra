@@ -4,7 +4,6 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckedTextView;
@@ -12,31 +11,33 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.inledco.exoterra.R;
+import com.inledco.exoterra.common.SimpleAdapter;
 import com.inledco.exoterra.util.DeviceUtil;
 
 import java.util.List;
 
 import cn.xlink.restful.api.app.HomeApi;
 
-public abstract class GroupDevicesAdapter extends RecyclerView.Adapter<GroupDevicesAdapter.HomeDevicesViewHolder> {
-    private Context mContext;
-    private List<HomeApi.HomeDevicesResponse.Device> mDevices;
+public class GroupDevicesAdapter extends SimpleAdapter<HomeApi.HomeDevicesResponse.Device, GroupDevicesAdapter.HomeDevicesViewHolder> {
+    public GroupDevicesAdapter(@NonNull Context context, List<HomeApi.HomeDevicesResponse.Device> data) {
+        super(context, data);
+    }
 
-    public GroupDevicesAdapter(@NonNull final Context context, List<HomeApi.HomeDevicesResponse.Device> devices) {
-        mContext = context;
-        mDevices = devices;
+    @Override
+    protected int getItemLayoutResId() {
+        return R.layout.item_device_content;
     }
 
     @NonNull
     @Override
     public HomeDevicesViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
-        HomeDevicesViewHolder holder = new HomeDevicesViewHolder(LayoutInflater.from(mContext).inflate(R.layout.item_device_content, viewGroup, false));
-        return holder;
+        return new HomeDevicesViewHolder(createView(viewGroup));
     }
 
     @Override
-    public void onBindViewHolder(@NonNull HomeDevicesViewHolder holder, final int i) {
-        HomeApi.HomeDevicesResponse.Device device = mDevices.get(i);
+    public void onBindViewHolder(@NonNull HomeDevicesViewHolder holder, int i) {
+        final int position = holder.getAdapterPosition();
+        HomeApi.HomeDevicesResponse.Device device = mData.get(position);
         String pid = device.productId;
         String name = TextUtils.isEmpty(device.name) ? DeviceUtil.getDefaultName(pid) : device.name;
         holder.iv_icon.setImageResource(DeviceUtil.getProductIcon(pid));
@@ -48,25 +49,21 @@ public abstract class GroupDevicesAdapter extends RecyclerView.Adapter<GroupDevi
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                onItemClick(i);
+                if (mItemClickListener != null) {
+                    mItemClickListener.onItemClick(position);
+                }
             }
         });
         holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-                return onItemLongClick(i);
+                if (mItemLongClickListener != null) {
+                    return mItemLongClickListener.onItemLongClick(position);
+                }
+                return false;
             }
         });
     }
-
-    @Override
-    public int getItemCount() {
-        return mDevices == null ? 0: mDevices.size();
-    }
-
-    protected abstract void onItemClick(int position);
-
-    protected abstract boolean onItemLongClick(int position);
 
     class HomeDevicesViewHolder extends RecyclerView.ViewHolder {
         private ImageView iv_icon;

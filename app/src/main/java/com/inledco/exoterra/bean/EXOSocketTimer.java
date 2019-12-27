@@ -1,5 +1,7 @@
 package com.inledco.exoterra.bean;
 
+import android.util.Log;
+
 public class EXOSocketTimer {
     public static final byte ACTION_TURNOFF            = 0;
     public static final byte ACTION_TURNON             = 1;
@@ -19,16 +21,23 @@ public class EXOSocketTimer {
         if (mAction < ACTION_TURNOFF || mAction > ACTION_TURNON_PERIOD) {
             return false;
         }
-        if ((mRepeat&0x80) != 0) {
+        if (mHour < 0 || mMinute < 0 || mSecond < 0) {
             return false;
         }
         if (mHour > 23 || mMinute > 59 || mSecond > 59) {
+            return false;
+        }
+        if (mEndHour < 0 || mEndMinute < 0 || mEndSecond < 0) {
             return false;
         }
         if (mEndHour > 23 || mEndMinute > 59 || mEndSecond > 59) {
             return false;
         }
         return true;
+    }
+
+    public byte getAction() {
+        return mAction;
     }
 
     public void setAction(byte action) {
@@ -121,16 +130,19 @@ public class EXOSocketTimer {
             if (array == null || array.length != 12) {
                 return null;
             }
-            if (array[0] != 0 || array[0] != 1) {
+            if (array[0] != 0 && array[0] != 1) {
                 return null;
             }
             if (array[1] < ACTION_TURNOFF || array[1] > ACTION_TURNON_PERIOD) {
                 return null;
             }
-            if ((array[2]&0x80) != 0) {
+            if (array[3] < 0 || array[4] < 0 || array[5] < 0) {
                 return null;
             }
             if (array[3] > 23 || array[4] > 59 || array[5] > 59) {
+                return null;
+            }
+            if (array[6] < 0 || array[7] < 0 || array[8] < 0) {
                 return null;
             }
             if (array[6] > 23 || array[7] > 59 || array[8] > 59) {

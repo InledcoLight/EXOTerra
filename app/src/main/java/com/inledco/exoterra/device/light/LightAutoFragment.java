@@ -3,7 +3,6 @@ package com.inledco.exoterra.device.light;
 import android.annotation.SuppressLint;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
-import android.content.DialogInterface;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Build;
 import android.os.Bundle;
@@ -11,8 +10,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomSheetDialog;
 import android.support.design.widget.CheckableImageButton;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.widget.SwitchCompat;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.style.ImageSpan;
@@ -23,14 +20,12 @@ import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.NumberPicker;
 import android.widget.SeekBar;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.TimePicker;
-import android.widget.Toast;
 
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.data.Entry;
@@ -41,15 +36,11 @@ import com.inledco.exoterra.R;
 import com.inledco.exoterra.base.BaseFragment;
 import com.inledco.exoterra.bean.EXOLedstrip;
 import com.inledco.exoterra.util.LightUtil;
-import com.inledco.exoterra.xlink.XlinkCloudManager;
-import com.inledco.exoterra.xlink.XlinkRequestCallback;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
-import cn.xlink.restful.api.app.DeviceApi;
 
 public class LightAutoFragment extends BaseFragment {
     private LineChart auto_line_chart;
@@ -59,14 +50,11 @@ public class LightAutoFragment extends BaseFragment {
     private TextView auto_tv_turnoff;
     private TextView auto_tv_day;
     private TextView auto_tv_night;
-    private LinearLayout auto_ll;
-    private SwitchCompat auto_sw_gis;
 
     private LightViewModel mLightViewModel;
     private EXOLedstrip mLight;
 
     private int chnCount;
-    private boolean gisValid;
     private int sunriseStart;
     private int sunriseRamp;
     private int sunsetEnd;
@@ -102,8 +90,6 @@ public class LightAutoFragment extends BaseFragment {
         auto_tv_turnoff = view.findViewById(R.id.auto_tv_turnoff);
         auto_tv_day = view.findViewById(R.id.auto_tv_day);
         auto_tv_night = view.findViewById(R.id.auto_tv_night);
-        auto_ll = view.findViewById(R.id.auto_ll);
-        auto_sw_gis = view.findViewById(R.id.auto_sw_gis);
 
         LineChartHelper.init(auto_line_chart);
     }
@@ -156,26 +142,14 @@ public class LightAutoFragment extends BaseFragment {
                 showEditDayNightDialog(true);
             }
         });
-        auto_ll.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (auto_sw_gis.isChecked()) {
-                    showDisableGisDialog();
-                }
-                else {
-                    showEnableGisDialog();
-                }
-            }
-        });
     }
 
     private void initParam() {
         chnCount = mLight.getChannelCount();
-        gisValid = mLight.getGisEnable() && mLight.getGisValid();
-        sunriseStart = (gisValid ? mLight.getGisSunrise() : mLight.getSunrise());
-        sunriseRamp = (gisValid ? ((1440 + mLight.getGisSunset() - mLight.getGisSunrise()) % 1440) / 10 : mLight.getSunriseRamp());
-        sunsetEnd = (gisValid ? mLight.getGisSunset() : mLight.getSunset());
-        sunsetRamp = (gisValid ? ((1440 + mLight.getGisSunset() - mLight.getGisSunrise()) % 1440) / 10 : mLight.getSunsetRamp());
+        sunriseStart = mLight.getDaytimeStart();
+        sunriseRamp = mLight.getSunriseRamp();
+        sunsetEnd = mLight.getDaytimeEnd();
+        sunsetRamp = mLight.getSunsetRamp();
         turnoffEnable = mLight.getTurnoffEnable();
         turnoffTime = mLight.getTurnoffTime();
         byte[] brights = mLight.getDayBrights();
@@ -244,10 +218,8 @@ public class LightAutoFragment extends BaseFragment {
             }
         }
         if (!b) {
-            if (!gisValid) {
-                auto_tv_sunrise.setError("");
-                auto_tv_sunset.setError("");
-            }
+            auto_tv_sunrise.setError("");
+            auto_tv_sunset.setError("");
             auto_tv_turnoff.setError("");
         }
 
@@ -314,69 +286,11 @@ public class LightAutoFragment extends BaseFragment {
         else {
             auto_tv_turnoff.setText(R.string.disabled);
         }
-        auto_sw_gis.setChecked(mLight.getGisEnable());
-        auto_sw_gis.setText(mLight.getGisEnable() ? R.string.sync_func_enabled : R.string.sync_func_disabled);
-    }
-
-    private void showDisableGisDialog() {
-        if (mLight == null) {
-            return;
-        }
-        DecimalFormat df = new DecimalFormat("00");
-        int sunrise = mLight.getSunrise();
-        int sunset = mLight.getSunset();
-        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-        builder.setTitle("Disable Synchro Function")
-               .setMessage("Once disable, device will run the sunrise and sunset settings of manual settings. ")
-               .setNegativeButton(R.string.cancel, null)
-               .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-                   @Override
-                   public void onClick(DialogInterface dialog, int which) {
-                       mLightViewModel.setGisEnable(false);
-                   }
-               })
-               .show();
-    }
-
-    private void showEnableGisDialog() {
-        if (mLight == null) {
-            return;
-        }
-        DecimalFormat df = new DecimalFormat("00");
-//        int sunrise = mLight.getGisSunrise();
-//        int sunset = mLight.getGisSunset();
-        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-        builder.setTitle("Enable Synchro Function")
-               .setMessage("Once enable, device will run according to local sunrise and sunset time.")
-               .setNegativeButton(R.string.cancel, null)
-               .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-                   @Override
-                   public void onClick(DialogInterface dialog, int which) {
-                       XlinkCloudManager.getInstance().getDeviceLocation(mLight.getXDevice(), new XlinkRequestCallback<DeviceApi.DeviceGeographyResponse>() {
-                           @Override
-                           public void onError(String error) {
-                               Toast.makeText(getContext(), error, Toast.LENGTH_SHORT)
-                                    .show();
-                           }
-
-                           @Override
-                           public void onSuccess(DeviceApi.DeviceGeographyResponse response) {
-                               mLightViewModel.setGisEnable(true, (float) response.lon, (float) response.lat);
-                           }
-                       });
-                   }
-               })
-               .show();
     }
 
     @SuppressLint ("RestrictedApi")
     private void showEditSunriseDialog(final boolean sunset) {
         if (mLight == null) {
-            return;
-        }
-        if (gisValid) {
-            Toast.makeText(getContext(), "已开启定位功能，自动获取日出日落时间.", Toast.LENGTH_LONG)
-                 .show();
             return;
         }
         mEditing = true;

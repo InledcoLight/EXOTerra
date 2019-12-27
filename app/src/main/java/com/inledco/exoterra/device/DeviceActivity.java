@@ -208,10 +208,7 @@ public class DeviceActivity extends BaseActivity {
 
                 StringBuilder sb = new StringBuilder();
                 for (XLinkDataPoint dp : dataPoints) {
-                    sb.append(dp.getIndex()).append(" ")
-                      .append(dp.getName()).append(" ")
-                      .append(dp.getType()).append(" ")
-                      .append(dp.getValue()).append(" ").append(dp.getRawValue()).append("\n");
+                    sb.append(dp.toString()).append("\n");
                 }
                 Log.e(TAG, "onComplete: " + "    " + sb);
                 mDeviceBaseViewModel.postValue();
@@ -310,9 +307,9 @@ public class DeviceActivity extends BaseActivity {
             && TextUtils.equals(event.getDeviceTag(), mDevice.getDeviceTag())) {
             Device device = DeviceManager.getInstance().getDevice(event.getDeviceTag());
             if (device != null) {
-                for (XLinkDataPoint dp : device.getDataPointList()) {
-                    mDevice.setDataPoint(dp);
-                }
+//                for (XLinkDataPoint dp : device.getDataPointList()) {
+//                    mDevice.setDataPoint(dp);
+//                }
                 mDeviceBaseViewModel.postValue(device);
                 mDeviceViewModel.postValue();
             }

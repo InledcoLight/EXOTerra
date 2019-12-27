@@ -14,7 +14,6 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -30,6 +29,7 @@ import com.inledco.exoterra.event.DatapointChangedEvent;
 import com.inledco.exoterra.event.HomeChangedEvent;
 import com.inledco.exoterra.event.HomeDeviceChangedEvent;
 import com.inledco.exoterra.event.HomePropertyChangedEvent;
+import com.inledco.exoterra.event.HomesRefreshedEvent;
 import com.inledco.exoterra.group.GroupFragment;
 import com.inledco.exoterra.manager.HomeManager;
 import com.inledco.exoterra.xlink.XlinkCloudManager;
@@ -50,19 +50,19 @@ public class GroupsFragment extends BaseFragment {
 
     private final List<Home> mHomes = HomeManager.getInstance().getHomeList();
     private GroupsAdapter mAdapter;
-    private final XlinkRequestCallback<List<Home>> mHomesResponseCallback = new XlinkRequestCallback<List<Home>>() {
-        @Override
-        public void onError(String error) {
+//    private final XlinkRequestCallback<List<Home>> mHomesResponseCallback = new XlinkRequestCallback<List<Home>>() {
+//        @Override
+//        public void onError(String error) {
+//
+//        }
+//
+//        @Override
+//        public void onSuccess(List<Home> homes) {
+//            mAdapter.refreshData();
+//        }
+//    };
 
-        }
-
-        @Override
-        public void onSuccess(List<Home> homes) {
-            mAdapter.refreshData();
-        }
-    };
-
-    private final BroadcastReceiver mTimeChangeReceiver = new BroadcastReceiver() {
+    private final BroadcastReceiver mTimeReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             switch (intent.getAction()) {
@@ -92,20 +92,24 @@ public class GroupsFragment extends BaseFragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        getActivity().unregisterReceiver(mTimeChangeReceiver);
+        getActivity().unregisterReceiver(mTimeReceiver);
         if (EventBus.getDefault().isRegistered(this)) {
             EventBus.getDefault().unregister(this);
         }
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onHomesRefreshedEvent(HomesRefreshedEvent event) {
+        mAdapter.notifyDataSetChanged();
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
     public void onHomeChangedEvent(HomeChangedEvent event) {
-        HomeManager.getInstance().refreshHomeList(mHomesResponseCallback);
+
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onHomePropertyChangedEvent(HomePropertyChangedEvent event) {
-        Log.e(TAG, "onHomePropertyChangedEvent: ");
         for (int i = 0; i < mHomes.size(); i++) {
             if (TextUtils.equals(event.getHomeid(), mHomes.get(i).getHome().id)) {
                 mAdapter.updateData(i);
@@ -148,14 +152,13 @@ public class GroupsFragment extends BaseFragment {
         groups_rv = view.findViewById(R.id.groups_rv);
 
         groups_toolbar.inflateMenu(R.menu.menu_groups);
-        //        groups_rv.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL));
     }
 
     @Override
     protected void initData() {
         IntentFilter filter = new IntentFilter();
         filter.addAction(Intent.ACTION_TIME_TICK);
-        getActivity().registerReceiver(mTimeChangeReceiver, filter);
+        getActivity().registerReceiver(mTimeReceiver, filter);
 
         mAdapter = new GroupsAdapter(getContext(), mHomes);
         mAdapter.setOnItemClickListener(new OnItemClickListener() {
@@ -168,7 +171,7 @@ public class GroupsFragment extends BaseFragment {
             }
         });
         groups_rv.setAdapter(mAdapter);
-        HomeManager.getInstance().refreshHomeList(mHomesResponseCallback);
+        HomeManager.getInstance().refreshHomeList(null);
     }
 
     @Override
@@ -178,7 +181,6 @@ public class GroupsFragment extends BaseFragment {
             public boolean onMenuItemClick(MenuItem menuItem) {
                 switch (menuItem.getItemId()) {
                     case R.id.menu_groups_add:
-//                        showCreateGroupDialog();
                         addFragmentToStack(R.id.main_fl, new AddHabitatFragment());
                         break;
                 }
@@ -228,7 +230,7 @@ public class GroupsFragment extends BaseFragment {
 //                                    Log.e(TAG, "onSuccess: " + roomResponse.id + " " + roomResponse.name);
 //                                }
 //                            });
-                            HomeManager.getInstance().refreshHomeList(mHomesResponseCallback);
+                            HomeManager.getInstance().refreshHomeList(null);
                         }
                     });
                     dialog.dismiss();

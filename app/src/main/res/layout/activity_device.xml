@@ -13,12 +13,11 @@
         android:layout_height="wrap_content"
         android:minHeight="?attr/actionBarSize"
         android:theme="?attr/actionBarTheme"
+        android:background="@drawable/rect_gradient"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:navigationIcon="@drawable/ic_arrow_back_white_32dp">
-
-    </android.support.v7.widget.Toolbar>
+        app:navigationIcon="@drawable/ic_arrow_back_white_32dp"/>
 
     <FrameLayout
         android:id="@+id/device_fl_show"

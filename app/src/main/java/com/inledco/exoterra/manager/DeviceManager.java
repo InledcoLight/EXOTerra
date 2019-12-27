@@ -9,6 +9,7 @@ import com.inledco.exoterra.bean.EXOLedstrip;
 import com.inledco.exoterra.bean.EXOMonsoon;
 import com.inledco.exoterra.bean.EXOSocket;
 import com.inledco.exoterra.event.DatapointChangedEvent;
+import com.inledco.exoterra.event.DevicesRefreshedEvent;
 import com.inledco.exoterra.xlink.XlinkCloudManager;
 import com.inledco.exoterra.xlink.XlinkConstants;
 import com.inledco.exoterra.xlink.XlinkTaskCallback;
@@ -32,12 +33,14 @@ public class DeviceManager {
     private static final String TAG = "DeviceManager";
 
     private final Map<String, Device> mSubcribedDevices;
+    private final List<Device> mDevices;
 
     private boolean mSyncing;
     private AsyncTask<Void, Void, Void> mAsyncTask;
 
     private DeviceManager() {
         mSubcribedDevices = new ConcurrentHashMap<>();
+        mDevices = new ArrayList<>();
     }
 
     public static DeviceManager getInstance() {
@@ -85,6 +88,7 @@ public class DeviceManager {
 
     public void clear() {
         mSubcribedDevices.clear();
+        mDevices.clear();
     }
 
     public boolean contains(String key) {
@@ -143,20 +147,21 @@ public class DeviceManager {
     }
 
     public List<Device> getAllDevices() {
-        List<Device> list = new ArrayList<>(mSubcribedDevices.values());
-        Collections.sort(list, new Comparator<Device>() {
-            @Override
-            public int compare(Device o1, Device o2) {
-                if (o1.getXDevice().isOnline() && !o2.getXDevice().isOnline()) {
-                    return -1;
-                }
-                if (!o1.getXDevice().isOnline() && o2.getXDevice().isOnline()) {
-                    return 1;
-                }
-                return 0;
-            }
-        });
-        return list;
+//        List<Device> list = new ArrayList<>(mSubcribedDevices.values());
+//        Collections.sort(list, new Comparator<Device>() {
+//            @Override
+//            public int compare(Device o1, Device o2) {
+//                if (o1.getXDevice().isOnline() && !o2.getXDevice().isOnline()) {
+//                    return -1;
+//                }
+//                if (!o1.getXDevice().isOnline() && o2.getXDevice().isOnline()) {
+//                    return 1;
+//                }
+//                return 0;
+//            }
+//        });
+//        return list;
+        return mDevices;
     }
 
     public Set<String> getAllDeviceAddress() {
@@ -172,7 +177,25 @@ public class DeviceManager {
         }
     }
 
-    public void updateDevice(@NonNull final Device device) {
+    private void updateDevices(@NonNull final List<XDevice> xDevices) {
+        Set<String> oldsets = new HashSet<>(mSubcribedDevices.keySet());
+        Set<String> newsets = new HashSet<>();
+        for (XDevice xdev : xDevices) {
+            newsets.add(xdev.getProductId() + "_" + xdev.getMacAddress());
+        }
+        for (String key : oldsets) {
+            if (newsets.contains(key) == false) {
+                mSubcribedDevices.remove(key);
+            }
+        }
+        for (XDevice xdev : xDevices) {
+            updateDevice(xdev);
+        }
+        mDevices.clear();
+        mDevices.addAll(mSubcribedDevices.values());
+    }
+
+    public void refreshDevice(@NonNull final Device device) {
         if (contains(device) && device.getXDevice() != null && device.getXDevice().isOnline()) {
             XlinkCloudManager.getInstance().getDeviceDatapoints(device.getXDevice(), new XlinkTaskCallback<List<XLinkDataPoint>>() {
                 @Override
@@ -214,6 +237,7 @@ public class DeviceManager {
             @Override
             public void onComplete(List<XDevice> xDevices) {
                 mSubcribedDevices.clear();
+                mDevices.clear();
                 if (xDevices != null) {
                     for (XDevice xDevice : xDevices) {
                         if (xDevice != null) {
@@ -221,15 +245,18 @@ public class DeviceManager {
                         }
                     }
                 }
-
+                mDevices.addAll(mSubcribedDevices.values());
                 if (listener != null) {
-                    listener.onComplete(getAllDevices());
+                    listener.onComplete(mDevices);
                 }
             }
         });
     }
 
     public void syncSubcribeDevices(final XlinkTaskCallback<List<Device>> listener) {
+        if (mAsyncTask != null) {
+            mAsyncTask.cancel(true);
+        }
         XlinkCloudManager.getInstance().syncSubscribedDevices(new XlinkTaskCallback<List<XDevice>>() {
             @Override
             public void onError(String error) {
@@ -247,19 +274,28 @@ public class DeviceManager {
 
             @Override
             public void onComplete(List<XDevice> xDevices) {
-                mSubcribedDevices.clear();
-                if (xDevices != null) {
-                    for (final XDevice xDevice : xDevices) {
-                        if (xDevice != null) {
-                            updateDevice(xDevice);
-                        }
-                    }
-                }
+                updateDevices(xDevices);
+                EventBus.getDefault().post(new DevicesRefreshedEvent());
                 if (listener != null) {
-                    listener.onComplete(getAllDevices());
+                    listener.onComplete(mDevices);
                 }
-
                 getAllDeviceDatapoints();
+
+//                mSubcribedDevices.clear();
+//                mDevices.clear();
+//                if (xDevices != null) {
+//                    for (final XDevice xDevice : xDevices) {
+//                        if (xDevice != null) {
+//                            updateDevice(xDevice);
+//                        }
+//                    }
+//                }
+//                mDevices.addAll(mSubcribedDevices.values());
+//                if (listener != null) {
+//                    listener.onComplete(mDevices);
+//                }
+//
+//                getAllDeviceDatapoints();
             }
         });
     }
@@ -274,8 +310,8 @@ public class DeviceManager {
         mAsyncTask = new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... voids) {
-                for (Device dev : mSubcribedDevices.values()) {
-                    if (dev.getXDevice().isOnline()) {
+                for (Device dev : mDevices) {
+                    if (dev.getXDevice().isOnline() && !dev.isSynchronized()) {
                         XlinkTaskHandler<List<XLinkDataPoint>> callback = new XlinkTaskHandler<>();
                         XlinkCloudManager.getInstance().getDeviceDatapoints(dev.getXDevice(), callback);
                         while (!callback.isOver());

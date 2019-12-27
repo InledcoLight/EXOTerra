@@ -22,12 +22,10 @@ import android.widget.Toast;
 
 import com.inledco.exoterra.R;
 import com.inledco.exoterra.base.BaseFragment;
-import com.inledco.exoterra.event.HomeChangedEvent;
+import com.inledco.exoterra.manager.HomeManager;
 import com.inledco.exoterra.view.AdvancedTextInputEditText;
 import com.inledco.exoterra.xlink.XlinkCloudManager;
 import com.inledco.exoterra.xlink.XlinkRequestCallback;
-
-import org.greenrobot.eventbus.EventBus;
 
 import java.text.DateFormat;
 import java.text.DecimalFormat;
@@ -222,11 +220,12 @@ public class AddHabitatFragment extends BaseFragment {
                     public void onError(String error) {
                         Toast.makeText(getContext(), error, Toast.LENGTH_SHORT)
                              .show();
+                        getActivity().getSupportFragmentManager().popBackStack();
                     }
 
                     @Override
                     public void onSuccess(String s) {
-                        EventBus.getDefault().post(new HomeChangedEvent());
+                        HomeManager.getInstance().refreshHomeList(null);
                         getActivity().getSupportFragmentManager().popBackStack();
                     }
                 });

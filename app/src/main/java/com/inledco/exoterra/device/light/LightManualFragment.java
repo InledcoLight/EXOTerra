@@ -30,6 +30,7 @@ import com.inledco.exoterra.R;
 import com.inledco.exoterra.base.BaseFragment;
 import com.inledco.exoterra.bean.EXOLedstrip;
 import com.inledco.exoterra.bean.LightSpectrum;
+import com.inledco.exoterra.common.OnItemClickListener;
 import com.inledco.exoterra.util.LightUtil;
 import com.inledco.exoterra.util.SpectrumUtil;
 import com.inledco.exoterra.view.MultiCircleProgress;
@@ -52,7 +53,10 @@ public class LightManualFragment extends BaseFragment {
 
     private LightViewModel mLightViewModel;
     private EXOLedstrip mLight;
-    private VerticalSliderAdapter mAdapter;
+//    private VerticalSliderAdapter mAdapter;
+    private SliderAdapter mAdapter;
+
+    private int mSelected = -1;
 
     private LightSpectrum mLightSpectrum;
 
@@ -101,12 +105,13 @@ public class LightManualFragment extends BaseFragment {
         xAxis.setGranularityEnabled(true);
         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
         xAxis.setDrawGridLines(false);
-        xAxis.setDrawAxisLine(true);
+        xAxis.setDrawAxisLine(false);
         xAxis.setAxisLineColor(Color.WHITE);
         xAxis.setTextColor(Color.WHITE);
         xAxis.setAxisMaximum(getResources().getInteger(R.integer.spectrum_wavelength_max));
         xAxis.setAxisMinimum(getResources().getInteger(R.integer.spectrum_wavelength_min));
         xAxis.setLabelCount(5, false);
+        xAxis.setDrawLabels(false);
         xAxis.setValueFormatter(new ValueFormatter() {
             @Override
             public String getFormattedValue(float value) {
@@ -122,14 +127,15 @@ public class LightManualFragment extends BaseFragment {
                 return df.format(value);
             }
         };
-        axisLeft.setAxisMaximum(1.1f);
+        axisLeft.setAxisMaximum(1.0f);
         axisLeft.setAxisMinimum(0);
         axisLeft.setLabelCount(6, false);
+        axisLeft.setDrawLabels(false);
         axisLeft.setValueFormatter(formatter);
         axisLeft.setPosition(YAxis.YAxisLabelPosition.OUTSIDE_CHART);
         axisLeft.setTextColor(Color.WHITE);
         axisLeft.setDrawGridLines(false);
-        axisLeft.setDrawAxisLine(true);
+        axisLeft.setDrawAxisLine(false);
         axisLeft.setAxisLineColor(Color.WHITE);
         axisLeft.setGranularity(0.1f);
         axisLeft.setGranularityEnabled(true);
@@ -160,12 +166,15 @@ public class LightManualFragment extends BaseFragment {
     protected void initData() {
         mLightViewModel = ViewModelProviders.of(getActivity()).get(LightViewModel.class);
         mLight = mLightViewModel.getData();
-        mAdapter = new VerticalSliderAdapter(getContext(), mLight) {
+        mAdapter = new SliderAdapter(getContext(), mLight);
+        mAdapter.setOnItemClickListener(new OnItemClickListener() {
             @Override
-            protected void setBright(int idx, int bright) {
-                mLightViewModel.setBright(idx, bright);
+            public void onItemClick(int position) {
+                if (mSelected == position) {
+                    mSelected = -1;
+                }
             }
-        };
+        });
         light_manual_rv.setAdapter(mAdapter);
         mLightViewModel.observe(this, new Observer<EXOLedstrip>() {
             @Override

@@ -3,11 +3,11 @@ package com.inledco.exoterra.device.socket;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
-import android.os.CountDownTimer;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.AppCompatImageButton;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -37,18 +37,6 @@ public class SocketControlFragment extends BaseFragment {
     private SocketViewModel mSocketViewModel;
     private EXOSocket mSocket;
 
-    private CountDownTimer mTimer = new CountDownTimer(200000, 2000) {
-        @Override
-        public void onTick(long millisUntilFinished) {
-            mSocketViewModel.setPower(!mSocket.getPower());
-        }
-
-        @Override
-        public void onFinish() {
-
-        }
-    };
-
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -62,8 +50,6 @@ public class SocketControlFragment extends BaseFragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        mTimer.cancel();
-        mTimer = null;
     }
 
     @Override
@@ -141,14 +127,6 @@ public class SocketControlFragment extends BaseFragment {
                 mSocketViewModel.setPower(!mSocket.getPower());
             }
         });
-
-        socket_control_power.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                mTimer.start();
-                return true;
-            }
-        });
     }
 
     private void refreshData() {
@@ -170,6 +148,7 @@ public class SocketControlFragment extends BaseFragment {
             socket_control_ll.setVisibility(View.INVISIBLE);
         }
 
+        Log.e(TAG, "refreshData: " + mSocket.getPower());
         socket_control_power.setImageResource(mSocket.getPower() ? R.drawable.ic_power_blue : R.drawable.ic_power_red);
         socket_control_status.setText(getString(R.string.current_status) + (mSocket.getPower() ? getString(R.string.on) : getString(R.string.off)));
         socket_control_life.setText("" + mSocket.getSwitchCount() + "/" + mSocket.getSwitchCountMax());

@@ -4,12 +4,9 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.inledco.exoterra.bean.Home2;
-import com.inledco.exoterra.event.HomeChangedEvent;
 import com.inledco.exoterra.xlink.HomesExtendApi;
 import com.inledco.exoterra.xlink.XlinkCloudManager;
 import com.inledco.exoterra.xlink.XlinkRequestCallback;
-
-import org.greenrobot.eventbus.EventBus;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -145,7 +142,6 @@ public class Home2Manager {
             public void onSuccess(HomesExtendApi.HomesResponse response) {
                 mHome2List.clear();
                 mHome2List.addAll(response.list);
-                EventBus.getDefault().post(new HomeChangedEvent());
             }
         });
     }

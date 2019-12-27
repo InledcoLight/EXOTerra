@@ -67,4 +67,18 @@
         <attr name="colorStart" format="color|reference"/>
         <attr name="colorEnd" format="color|reference"/>
     </declare-styleable>
+
+    <declare-styleable name="CircleSeekbar">
+        <attr name="minProgress" format="integer"/>
+        <attr name="maxProgress" format="integer"/>
+        <attr name="curProgress" format="integer"/>
+        <attr name="unreachedColor" format="color|reference"/>
+        <attr name="progressColor" format="color|reference"/>
+        <attr name="pointerColor" format="color|reference"/>
+        <attr name="unreachedWidth" format="dimension|reference"/>
+        <attr name="progressWidth" format="dimension|reference"/>
+        <attr name="pointerRadius" format="dimension|reference"/>
+        <attr name="seekable" format="boolean"/>
+        <attr name="scrollOnce" format="boolean"/>
+    </declare-styleable>
 </resources>

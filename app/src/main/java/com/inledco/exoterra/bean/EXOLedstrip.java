@@ -37,14 +37,14 @@ public class EXOLedstrip extends Device {
     private final int INDEX_CUSTOM2_BRIGHTS     = 26;
     private final int INDEX_CUSTOM3_BRIGHTS     = 27;
     private final int INDEX_CUSTOM4_BRIGHTS     = 28;
-    private final int INDEX_GIS_ENABLE          = 29;
-    private final int INDEX_GIS_SUNRISE         = 30;
-    private final int INDEX_GIS_SUNSET          = 31;
-    private final int INDEX_GIS_VALID           = 32;
-    private final int INDEX_SUNRISE             = 33;
+//    private final int INDEX_GIS_ENABLE          = 29;
+//    private final int INDEX_GIS_SUNRISE         = 30;
+//    private final int INDEX_GIS_SUNSET          = 31;
+//    private final int INDEX_GIS_VALID           = 32;
+//    private final int INDEX_SUNRISE             = 33;
     private final int INDEX_SUNRISE_RAMP        = 34;
     private final int INDEX_DAY_BRIGHTS         = 35;
-    private final int INDEX_SUNSET              = 36;
+//    private final int INDEX_SUNSET              = 36;
     private final int INDEX_SUNSET_RAMP         = 37;
     private final int INDEX_NIGHT_BRIGHTS       = 38;
     private final int INDEX_TURNOFF_ENABLE      = 39;
@@ -63,7 +63,7 @@ public class EXOLedstrip extends Device {
     private final int PROFILE_COUNT_MAX         = 12;
     private final int BRIGHT_MAX                = 1000;
     private final int POINTS_COUNT_MIN          = 4;
-    private final int POINTS_COUNT_MAX          = 10;
+    private final int POINTS_COUNT_MAX          = 12;
 
     public static final int MODE_MANUAL         = 0;
     public static final int MODE_AUTO           = 1;
@@ -226,36 +226,36 @@ public class EXOLedstrip extends Device {
 //        return cmd;
 //    }
 
-    public boolean getGisEnable() {
-        return getBoolean(INDEX_GIS_ENABLE);
-    }
-
-    public XLinkDataPoint setGisEnable(boolean enable) {
-        return setBoolean(INDEX_GIS_ENABLE, enable);
-    }
-
-    public int getGisSunrise() {
-        return getUShort(INDEX_GIS_SUNRISE);
-    }
-
-    public int getGisSunset() {
-        return getUShort(INDEX_GIS_SUNSET);
-    }
-
-    public boolean getGisValid() {
-        return getBoolean(INDEX_GIS_VALID);
-    }
-
-    public int getSunrise() {
-        return getUShort(INDEX_SUNRISE);
-    }
-
-    public XLinkDataPoint setSunrise(int sunrise) {
-        if (sunrise < 0 || sunrise > 1439) {
-            return null;
-        }
-        return setUShort(INDEX_SUNRISE, (short) sunrise);
-    }
+//    public boolean getGisEnable() {
+//        return getBoolean(INDEX_GIS_ENABLE);
+//    }
+//
+//    public XLinkDataPoint setGisEnable(boolean enable) {
+//        return setBoolean(INDEX_GIS_ENABLE, enable);
+//    }
+//
+//    public int getGisSunrise() {
+//        return getUShort(INDEX_GIS_SUNRISE);
+//    }
+//
+//    public int getGisSunset() {
+//        return getUShort(INDEX_GIS_SUNSET);
+//    }
+//
+//    public boolean getGisValid() {
+//        return getBoolean(INDEX_GIS_VALID);
+//    }
+//
+//    public int getSunrise() {
+//        return getUShort(INDEX_SUNRISE);
+//    }
+//
+//    public XLinkDataPoint setSunrise(int sunrise) {
+//        if (sunrise < 0 || sunrise > 1439) {
+//            return null;
+//        }
+//        return setUShort(INDEX_SUNRISE, (short) sunrise);
+//    }
 
     public int getSunriseRamp() {
         return getByte(INDEX_SUNRISE_RAMP)&0xFF;
@@ -284,16 +284,16 @@ public class EXOLedstrip extends Device {
         return setByteArray(INDEX_DAY_BRIGHTS, brights);
     }
 
-    public int getSunset() {
-        return getUShort(INDEX_SUNSET);
-    }
-
-    public XLinkDataPoint setSunset(int sunset) {
-        if (sunset < 0 || sunset > 1439) {
-            return null;
-        }
-        return setUShort(INDEX_SUNSET, (short) sunset);
-    }
+//    public int getSunset() {
+//        return getUShort(INDEX_SUNSET);
+//    }
+//
+//    public XLinkDataPoint setSunset(int sunset) {
+//        if (sunset < 0 || sunset > 1439) {
+//            return null;
+//        }
+//        return setUShort(INDEX_SUNSET, (short) sunset);
+//    }
 
     public int getSunsetRamp() {
         return getByte(INDEX_SUNSET_RAMP)&0xFF;

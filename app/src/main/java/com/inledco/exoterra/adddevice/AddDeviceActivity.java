@@ -2,12 +2,14 @@ package com.inledco.exoterra.adddevice;
 
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 
+import com.inledco.exoterra.AppConstants;
 import com.inledco.exoterra.R;
 import com.inledco.exoterra.base.BaseActivity;
 
@@ -40,7 +42,12 @@ public class AddDeviceActivity extends BaseActivity {
 
     @Override
     protected void initData() {
-        mConnectNetBean = new ConnectNetBean();
+        String homeid = null;
+        Intent intent = getIntent();
+        if (intent != null) {
+            homeid = intent.getStringExtra(AppConstants.HOME_ID);
+        }
+        mConnectNetBean = new ConnectNetBean(homeid);
         mConnectNetViewModel = ViewModelProviders.of(this).get(ConnectNetViewModel.class);
         mConnectNetViewModel.setData(mConnectNetBean);
         replaceFragment(R.id.adddevice_fl, new ProductsFragment());

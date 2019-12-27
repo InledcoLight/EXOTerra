@@ -17,7 +17,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:navigationIcon="@drawable/ic_arrow_back_white_32dp"
-        app:title="@string/add_device_to_home"/>
+        app:title="@string/add_device_to_habitat"/>
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/add_home_devie_rv"

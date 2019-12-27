@@ -28,6 +28,8 @@ import com.inledco.exoterra.main.devices.LocalDevicesFragment;
 import com.inledco.exoterra.main.groups.GroupsFragment;
 import com.inledco.exoterra.main.home.HomeFragment;
 import com.inledco.exoterra.main.me.MeFragment;
+import com.inledco.exoterra.manager.DeviceManager;
+import com.inledco.exoterra.manager.HomeManager;
 import com.inledco.exoterra.manager.UserManager;
 import com.inledco.exoterra.push.AlipushService;
 import com.inledco.exoterra.push.FCMMessageService;
@@ -91,6 +93,8 @@ public class MainActivity extends BaseActivity {
     @Override
     protected void initData() {
         XLinkSDK.start();
+        DeviceManager.getInstance().syncSubcribeDevices(null);
+        HomeManager.getInstance().refreshHomeList(null);
         replaceFragment(R.id.main_fl_show, new HomeFragment());
 //        if (checkCameraPermissions() == false) {
 //            requestCameraPermission();

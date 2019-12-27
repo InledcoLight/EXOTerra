@@ -891,7 +891,6 @@ public class XlinkCloudManager {
         XLinkRestful.getApplicationApi().getHomeProperty(homeid).enqueue(new XlinkRequestCallback<Map<String, HomeApi.HomeProperty>>() {
             @Override
             public void onError(String error) {
-                Log.e(TAG, "onError: " + homeid + " " + error);
                 if (callback != null) {
                     callback.onError(error);
                 }
@@ -899,15 +898,28 @@ public class XlinkCloudManager {
 
             @Override
             public void onSuccess(Map<String, HomeApi.HomeProperty> map) {
-                Log.e(TAG, "onSuccess: " + map);
                 if (map.containsKey("zone") && map.containsKey("sunrise") && map.containsKey("sunset")) {
-                    Object zone = map.get("zone").value;
-                    Object sunrise = map.get("sunrise").value;
-                    Object sunset = map.get("sunset").value;
-                    if (zone instanceof Integer && sunrise instanceof Integer && sunset instanceof Integer) {
-                        HomeProperty property = new HomeProperty((Integer) zone, (Integer) sunrise, (Integer) sunset);
+                    Object rawZone = map.get("zone").value;
+                    Object rawSunrise = map.get("sunrise").value;
+                    Object rawSunset = map.get("sunset").value;
+                    if (rawZone instanceof String && rawSunrise instanceof String && rawSunset instanceof String) {
+                        try {
+                            int zone = Integer.parseInt((String) rawZone);
+                            int sunrise = Integer.parseInt((String) rawSunrise);
+                            int sunset = Integer.parseInt((String) rawSunset);
+                            HomeProperty property = new HomeProperty(zone, sunrise, sunset);
+                            if (callback != null) {
+                                callback.onSuccess(property);
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            if (callback != null) {
+                                callback.onError(e.getMessage());
+                            }
+                        }
+                    } else {
                         if (callback != null) {
-                            callback.onSuccess(property);
+                            callback.onError(null);
                         }
                     }
                 }
@@ -951,12 +963,6 @@ public class XlinkCloudManager {
     }
 
     public void renameHome(@NonNull final String homeid, @NonNull final String newName, final XlinkRequestCallback<String> callback) {
-//        if (TextUtils.equals(newName, XlinkConstants.DEFAULT_HOME_NAME)) {
-//            if (callback != null) {
-//                callback.onError("Invalid input");
-//            }
-//            return;
-//        }
         HomeApi.HomeRequest request = new HomeApi.HomeRequest();
         request.name = newName;
         XLinkRestful.getApplicationApi()

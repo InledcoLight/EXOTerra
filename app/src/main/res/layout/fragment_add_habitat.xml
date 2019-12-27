@@ -39,6 +39,7 @@
             android:layout_height="wrap_content"
             android:hint="@string/habitat_name"
             android:lines="1"
+            android:imeOptions="actionDone"
             android:maxLength="32"
             android:maxLines="1" />
     </android.support.design.widget.TextInputLayout>

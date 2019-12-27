@@ -24,11 +24,11 @@ import com.inledco.exoterra.bean.Device;
 import com.inledco.exoterra.device.DeviceActivity;
 import com.inledco.exoterra.event.DatapointChangedEvent;
 import com.inledco.exoterra.event.DeviceStateChangedEvent;
-import com.inledco.exoterra.event.HomeDeviceChangedEvent;
 import com.inledco.exoterra.event.HomeMemberChangedEvent;
 import com.inledco.exoterra.event.SubscribeChangedEvent;
 import com.inledco.exoterra.manager.DeviceManager;
 import com.inledco.exoterra.manager.Home2Manager;
+import com.inledco.exoterra.manager.HomeManager;
 import com.inledco.exoterra.manager.UserManager;
 import com.inledco.exoterra.splash.SplashActivity;
 import com.inledco.exoterra.util.DeviceUtil;
@@ -259,7 +259,8 @@ public class EXOTerraApplication extends Application {
                     case EventNotify.MSG_TYPE_SUBSCRIPTION_CHANGE:      //6
                         final EventNotifyHelper.SubscriptionChangeNotify subscriptionChangeNotify = EventNotifyHelper.parseSubscriptionChangeNotify(notify.payload);
                         Log.e(TAG, "onEventNotify: subscribeChanged - " + subscriptionChangeNotify.toString());
-                        EventBus.getDefault().post(new SubscribeChangedEvent());
+                        DeviceManager.getInstance().syncSubcribeDevices(null);
+//                        EventBus.getDefault().post(new SubscribeChangedEvent());
                         break;
                     case EventNotify.MSG_TYPE_ONLINE_STATE_CHANGE:      //7
                         final EventNotifyHelper.OnlineStateChangeNotify onlineStateChangeNotify = EventNotifyHelper.parseOnlineStateChangeNotify(notify.payload);
@@ -297,7 +298,7 @@ public class EXOTerraApplication extends Application {
                         final EventNotifyHelper.HomeDeviceChangedNotify homeDeviceChangedNotify = EventNotifyHelper.parseNotifyEntityFromJson(notify.payload,
                                                                                                                                               EventNotifyHelper.HomeDeviceChangedNotify.class);
                         Log.e(TAG, "onEventNotify: homeDeviceChanged - " + homeDeviceChangedNotify.toString());
-                        EventBus.getDefault().post(new HomeDeviceChangedEvent(homeDeviceChangedNotify.home_id));
+                        HomeManager.getInstance().refreshHomeDevices(homeDeviceChangedNotify.home_id);
                         break;
                 }
             }
@@ -309,8 +310,8 @@ public class EXOTerraApplication extends Application {
                 Device device = DeviceManager.getInstance().getDevice(xDevice);
                 if (device != null) {
                     device.setXDevice(xDevice);
-                    DeviceManager.getInstance().updateDevice(device);
                     EventBus.getDefault().post(new DeviceStateChangedEvent(device.getDeviceTag(), state));
+                    DeviceManager.getInstance().refreshDevice(device);
                 }
             }
 
@@ -625,7 +626,7 @@ public class EXOTerraApplication extends Application {
         String home = TextUtils.isEmpty(notify.home_name) ? notify.home_id : notify.home_name;
         NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         NotificationCompat.Builder builder = new NotificationCompat.Builder(mCurrentActivity.get(), "home_member_changed");
-        Notification notification = builder.setContentTitle("Join Home2")
+        Notification notification = builder.setContentTitle("Join Habitat")
                                            .setContentText("User " + notify.name + " join home " + home + ".")
                                            .setWhen(System.currentTimeMillis())
                                            .setSmallIcon(R.drawable.ic_device_default_black_64dp)
@@ -638,7 +639,7 @@ public class EXOTerraApplication extends Application {
         String home = TextUtils.isEmpty(notify.home_name) ? notify.home_id : notify.home_name;
         NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, "home_member_changed");
-        Notification notification = builder.setContentTitle("Leave Home2")
+        Notification notification = builder.setContentTitle("Leave Habitat")
                                            .setContentText("User " + notify.name + " leave home " + home + ".")
                                            .setWhen(System.currentTimeMillis())
                                            .setSmallIcon(R.drawable.ic_device_default_black_64dp)
@@ -651,8 +652,8 @@ public class EXOTerraApplication extends Application {
         if (getNotificationManager() != null) {
             String home = TextUtils.isEmpty(notify.home_name) ? notify.home_id : notify.home_name;
             NotificationCompat.Builder builder = new NotificationCompat.Builder(this, getString(R.string.notify_chnid_delete_home));
-            Notification notification = builder.setContentTitle("Delete Home2")
-                                               .setContentText("Home2 " + home + " was deleted.")
+            Notification notification = builder.setContentTitle("Delete Habitat")
+                                               .setContentText("Habitat " + home + " was deleted.")
                                                .setWhen(System.currentTimeMillis())
                                                .setSmallIcon(R.drawable.ic_device_default_black_64dp)
                                                .setAutoCancel(true)

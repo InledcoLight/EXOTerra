@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="?attr/selectableItemBackground"
+    android:orientation="vertical"
+    android:gravity="center_horizontal">
+
+    <com.github.lzyzsd.circleprogress.DonutProgress
+        android:id="@+id/item_progress_percent"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        app:donut_circle_starting_degree="270"
+        app:donut_finished_color="@color/colorWhite"
+        app:donut_finished_stroke_width="6dp"
+        app:donut_max="1000"
+        app:donut_prefix_text=""
+        app:donut_progress="0"
+        app:donut_suffix_text=" %"
+        app:donut_text="0 %"
+        app:donut_text_size="@dimen/textSizeSecondary"
+        app:donut_text_color="@color/colorWhite"
+        app:donut_unfinished_color="@color/colorGray"
+        app:donut_unfinished_stroke_width="6dp"/>
+    <TextView
+        android:id="@+id/item_progress_color"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/textColorSencondary"
+        android:textSize="12sp"/>
+
+</LinearLayout>

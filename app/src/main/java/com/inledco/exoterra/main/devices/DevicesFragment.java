@@ -22,7 +22,7 @@ import com.inledco.exoterra.common.OnItemClickListener;
 import com.inledco.exoterra.device.DeviceActivity;
 import com.inledco.exoterra.event.DatapointChangedEvent;
 import com.inledco.exoterra.event.DeviceStateChangedEvent;
-import com.inledco.exoterra.event.SubscribeChangedEvent;
+import com.inledco.exoterra.event.DevicesRefreshedEvent;
 import com.inledco.exoterra.manager.DeviceManager;
 import com.inledco.exoterra.scan.ScanActivity;
 import com.inledco.exoterra.smartconfig.SmartconfigActivity;
@@ -32,7 +32,6 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class DevicesFragment extends BaseFragment {
@@ -40,7 +39,7 @@ public class DevicesFragment extends BaseFragment {
     private SwipeRefreshLayout devices_swipe_refresh;
     private RecyclerView devices_rv_show;
 
-    private final List<Device> mDevices = new ArrayList<>();
+    private final List<Device> mDevices = DeviceManager.getInstance().getAllDevices();
     private DevicesAdapter mAdapter;
 
 //    private AsyncTask<Void, Void, Void> mGetPropertyTask;
@@ -124,8 +123,9 @@ public class DevicesFragment extends BaseFragment {
     }
 
     @Subscribe (threadMode = ThreadMode.MAIN)
-    public void onSubscribeChangedEvent(SubscribeChangedEvent event) {
-        refreshDevices();
+    public void onDevicesRefreshedEvent(DevicesRefreshedEvent event) {
+        mAdapter.notifyDataSetChanged();
+        devices_swipe_refresh.setRefreshing(false);
     }
 
     @Subscribe (threadMode = ThreadMode.MAIN)
@@ -154,15 +154,12 @@ public class DevicesFragment extends BaseFragment {
         DeviceManager.getInstance().syncSubcribeDevices(new XlinkTaskCallback<List<Device>>() {
             @Override
             public void onError(String error) {
-
+                devices_swipe_refresh.setRefreshing(false);
             }
 
             @Override
             public void onComplete(List<Device> devices) {
-                mDevices.clear();
-                mDevices.addAll(devices);
-                mAdapter.notifyDataSetChanged();
-                devices_swipe_refresh.setRefreshing(false);
+
             }
         });
     }

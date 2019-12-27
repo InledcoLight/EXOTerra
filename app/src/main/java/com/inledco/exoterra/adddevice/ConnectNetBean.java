@@ -1,6 +1,7 @@
 package com.inledco.exoterra.adddevice;
 
 public class ConnectNetBean {
+    private String mHomeid;
     private String mProductId;
     private String mSsid;
     private String mBssid;
@@ -10,6 +11,18 @@ public class ConnectNetBean {
     private boolean mConflict;
     private boolean mCompatibleMode;
     private boolean mRunning;
+
+    public ConnectNetBean() {
+
+    }
+
+    public ConnectNetBean(String homeid) {
+        mHomeid = homeid;
+    }
+
+    public String getHomeid() {
+        return mHomeid;
+    }
 
     public String getProductId() {
         return mProductId;

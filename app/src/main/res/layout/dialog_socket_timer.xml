@@ -1,30 +1,103 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              xmlns:app="http://schemas.android.com/apk/res-auto"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent"
-              android:orientation="vertical">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_marginTop="8dp"
+    android:layout_marginLeft="8dp"
+    android:layout_marginRight="8dp"
+    android:gravity="center_horizontal"
+    android:orientation="vertical">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:gravity="center_vertical"
-        android:padding="8dp">
-        <ImageView
+        android:gravity="center_vertical">
+        <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:srcCompat="@drawable/ic_alarm_white_32dp"
-            android:background="@android:color/transparent"/>
+            android:textColor="@color/textColorPrimary"
+            android:textSize="@dimen/textSizePrimary"
+            android:text="@string/action"/>
         <Space
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"/>
-        <TimePicker
-            android:id="@+id/dialog_socket_timer"
+        <Spinner
+            android:id="@+id/dialog_socket_action"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:timePickerMode="spinner"/>
+            android:entries="@array/socket_actions"/>
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/colorDivider"/>
+
+    <RadioGroup
+        android:id="@+id/dialog_socket_rg"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <RadioButton
+            android:id="@+id/dialog_socket_start"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="4dp"
+            android:gravity="right"
+            android:button="@null"
+            android:background="?attr/selectableItemBackground"
+            android:textSize="@dimen/textSizePrimary"
+            android:textColor="@color/selector_week"
+            android:text=""/>
+        <RadioButton
+            android:id="@+id/dialog_socket_end"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="4dp"
+            android:gravity="right"
+            android:button="@null"
+            android:background="?attr/selectableItemBackground"
+            android:textSize="@dimen/textSizePrimary"
+            android:textColor="@color/selector_week"
+            android:text=""/>
+    </RadioGroup>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/colorDivider"/>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center">
+
+        <NumberPicker
+            android:id="@+id/dialog_socket_hour"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="6dp"
+            android:text=":"/>
+        <NumberPicker
+            android:id="@+id/dialog_socket_minute"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="6dp"
+            android:text=":"/>
+        <NumberPicker
+            android:id="@+id/dialog_socket_second"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
     </LinearLayout>
 
     <View
@@ -36,44 +109,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:gravity="center_vertical"
-        android:padding="8dp">
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:srcCompat="@drawable/ic_power_white_32dp"
-            android:background="@android:color/transparent"/>
-        <Space
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"/>
-        <ToggleButton
-            android:id="@+id/dialog_socket_power"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="?attr/selectableItemBackground"
-            android:textAllCaps="false"
-            android:textColor="@color/seletor_power_onoff"
-            android:textOn="@string/poweron"
-            android:textOff="@string/poweroff"/>
-    </LinearLayout>
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="@color/colorGray"/>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center_vertical"
-        android:padding="8dp">
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:srcCompat="@drawable/ic_date_white_32dp"
-            android:background="@android:color/transparent"/>
+        android:gravity="center_vertical">
         <Space
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -84,68 +120,240 @@
             android:layout_height="wrap_content"
             android:padding="8dp"
             android:button="@null"
-            android:checked="true"
             android:textColor="@color/selector_week"
             android:text="@string/week_sun"/>
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"/>
         <CheckBox
             android:id="@+id/dialog_socket_mon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:padding="8dp"
             android:button="@null"
-            android:checked="true"
             android:textColor="@color/selector_week"
             android:text="@string/week_mon"/>
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"/>
         <CheckBox
             android:id="@+id/dialog_socket_tue"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:padding="8dp"
             android:button="@null"
-            android:checked="true"
             android:textColor="@color/selector_week"
             android:text="@string/week_tue"/>
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"/>
         <CheckBox
             android:id="@+id/dialog_socket_wed"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:padding="8dp"
             android:button="@null"
-            android:checked="true"
             android:textColor="@color/selector_week"
             android:text="@string/week_wed"/>
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"/>
         <CheckBox
             android:id="@+id/dialog_socket_thu"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:padding="8dp"
             android:button="@null"
-            android:checked="true"
             android:textColor="@color/selector_week"
             android:text="@string/week_thu"/>
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"/>
         <CheckBox
             android:id="@+id/dialog_socket_fri"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:padding="8dp"
-            android:checked="true"
             android:button="@null"
             android:textColor="@color/selector_week"
             android:text="@string/week_fri"/>
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"/>
         <CheckBox
             android:id="@+id/dialog_socket_sat"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:padding="8dp"
             android:button="@null"
-            android:checked="true"
             android:textColor="@color/selector_week"
             android:text="@string/week_sat"/>
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"/>
     </LinearLayout>
+
+    <TextView
+        android:id="@+id/dialog_socket_exec"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="right"
+        android:textColor="@color/textColorPrimary"
+        android:text="@string/execute_once"/>
 
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="@color/colorGray"/>
+        android:background="@color/colorDivider"/>
+
+<!--    <LinearLayout-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:orientation="horizontal"-->
+<!--        android:gravity="center_vertical"-->
+<!--        android:padding="8dp">-->
+<!--        <ImageView-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            app:srcCompat="@drawable/ic_alarm_white_32dp"-->
+<!--            android:background="@android:color/transparent"/>-->
+<!--        <Space-->
+<!--            android:layout_width="0dp"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_weight="1"/>-->
+<!--        <TimePicker-->
+<!--            android:id="@+id/dialog_socket_timer"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:timePickerMode="spinner"/>-->
+<!--    </LinearLayout>-->
+
+<!--    <View-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="1dp"-->
+<!--        android:background="@color/colorDivider"/>-->
+
+<!--    <LinearLayout-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:orientation="horizontal"-->
+<!--        android:gravity="center_vertical"-->
+<!--        android:padding="8dp">-->
+<!--        <ImageView-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            app:srcCompat="@drawable/ic_power_white_32dp"-->
+<!--            android:background="@android:color/transparent"/>-->
+<!--        <Space-->
+<!--            android:layout_width="0dp"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_weight="1"/>-->
+<!--        <ToggleButton-->
+<!--            android:id="@+id/dialog_socket_power"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:background="?attr/selectableItemBackground"-->
+<!--            android:textAllCaps="false"-->
+<!--            android:textColor="@color/seletor_power_onoff"-->
+<!--            android:textOn="@string/poweron"-->
+<!--            android:textOff="@string/poweroff"/>-->
+<!--    </LinearLayout>-->
+
+<!--    <View-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="1dp"-->
+<!--        android:background="@color/colorGray"/>-->
+
+<!--    <LinearLayout-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:orientation="horizontal"-->
+<!--        android:gravity="center_vertical"-->
+<!--        android:padding="8dp">-->
+<!--        <ImageView-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            app:srcCompat="@drawable/ic_date_white_32dp"-->
+<!--            android:background="@android:color/transparent"/>-->
+<!--        <Space-->
+<!--            android:layout_width="0dp"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_weight="1"/>-->
+<!--        <CheckBox-->
+<!--            android:id="@+id/dialog_socket_sun"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:padding="8dp"-->
+<!--            android:button="@null"-->
+<!--            android:checked="true"-->
+<!--            android:textColor="@color/selector_week"-->
+<!--            android:text="@string/week_sun"/>-->
+<!--        <CheckBox-->
+<!--            android:id="@+id/dialog_socket_mon"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:padding="8dp"-->
+<!--            android:button="@null"-->
+<!--            android:checked="true"-->
+<!--            android:textColor="@color/selector_week"-->
+<!--            android:text="@string/week_mon"/>-->
+<!--        <CheckBox-->
+<!--            android:id="@+id/dialog_socket_tue"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:padding="8dp"-->
+<!--            android:button="@null"-->
+<!--            android:checked="true"-->
+<!--            android:textColor="@color/selector_week"-->
+<!--            android:text="@string/week_tue"/>-->
+<!--        <CheckBox-->
+<!--            android:id="@+id/dialog_socket_wed"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:padding="8dp"-->
+<!--            android:button="@null"-->
+<!--            android:checked="true"-->
+<!--            android:textColor="@color/selector_week"-->
+<!--            android:text="@string/week_wed"/>-->
+<!--        <CheckBox-->
+<!--            android:id="@+id/dialog_socket_thu"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:padding="8dp"-->
+<!--            android:button="@null"-->
+<!--            android:checked="true"-->
+<!--            android:textColor="@color/selector_week"-->
+<!--            android:text="@string/week_thu"/>-->
+<!--        <CheckBox-->
+<!--            android:id="@+id/dialog_socket_fri"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:padding="8dp"-->
+<!--            android:checked="true"-->
+<!--            android:button="@null"-->
+<!--            android:textColor="@color/selector_week"-->
+<!--            android:text="@string/week_fri"/>-->
+<!--        <CheckBox-->
+<!--            android:id="@+id/dialog_socket_sat"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:padding="8dp"-->
+<!--            android:button="@null"-->
+<!--            android:checked="true"-->
+<!--            android:textColor="@color/selector_week"-->
+<!--            android:text="@string/week_sat"/>-->
+<!--    </LinearLayout>-->
+
+<!--    <View-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="1dp"-->
+<!--        android:background="@color/colorGray"/>-->
 
 </LinearLayout>

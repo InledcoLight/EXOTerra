@@ -31,25 +31,25 @@ public class LightViewModel extends DeviceViewModel<EXOLedstrip> {
         setDeviceDatapoint(getData().setCustomBrights(idx, brights));
     }
 
-    public void setGisEnable(boolean enable) {
-        setDeviceDatapoint(getData().setGisEnable(enable));
-    }
-
-    public void setGisEnable(boolean enable, float lon, float lat) {
-        final List<XLinkDataPoint> dps = new ArrayList<>();
-        XLinkDataPoint dp1 = getData().setGisEnable(enable);
-        XLinkDataPoint dp2 = getData().setLongitude(lon);
-        XLinkDataPoint dp3 = getData().setLatitude(lat);
-        if (dp1 != null && dp2 != null && dp3 != null) {
-            dps.add(dp1);
-            dps.add(dp2);
-            dps.add(dp3);
-            setDeviceDatapoints(dps);
-        }
-    }
+//    public void setGisEnable(boolean enable) {
+//        setDeviceDatapoint(getData().setGisEnable(enable));
+//    }
+//
+//    public void setGisEnable(boolean enable, float lon, float lat) {
+//        final List<XLinkDataPoint> dps = new ArrayList<>();
+//        XLinkDataPoint dp1 = getData().setGisEnable(enable);
+//        XLinkDataPoint dp2 = getData().setLongitude(lon);
+//        XLinkDataPoint dp3 = getData().setLatitude(lat);
+//        if (dp1 != null && dp2 != null && dp3 != null) {
+//            dps.add(dp1);
+//            dps.add(dp2);
+//            dps.add(dp3);
+//            setDeviceDatapoints(dps);
+//        }
+//    }
 
     public void setSunrise(int sunrise) {
-        setDeviceDatapoint(getData().setSunrise(sunrise));
+        setDeviceDatapoint(getData().setDaytimeStart(sunrise));
     }
 
     public void setSunriseRamp(int ramp) {
@@ -57,7 +57,7 @@ public class LightViewModel extends DeviceViewModel<EXOLedstrip> {
     }
 
     public void setSunriseAndRamp(int sunrise, int ramp) {
-        XLinkDataPoint dp1 = getData().setSunrise(sunrise);
+        XLinkDataPoint dp1 = getData().setDaytimeStart(sunrise);
         XLinkDataPoint dp2 = getData().setSunriseRamp(ramp);
         if (dp1 != null && dp2 != null) {
             List<XLinkDataPoint> dps = new ArrayList<>();
@@ -72,7 +72,7 @@ public class LightViewModel extends DeviceViewModel<EXOLedstrip> {
     }
 
     public void setSunset(int sunset) {
-        setDeviceDatapoint(getData().setSunset(sunset));
+        setDeviceDatapoint(getData().setDaytimeEnd(sunset));
     }
 
     public void setSunsetRamp(int ramp) {
@@ -80,7 +80,7 @@ public class LightViewModel extends DeviceViewModel<EXOLedstrip> {
     }
 
     public void setSunsetAndRamp(int sunset, int ramp) {
-        XLinkDataPoint dp1 = getData().setSunset(sunset);
+        XLinkDataPoint dp1 = getData().setDaytimeEnd(sunset);
         XLinkDataPoint dp2 = getData().setSunsetRamp(ramp);
         if (dp1 != null && dp2 != null) {
             List<XLinkDataPoint> dps = new ArrayList<>();

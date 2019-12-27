@@ -24,10 +24,6 @@ public class SocketViewModel extends DeviceViewModel<EXOSocket> {
         setDeviceDatapoint(getData().addTimer(timer));
     }
 
-    public void setTimer(int idx, int timer) {
-        setDeviceDatapoint(getData().setTimer(idx, timer));
-    }
-
     public void setTimer(int idx, EXOSocketTimer timer) {
         setDeviceDatapoint(getData().setTimer(idx, timer));
     }
