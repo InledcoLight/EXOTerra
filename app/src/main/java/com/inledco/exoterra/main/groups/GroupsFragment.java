@@ -2,24 +2,19 @@ package com.inledco.exoterra.main.groups;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.design.widget.TextInputEditText;
-import android.support.design.widget.TextInputLayout;
-import android.support.v7.app.AlertDialog;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.Toast;
+import android.widget.ImageButton;
+import android.widget.TextView;
 
 import com.inledco.exoterra.R;
 import com.inledco.exoterra.base.BaseFragment;
@@ -32,35 +27,35 @@ import com.inledco.exoterra.event.HomePropertyChangedEvent;
 import com.inledco.exoterra.event.HomesRefreshedEvent;
 import com.inledco.exoterra.group.GroupFragment;
 import com.inledco.exoterra.manager.HomeManager;
-import com.inledco.exoterra.xlink.XlinkCloudManager;
+import com.inledco.exoterra.util.FavouriteUtil;
 import com.inledco.exoterra.xlink.XlinkConstants;
-import com.inledco.exoterra.xlink.XlinkRequestCallback;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import cn.xlink.restful.api.app.HomeApi;
 
 public class GroupsFragment extends BaseFragment {
-    private Toolbar groups_toolbar;
+    private TextView groups_title;
+    private SwipeRefreshLayout groups_refresh;
+    private View groups_warning;
+    private TextView warning_tv_msg;
     private RecyclerView groups_rv;
+    private ImageButton groups_ib_add;
 
-    private final List<Home> mHomes = HomeManager.getInstance().getHomeList();
+    private boolean showOnlyFavourite;
+    private Set<String> mFavourites;
+    private final List<Home> mFavouriteHomes = new ArrayList<>();
+
+    private List<Home> mHomes;
     private GroupsAdapter mAdapter;
-//    private final XlinkRequestCallback<List<Home>> mHomesResponseCallback = new XlinkRequestCallback<List<Home>>() {
-//        @Override
-//        public void onError(String error) {
-//
-//        }
-//
-//        @Override
-//        public void onSuccess(List<Home> homes) {
-//            mAdapter.refreshData();
-//        }
-//    };
+
+    private static final String KEY_ONLY_FAVOURITE = "only_favourite";
 
     private final BroadcastReceiver mTimeReceiver = new BroadcastReceiver() {
         @Override
@@ -72,6 +67,14 @@ public class GroupsFragment extends BaseFragment {
             }
         }
     };
+
+    public static GroupsFragment newInstance(final boolean onlyFavourite) {
+        Bundle args = new Bundle();
+        args.putBoolean(KEY_ONLY_FAVOURITE, onlyFavourite);
+        GroupsFragment fragment = new GroupsFragment();
+        fragment.setArguments(args);
+        return fragment;
+    }
 
     @Nullable
     @Override
@@ -85,11 +88,6 @@ public class GroupsFragment extends BaseFragment {
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
-    }
-
-    @Override
     public void onDestroyView() {
         super.onDestroyView();
         getActivity().unregisterReceiver(mTimeReceiver);
@@ -100,6 +98,19 @@ public class GroupsFragment extends BaseFragment {
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onHomesRefreshedEvent(HomesRefreshedEvent event) {
+        groups_refresh.setRefreshing(false);
+        if (showOnlyFavourite) {
+            mFavouriteHomes.clear();
+            for (int i = 0; i < mHomes.size(); i++) {
+                Home home = mHomes.get(i);
+                if (mFavourites.contains(home.getHome().id)) {
+                    mFavouriteHomes.add(home);
+                }
+            }
+            groups_warning.setVisibility(mFavouriteHomes.size() == 0 ? View.VISIBLE : View.GONE);
+        } else {
+            groups_warning.setVisibility(mHomes.size() == 0 ? View.VISIBLE : View.GONE);
+        }
         mAdapter.notifyDataSetChanged();
     }
 
@@ -148,182 +159,74 @@ public class GroupsFragment extends BaseFragment {
 
     @Override
     protected void initView(View view) {
-        groups_toolbar = view.findViewById(R.id.groups_toolbar);
+        groups_title = view.findViewById(R.id.groups_title);
+        groups_refresh = view.findViewById(R.id.groups_refresh);
+        groups_warning = view.findViewById(R.id.groups_warning);
+        warning_tv_msg = groups_warning.findViewById(R.id.warning_tv_msg);
         groups_rv = view.findViewById(R.id.groups_rv);
+        groups_ib_add = view.findViewById(R.id.groups_ib_add);
 
-        groups_toolbar.inflateMenu(R.menu.menu_groups);
+        warning_tv_msg.setText(R.string.no_habitat_warning);
     }
 
     @Override
     protected void initData() {
+        Bundle args = getArguments();
+        if (args != null) {
+            showOnlyFavourite = args.getBoolean(KEY_ONLY_FAVOURITE);
+        }
         IntentFilter filter = new IntentFilter();
         filter.addAction(Intent.ACTION_TIME_TICK);
         getActivity().registerReceiver(mTimeReceiver, filter);
 
-        mAdapter = new GroupsAdapter(getContext(), mHomes);
+        mHomes = HomeManager.getInstance().getHomeList();
+        if (!showOnlyFavourite) {
+            mAdapter = new GroupsAdapter(getContext(), mHomes);
+        } else {
+            groups_title.setVisibility(View.VISIBLE);
+            mFavourites = FavouriteUtil.getFavourites(getContext());
+            for (int i = 0; i < mHomes.size(); i++) {
+                Home home = mHomes.get(i);
+                if (mFavourites.contains(home.getHome().id)) {
+                    mFavouriteHomes.add(home);
+                }
+            }
+            mAdapter = new GroupsAdapter(getContext(), mFavouriteHomes);
+        }
+
         mAdapter.setOnItemClickListener(new OnItemClickListener() {
             @Override
             public void onItemClick(int position) {
-                HomeApi.HomesResponse.Home home = mHomes.get(position).getHome();
+                HomeApi.HomesResponse.Home home;
+                if (showOnlyFavourite) {
+                    home = mFavouriteHomes.get(position).getHome();
+                } else {
+                    home = mHomes.get(position).getHome();
+                }
                 String homeid = home.id;
                 String homename = home.name;
                 addFragmentToStack(R.id.main_fl, GroupFragment.newInstance(homeid, homename));
             }
         });
         groups_rv.setAdapter(mAdapter);
+        groups_refresh.setRefreshing(true);
         HomeManager.getInstance().refreshHomeList(null);
     }
 
     @Override
     protected void initEvent() {
-        groups_toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
+        groups_refresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
-            public boolean onMenuItemClick(MenuItem menuItem) {
-                switch (menuItem.getItemId()) {
-                    case R.id.menu_groups_add:
-                        addFragmentToStack(R.id.main_fl, new AddHabitatFragment());
-                        break;
-                }
-                return true;
+            public void onRefresh() {
+                HomeManager.getInstance().refreshHomeList(null);
             }
         });
-    }
 
-    private void showCreateGroupDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-        View view = LayoutInflater.from(getContext()).inflate(R.layout.dialog_add, null, false);
-        final TextInputLayout til = view.findViewById(R.id.dialog_add_til);
-        final TextInputEditText et_name = view.findViewById(R.id.dialog_add_name);
-        builder.setTitle(R.string.create_habitat);
-        builder.setView(view);
-        builder.setNegativeButton(R.string.cancel, null);
-        builder.setPositiveButton(R.string.ok, null);
-        final AlertDialog dialog = builder.show();
-        Button btn_ok = dialog.getButton(DialogInterface.BUTTON_POSITIVE);
-        btn_ok.setOnClickListener(new View.OnClickListener() {
+        groups_ib_add.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                final String name = et_name.getText().toString();
-                if (TextUtils.isEmpty(name)) {
-                    til.setError(getString(R.string.input_empty));
-                } else {
-                    XlinkCloudManager.getInstance().createHome(name, new XlinkRequestCallback<HomeApi.HomeResponse>() {
-                        @Override
-                        public void onError(String error) {
-                            Toast.makeText(getContext(), error, Toast.LENGTH_SHORT)
-                                 .show();
-                        }
-
-                        @Override
-                        public void onSuccess(HomeApi.HomeResponse response) {
-                            Toast.makeText(getContext(), "Create habitat success.", Toast.LENGTH_SHORT)
-                                 .show();
-//                            XlinkCloudManager.getInstance().createRoom(response.id, name, new XlinkRequestCallback<RoomApi.RoomResponse>() {
-//                                @Override
-//                                public void onError(String error) {
-//                                    Toast.makeText(getContext(), error, Toast.LENGTH_SHORT)
-//                                         .show();
-//                                }
-//
-//                                @Override
-//                                public void onSuccess(RoomApi.RoomResponse roomResponse) {
-//                                    Log.e(TAG, "onSuccess: " + roomResponse.id + " " + roomResponse.name);
-//                                }
-//                            });
-                            HomeManager.getInstance().refreshHomeList(null);
-                        }
-                    });
-                    dialog.dismiss();
-                }
+                addFragmentToStack(R.id.main_fl, AddHabitatFragment.newInstance(showOnlyFavourite));
             }
         });
     }
-
-//    private void showRenameGroupDialog(@NonNull final String homeid) {
-//        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-//        View view = LayoutInflater.from(getContext()).inflate(R.layout.dialog_add, null, false);
-//        final TextInputLayout til = view.findViewById(R.id.dialog_add_til);
-//        final TextInputEditText et_name = view.findViewById(R.id.dialog_add_name);
-//        builder.setTitle(R.string.rename_group);
-//        builder.setView(view);
-//        builder.setNegativeButton(R.string.cancel, null);
-//        builder.setPositiveButton(R.string.ok, null);
-//        final AlertDialog dialog = builder.show();
-//        Button btn_ok = dialog.getButton(DialogInterface.BUTTON_POSITIVE);
-//        btn_ok.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                String name = et_name.getText().toString();
-//                if (TextUtils.isEmpty(name)) {
-//                    til.setError(getString(R.string.input_empty));
-//                } else {
-//                    XlinkCloudManager.getInstance().renameHome(homeid, name, new XlinkRequestCallback<String>() {
-//                        @Override
-//                        public void onError(String error) {
-//                            Toast.makeText(getContext(), error, Toast.LENGTH_SHORT)
-//                                 .show();
-//                        }
-//
-//                        @Override
-//                        public void onSuccess(String response) {
-//                            Toast.makeText(getContext(), "Rename habitat success.", Toast.LENGTH_SHORT)
-//                                 .show();
-//                            HomeManager.getInstance().refreshHomeList(mHomesResponseCallback);
-//                        }
-//                    });
-//                    dialog.dismiss();
-//                }
-//            }
-//        });
-//    }
-
-//    private void showItemActionDialog(@NonNull final Home2 home2) {
-//        AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), R.style.BottomDialogTheme);
-//        View view = LayoutInflater.from(getContext()).inflate(R.layout.dialog_action, null, false);
-//        Button btn_rename = view.findViewById(R.id.dialog_action_act1);
-//        Button btn_delete = view.findViewById(R.id.dialog_action_act2);
-//        Button btn_cancel = view.findViewById(R.id.dialog_action_cancel);
-//        btn_rename.setText(R.string.rename);
-//        btn_rename.setVisibility(View.VISIBLE);
-//        final AlertDialog dialog = builder.setView(view)
-//                                          .setCancelable(false)
-//                                          .show();
-//        Window window = dialog.getWindow();
-//        window.setGravity(Gravity.BOTTOM | Gravity.FILL_HORIZONTAL);
-//        WindowManager.LayoutParams lp = window.getAttributes();
-//        lp.width = Resources.getSystem().getDisplayMetrics().widthPixels;
-//        window.setAttributes(lp);
-//        btn_cancel.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                dialog.dismiss();
-//            }
-//        });
-//        btn_rename.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                showRenameGroupDialog(home2.id);
-//                dialog.dismiss();
-//            }
-//        });
-//        btn_delete.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-////                XlinkCloudManager.getInstance().deleteHome(home2, new XlinkRequestCallback<String>() {
-////                    @Override
-////                    public void onError(String error) {
-////                        Toast.makeText(getContext(), error, Toast.LENGTH_SHORT)
-////                             .show();
-////                    }
-////
-////                    @Override
-////                    public void onSuccess(String s) {
-////                        mHome2s.remove(home2);
-////                        mAdapter.notifyDataSetChanged();
-////                    }
-////                });
-//                dialog.dismiss();
-//            }
-//        });
-//    }
 }

@@ -44,6 +44,12 @@ public class PrefUtil {
         editor.apply();
     }
 
+    public synchronized static void put(@NonNull Context context, @NonNull String key, Set<String> value) {
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = sp.edit().putStringSet(key, value);
+        editor.apply();
+    }
+
     public synchronized static void put(@NonNull Context context, @NonNull String key, @NonNull Object object) {
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -88,6 +94,12 @@ public class PrefUtil {
     public synchronized static void put(@NonNull Context context, @NonNull String file, @NonNull String key, String value) {
         SharedPreferences sp = context.getSharedPreferences(file, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sp.edit().putString(key, value);
+        editor.apply();
+    }
+
+    public synchronized static void put(@NonNull Context context, @NonNull String file, @NonNull String key, Set<String> value) {
+        SharedPreferences sp = context.getSharedPreferences(file, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sp.edit().putStringSet(key, value);
         editor.apply();
     }
 
@@ -183,6 +195,11 @@ public class PrefUtil {
         return sp.getString(key, def);
     }
 
+    public synchronized static Set<String> getStringSet(@NonNull Context context, @NonNull String key) {
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
+        return sp.getStringSet(key, null);
+    }
+
     public synchronized static Object getObject(@NonNull Context context, @NonNull String key) {
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
         String objectStr = sp.getString(key, "");
@@ -227,6 +244,11 @@ public class PrefUtil {
     public synchronized static String getString(@NonNull Context context, @NonNull String file, @NonNull String key, String def) {
         SharedPreferences sp = context.getSharedPreferences(file, Context.MODE_PRIVATE);
         return sp.getString(key, def);
+    }
+
+    public synchronized static Set<String> getStringSet(@NonNull Context context, @NonNull String file, @NonNull String key) {
+        SharedPreferences sp = context.getSharedPreferences(file, Context.MODE_PRIVATE);
+        return sp.getStringSet(key, null);
     }
 
     public synchronized static Object getObject(@NonNull Context context, @NonNull String file, @NonNull String key) {

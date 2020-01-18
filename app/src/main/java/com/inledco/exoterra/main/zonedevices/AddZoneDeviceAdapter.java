@@ -95,7 +95,7 @@ public class AddZoneDeviceAdapter extends SimpleAdapter<RoomDevice, DeviceViewHo
         holder.ctv_state.setText(state ? R.string.cloud_online : R.string.cloud_offline);
         holder.cb_select.setVisibility(View.VISIBLE);
         holder.cb_select.setChecked(mTargetRoomIds.contains(roomDevice.getRoomId()));
-        //        holder.tv_desc.setText(device.mac);
+        //        holder.ctv_habitat.setText(device.mac);
 
         holder.cb_select.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override

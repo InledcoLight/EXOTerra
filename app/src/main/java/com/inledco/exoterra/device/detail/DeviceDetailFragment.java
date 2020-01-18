@@ -29,8 +29,11 @@ import android.widget.Toast;
 import com.inledco.exoterra.R;
 import com.inledco.exoterra.base.BaseFragment;
 import com.inledco.exoterra.bean.Device;
+import com.inledco.exoterra.bean.Home;
 import com.inledco.exoterra.device.DeviceBaseViewModel;
 import com.inledco.exoterra.event.DevicePropertyChangedEvent;
+import com.inledco.exoterra.event.HomeDeviceChangedEvent;
+import com.inledco.exoterra.manager.HomeManager;
 import com.inledco.exoterra.util.DeviceUtil;
 import com.inledco.exoterra.view.MessageDialog;
 import com.inledco.exoterra.xlink.XlinkCloudManager;
@@ -38,6 +41,8 @@ import com.inledco.exoterra.xlink.XlinkRequestCallback;
 import com.inledco.exoterra.xlink.XlinkTaskCallback;
 
 import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.text.DateFormat;
 import java.text.DecimalFormat;
@@ -56,7 +61,7 @@ public class DeviceDetailFragment extends BaseFragment {
     private final String DEVICE_DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
 
     private Toolbar device_detail_toolbar;
-    private LinearLayout device_detail_ll_name;
+    private ImageView device_detail_icon;
     private TextView device_detail_name;
     private TextView device_detail_zone;
     private LinearLayout device_detail_ll_location;
@@ -70,7 +75,8 @@ public class DeviceDetailFragment extends BaseFragment {
     private TextView device_detail_upgrade;
     private TextView device_detail_fwversion;
     private TextView device_detail_cloudzone;
-    private Button device_detail_delete;
+    private TextView device_detail_delete;
+    private Button device_detail_back;
 
     private UpdateDialog mUpgradeDialog;
 
@@ -101,6 +107,7 @@ public class DeviceDetailFragment extends BaseFragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = super.onCreateView(inflater, container, savedInstanceState);
 
+        EventBus.getDefault().register(this);
         initData();
         initEvent();
         return view;
@@ -109,9 +116,25 @@ public class DeviceDetailFragment extends BaseFragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
+        if (EventBus.getDefault().isRegistered(this)) {
+            EventBus.getDefault().unregister(this);
+        }
         isDestroyed = true;
         mTimer.cancel();
         mTask.cancel();
+    }
+
+    @Subscribe (threadMode = ThreadMode.MAIN)
+    public void onHomeDeviceChangedEvent(HomeDeviceChangedEvent event) {
+        Log.e(TAG, "onHomeDeviceChangedEvent: " + event.getHomeid());
+        if (mDevice == null) {
+            return;
+        }
+        Home home = HomeManager.getInstance().getDeviceHome(mDevice);
+        if (home != null) {
+            device_detail_habitat.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
+            device_detail_habitat.setText(home.getHome().name);
+        }
     }
 
     @Override
@@ -122,25 +145,26 @@ public class DeviceDetailFragment extends BaseFragment {
     @Override
     protected void initView(View view) {
         device_detail_toolbar = view.findViewById(R.id.device_detail_toolbar);
-        device_detail_ll_name = view.findViewById(R.id.device_detail_ll_name);
+        device_detail_icon = view.findViewById(R.id.device_detail_icon);
         device_detail_name = view.findViewById(R.id.device_detail_name);
+        device_detail_habitat = view.findViewById(R.id.device_detail_habitat);
         device_detail_zone = view.findViewById(R.id.device_detail_zone);
         device_detail_ll_location = view.findViewById(R.id.device_detail_ll_location);
         device_detail_location = view.findViewById(R.id.device_detail_location);
         device_detail_datetime = view.findViewById(R.id.device_detail_datetime);
         device_detail_rssi = view.findViewById(R.id.device_detail_rssi);
         device_detail_user_list = view.findViewById(R.id.device_detail_user_list);
-        device_detail_habitat = view.findViewById(R.id.device_detail_habitat);
         device_detail_devid = view.findViewById(R.id.device_detail_devid);
         device_detail_mac = view.findViewById(R.id.device_detail_mac);
         device_detail_fwversion = view.findViewById(R.id.device_detail_fwversion);
         device_detail_upgrade = view.findViewById(R.id.device_detail_upgrade);
         device_detail_cloudzone = view.findViewById(R.id.device_detail_cloudzone);
         device_detail_delete = view.findViewById(R.id.device_detail_delete);
+        device_detail_back = view.findViewById(R.id.device_detail_back);
 
-        device_detail_user_list.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_arrow_right_white_32dp, 0);
-        device_detail_habitat.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_arrow_right_white_32dp, 0);
-        device_detail_upgrade.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_arrow_right_white_32dp, 0);
+        device_detail_name.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_edit_white_24dp, 0);
+        device_detail_user_list.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_edit_white_24dp, 0);
+        device_detail_upgrade.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_edit_white_24dp, 0);
     }
 
     @Override
@@ -176,11 +200,18 @@ public class DeviceDetailFragment extends BaseFragment {
         });
 
         if (mDevice != null) {
-            @DrawableRes int[] wifi_signals = new int[] {R.drawable.ic_signal_wifi_0_bar_white_24dp,
-                                                         R.drawable.ic_signal_wifi_1_bar_white_24dp,
-                                                         R.drawable.ic_signal_wifi_2_bar_white_24dp,
-                                                         R.drawable.ic_signal_wifi_3_bar_white_24dp,
-                                                         R.drawable.ic_signal_wifi_4_bar_white_24dp};
+            device_detail_icon.setImageResource(DeviceUtil.getProductIconSmall(mDevice.getXDevice().getProductId()));
+            Home home = HomeManager.getInstance().getDeviceHome(mDevice);
+            if (home != null) {
+                device_detail_habitat.setText(home.getHome().name);
+            } else {
+                device_detail_habitat.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_edit_white_24dp, 0);
+            }
+            @DrawableRes int[] wifi_signals = new int[] {R.drawable.ic_signal_0_bar_white_24dp,
+                                                         R.drawable.ic_signal_1_bar_white_24dp,
+                                                         R.drawable.ic_signal_2_bar_white_24dp,
+                                                         R.drawable.ic_signal_3_bar_white_24dp,
+                                                         R.drawable.ic_signal_4_bar_white_24dp};
             device_detail_delete.setEnabled(mDevice.getXDevice().getRole() == 0);
             getDeviceDatetime();
             String name = mDevice.getXDevice().getDeviceName();
@@ -222,10 +253,10 @@ public class DeviceDetailFragment extends BaseFragment {
         device_detail_toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                getActivity().onBackPressed();
+                getActivity().getSupportFragmentManager().popBackStack();
             }
         });
-        device_detail_ll_name.setOnClickListener(new View.OnClickListener() {
+        device_detail_name.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (mDevice == null) {
@@ -234,16 +265,20 @@ public class DeviceDetailFragment extends BaseFragment {
                 showRenameDialog();
             }
         });
+        device_detail_habitat.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Home home = HomeManager.getInstance().getDeviceHome(mDevice);
+                if (home == null) {
+                    int devid = mDevice.getXDevice().getDeviceId();
+                    addFragmentToStack(R.id.device_root, SetHabitatFragment.newInstance(devid));
+                }
+            }
+        });
         device_detail_ll_location.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 //                addFragmentToStack(R.id.device_root, new LocationFragment());
-            }
-        });
-        device_detail_habitat.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                addFragmentToStack(R.id.device_root, new DeviceZonesFragment());
             }
         });
         device_detail_user_list.setOnClickListener(new View.OnClickListener() {
@@ -273,6 +308,12 @@ public class DeviceDetailFragment extends BaseFragment {
                 showDeleteDialog();
             }
         });
+        device_detail_back.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getActivity().getSupportFragmentManager().popBackStack();
+            }
+        });
     }
 
     private String getTimezoneDesc(int zone) {
@@ -287,18 +328,36 @@ public class DeviceDetailFragment extends BaseFragment {
     }
 
     private void deleteDevice() {
-        XlinkCloudManager.getInstance().unsubscribeDevice(mDevice.getXDevice(), new XlinkTaskCallback<String>() {
-            @Override
-            public void onError(String error) {
-                Toast.makeText(getContext(), error, Toast.LENGTH_SHORT)
-                     .show();
-            }
+        Home home = HomeManager.getInstance().getDeviceHome(mDevice);
+        if (home != null) {
+            int devid = mDevice.getXDevice().getDeviceId();
+            String homeid = home.getHome().id;
+            XlinkCloudManager.getInstance().deleteDeviceFromHome(homeid, devid, new XlinkRequestCallback<String>() {
+                @Override
+                public void onError(String error) {
+                    Toast.makeText(getContext(), error, Toast.LENGTH_SHORT)
+                         .show();
+                }
 
-            @Override
-            public void onComplete(String s) {
-                getActivity().finish();
-            }
-        });
+                @Override
+                public void onSuccess(String s) {
+                    getActivity().finish();
+                }
+            });
+        } else {
+            XlinkCloudManager.getInstance().unsubscribeDevice(mDevice.getXDevice(), new XlinkTaskCallback<String>() {
+                @Override
+                public void onError(String error) {
+                    Toast.makeText(getContext(), error, Toast.LENGTH_SHORT)
+                         .show();
+                }
+
+                @Override
+                public void onComplete(String s) {
+                    getActivity().finish();
+                }
+            });
+        }
     }
 
     private void showDeleteDialog() {

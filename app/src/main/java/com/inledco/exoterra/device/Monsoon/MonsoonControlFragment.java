@@ -3,7 +3,6 @@ package com.inledco.exoterra.device.Monsoon;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.DialogInterface;
-import android.graphics.drawable.AnimationDrawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -12,12 +11,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.CheckedTextView;
-import android.widget.ImageView;
 import android.widget.NumberPicker;
 import android.widget.TextView;
 
-import com.inledco.exoterra.AppConstants;
 import com.inledco.exoterra.R;
 import com.inledco.exoterra.base.BaseFragment;
 import com.inledco.exoterra.bean.EXOMonsoon;
@@ -25,37 +21,14 @@ import com.inledco.exoterra.bean.EXOMonsoon;
 import java.util.List;
 
 public class MonsoonControlFragment extends BaseFragment {
-    private ImageView monsoon_ctrl_status;
-    private TextView monsoon_ctrl_period;
-    private CheckedTextView monsoon_ctrl_turn;
     private Button[] monsoon_ctrl_custom = new Button[8];
     private TextView monsoon_key;
 
-    private static final String[] mPeriods = new String[120];
-    private static final String[] mKeyActions = new String[120];
+    private final String[] mPeriods = new String[120];
+    private final String[] mKeyActions = new String[120];
 
     private MonsoonViewModel mMonsoonViewModel;
     private EXOMonsoon mMonsoon;
-
-    static {
-        for (int i = 0; i < 59; i++) {
-            mPeriods[i] = "" + (i+1) + " Sec";
-        }
-        mPeriods[59] = "1 Min";
-        for (int i = 60; i < 119; i++) {
-            mPeriods[i] = "1 Min " + (i-59) + " Sec";
-        }
-        mPeriods[119] = "2 Min";
-
-        for (int i = 0; i < 59; i++) {
-            mKeyActions[i] = "Turn on " + (i+1) + " Sec";
-        }
-        mKeyActions[59] = "Turn on 1 Min";
-        for (int i = 60; i < 119; i++) {
-            mKeyActions[i] = "Turn on 1 Min " + (i-59) + " Sec";
-        }
-        mKeyActions[119] = "Turn on 2 Min";
-    }
 
     @Nullable
     @Override
@@ -74,9 +47,6 @@ public class MonsoonControlFragment extends BaseFragment {
 
     @Override
     protected void initView(View view) {
-        monsoon_ctrl_status = view.findViewById(R.id.monsoon_ctrl_status);
-        monsoon_ctrl_period = view.findViewById(R.id.monsoon_ctrl_period);
-        monsoon_ctrl_turn = view.findViewById(R.id.monsoon_ctrl_turn);
         monsoon_ctrl_custom[0] = view.findViewById(R.id.monsoon_ctrl_custom1);
         monsoon_ctrl_custom[1] = view.findViewById(R.id.monsoon_ctrl_custom2);
         monsoon_ctrl_custom[2] = view.findViewById(R.id.monsoon_ctrl_custom3);
@@ -86,6 +56,7 @@ public class MonsoonControlFragment extends BaseFragment {
         monsoon_ctrl_custom[6] = view.findViewById(R.id.monsoon_ctrl_custom7);
         monsoon_ctrl_custom[7] = view.findViewById(R.id.monsoon_ctrl_custom8);
         monsoon_key = view.findViewById(R.id.monsoon_key);
+        monsoon_key.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_edit_white_24dp, 0);
     }
 
     @Override
@@ -100,19 +71,31 @@ public class MonsoonControlFragment extends BaseFragment {
             }
         });
 
+        String minute = getString(R.string.minute);
+        String second = getString(R.string.second);
+        String spray = getString(R.string.spray);
+        for (int i = 0; i < 59; i++) {
+            mPeriods[i] = "" + (i+1) + " " + second;
+        }
+        mPeriods[59] = "1 " + minute;
+        for (int i = 60; i < 119; i++) {
+            mPeriods[i] = "1 " + minute + " " + (i-59) + " " + second;
+        }
+        mPeriods[119] = "2 " + minute;
+
+        for (int i = 0; i < 59; i++) {
+            mKeyActions[i] = spray + " " + (i+1) + " " + second;
+        }
+        mKeyActions[59] = spray + " 1 " + minute;
+        for (int i = 60; i < 119; i++) {
+            mKeyActions[i] = spray + " 1 " + minute + " " + (i-59) + " " + second;
+        }
+        mKeyActions[119] = spray + " 2 " + minute;
         refreshData();
     }
 
     @Override
     protected void initEvent() {
-        monsoon_ctrl_turn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                byte power = monsoon_ctrl_turn.isChecked() ? AppConstants.MONSOON_POWEROFF : AppConstants.MONSOON_POWERON;
-                mMonsoonViewModel.setPower(power);
-            }
-        });
-
         monsoon_key.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -131,7 +114,7 @@ public class MonsoonControlFragment extends BaseFragment {
             for (int i = 0; i < addIdx && i < monsoon_ctrl_custom.length; i++) {
                 monsoon_ctrl_custom[i].setCompoundDrawablesWithIntrinsicBounds(0, R.mipmap.ic_monsoon_pulse_64, 0, 0);
                 monsoon_ctrl_custom[i].setVisibility(View.VISIBLE);
-                monsoon_ctrl_custom[i].setText((actions.get(i) <= 0 || actions.get(i) > 127) ? "" : mPeriods[actions.get(i)-1]);
+                monsoon_ctrl_custom[i].setText((actions.get(i) <= 0 || actions.get(i) > 120) ? "" : mPeriods[actions.get(i)-1]);
                 final int idx = i;
                 monsoon_ctrl_custom[i].setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -148,7 +131,7 @@ public class MonsoonControlFragment extends BaseFragment {
                 });
             }
             if (addIdx < monsoon_ctrl_custom.length) {
-                monsoon_ctrl_custom[addIdx].setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_add_white_64dp, 0, 0);
+                monsoon_ctrl_custom[addIdx].setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_add_white_48dp, 0, 0);
                 monsoon_ctrl_custom[addIdx].setVisibility(View.VISIBLE);
                 monsoon_ctrl_custom[addIdx].setText("");
                 final int idx = addIdx;
@@ -165,23 +148,8 @@ public class MonsoonControlFragment extends BaseFragment {
                     monsoon_ctrl_custom[i].setOnLongClickListener(null);
                 }
             }
-            int power = (mMonsoon.getPower()&0xFF);
-            int time = mMonsoon.getPoweronTmr();
-            if (power >= 0x80) {
-                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
-                    AnimationDrawable animation = (AnimationDrawable) getContext().getDrawable(R.drawable.monsoon_spray);
-                    monsoon_ctrl_status.setImageDrawable(animation);
-                    animation.start();
-                } else {
-                    monsoon_ctrl_status.setImageResource(R.mipmap.ic_monsoon_turnon_0);
-                }
-            } else {
-                monsoon_ctrl_status.setImageResource(R.mipmap.ic_monsoon_turnoff);
-            }
-            monsoon_ctrl_period.setText(time == 0 ? null : "Turn off after " + time + " seconds");
-            monsoon_ctrl_turn.setChecked(power >= 0x80);
-            monsoon_ctrl_turn.setText(power >= 0x80 ? R.string.turnoff : R.string.turnon);
-            monsoon_key.setText("Device button action: " + getKeyActionText());
+
+            monsoon_key.setText(getKeyActionText());
         }
     }
 
@@ -204,7 +172,7 @@ public class MonsoonControlFragment extends BaseFragment {
         np.setValue(mMonsoon.getKeyAction());
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         builder.setView(view);
-        builder.setTitle("Device Key Action");
+        builder.setTitle(R.string.device_key_action);
         builder.setNegativeButton(R.string.cancel, null);
         builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
             @Override
@@ -235,7 +203,7 @@ public class MonsoonControlFragment extends BaseFragment {
                 np.setValue(actions.get(idx));
             }
             AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-            builder.setTitle( "Set Turnon Duration" );
+            builder.setTitle( "Set Spray Duration" );
             builder.setView(view);
             builder.setNegativeButton(R.string.cancel, null);
             builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {

@@ -7,16 +7,138 @@
                                              android:layout_width="match_parent"
                                              android:layout_height="match_parent">
 
-    <android.support.v7.widget.Toolbar
-        android:id="@+id/group_toolbar"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:minHeight="?attr/actionBarSize"
-        android:theme="?attr/actionBarTheme"
+<!--    <android.support.v7.widget.Toolbar-->
+<!--        android:id="@+id/group_toolbar"-->
+<!--        android:layout_width="0dp"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:minHeight="?attr/actionBarSize"-->
+<!--        android:theme="?attr/actionBarTheme"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintTop_toTopOf="parent"-->
+<!--        app:navigationIcon="@drawable/ic_arrow_back_white_32dp"/>-->
+
+    <ImageView
+        android:id="@+id/imageView11"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/brandHeight"
+        android:paddingLeft="8dp"
+        android:paddingRight="8dp"
+        android:scaleType="fitXY"
+        android:src="@mipmap/ic_brand"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:navigationIcon="@drawable/ic_arrow_back_white_32dp"/>
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <com.inledco.exoterra.view.GradientCornerLinearLayout
+        android:id="@+id/gradientCornerLinearLayout11"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="16dp"
+        android:gravity="center"
+        android:orientation="vertical"
+        app:direction="horizontal"
+        app:gradientEnd="@color/gradientGreen"
+        app:gradientStart="@color/gradientYellow"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/imageView11"
+        app:radius="@dimen/cornerRadius"
+        app:strokeWidth="@dimen/strokeWidth">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/titleHeight"
+            android:background="@drawable/shape_topcorner_rect_gradient"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="8dp"
+                app:srcCompat="@drawable/ic_habitats_white_48dp" />
+
+            <TextView
+                android:id="@+id/group_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="8dp"
+                android:textColor="@color/textColorPrimary"
+                android:textSize="@dimen/textSizeTitle"
+                android:textStyle="bold" />
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"/>
+            <ImageButton
+                android:id="@+id/group_detail"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="8dp"
+                android:background="?attr/selectableItemBackground"
+                app:srcCompat="@drawable/ic_set"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="8dp"
+            android:paddingLeft="8dp"
+            android:paddingRight="8dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="8dp"
+                app:srcCompat="@drawable/ic_time_white_24dp" />
+            <TextView
+                android:id="@+id/group_time"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="8dp"
+                android:textColor="@color/textColorPrimary"
+                android:textSize="@dimen/textSizeSecondary" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="8dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="8dp"
+                app:srcCompat="@drawable/ic_sunrise" />
+            <TextView
+                android:id="@+id/group_sunrise"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginLeft="8dp"
+                android:textColor="@color/textColorPrimary"
+                android:textSize="@dimen/textSizeSecondary" />
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="8dp"
+                app:srcCompat="@drawable/ic_sunset" />
+            <TextView
+                android:id="@+id/group_sunset"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginLeft="8dp"
+                android:textColor="@color/textColorPrimary"
+                android:textSize="@dimen/textSizeSecondary" />
+        </LinearLayout>
+    </com.inledco.exoterra.view.GradientCornerLinearLayout>
 
     <com.inledco.exoterra.view.GradientCornerLinearLayout
         android:id="@+id/gradientCornerLinearLayout2"
@@ -25,87 +147,52 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="16dp"
-        android:orientation="vertical"
-        android:paddingLeft="16dp"
-        android:paddingRight="16dp"
-        android:paddingTop="8dp"
-        android:paddingBottom="8dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:padding="8dp"
         app:direction="horizontal"
         app:gradientEnd="@color/gradientGreen"
         app:gradientStart="@color/gradientYellow"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/group_toolbar"
+        app:layout_constraintTop_toBottomOf="@+id/gradientCornerLinearLayout11"
         app:radius="8dp"
         app:strokeWidth="@dimen/strokeWidth">
 
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:scaleType="center"
+            app:srcCompat="@drawable/ic_temperature_color_64dp"/>
         <TextView
-            android:id="@+id/group_time"
-            android:layout_width="match_parent"
+            android:id="@+id/group_sensor1"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="@color/textColorPrimary"
-            android:textSize="@dimen/textSizePrimary" />
-
-        <LinearLayout
-            android:layout_width="match_parent"
+            android:layout_marginLeft="8dp"
+            android:textAlignment="textEnd"
+            android:textColor="#F7931D"
+            android:textSize="@dimen/textSizeSubTitle" />
+        <Space
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:orientation="horizontal">
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:orientation="vertical">
-
-                <TextView
-                    android:id="@+id/group_sunrise"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:textColor="@color/textColorPrimary"
-                    android:textSize="@dimen/textSizePrimary" />
-
-                <TextView
-                    android:id="@+id/group_sunset"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:textColor="@color/textColorPrimary"
-                    android:textSize="@dimen/textSizePrimary" />
-            </LinearLayout>
-
-            <TextView
-                android:id="@+id/group_daynight"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/daytime"
-                android:textColor="@color/textColorPrimary"
-                android:textSize="@dimen/textSizePrimary" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
+            android:layout_weight="1"/>
+        <ImageView
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <TextView
-                android:id="@+id/group_sensor1"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center_vertical"
-                android:textColor="@color/textColorPrimary"
-                android:textSize="@dimen/textSizePrimary" />
-
-            <TextView
-                android:id="@+id/group_sensor2"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center_vertical"
-                android:textColor="@color/textColorPrimary"
-                android:textSize="@dimen/textSizePrimary" />
-        </LinearLayout>
+            android:scaleType="center"
+            app:srcCompat="@drawable/ic_humidity_color_64dp"/>
+        <TextView
+            android:id="@+id/group_sensor2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="8dp"
+            android:textAlignment="textEnd"
+            android:textColor="#00AEEF"
+            android:textSize="@dimen/textSizeSubTitle" />
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"/>
     </com.inledco.exoterra.view.GradientCornerLinearLayout>
 
     <com.inledco.exoterra.view.GradientCornerLinearLayout
@@ -114,16 +201,15 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="16dp"
-        android:layout_marginBottom="16dp"
+        android:layout_marginBottom="8dp"
         android:orientation="vertical"
-        android:paddingLeft="16dp"
-        android:paddingRight="16dp"
-        android:paddingTop="8dp"
+        android:paddingLeft="8dp"
+        android:paddingRight="8dp"
         android:paddingBottom="8dp"
         app:direction="horizontal"
         app:gradientEnd="@color/gradientGreen"
         app:gradientStart="@color/gradientYellow"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/group_exit"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/gradientCornerLinearLayout2"
@@ -154,13 +240,13 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="?attr/selectableItemBackground"
+                android:padding="4dp"
                 app:srcCompat="@drawable/ic_add_white_24dp" />
         </LinearLayout>
 
         <View
             android:layout_width="match_parent"
             android:layout_height="@dimen/dividerWidth"
-            android:layout_marginTop="8dp"
             android:layout_marginBottom="8dp"
             android:background="@drawable/shape_rect_gradient" />
 
@@ -172,5 +258,24 @@
             android:orientation="vertical"
             app:layoutManager="android.support.v7.widget.LinearLayoutManager" />
     </com.inledco.exoterra.view.GradientCornerLinearLayout>
+
+    <com.inledco.exoterra.view.GradientCornerButton
+        android:id="@+id/group_exit"
+        style="?attr/buttonStyle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        android:background="?attr/selectableItemBackground"
+        android:text="@string/exit"
+        app:direction="horizontal"
+        app:gradientEnd="@color/gradientWhite"
+        app:gradientStart="@color/gradientYellow"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:radius="@dimen/cornerRadius"
+        app:strokeWidth="@dimen/strokeWidth" />
 
 </android.support.constraint.ConstraintLayout>

@@ -1,25 +1,26 @@
 package com.inledco.exoterra.device.light;
 
-import android.annotation.SuppressLint;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomSheetDialog;
-import android.support.design.widget.CheckableImageButton;
-import android.text.SpannableStringBuilder;
-import android.text.Spanned;
-import android.text.style.ImageSpan;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.CompoundButton;
-import android.widget.ImageView;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.NumberPicker;
 import android.widget.SeekBar;
@@ -27,32 +28,53 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.TimePicker;
 
+import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.components.LimitLine;
+import com.github.mikephil.charting.data.BarData;
+import com.github.mikephil.charting.data.BarDataSet;
+import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
+import com.github.mikephil.charting.interfaces.datasets.IBarDataSet;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
+import com.inledco.exoterra.GlobalSettings;
 import com.inledco.exoterra.R;
 import com.inledco.exoterra.base.BaseFragment;
 import com.inledco.exoterra.bean.EXOLedstrip;
+import com.inledco.exoterra.bean.LightSpectrum;
 import com.inledco.exoterra.util.LightUtil;
+import com.inledco.exoterra.util.SpectrumUtil;
+import com.inledco.exoterra.util.TimeFormatUtil;
 
-import java.text.DecimalFormat;
+import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 public class LightAutoFragment extends BaseFragment {
     private LineChart auto_line_chart;
-    private ImageView auto_iv_sunrise;
-    private TextView auto_tv_sunrise;
-    private TextView auto_tv_sunset;
-    private TextView auto_tv_turnoff;
-    private TextView auto_tv_day;
-    private TextView auto_tv_night;
+    private BarChart auto_spectrum;
+//    private ImageView auto_iv_sunrise;
+    private TextView auto_sunrise;
+    private TextView auto_sunrise_ramp;
+    private ImageButton auto_sunrise_edit;
+    private TextView auto_sunset;
+    private TextView auto_sunset_ramp;
+    private ImageButton auto_sunset_edit;
+    private TextView auto_turnoff;
+    private ImageButton auto_turnoff_edit;
+    private View auto_daylight;
+    private ImageButton auto_daylight_edit;
+    private View auto_nightlight;
+    private ImageButton auto_nightlight_edit;
+    private TextView[] daylight_tv;
+    private TextView[] nightlight_tv;
 
     private LightViewModel mLightViewModel;
     private EXOLedstrip mLight;
+    private LightSpectrum mLightSpectrum;
 
     private int chnCount;
     private int sunriseStart;
@@ -64,7 +86,18 @@ public class LightAutoFragment extends BaseFragment {
     private byte[] dayBrights;
     private byte[] nightBrights;
 
+    private DateFormat mTimeFormat;
     private boolean mEditing;
+
+    private final BroadcastReceiver mTimeTickReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (TextUtils.equals(intent.getAction(), Intent.ACTION_TIME_TICK)) {
+                refresSpectrum();
+                showTimeLine();
+            }
+        }
+    };
 
     @Nullable
     @Override
@@ -77,6 +110,12 @@ public class LightAutoFragment extends BaseFragment {
     }
 
     @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        getActivity().unregisterReceiver(mTimeTickReceiver);
+    }
+
+    @Override
     protected int getLayoutRes() {
         return R.layout.fragment_light_auto;
     }
@@ -84,18 +123,41 @@ public class LightAutoFragment extends BaseFragment {
     @Override
     protected void initView(View view) {
         auto_line_chart = view.findViewById(R.id.auto_line_chart);
-        auto_iv_sunrise = view.findViewById(R.id.auto_iv_sunrise);
-        auto_tv_sunrise = view.findViewById(R.id.auto_tv_sunrise);
-        auto_tv_sunset = view.findViewById(R.id.auto_tv_sunset);
-        auto_tv_turnoff = view.findViewById(R.id.auto_tv_turnoff);
-        auto_tv_day = view.findViewById(R.id.auto_tv_day);
-        auto_tv_night = view.findViewById(R.id.auto_tv_night);
+        auto_spectrum = view.findViewById(R.id.light_auto_spectrum);
+        auto_sunrise = view.findViewById(R.id.light_auto_sunrise);
+//        auto_sunrise_ramp = view.findViewById(R.id.light_auto_sunrise_ramp);
+        auto_sunrise_edit = view.findViewById(R.id.light_auto_sunrise_edit);
+        auto_sunset = view.findViewById(R.id.light_auto_sunset);
+//        auto_sunset_ramp = view.findViewById(R.id.light_auto_sunset_ramp);
+        auto_sunset_edit = view.findViewById(R.id.light_auto_sunset_edit);
+        auto_turnoff = view.findViewById(R.id.light_auto_turnoff);
+        auto_turnoff_edit =view.findViewById(R.id.light_auto_turnoff_edit);
+        auto_daylight = view.findViewById(R.id.light_auto_daylight);
+        auto_daylight_edit = view.findViewById(R.id.light_auto_daylight_edit);
+        auto_nightlight = view.findViewById(R.id.light_auto_nightlight);
+        auto_nightlight_edit = view.findViewById(R.id.light_auto_nightlight_edit);
+        daylight_tv = new TextView[6];
+        nightlight_tv = new TextView[6];
+        daylight_tv[0] = auto_daylight.findViewById(R.id.item_percent_tv1);
+        daylight_tv[1] = auto_daylight.findViewById(R.id.item_percent_tv2);
+        daylight_tv[2] = auto_daylight.findViewById(R.id.item_percent_tv3);
+        daylight_tv[3] = auto_daylight.findViewById(R.id.item_percent_tv4);
+        daylight_tv[4] = auto_daylight.findViewById(R.id.item_percent_tv5);
+        daylight_tv[5] = auto_daylight.findViewById(R.id.item_percent_tv6);
+        nightlight_tv[0] = auto_nightlight.findViewById(R.id.item_percent_tv1);
+        nightlight_tv[1] = auto_nightlight.findViewById(R.id.item_percent_tv2);
+        nightlight_tv[2] = auto_nightlight.findViewById(R.id.item_percent_tv3);
+        nightlight_tv[3] = auto_nightlight.findViewById(R.id.item_percent_tv4);
+        nightlight_tv[4] = auto_nightlight.findViewById(R.id.item_percent_tv5);
+        nightlight_tv[5] = auto_nightlight.findViewById(R.id.item_percent_tv6);
 
-        LineChartHelper.init(auto_line_chart);
+        ChartHelper.initLineChart(auto_line_chart);
+        ChartHelper.initBarChart(auto_spectrum);
     }
 
     @Override
     protected void initData() {
+        mTimeFormat = GlobalSettings.getTimeFormat();
         mLightViewModel = ViewModelProviders.of(getActivity())
                                             .get(LightViewModel.class);
         mLight = mLightViewModel.getData();
@@ -108,38 +170,51 @@ public class LightAutoFragment extends BaseFragment {
                 }
             }
         });
+
+        mLightSpectrum = SpectrumUtil.loadDataFromAssets(getContext().getAssets(), "exoterrastrip_spectrum_450.txt");
+
+        IntentFilter filter = new IntentFilter(Intent.ACTION_TIME_TICK);
+        getActivity().registerReceiver(mTimeTickReceiver, filter);
+
+        refreshData();
+        showTimeLine();
     }
 
     @Override
     protected void initEvent() {
-        auto_tv_sunrise.setOnClickListener(new View.OnClickListener() {
+        auto_sunrise_edit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showEditSunriseDialog(false);
+//                showEditSunriseDialog(false);
+                addFragmentToStack(R.id.device_fl_show, EditSunriseSusetFragment.newInstance(false));
             }
         });
-        auto_tv_sunset.setOnClickListener(new View.OnClickListener() {
+        auto_sunset_edit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showEditSunriseDialog(true);
+//                showEditSunriseDialog(true);
+                addFragmentToStack(R.id.device_fl_show, EditSunriseSusetFragment.newInstance(true));
             }
         });
-        auto_tv_turnoff.setOnClickListener(new View.OnClickListener() {
+        auto_turnoff_edit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showEditTurnoffDialog();
+//                showEditTurnoffDialog();
+                addFragmentToStack(R.id.device_fl_show, new EditTurnoffFragment());
             }
         });
-        auto_tv_day.setOnClickListener(new View.OnClickListener() {
+        auto_daylight_edit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showEditDayNightDialog(false);
+//                showEditDayNightDialog(false);
+                addFragmentToStack(R.id.device_fl_show, EditDayNightFragment.newInstance(false));
             }
         });
-        auto_tv_night.setOnClickListener(new View.OnClickListener() {
+        auto_nightlight_edit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showEditDayNightDialog(true);
+//                showEditDayNightDialog(true);
+                addFragmentToStack(R.id.device_fl_show, EditDayNightFragment.newInstance(true));
             }
         });
     }
@@ -158,13 +233,149 @@ public class LightAutoFragment extends BaseFragment {
         nightBrights = Arrays.copyOf(brights, brights.length);
     }
 
+    private void showTimeLine() {
+        int zone = mLight.getZone();
+        zone = (zone/100)*60 + (zone%100);
+        long tm = System.currentTimeMillis()/60000 + zone;
+        int minutes = (int) (tm%1440);
+        LimitLine line = new LimitLine(minutes);
+        line.setLineColor(Color.WHITE);
+        line.setLineWidth(1);
+        line.enableDashedLine(10, 20, 0);
+        auto_line_chart.getXAxis().removeAllLimitLines();
+        auto_line_chart.getXAxis().addLimitLine(line);
+        auto_line_chart.invalidate();
+    }
+
+    private void refresSpectrum() {
+        int zone = mLight.getZone();
+        zone = (zone/100)*60 + (zone%100);
+        long tm = System.currentTimeMillis()/60000 + zone;
+        int minutes = (int) (tm%1440);
+
+        int cnt = mLight.getChannelCount();
+        int t1 = mLight.getDaytimeStart();
+        int d1 = mLight.getSunriseRamp();
+        int t2 = mLight.getDaytimeEnd();
+        int d2 = mLight.getSunsetRamp();
+        boolean enable = mLight.getTurnoffEnable();
+        int t3 = mLight.getTurnoffTime();
+        byte[] brts = mLight.getDayBrights();
+        byte[] dbrts = Arrays.copyOf(brts, brts.length);
+        brts = mLight.getNightBrights();
+        byte[] nbrts = Arrays.copyOf(brts, brts.length);
+        int sunriseEnd = (t1 + d1) % 1440;
+        int sunsetStart = (1440 + t2 - d2) % 1440;
+        int[] time;
+        int[][] brights;
+
+        if (enable) {
+            time = new int[]{t1, sunriseEnd, sunsetStart, t2, t3, t3};
+            brights = new int[6][cnt];
+            for (int i = 0; i < cnt; i++) {
+                brights[0][i] = 0;
+                brights[1][i] = dbrts[i];
+                brights[2][i] = dbrts[i];
+                brights[3][i] = nbrts[i];
+                brights[4][i] = nbrts[i];
+                brights[5][i] = 0;
+            }
+        }
+        else {
+            time = new int[]{t1, sunriseEnd, sunsetStart, t2};
+            brights = new int[4][cnt];
+            for (int i = 0; i < cnt; i++) {
+                brights[0][i] = nbrts[i];
+                brights[1][i] = dbrts[i];
+                brights[2][i] = dbrts[i];
+                brights[3][i] = nbrts[i];
+            }
+        }
+        int duration = 0;
+        int span = 0;
+        for (int i = 0; i < time.length; i++) {
+            int j = (i+1)%time.length;
+            if (time[i] < time[j]) {
+                if (minutes >= time[i] && minutes < time[j]) {
+                    duration = time[j] - time[i];
+                    span = minutes - time[i];
+                    for (int k = 0; k < cnt; k++) {
+                        int db = brights[j][k] - brights[i][k];
+                        int val = brights[i][k] + db * span / duration;
+                        mLightSpectrum.setGain(k, ((float) val)/100);
+                    }
+                    break;
+                }
+            } else {
+                if (minutes >= time[i] || minutes < time[j]) {
+                    duration = 1440 - time[i] + time[j];
+                    span = 1440 - time[i] + minutes;
+                    for (int k = 0; k < cnt; k++) {
+                        int db = brights[j][k] - brights[i][k];
+                        int val = brights[i][k] + db * span / duration;
+                        mLightSpectrum.setGain(k, ((float) val)/100);
+                    }
+                    break;
+                }
+            }
+        }
+
+        int min = getResources().getInteger(R.integer.spectrum_wavelength_min);
+        int max = getResources().getInteger(R.integer.spectrum_wavelength_max);
+        int[] waveColors = getResources().getIntArray(R.array.spectrum);
+        if (waveColors == null || waveColors.length != max-min+1) {
+            try {
+                throw new Exception("Invalid wave-color table.");
+            }
+            catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        int wave_min = mLightSpectrum.getStart();
+        float spectrumMax = mLightSpectrum.getMax();
+        List<IBarDataSet> dataSets = new ArrayList<>();
+        for (int i = min; i <= max; i++) {
+            List<BarEntry> entries = new ArrayList<>();
+            entries.add(new BarEntry(i, mLightSpectrum.get(i-wave_min)/spectrumMax));
+            BarDataSet barDataSet = new BarDataSet(entries, null);
+            barDataSet.setDrawValues(false);
+            int color = waveColors[i - min];
+            barDataSet.setColor(color);
+            barDataSet.setBarBorderColor(color);
+            barDataSet.setBarShadowColor(color);
+            barDataSet.setHighlightEnabled(false);
+            dataSets.add(barDataSet);
+        }
+        BarData barData = new BarData(dataSets);
+        barData.setBarWidth(2);
+        auto_spectrum.setData(barData);
+        auto_spectrum.invalidate();
+    }
+
+    private String getPercentText(int val) {
+        if (val >= 100) {
+            return "100%";
+        }
+        if (val >= 10) {
+            return " " + val + "%";
+        }
+        if (val >= 0) {
+            return "  " + val + "%";
+        }
+        return "  0%";
+    }
+
+    private String getTimeText(int time) {
+        return TimeFormatUtil.formatMinutesTime(mTimeFormat, time);
+    }
+
     private void refreshData() {
         if (mLight == null) {
             return;
         }
-        auto_tv_sunrise.setError(null);
-        auto_tv_sunset.setError(null);
-        auto_tv_turnoff.setError(null);
+        auto_sunrise.setError(null);
+        auto_sunset.setError(null);
+        auto_turnoff.setError(null);
         List<ILineDataSet> dataSets = new ArrayList<>();
 
         int sunriseEnd = (sunriseStart + sunriseRamp) % 1440;
@@ -218,9 +429,9 @@ public class LightAutoFragment extends BaseFragment {
             }
         }
         if (!b) {
-            auto_tv_sunrise.setError("");
-            auto_tv_sunset.setError("");
-            auto_tv_turnoff.setError("");
+            auto_sunrise.setError("");
+            auto_sunset.setError("");
+            auto_turnoff.setError("");
         }
 
         //chart
@@ -259,55 +470,49 @@ public class LightAutoFragment extends BaseFragment {
         auto_line_chart.setData(lineData);
         auto_line_chart.invalidate();
 
-        DecimalFormat df = new DecimalFormat("00");
-        //        auto_tv_sunrise.setText(df.format(sunriseStart/60) + ":" + df.format(sunriseStart%60) +
-        //                                "\n~\n" + sunriseRamp + " min");
-        //        auto_tv_sunset.setText(df.format(sunsetEnd/60) + ":" + df.format(sunsetEnd%60) +
-        //                               "\n~\n" + sunsetRamp + " min");
-        auto_tv_sunrise.setText(df.format(sunriseStart / 60) + ":" + df.format(sunriseStart % 60) + "\n~\n" + df.format(sunriseEnd / 60) + ":" + df.format(sunriseEnd % 60));
-        auto_tv_sunset.setText(df.format(sunsetStart / 60) + ":" + df.format(sunsetStart % 60) + "\n~\n" + df.format(sunsetEnd / 60) + ":" + df.format(sunsetEnd % 60));
-        SpannableStringBuilder sp1 = new SpannableStringBuilder();
-        SpannableStringBuilder sp2 = new SpannableStringBuilder();
+        auto_sunrise.setText(getTimeText(sunriseStart) + " ~ " + getTimeText(sunriseEnd));
+        auto_sunset.setText(getTimeText(sunsetStart) + " ~ " + getTimeText(sunsetEnd));
         for (int i = 0; i < chnCount; i++) {
             String name = mLight.getChannelName(i);
-            ImageSpan icon = new ImageSpan(getContext(), LightUtil.getIconRes(name));
-            sp1.append(" ");
-            sp1.setSpan(icon, sp1.length() - 1, sp1.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-            sp1.append("  " + dayBrights[i] + " %\n");
-            sp2.append(" ");
-            sp2.setSpan(icon, sp2.length() - 1, sp2.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-            sp2.append("  " + nightBrights[i] + " %\n");
+            int color = LightUtil.getColorValue(name);
+            daylight_tv[i].setVisibility(View.VISIBLE);
+            daylight_tv[i].setText(getPercentText(dayBrights[i]));
+            daylight_tv[i].setBackgroundColor(color);
+            nightlight_tv[i].setVisibility(View.VISIBLE);
+            nightlight_tv[i].setText(getPercentText(nightBrights[i]));
+            nightlight_tv[i].setBackgroundColor(color);
         }
-        auto_tv_day.setText(sp1, TextView.BufferType.SPANNABLE);
-        auto_tv_night.setText(sp2, TextView.BufferType.SPANNABLE);
+        for (int i = chnCount; i < 6; i++) {
+            daylight_tv[i].setVisibility(View.INVISIBLE);
+            nightlight_tv[i].setVisibility(View.INVISIBLE);
+        }
         if (mLight.getTurnoffEnable()) {
-            auto_tv_turnoff.setText(df.format(turnoffTime / 60) + ":" + df.format(turnoffTime % 60));
+            auto_turnoff.setText(getTimeText(turnoffTime));
         }
         else {
-            auto_tv_turnoff.setText(R.string.disabled);
+            auto_turnoff.setText(R.string.disabled);
         }
+        refresSpectrum();
     }
 
-    @SuppressLint ("RestrictedApi")
     private void showEditSunriseDialog(final boolean sunset) {
         if (mLight == null) {
             return;
         }
         mEditing = true;
-        int height = auto_iv_sunrise.getHeight();
         View view = LayoutInflater.from(getContext())
                                   .inflate(R.layout.dialog_edit_sunrise_sunset, null, false);
+        int height = (int) (auto_line_chart.getHeight() * 1.2f);
         view.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, height));
         final BottomSheetDialog dialog = new BottomSheetDialog(getContext());
         dialog.setContentView(view);
         dialog.setCanceledOnTouchOutside(false);
         dialog.setCancelable(false);
-        CheckableImageButton cib_bg = view.findViewById(R.id.dialog_sunrs_bg);
         TextView tv_text = view.findViewById(R.id.dialog_sunrs_text);
         final TimePicker tp_time = view.findViewById(R.id.dialog_sunrs_time);
         final NumberPicker np_ramp = view.findViewById(R.id.dialog_sunrs_ramp);
-        Button btn_cancel = view.findViewById(R.id.dialog_sunrs_cancel);
-        Button btn_save = view.findViewById(R.id.dialog_sunrs_save);
+        Button btn_cancel = view.findViewById(R.id.btn_cancel);
+        Button btn_save = view.findViewById(R.id.btn_save);
         String[] displayValues = new String[25];
         for (int i = 0; i < 25; i++) {
             displayValues[i] = "" + i * 10 + " min";
@@ -315,7 +520,6 @@ public class LightAutoFragment extends BaseFragment {
         np_ramp.setMaxValue(24);
         np_ramp.setMinValue(0);
         np_ramp.setDisplayedValues(displayValues);
-        cib_bg.setChecked(sunset);
         int time;
         if (sunset) {
             tv_text.setText(R.string.sunset);
@@ -326,7 +530,7 @@ public class LightAutoFragment extends BaseFragment {
             time = sunriseStart;
             np_ramp.setValue(sunriseRamp / 10);
         }
-        tp_time.setIs24HourView(true);
+        tp_time.setIs24HourView(GlobalSettings.is24HourFormat());
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             tp_time.setHour(time / 60);
             tp_time.setMinute(time % 60);
@@ -398,15 +602,15 @@ public class LightAutoFragment extends BaseFragment {
             return;
         }
         mEditing = true;
-        int height = auto_iv_sunrise.getHeight();
-        View view = LayoutInflater.from(getContext())
-                                  .inflate(R.layout.dialog_edit_turnoff, null, false);
+        View view = LayoutInflater.from(getContext()).inflate(R.layout.dialog_edit_turnoff, null, false);
+        int height = (int) (auto_line_chart.getHeight() * 1.2f);
+        view.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, height));
         final Switch sw_enable = view.findViewById(R.id.dialog_turnoff_enable);
         final TimePicker tp_turnoff = view.findViewById(R.id.dialog_turnoff_time);
-        Button btn_cancel = view.findViewById(R.id.dialog_turnoff_cancel);
-        Button btn_save = view.findViewById(R.id.dialog_turnoff_save);
+        Button btn_cancel = view.findViewById(R.id.btn_cancel);
+        Button btn_save = view.findViewById(R.id.btn_save);
         sw_enable.setChecked(turnoffEnable);
-        tp_turnoff.setIs24HourView(true);
+        tp_turnoff.setIs24HourView(GlobalSettings.is24HourFormat());
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             tp_turnoff.setHour(turnoffTime / 60);
             tp_turnoff.setMinute(turnoffTime % 60);
@@ -415,7 +619,6 @@ public class LightAutoFragment extends BaseFragment {
             tp_turnoff.setCurrentHour(turnoffTime / 60);
             tp_turnoff.setCurrentMinute(turnoffTime % 60);
         }
-        view.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, height));
         final BottomSheetDialog dialog = new BottomSheetDialog(getContext());
         dialog.setContentView(view);
         dialog.setCanceledOnTouchOutside(false);
@@ -462,21 +665,19 @@ public class LightAutoFragment extends BaseFragment {
         dialog.show();
     }
 
-    @SuppressLint ("RestrictedApi")
     private void showEditDayNightDialog(final boolean night) {
         if (mLight == null) {
             return;
         }
         mEditing = true;
-        int height = auto_iv_sunrise.getHeight();
-        View view = LayoutInflater.from(getContext())
-                                  .inflate(R.layout.dialog_edit_day_night, null, false);
-        CheckableImageButton cib_bg = view.findViewById(R.id.dialog_daynight_bg);
+        View view = LayoutInflater.from(getContext()).inflate(R.layout.dialog_edit_day_night, null, false);
+        int height = (int) (auto_line_chart.getHeight() * 1.2f);
+        view.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, height));
+        TextView title = view.findViewById(R.id.dialog_daynight_title);
         ListView listView = view.findViewById(R.id.dialog_daynight_lv);
         Button btn_cancel = view.findViewById(R.id.dialog_daynight_cancel);
         Button btn_save = view.findViewById(R.id.dialog_daynight_save);
-        cib_bg.setChecked(night);
-        view.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, height));
+        title.setText(night ? R.string.night_light : R.string.day_light);
         final BottomSheetDialog dialog = new BottomSheetDialog(getContext());
         dialog.setContentView(view);
         dialog.setCanceledOnTouchOutside(false);
@@ -537,7 +738,7 @@ public class LightAutoFragment extends BaseFragment {
                 view = LayoutInflater.from(getContext())
                                      .inflate(R.layout.dialog_item_slider, viewGroup, false);
                 holder = new ViewHolder();
-                holder.iv_icon = view.findViewById(R.id.dialog_item_slider_color);
+//                holder.iv_icon = view.findViewById(R.id.dialog_item_slider_color);
                 holder.sb_progress = view.findViewById(R.id.dialog_item_slider_progress);
                 holder.tv_percent = view.findViewById(R.id.dialog_item_slider_percent);
                 view.setTag(holder);
@@ -548,8 +749,8 @@ public class LightAutoFragment extends BaseFragment {
             String name = mLight.getChannelName(postion);
             int color = LightUtil.getColorValue(name);
 
-            GradientDrawable icon = (GradientDrawable) holder.iv_icon.getDrawable();
-            icon.setColor(color);
+//            GradientDrawable icon = (GradientDrawable) holder.iv_icon.getDrawable();
+//            icon.setColor(color);
             //动态设置SeekBar progressDrawable
             holder.sb_progress.setProgressDrawable(LightUtil.getProgressDrawable(getContext(), name));
             //动态设置SeekBar thumb
@@ -584,7 +785,7 @@ public class LightAutoFragment extends BaseFragment {
     }
 
     class ViewHolder {
-        private ImageView iv_icon;
+//        private ImageView iv_icon;
         private SeekBar sb_progress;
         private TextView tv_percent;
     }

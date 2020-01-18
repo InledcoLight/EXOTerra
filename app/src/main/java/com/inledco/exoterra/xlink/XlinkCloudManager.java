@@ -151,6 +151,15 @@ public class XlinkCloudManager {
         XLinkSDK.startTask(task);
     }
 
+    public void modifyNickname(final String nickname, final XlinkRequestCallback<String> callback) {
+        int userid = XLinkUserManager.getInstance().getUid();
+        UserApi.UserRequest request = new UserApi.UserRequest();
+        request.nickname = nickname;
+        XLinkRestful.getApplicationApi()
+                    .updateUserInfo(userid, request)
+                    .enqueue(callback);
+    }
+
     public void modifyPassword(String oldPassword, String newPassword, final XlinkRequestCallback<String> callback) {
         UserApi.PasswordResetRequest request = new UserApi.PasswordResetRequest();
         request.oldPassword = oldPassword;
@@ -742,9 +751,7 @@ public class XlinkCloudManager {
         request.deviceId = xDevice.getDeviceId();
         try {
             int version = Integer.parseInt(xDevice.getFirmwareVersion());
-            if (version >= 2) {
-                request.identify = (version & 0x01) == 0x01 ? 1 : 2;
-            }
+            request.identify = (version & 0x01) == 0x01 ? 1 : 2;
             XLinkRestful.getApplicationApi()
                         .getDeviceNewestVersion(request)
                         .enqueue(callback);
@@ -762,9 +769,7 @@ public class XlinkCloudManager {
         request.deviceId = xDevice.getDeviceId();
         try {
             int version = Integer.parseInt(xDevice.getFirmwareVersion());
-            if (version >= 2) {
-                request.identify = (version & 0x01) == 0x01 ? 1 : 2;
-            }
+            request.identify = (version & 0x01) == 0x01 ? 1 : 2;
             XLinkRestful.getApplicationApi()
                         .upgradeDevice(request)
                         .enqueue(callback);

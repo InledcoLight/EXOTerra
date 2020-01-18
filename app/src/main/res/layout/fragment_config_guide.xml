@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -37,7 +36,6 @@
                 android:id="@+id/config_guide_prdt"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="8dp"
                 android:layout_marginTop="8dp"
                 android:layout_marginBottom="8dp" />
 
@@ -93,6 +91,25 @@
         app:layout_constraintStart_toStartOf="parent" />
 
     <com.inledco.exoterra.view.GradientCornerButton
+        android:id="@+id/config_guide_back"
+        style="?attr/buttonStyle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        android:background="?attr/selectableItemBackground"
+        android:text="@string/back"
+        app:direction="horizontal"
+        app:gradientEnd="@color/gradientWhite"
+        app:gradientStart="@color/gradientYellow"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/guideline"
+        app:layout_constraintStart_toStartOf="parent"
+        app:radius="@dimen/cornerRadius"
+        app:strokeWidth="@dimen/strokeWidth" />
+
+    <com.inledco.exoterra.view.GradientCornerButton
         android:id="@+id/config_guide_next"
         style="?attr/buttonStyle"
         android:layout_width="0dp"
@@ -106,11 +123,11 @@
         app:direction="horizontal"
         app:gradientEnd="@color/gradientWhite"
         app:gradientStart="@color/gradientYellow"
-        app:radius="@dimen/cornerRadius"
-        app:strokeWidth="@dimen/strokeWidth"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="@+id/guideline"
+        app:radius="@dimen/cornerRadius"
+        app:strokeWidth="@dimen/strokeWidth" />
 
     <ImageView
         android:id="@+id/config_guide_icon"
@@ -125,13 +142,20 @@
         app:layout_constraintTop_toBottomOf="@+id/gradientCornerLinearLayout"
         app:srcCompat="@drawable/ic_power_gray" />
 
+    <android.support.constraint.Guideline
+        android:id="@+id/guideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.5" />
+
     <!--    <ImageView-->
-<!--        android:id="@+id/config_guide_led"-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:layout_marginStart="16dp"-->
-<!--        android:layout_marginTop="32dp"-->
-<!--        android:visibility="visible"-->
-<!--        app:srcCompat="@drawable/ic_power_green"/>-->
+    <!--        android:id="@+id/config_guide_led"-->
+    <!--        android:layout_width="wrap_content"-->
+    <!--        android:layout_height="wrap_content"-->
+    <!--        android:layout_marginStart="16dp"-->
+    <!--        android:layout_marginTop="32dp"-->
+    <!--        android:visibility="visible"-->
+    <!--        app:srcCompat="@drawable/ic_power_green"/>-->
 
 </android.support.constraint.ConstraintLayout>

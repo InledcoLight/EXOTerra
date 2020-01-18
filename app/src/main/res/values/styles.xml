@@ -29,6 +29,16 @@
         <item name="android:windowAnimationStyle">@style/ActivityAnimation</item>
     </style>
 
+    <style name="SwitchStyle" parent="Widget.AppCompat.CompoundButton.Switch">
+        <item name="android:thumb">@drawable/switch_thumb</item>
+        <item name="android:track">@drawable/switch_track</item>
+    </style>
+
+    <style name="SwitchStyle2" parent="Widget.AppCompat.CompoundButton.Switch">
+        <item name="android:thumb">@drawable/switch_thumb_2</item>
+        <item name="android:track">@drawable/switch_track_2</item>
+    </style>
+
     <style name="ActivityAnimation">
         <item name="android:activityOpenEnterAnimation">@anim/slide_in_right</item>
         <item name="android:activityCloseExitAnimation">@anim/slide_out_right</item>

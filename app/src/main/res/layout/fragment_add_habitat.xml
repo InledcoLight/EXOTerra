@@ -7,17 +7,82 @@
     android:background="@mipmap/ic_background"
     android:clickable="true">
 
-    <android.support.v7.widget.Toolbar
-        android:id="@+id/add_habitat_toolbar"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:minHeight="?attr/actionBarSize"
-        android:theme="?attr/actionBarTheme"
-        app:title="@string/add_habitat"
-        app:navigationIcon="@drawable/ic_arrow_back_white_32dp"
+    <ImageView
+        android:id="@+id/imageView10"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/brandHeight"
+        android:paddingLeft="8dp"
+        android:paddingRight="8dp"
+        android:scaleType="fitXY"
+        android:src="@mipmap/ic_brand"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <com.inledco.exoterra.view.GradientCornerLinearLayout
+        android:id="@+id/gradientCornerLinearLayout10"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:layout_marginTop="8dp"
+        android:gravity="center"
+        android:orientation="vertical"
+        app:direction="horizontal"
+        app:gradientEnd="@color/gradientGreen"
+        app:gradientStart="@color/gradientYellow"
+        app:layout_constraintTop_toBottomOf="@+id/imageView10"
+        app:radius="@dimen/cornerRadius"
+        app:strokeWidth="@dimen/strokeWidth"
+        tools:layout_editor_absoluteX="16dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/titleHeight"
+            android:background="@drawable/shape_topcorner_rect_gradient"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="8dp"
+                app:srcCompat="@drawable/ic_habitats_white_48dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="8dp"
+                android:text="@string/add_habitat"
+                android:textColor="@color/textColorPrimary"
+                android:textSize="@dimen/textSizeTitle"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:padding="8dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingTop="8dp"
+                android:paddingBottom="8dp"
+                android:text="@string/system_time"
+                android:textColor="@color/textColorPrimary"
+                android:textSize="@dimen/textSizePrimary" />
+
+            <TextView
+                android:id="@+id/add_habitat_systime"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="8dp"
+                android:textColor="@color/textColorPrimary"
+                android:textSize="@dimen/textSizePrimary" />
+        </LinearLayout>
+    </com.inledco.exoterra.view.GradientCornerLinearLayout>
 
     <android.support.design.widget.TextInputLayout
         android:id="@+id/add_habitat_til"
@@ -31,15 +96,15 @@
         app:hintEnabled="true"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/add_habitat_toolbar">
+        app:layout_constraintTop_toBottomOf="@+id/gradientCornerLinearLayout10">
 
         <com.inledco.exoterra.view.AdvancedTextInputEditText
             android:id="@+id/add_habitat_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/habitat_name"
-            android:lines="1"
             android:imeOptions="actionDone"
+            android:lines="1"
             android:maxLength="32"
             android:maxLines="1" />
     </android.support.design.widget.TextInputLayout>
@@ -50,7 +115,6 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="8dp"
         android:layout_marginEnd="16dp"
         app:hintEnabled="true"
         app:layout_constraintEnd_toEndOf="parent"
@@ -61,9 +125,9 @@
             android:id="@+id/add_habitat_time"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/habitat_time"
-            android:gravity="center_vertical"
             android:enabled="false"
+            android:gravity="center_vertical"
+            android:hint="@string/habitat_time"
             android:lines="1"
             android:maxLines="1" />
     </android.support.design.widget.TextInputLayout>
@@ -85,12 +149,11 @@
             android:id="@+id/add_habitat_sunrise"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/sunrise"
-            android:gravity="center_vertical"
             android:enabled="false"
-            android:text="06:00"
+            android:gravity="center_vertical"
+            android:hint="@string/sunrise"
             android:lines="1"
-            android:maxLines="1" />
+            android:maxLines="1"/>
     </android.support.design.widget.TextInputLayout>
 
     <android.support.design.widget.TextInputLayout
@@ -110,43 +173,75 @@
             android:id="@+id/add_habitat_sunset"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/sunset"
-            android:gravity="center_vertical"
             android:enabled="false"
-            android:text="18:00"
+            android:gravity="center_vertical"
+            android:hint="@string/sunset"
             android:lines="1"
-            android:maxLines="1" />
+            android:maxLines="1"/>
     </android.support.design.widget.TextInputLayout>
 
-    <LinearLayout
+    <Switch
+        android:id="@+id/add_habitat_favourite"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="16dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
         android:paddingTop="8dp"
         android:paddingBottom="8dp"
-        android:orientation="horizontal"
-        android:gravity="center_vertical"
+        style="@style/SwitchStyle"
+        android:textColor="@color/textColorPrimary"
+        android:textSize="@dimen/textSizePrimary"
+        android:text="@string/favourite_habitat"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textInputLayout3">
+        app:layout_constraintTop_toBottomOf="@+id/textInputLayout3"/>
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="@dimen/textSizePrimary"
-            android:textColor="@color/textColorPrimary"
-            android:text="@string/favourite_habitat"/>
-        <Space
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"/>
-        <Switch
-            android:id="@+id/add_habitat_favourite"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:checked="true"/>
-    </LinearLayout>
+    <android.support.constraint.Guideline
+        android:id="@+id/guideline4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.5" />
+
+    <com.inledco.exoterra.view.GradientCornerButton
+        android:id="@+id/add_habitat_back"
+        style="?attr/buttonStyle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        android:background="?attr/selectableItemBackground"
+        android:text="@string/back"
+        app:direction="horizontal"
+        app:strokeWidth="@dimen/strokeWidth"
+        app:radius="@dimen/cornerRadius"
+        app:gradientStart="@color/gradientYellow"
+        app:gradientEnd="@color/gradientWhite"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/guideline4"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <com.inledco.exoterra.view.GradientCornerButton
+        android:id="@+id/add_habitat_save"
+        style="?attr/buttonStyle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        android:background="?attr/selectableItemBackground"
+        android:text="@string/save"
+        app:direction="horizontal"
+        app:strokeWidth="@dimen/strokeWidth"
+        app:radius="@dimen/cornerRadius"
+        app:gradientStart="@color/gradientYellow"
+        app:gradientEnd="@color/gradientWhite"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/guideline4" />
 
 </android.support.constraint.ConstraintLayout>

@@ -1,5 +1,6 @@
 package com.inledco.exoterra.group;
 
+import android.app.TimePickerDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -11,7 +12,6 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputEditText;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -19,26 +19,31 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CompoundButton;
+import android.widget.ImageButton;
 import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.TimePicker;
 import android.widget.Toast;
 
+import com.inledco.exoterra.GlobalSettings;
 import com.inledco.exoterra.R;
 import com.inledco.exoterra.base.BaseFragment;
 import com.inledco.exoterra.bean.Home;
 import com.inledco.exoterra.event.HomeChangedEvent;
+import com.inledco.exoterra.event.HomePropertyChangedEvent;
 import com.inledco.exoterra.event.HomesRefreshedEvent;
 import com.inledco.exoterra.manager.HomeManager;
+import com.inledco.exoterra.util.FavouriteUtil;
 import com.inledco.exoterra.util.RegexUtil;
+import com.inledco.exoterra.util.TimeFormatUtil;
+import com.inledco.exoterra.view.GradientCornerButton;
 import com.inledco.exoterra.xlink.XlinkCloudManager;
 import com.inledco.exoterra.xlink.XlinkRequestCallback;
 
 import org.greenrobot.eventbus.EventBus;
 
 import java.text.DateFormat;
-import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.util.Set;
 import java.util.TimeZone;
 
 import cn.xlink.restful.XLinkRestfulEnum;
@@ -46,26 +51,27 @@ import cn.xlink.restful.api.app.HomeApi;
 import cn.xlink.sdk.v5.manager.XLinkUserManager;
 
 public class HabitatDetailFragment extends BaseFragment {
-
-    private Toolbar habitat_detail_toolbar;
     private TextView habitat_detail_name;
     private TextView habitat_detail_localdatetime;
     private TextView habitat_detail_datetime;
     private TextView habitat_detail_sunrise;
     private TextView habitat_detail_sunset;
     private Switch habitat_detail_favourite;
-    private TextView habitat_detail_share;
-    private Button habitat_detail_delete;
+    private ImageButton habitat_detail_share;
+    private ImageButton habitat_detail_delete;
+    private GradientCornerButton habitat_detail_back;
 
     private static final String KEY_HOMEID = "homeid";
     private String mHomeid;
     private Home mHome;
 
-    private int defaultZone = TimeZone.getDefault().getRawOffset()/60000;
-    private int mZone = defaultZone;
-    private int mSunrise = 360;
-    private int mSunset = 1080;
+    private final int defaultZone = TimeZone.getDefault().getRawOffset()/60000;
+    private int mZone;
+    private int mSunrise;
+    private int mSunset;
 
+    private DateFormat mDateFormat;
+    private DateFormat mTimeFormat;
     private BroadcastReceiver mTimeReceiver;
 
     private boolean mHomeAdmin;
@@ -103,7 +109,6 @@ public class HabitatDetailFragment extends BaseFragment {
 
     @Override
     protected void initView(View view) {
-        habitat_detail_toolbar = view.findViewById(R.id.habitat_detail_toolbar);
         habitat_detail_name = view.findViewById(R.id.habitat_detail_name);
         habitat_detail_localdatetime = view.findViewById(R.id.habitat_detail_localdatetime);
         habitat_detail_datetime = view.findViewById(R.id.habitat_detail_datetime);
@@ -112,21 +117,26 @@ public class HabitatDetailFragment extends BaseFragment {
         habitat_detail_favourite = view.findViewById(R.id.habitat_detail_favourite);
         habitat_detail_share = view.findViewById(R.id.habitat_detail_share);
         habitat_detail_delete = view.findViewById(R.id.habitat_detail_delete);
+        habitat_detail_back = view.findViewById(R.id.habitat_detail_back);
 
         habitat_detail_name.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_edit_white_24dp, 0);
         habitat_detail_datetime.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_edit_white_24dp, 0);
         habitat_detail_sunrise.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_edit_white_24dp, 0);
         habitat_detail_sunset.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_edit_white_24dp, 0);
-        habitat_detail_share.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_share_white_24dp, 0);
     }
 
     @Override
     protected void initData() {
+        mDateFormat = GlobalSettings.getDateTimeFormat();
+        mTimeFormat = GlobalSettings.getTimeFormat();
         Bundle args = getArguments();
         if (args != null) {
             mHomeid = args.getString(KEY_HOMEID);
             mHome = HomeManager.getInstance().getHome(mHomeid);
             if (mHome != null) {
+                mZone = mHome.getZone();
+                mSunrise = mHome.getSunrise();
+                mSunset = mHome.getSunset();
                 mTimeReceiver = new BroadcastReceiver() {
                     @Override
                     public void onReceive(Context context, Intent intent) {
@@ -149,6 +159,8 @@ public class HabitatDetailFragment extends BaseFragment {
                     }
                 }
 
+                final Set<String> favourites = FavouriteUtil.getFavourites(getContext());
+                habitat_detail_favourite.setChecked(favourites.contains(mHomeid));
                 refreshData();
             }
         }
@@ -156,13 +168,12 @@ public class HabitatDetailFragment extends BaseFragment {
 
     @Override
     protected void initEvent() {
-        habitat_detail_toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+        habitat_detail_back.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 getActivity().getSupportFragmentManager().popBackStack();
             }
         });
-
         if (mHome == null) {
             return;
         }
@@ -176,28 +187,61 @@ public class HabitatDetailFragment extends BaseFragment {
         habitat_detail_datetime.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                long time = System.currentTimeMillis();
+                int habitatTime = (int) ((time / 60000 + mZone) % 1440);
+                showTimePickerDialog(habitatTime, new TimePickerDialog.OnTimeSetListener() {
+                    @Override
+                    public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+                        int currTime = (int) ((System.currentTimeMillis() / 60000) % 1440);
+                        int setTime = hourOfDay*60 + minute;
+                        int zone = setTime - currTime;
+                        if (zone < -720) {
+                            zone += 1440;
+                        } else if (zone > 720) {
+                            zone -= 1440;
+                        }
+                        setHome(zone, mSunrise, mSunset);
+                    }
+                });
             }
         });
 
         habitat_detail_sunrise.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                showTimePickerDialog(mSunrise, new TimePickerDialog.OnTimeSetListener() {
+                    @Override
+                    public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+                        int sunrise = hourOfDay*60 + minute;
+                        setHome(mZone, sunrise, mSunset);
+                    }
+                });
             }
         });
 
         habitat_detail_sunset.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                showTimePickerDialog(mSunset, new TimePickerDialog.OnTimeSetListener() {
+                    @Override
+                    public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+                        int sunset = hourOfDay*60 + minute;
+                        setHome(mZone, mSunrise, sunset);
+                    }
+                });
             }
         });
 
         habitat_detail_favourite.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-
+                Log.e(TAG, "onCheckedChanged: " + isChecked);
+                if (isChecked) {
+                    FavouriteUtil.addFavourite(getContext(), mHomeid);
+                } else {
+                    FavouriteUtil.removeFavourite(getContext(), mHomeid);
+                    EventBus.getDefault().post(new HomesRefreshedEvent());
+                }
             }
         });
 
@@ -216,34 +260,53 @@ public class HabitatDetailFragment extends BaseFragment {
         });
     }
 
+    private void setHome(final int zone, final int sunrise, final int sunset) {
+        XlinkCloudManager.getInstance().setHomeProperty(mHomeid, zone, sunrise, sunset, new XlinkRequestCallback<String>() {
+            @Override
+            public void onError(String error) {
+                Toast.makeText(getContext(), error, Toast.LENGTH_SHORT)
+                     .show();
+            }
+
+            @Override
+            public void onSuccess(String s) {
+                mZone = zone;
+                mSunrise = sunrise;
+                mSunset = sunset;
+                mHome.getProperty().setZone(mZone);
+                mHome.getProperty().setSunrise(mSunrise);
+                mHome.getProperty().setSunset(mSunset);
+                refreshTime();
+                habitat_detail_sunrise.setText(getTimeText(mSunrise));
+                habitat_detail_sunset.setText(getTimeText(mSunset));
+                EventBus.getDefault().post(new HomePropertyChangedEvent(mHomeid));
+            }
+        });
+    }
+
     private String getTimeText(int time) {
-        DecimalFormat df = new DecimalFormat("00");
-        return df.format(time/60) + ":" + df.format(time%60);
+        return TimeFormatUtil.formatMinutesTime(mTimeFormat, time);
     }
 
     private void refreshData() {
         String name = mHome.getHome().name;
         habitat_detail_name.setText(name);
         refreshTime();
-        if (mHome.getProperty() != null) {
-            mSunrise = mHome.getProperty().getSunrise();
-            mSunset = mHome.getProperty().getSunset();
-        }
-        habitat_detail_sunrise.setText(getString(R.string.sunrise_time, getTimeText(mSunrise)));
-        habitat_detail_sunset.setText(getString(R.string.sunset_time, getTimeText(mSunset)));
+        habitat_detail_sunrise.setText(getTimeText(mSunrise));
+        habitat_detail_sunset.setText(getTimeText(mSunset));
     }
 
     private void refreshTime() {
-        final DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm");
-        if (mHome.getProperty() != null) {
-            mZone = mHome.getProperty().getZone();
-        }
-
         long time = System.currentTimeMillis();
-        habitat_detail_localdatetime.setText(getString(R.string.local_datetime, df.format(new Date(time))));
+        habitat_detail_localdatetime.setText(mDateFormat.format(time));
 
         long habitatTime = time + (mZone-defaultZone)*60000;
-        habitat_detail_datetime.setText(getString(R.string.habitat_datetime, df.format(new Date(habitatTime))));
+        habitat_detail_datetime.setText(mDateFormat.format(habitatTime));
+    }
+
+    private void showTimePickerDialog(int time, final TimePickerDialog.OnTimeSetListener listener) {
+        TimePickerDialog  dialog = new TimePickerDialog(getContext(), listener, time/60, time%60, GlobalSettings.is24HourFormat());
+        dialog.show();
     }
 
     private void showRenameDialog() {

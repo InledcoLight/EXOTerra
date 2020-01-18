@@ -10,24 +10,24 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.github.lzyzsd.circleprogress.DonutProgress;
 import com.inledco.exoterra.R;
 import com.inledco.exoterra.base.BaseFragment;
-import com.inledco.exoterra.event.SubscribeChangedEvent;
 import com.inledco.exoterra.util.DeviceUtil;
 import com.inledco.exoterra.util.RouterUtil;
-
-import org.greenrobot.eventbus.EventBus;
+import com.inledco.exoterra.view.CircleSeekbar;
 
 import cn.xlink.sdk.v5.manager.XLinkUserManager;
 
 public class CompatibleModeFragment extends BaseFragment {
     private ImageView netconfig_prdt;
     private TextView netconfig_title;
-    private DonutProgress netconfig_pb;
+    private CircleSeekbar netconfig_csb;
+    private TextView netconfig_progress;
+    private Button netconfig_back;
 
     private ConnectNetViewModel mConnectNetViewModel;
     private ConnectNetBean mConnectNetBean;
@@ -63,7 +63,9 @@ public class CompatibleModeFragment extends BaseFragment {
     protected void initView(View view) {
         netconfig_prdt = view.findViewById(R.id.netconfig_prdt);
         netconfig_title = view.findViewById(R.id.netconfig_title);
-        netconfig_pb = view.findViewById(R.id.netconfig_pb);
+        netconfig_csb = view.findViewById(R.id.netconfig_csb);
+        netconfig_progress = view.findViewById(R.id.netconfig_progress);
+        netconfig_back = view.findViewById(R.id.netconfig_back);
     }
 
     @Override
@@ -84,16 +86,9 @@ public class CompatibleModeFragment extends BaseFragment {
         mListener = new APConfigLinker.APConfigListener() {
             @Override
             public void onProgressUpdate(int progress) {
-                netconfig_pb.setProgress(progress);
-                netconfig_pb.setText("" + progress + " %");
+                netconfig_csb.setProgress(progress);
+                netconfig_progress.setText("" + progress + " %");
             }
-
-//            @Override
-//            public void onSubscribeFailed(String error) {
-//                mConnectNetBean.setRunning(false);
-//                mConnectNetViewModel.postValue();
-//                showAPConfigFailedDialog(error);
-//            }
 
             @Override
             public void onTimeout() {
@@ -108,8 +103,8 @@ public class CompatibleModeFragment extends BaseFragment {
                 mConnectNetBean.setResultDevid(devid);
                 mConnectNetBean.setResultAddress(mac);
                 mConnectNetViewModel.postValue();
-//                showAPConfigSuccessDialog();
                 RouterUtil.putRouterPassword(getContext(), mConnectNetViewModel.getData().getSsid(), mConnectNetViewModel.getData().getPassword());
+                getActivity().getSupportFragmentManager().popBackStack(null, 1);
                 addFragmentToStack(R.id.adddevice_fl, new ConfigDeviceFragment());
             }
 
@@ -126,20 +121,12 @@ public class CompatibleModeFragment extends BaseFragment {
 
     @Override
     protected void initEvent() {
-
-    }
-
-    private void showAPConfigSuccessDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-        builder.setTitle("Config Success")
-               .setPositiveButton(R.string.close, new DialogInterface.OnClickListener() {
-                   @Override
-                   public void onClick(DialogInterface dialog, int which) {
-                       EventBus.getDefault().post(new SubscribeChangedEvent());
-                       getActivity().finish();
-                   }
-               })
-               .show();
+        netconfig_back.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getActivity().onBackPressed();
+            }
+        });
     }
 
     private void showAPConfigFailedDialog(String error) {

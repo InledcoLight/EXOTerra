@@ -57,13 +57,13 @@ public class DeviceUtil {
 
     public static @DrawableRes int getProductIconSmall(String pid) {
         if (XlinkConstants.PRODUCT_ID_LEDSTRIP.equals(pid)) {
-            return R.drawable.ic_strip_24dp;
+            return R.drawable.ic_strip_48dp;
         }
         if (XlinkConstants.PRODUCT_ID_MONSOON.equals(pid)) {
-            return R.drawable.ic_monsoon_24dp;
+            return R.drawable.ic_monsoon_48dp;
         }
         if (XlinkConstants.PRODUCT_ID_SOCKET.equals(pid)) {
-            return R.drawable.ic_socket_24dp;
+            return R.drawable.ic_socket_48dp;
         }
         return R.drawable.ic_device_default_white_24dp;
     }

@@ -78,14 +78,14 @@ public class ProfileFragment extends BaseFragment {
             @Override
             public void onChanged(@Nullable EXOLedstrip exoLedstrip) {
                 mProfile = mLight.getProfile(mIndex);
-                LineChartHelper.setProfile(profile_chart, mLight.getChannelCount(), mLight.getChannelNames(), mProfile);
+                ChartHelper.setProfile(profile_chart, mLight.getChannelCount(), mLight.getChannelNames(), mProfile);
                 mAdapter.notifyDataSetChanged();
             }
         });
 
-        LineChartHelper.init(profile_chart);
+        ChartHelper.initLineChart(profile_chart);
         mProfile = mLight.getProfile(mIndex);
-        LineChartHelper.setProfile(profile_chart, mLight.getChannelCount(), mLight.getChannelNames(), mProfile);
+        ChartHelper.setProfile(profile_chart, mLight.getChannelCount(), mLight.getChannelNames(), mProfile);
         mAdapter = new TimePointsAdapter();
         profile_rv.setAdapter(mAdapter);
     }

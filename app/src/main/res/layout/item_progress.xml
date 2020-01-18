@@ -7,27 +7,35 @@
     android:orientation="vertical"
     android:gravity="center_horizontal">
 
-    <com.github.lzyzsd.circleprogress.DonutProgress
-        android:id="@+id/item_progress_percent"
-        android:layout_width="64dp"
-        android:layout_height="64dp"
-        app:donut_circle_starting_degree="270"
-        app:donut_finished_color="@color/colorWhite"
-        app:donut_finished_stroke_width="6dp"
-        app:donut_max="1000"
-        app:donut_prefix_text=""
-        app:donut_progress="0"
-        app:donut_suffix_text=" %"
-        app:donut_text="0 %"
-        app:donut_text_size="@dimen/textSizeSecondary"
-        app:donut_text_color="@color/colorWhite"
-        app:donut_unfinished_color="@color/colorGray"
-        app:donut_unfinished_stroke_width="6dp"/>
+    <com.inledco.exoterra.view.CircleSeekbar
+        android:id="@+id/item_progress_scb"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:padding="2dp"
+        app:seekable="false"
+        app:min="0"
+        app:max="1000"
+        app:pointerRadius="2dp"
+        app:progressWidth="4dp"
+        app:unreachedWidth="4dp"
+        app:unreachedColor="@color/colorGray">
+
+        <TextView
+            android:id="@+id/item_progress_pct"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/textColorPrimary"
+            android:textSize="@dimen/textSizeTiny"
+            android:textAlignment="center"/>
+    </com.inledco.exoterra.view.CircleSeekbar>
     <TextView
         android:id="@+id/item_progress_color"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="4dp"
         android:textColor="@color/textColorSencondary"
-        android:textSize="12sp"/>
+        android:textSize="@dimen/textSizeTiny"/>
 
 </LinearLayout>

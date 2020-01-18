@@ -9,41 +9,41 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputLayout;
-import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.Switch;
+import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import com.inledco.exoterra.GlobalSettings;
 import com.inledco.exoterra.R;
 import com.inledco.exoterra.base.BaseFragment;
 import com.inledco.exoterra.manager.HomeManager;
+import com.inledco.exoterra.util.FavouriteUtil;
+import com.inledco.exoterra.util.TimeFormatUtil;
 import com.inledco.exoterra.view.AdvancedTextInputEditText;
 import com.inledco.exoterra.xlink.XlinkCloudManager;
 import com.inledco.exoterra.xlink.XlinkRequestCallback;
 
 import java.text.DateFormat;
-import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.TimeZone;
 
 import cn.xlink.restful.api.app.HomeApi;
 
 public class AddHabitatFragment extends BaseFragment {
-    private Toolbar add_habitat_toolbar;
+    private TextView add_habitat_systime;
     private TextInputLayout add_habitat_til;
     private AdvancedTextInputEditText add_habitat_name;
     private AdvancedTextInputEditText add_habitat_time;
     private AdvancedTextInputEditText add_habitat_sunrise;
     private AdvancedTextInputEditText add_habitat_sunset;
     private Switch add_habitat_favourite;
+    private Button add_habitat_back;
+    private Button add_habitat_save;
 
     private final int mRawZone = TimeZone.getDefault().getRawOffset()/60000;
     private final BroadcastReceiver mTimeChangeReceiver = new BroadcastReceiver() {
@@ -51,19 +51,28 @@ public class AddHabitatFragment extends BaseFragment {
         public void onReceive(Context context, Intent intent) {
             switch (intent.getAction()) {
                 case Intent.ACTION_TIME_TICK:
-                    Log.e(TAG, "onReceive: ");
                     refreshTime();
                     break;
             }
         }
     };
 
-    private final String DATETIME_FORMAT = "yyyy-MM-dd HH:mm";
+    private DateFormat mDateFormat;
+    private DateFormat mTimeFormat;
 
-    private boolean is24Hour = true;
     private int mZone;
     private int mSunrise = 360;
     private int mSunset = 1080;
+
+    private static final String KEY_FAVOURITE = "favourite";
+
+    public static AddHabitatFragment newInstance(final boolean favourite) {
+        Bundle args = new Bundle();
+        args.putBoolean(KEY_FAVOURITE, favourite);
+        AddHabitatFragment fragment = new AddHabitatFragment();
+        fragment.setArguments(args);
+        return fragment;
+    }
 
     @Nullable
     @Override
@@ -88,15 +97,16 @@ public class AddHabitatFragment extends BaseFragment {
 
     @Override
     protected void initView(View view) {
-        add_habitat_toolbar = view.findViewById(R.id.add_habitat_toolbar);
+        add_habitat_systime = view.findViewById(R.id.add_habitat_systime);
         add_habitat_til = view.findViewById(R.id.add_habitat_til);
         add_habitat_name = view.findViewById(R.id.add_habitat_name);
         add_habitat_time = view.findViewById(R.id.add_habitat_time);
         add_habitat_sunrise = view.findViewById(R.id.add_habitat_sunrise);
         add_habitat_sunset = view.findViewById(R.id.add_habitat_sunset);
         add_habitat_favourite = view.findViewById(R.id.add_habitat_favourite);
+        add_habitat_back = view.findViewById(R.id.add_habitat_back);
+        add_habitat_save = view.findViewById(R.id.add_habitat_save);
 
-        add_habitat_toolbar.inflateMenu(R.menu.menu_save);
         add_habitat_name.requestFocus();
         add_habitat_name.bindTextInputLayout(add_habitat_til);
         add_habitat_time.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_edit_white_24dp, 0);
@@ -106,7 +116,15 @@ public class AddHabitatFragment extends BaseFragment {
 
     @Override
     protected void initData() {
+        Bundle args = getArguments();
+        if (args != null) {
+            add_habitat_favourite.setChecked(args.getBoolean(KEY_FAVOURITE));
+        }
+        mDateFormat = GlobalSettings.getDateTimeFormat();
+        mTimeFormat = GlobalSettings.getTimeFormat();
         mZone = TimeZone.getDefault().getRawOffset()/60000;
+        add_habitat_sunrise.setText(TimeFormatUtil.formatMinutesTime(mTimeFormat, mSunrise));
+        add_habitat_sunset.setText(TimeFormatUtil.formatMinutesTime(mTimeFormat, mSunset));
         refreshTime();
 
         IntentFilter filter = new IntentFilter();
@@ -116,41 +134,17 @@ public class AddHabitatFragment extends BaseFragment {
 
     @Override
     protected void initEvent() {
-        add_habitat_toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                getActivity().getSupportFragmentManager().popBackStack();
-            }
-        });
-
-        add_habitat_toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem menuItem) {
-                switch (menuItem.getItemId()) {
-                    case R.id.menu_save:
-                        String name = add_habitat_name.getText().toString();
-                        if (TextUtils.isEmpty(name)) {
-                            add_habitat_til.setError(getString(R.string.input_empty));
-                            return true;
-                        }
-                        createHome(name, mZone, mSunrise, mSunset);
-                        break;
-                }
-                return true;
-            }
-        });
-
         add_habitat_time.setDrawableRightClickListener(new AdvancedTextInputEditText.DrawableRightClickListener() {
             @Override
             public void onDrawableRightClick() {
-                int hour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY);
-                int minute = Calendar.getInstance().get(Calendar.MINUTE);
-                showTimePickerDialog(hour * 60 + minute, new TimePickerDialog.OnTimeSetListener() {
+                long time = System.currentTimeMillis();
+                int habitatTime = (int) ((time / 60000 + mZone) % 1440);
+                showTimePickerDialog(habitatTime, new TimePickerDialog.OnTimeSetListener() {
                     @Override
                     public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-                        int currTime = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)*60 + Calendar.getInstance().get(Calendar.MINUTE);
+                        int currTime = (int) ((System.currentTimeMillis() / 60000) % 1440);
                         int setTime = hourOfDay*60 + minute;
-                        int zone = mRawZone + (setTime - currTime);
+                        int zone = setTime - currTime;
                         if (zone < -720) {
                             zone += 1440;
                         } else if (zone > 720) {
@@ -170,8 +164,8 @@ public class AddHabitatFragment extends BaseFragment {
                     @Override
                     public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
                         mSunrise = hourOfDay*60+minute;
-                        DecimalFormat df = new DecimalFormat("00");
-                        add_habitat_sunrise.setText(df.format(mSunrise/60) + ":" + df.format(mSunrise%60));
+                        long time = ((1440+mSunrise-mRawZone)%1440)*60000;
+                        add_habitat_sunrise.setText(mTimeFormat.format(time));
                     }
                 });
             }
@@ -184,23 +178,42 @@ public class AddHabitatFragment extends BaseFragment {
                     @Override
                     public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
                         mSunset = hourOfDay*60+minute;
-                        DecimalFormat df = new DecimalFormat("00");
-                        add_habitat_sunset.setText(df.format(mSunset/60) + ":" + df.format(mSunset%60));
+                        long time = ((1440+mSunset-mRawZone)%1440)*60000;
+                        add_habitat_sunset.setText(mTimeFormat.format(time));
                     }
                 });
+            }
+        });
+
+        add_habitat_back.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getActivity().getSupportFragmentManager().popBackStack();
+            }
+        });
+
+        add_habitat_save.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String name = add_habitat_name.getText().toString();
+                if (TextUtils.isEmpty(name)) {
+                    add_habitat_til.setError(getString(R.string.input_empty));
+                    return;
+                }
+                createHome(name, mZone, mSunrise, mSunset);
             }
         });
     }
 
     private void refreshTime() {
-        long time = System.currentTimeMillis() + (mZone - mRawZone)*60000;
-        Date date = new Date(time);
-        DateFormat df = new SimpleDateFormat(DATETIME_FORMAT);
-        add_habitat_time.setText(df.format(date));
+        long current = System.currentTimeMillis();
+        long time = current + (mZone - mRawZone)*60000;
+        add_habitat_systime.setText(mDateFormat.format(current));
+        add_habitat_time.setText(mDateFormat.format(time));
     }
 
     private void showTimePickerDialog(int time, final TimePickerDialog.OnTimeSetListener listener) {
-        TimePickerDialog  dialog = new TimePickerDialog(getContext(), listener, time/60, time%60, is24Hour);
+        TimePickerDialog  dialog = new TimePickerDialog(getContext(), listener, time/60, time%60, GlobalSettings.is24HourFormat());
         dialog.show();
     }
 
@@ -220,6 +233,7 @@ public class AddHabitatFragment extends BaseFragment {
                     public void onError(String error) {
                         Toast.makeText(getContext(), error, Toast.LENGTH_SHORT)
                              .show();
+                        HomeManager.getInstance().refreshHomeList(null);
                         getActivity().getSupportFragmentManager().popBackStack();
                     }
 
@@ -229,6 +243,9 @@ public class AddHabitatFragment extends BaseFragment {
                         getActivity().getSupportFragmentManager().popBackStack();
                     }
                 });
+                if (add_habitat_favourite.isChecked()) {
+                    FavouriteUtil.addFavourite(getContext(), homeid);
+                }
             }
         });
     }

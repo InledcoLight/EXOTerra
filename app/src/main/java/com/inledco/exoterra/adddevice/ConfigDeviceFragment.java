@@ -90,7 +90,7 @@ public class ConfigDeviceFragment extends BaseFragment {
                         public void onSuccess(DeviceApi.DeviceResponse response) {
                             final String homeid = mConnectNetBean.getHomeid();
                             if (TextUtils.isEmpty(homeid)) {
-                                addFragmentToStack(R.id.adddevice_fl, new AssignHabitatFragment());
+                                replaceFragment(R.id.adddevice_fl, new AssignHabitatFragment());
                             } else {
                                 XlinkCloudManager.getInstance().addDeviceToHome(homeid, devid, new XlinkRequestCallback<String>() {
                                     @Override

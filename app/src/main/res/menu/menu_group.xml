@@ -3,7 +3,7 @@
       xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
         android:id="@+id/menu_group_add"
-        android:icon="@drawable/ic_add_white_64dp"
+        android:icon="@drawable/ic_add_white_48dp"
         android:title="@string/add_device"
         android:visible="false"
         app:showAsAction="always"/>

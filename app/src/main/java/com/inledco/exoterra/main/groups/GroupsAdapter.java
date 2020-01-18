@@ -1,6 +1,7 @@
 package com.inledco.exoterra.main.groups;
 
 import android.content.Context;
+import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
@@ -10,18 +11,17 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.inledco.exoterra.GlobalSettings;
 import com.inledco.exoterra.R;
 import com.inledco.exoterra.bean.Device;
 import com.inledco.exoterra.bean.EXOSocket;
 import com.inledco.exoterra.bean.Home;
 import com.inledco.exoterra.common.SimpleAdapter;
 import com.inledco.exoterra.manager.DeviceManager;
+import com.inledco.exoterra.util.TimeFormatUtil;
 import com.inledco.exoterra.xlink.XlinkConstants;
 
 import java.text.DateFormat;
-import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
 
@@ -30,7 +30,8 @@ import cn.xlink.restful.api.app.HomeApi;
 public class GroupsAdapter extends SimpleAdapter<Home, GroupsAdapter.GroupViewHolder> {
     private static final String TAG = "GroupsAdapter";
 
-    private final String DATETIME_FORMAT = "yyyy-MM-dd HH:mm";
+    private final DateFormat mDateFormat;
+    private final DateFormat mTimeFormat;
     private String mSelectedHomeid;
     private GroupViewHolder mSelectedHolder;
 
@@ -39,6 +40,8 @@ public class GroupsAdapter extends SimpleAdapter<Home, GroupsAdapter.GroupViewHo
     public GroupsAdapter(@NonNull Context context, List<Home> data) {
         super(context, data);
         defaultZone = TimeZone.getDefault().getRawOffset()/60000;
+        mDateFormat = GlobalSettings.getDateTimeFormat();
+        mTimeFormat = GlobalSettings.getTimeFormat();
     }
 
     @Override
@@ -105,7 +108,6 @@ public class GroupsAdapter extends SimpleAdapter<Home, GroupsAdapter.GroupViewHo
     }
 
     private void showDetail(@NonNull final GroupViewHolder holder, @NonNull final Home home) {
-        final DecimalFormat df = new DecimalFormat("00");
         final int zone = home.getZone();
         final int sunrise = home.getSunrise();
         final int sunset = home.getSunset();
@@ -118,13 +120,13 @@ public class GroupsAdapter extends SimpleAdapter<Home, GroupsAdapter.GroupViewHo
                     EXOSocket socket = (EXOSocket) device;
                     boolean res = false;
                     if (socket.getS1Available()) {
-                        holder.sensor1.setText("" + (float) socket.getS1Value() / 10 + " ℃");
+                        holder.sensor1.setText(GlobalSettings.getTemperatureText(socket.getS1Value()));
                         res = true;
                     } else {
                         holder.sensor1.setText(null);
                     }
                     if (socket.getS2Available()) {
-                        holder.sensor2.setText("" + (float) socket.getS2Value() / 10 + " %RH");
+                        holder.sensor2.setText(GlobalSettings.getHumidityText(socket.getS2Value()));
                         res = true;
                     } else {
                         holder.sensor2.setText(null);
@@ -137,11 +139,25 @@ public class GroupsAdapter extends SimpleAdapter<Home, GroupsAdapter.GroupViewHo
         }
 
         long time = System.currentTimeMillis() + (zone-defaultZone)*60000;
-        DateFormat format = new SimpleDateFormat(DATETIME_FORMAT);
-        Date date = new Date(time);
-        mSelectedHolder.time.setText(format.format(date));
-        holder.sunrise.setText(df.format(sunrise/60) + ":" + df.format(sunrise%60));
-        holder.sunset.setText(df.format(sunset/60) + ":" + df.format(sunset%60));
+        mSelectedHolder.time.setText(mDateFormat.format(time));
+        String daynight = mContext.getString(R.string.nighttime);
+        int minutes = (int) ((time / 60000 + 1440 + zone) % 1440);
+        @DrawableRes int icon = R.drawable.ic_moon;
+        if (sunrise <= sunset) {
+            if (minutes >= sunrise && minutes < sunset) {
+                daynight = mContext.getString(R.string.daytime);
+                icon = R.drawable.ic_sun;
+            }
+        } else {
+            if (minutes >= sunrise || minutes < sunset) {
+                daynight = mContext.getString(R.string.daytime);
+                icon = R.drawable.ic_sun;
+            }
+        }
+        mSelectedHolder.daynight.setText(daynight);
+        mSelectedHolder.daynight.setCompoundDrawablesWithIntrinsicBounds(icon, 0, 0, 0);
+        holder.sunrise.setText(TimeFormatUtil.formatMinutesTime(mTimeFormat, sunrise));
+        holder.sunset.setText(TimeFormatUtil.formatMinutesTime(mTimeFormat, sunset));
         holder.devcnt.setText(mContext.getString(R.string.habitat_devcnt, home.getDeviceCount()));
     }
 
@@ -173,9 +189,7 @@ public class GroupsAdapter extends SimpleAdapter<Home, GroupsAdapter.GroupViewHo
             int position = mSelectedHolder.getAdapterPosition();
             int zone = mData.get(position).getZone();
             long time = System.currentTimeMillis() + (zone-defaultZone)*60000;
-            DateFormat format = new SimpleDateFormat(DATETIME_FORMAT);
-            Date date = new Date(time);
-            mSelectedHolder.time.setText(format.format(date));
+            mSelectedHolder.time.setText(mDateFormat.format(time));
         }
     }
 
@@ -187,6 +201,7 @@ public class GroupsAdapter extends SimpleAdapter<Home, GroupsAdapter.GroupViewHo
         private TextView sensor1;
         private TextView sensor2;
         private TextView time;
+        private TextView daynight;
         private TextView sunrise;
         private TextView sunset;
         private TextView devcnt;
@@ -200,6 +215,7 @@ public class GroupsAdapter extends SimpleAdapter<Home, GroupsAdapter.GroupViewHo
             sensor1 = itemView.findViewById(R.id.item_habitat_sensor1);
             sensor2 = itemView.findViewById(R.id.item_habitat_sensor2);
             time = itemView.findViewById(R.id.item_habitat_time);
+            daynight = itemView.findViewById(R.id.item_habitat_daynight);
             sunrise = itemView.findViewById(R.id.item_habitat_sunrise);
             sunset = itemView.findViewById(R.id.item_habitat_sunset);
             devcnt = itemView.findViewById(R.id.item_habitat_devcnt);

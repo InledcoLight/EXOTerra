@@ -68,7 +68,7 @@ public class LocalDevicesAdapter extends SimpleAdapter<LocalDevice, LocalDevices
         private ImageView iv_icon;
         private TextView tv_name;
         private CheckedTextView ctv_state;
-//        private TextView tv_desc;
+//        private TextView ctv_habitat;
 
         public DevicesViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -76,7 +76,7 @@ public class LocalDevicesAdapter extends SimpleAdapter<LocalDevice, LocalDevices
             iv_icon = itemView.findViewById(R.id.item_local_device_icon);
             tv_name = itemView.findViewById(R.id.item_local_device_name);
             ctv_state = itemView.findViewById(R.id.item_local_device_state);
-//            tv_desc = itemView.findViewById(R.id.item_device_desc);
+//            ctv_habitat = itemView.findViewById(R.id.item_device_desc);
         }
     }
 }

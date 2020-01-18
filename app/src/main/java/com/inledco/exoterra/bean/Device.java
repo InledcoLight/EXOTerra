@@ -394,6 +394,17 @@ public class Device {
         return getUShort(INDEX_DAYTIME_END);
     }
 
+    public List<XLinkDataPoint> setDaytime(int dayStart, int dayEnd) {
+        List<XLinkDataPoint> dps = new ArrayList<>();
+        XLinkDataPoint dp1 = setUShort(INDEX_DAYTIME_START, (short) dayStart);
+        XLinkDataPoint dp2 = setUShort(INDEX_DAYTIME_END, (short) dayEnd);
+        if (dp1 != null && dp2 != null) {
+            dps.add(dp1);
+            dps.add(dp2);
+        }
+        return dps;
+    }
+
     public XLinkDataPoint setLocationEnable(boolean enable) {
         return setBoolean(INDEX_LOCATION_ENABLE, enable);
     }

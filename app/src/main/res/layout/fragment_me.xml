@@ -1,70 +1,182 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              xmlns:app="http://schemas.android.com/apk/res-auto"
-              android:clickable="true"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent"
-              android:orientation="vertical">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:clickable="true"
+    android:paddingLeft="16dp"
+    android:paddingRight="16dp"
+    android:gravity="center_horizontal"
+    android:orientation="vertical">
 
-    <android.support.v7.widget.Toolbar
-        android:id="@+id/me_toolbar"
-        android:layout_width="match_parent"
+    <ImageButton
+        android:id="@+id/me_icon_usr"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:minHeight="?attr/actionBarSize"
-        android:theme="?attr/actionBarTheme">
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:text="@string/me"
-            android:textSize="@dimen/textSizeTitle"
-            android:textColor="@color/textColorPrimary"/>
-    </android.support.v7.widget.Toolbar>
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="8dp"
+        android:background="?attr/selectableItemBackground"
+        app:srcCompat="@drawable/ic_user"/>
+    <TextView
+        android:id="@+id/me_tv_signin"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/textColorPrimary"
+        android:textSize="@dimen/textSizePrimary"
+        android:text="@string/signin"/>
 
     <LinearLayout
+        android:id="@+id/me_usr_detail"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:padding="8dp">
-        <ImageView
-            android:id="@+id/me_icon_usr"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="?attr/selectableItemBackground"
-            app:srcCompat="@drawable/ic_person_white_64dp"/>
+        android:orientation="vertical"
+        android:gravity="center_horizontal">
+
         <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
             android:gravity="center_vertical">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/textColorPrimary"
+                android:textSize="@dimen/textSizePrimary"
+                android:text="@string/hint_nickname"/>
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"/>
             <TextView
                 android:id="@+id/me_tv_nickname"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/hint_nickname"
-                android:visibility="gone"
+                android:paddingTop="8dp"
+                android:paddingBottom="8dp"
+                android:drawablePadding="8dp"
+                android:background="?attr/selectableItemBackground"
+                android:gravity="center_vertical"
+                android:textColor="@color/textColorSencondary"
+                android:textSize="@dimen/textSizeSecondary"/>
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:textColor="@color/textColorPrimary"
-                android:textSize="@dimen/textSizePrimary"/>
+                android:textSize="@dimen/textSizePrimary"
+                android:text="@string/email"/>
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"/>
             <TextView
                 android:id="@+id/me_tv_email"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/signin"
+                android:paddingTop="8dp"
+                android:paddingBottom="8dp"
+                android:drawablePadding="8dp"
+                android:gravity="center_vertical"
                 android:textColor="@color/textColorSencondary"
                 android:textSize="@dimen/textSizeSecondary"/>
         </LinearLayout>
-
-        <Button
-            android:id="@+id/me_btn_logout"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="8dp"
-            android:visibility="gone"
-            android:text="@string/logout"/>
-
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingTop="8dp"
+                android:paddingBottom="8dp"
+                android:textColor="@color/textColorPrimary"
+                android:textSize="@dimen/textSizePrimary"
+                android:text="@string/modify_password"/>
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"/>
+            <ImageButton
+                android:id="@+id/me_mod_psw"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="4dp"
+                android:background="?attr/selectableItemBackground"
+                app:srcCompat="@drawable/ic_edit_white_24dp"/>
+        </LinearLayout>
     </LinearLayout>
 
+<!--    <LinearLayout-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:orientation="horizontal"-->
+<!--        android:padding="8dp">-->
 
+<!--        <ImageView-->
+<!--            android:id="@+id/me_icon_usr"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:background="?attr/selectableItemBackground"-->
+<!--            app:srcCompat="@drawable/ic_person_white_64dp" />-->
+
+<!--        <LinearLayout-->
+<!--            android:layout_width="0dp"-->
+<!--            android:layout_height="match_parent"-->
+<!--            android:layout_weight="1"-->
+<!--            android:gravity="center_vertical"-->
+<!--            android:orientation="vertical">-->
+
+<!--            <TextView-->
+<!--                android:id="@+id/me_tv_nickname"-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:text="@string/hint_nickname"-->
+<!--                android:textColor="@color/textColorPrimary"-->
+<!--                android:textSize="@dimen/textSizePrimary"-->
+<!--                android:visibility="gone" />-->
+
+<!--            <TextView-->
+<!--                android:id="@+id/me_tv_email"-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:text="@string/signin"-->
+<!--                android:textColor="@color/textColorSencondary"-->
+<!--                android:textSize="@dimen/textSizeSecondary" />-->
+<!--        </LinearLayout>-->
+
+<!--        <Button-->
+<!--            android:id="@+id/me_btn_logout"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_margin="8dp"-->
+<!--            android:text="@string/logout"-->
+<!--            android:visibility="gone" />-->
+
+<!--    </LinearLayout>-->
+
+    <Space
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_weight="1"/>
+
+    <com.inledco.exoterra.view.GradientCornerButton
+        android:id="@+id/me_btn_logout"
+        style="?attr/buttonStyle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:background="?attr/selectableItemBackground"
+        android:text="@string/logout"
+        app:strokeWidth="@dimen/strokeWidth"
+        app:radius="@dimen/cornerRadius"
+        app:direction="horizontal"
+        app:gradientStart="@color/gradientYellow"
+        app:gradientEnd="@color/gradientWhite"/>
 
 </LinearLayout>

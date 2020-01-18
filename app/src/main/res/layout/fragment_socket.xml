@@ -1,25 +1,180 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                                             android:layout_width="match_parent"
-                                             android:layout_height="match_parent"
-                                             android:clickable="true"
-                                             xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:clickable="true">
 
-    <android.support.design.widget.TabLayout
-        android:id="@+id/socket_tabs"
+    <com.inledco.exoterra.view.GradientCornerLinearLayout
+        android:id="@+id/gradientCornerLinearLayout7"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="16dp"
+        android:orientation="vertical"
+        app:direction="horizontal"
+        app:gradientEnd="@color/gradientGreen"
+        app:gradientStart="@color/gradientYellow"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:radius="@dimen/cornerRadius"
+        app:strokeWidth="@dimen/strokeWidth">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="8dp"
+                android:scaleType="center"
+                app:srcCompat="@drawable/ic_temperature_color_64dp" />
+
+            <TextView
+                android:id="@+id/socket_sensor1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="8dp"
+                android:textAlignment="textEnd"
+                android:textColor="#F7931D"
+                android:textSize="@dimen/textSizeSubTitle" />
+
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1" />
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="8dp"
+                android:scaleType="center"
+                app:srcCompat="@drawable/ic_humidity_color_64dp" />
+
+            <TextView
+                android:id="@+id/socket_sensor2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="8dp"
+                android:textAlignment="textEnd"
+                android:textColor="#00AEEF"
+                android:textSize="@dimen/textSizeSubTitle" />
+
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginLeft="8dp"
+                android:padding="8dp"
+                android:textColor="@color/textColorPrimary"
+                android:text="@string/power" />
+
+            <ImageButton
+                android:id="@+id/socket_power"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="?attr/selectableItemBackground"
+                android:padding="8dp"
+                android:layout_marginRight="8dp"
+                app:srcCompat="@drawable/ic_power_red_48dp" />
+        </LinearLayout>
+
+    </com.inledco.exoterra.view.GradientCornerLinearLayout>
+
+    <LinearLayout
+        android:id="@+id/socket_mode_ll"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
-
-    <android.support.v4.view.ViewPager
-        android:id="@+id/socket_vp"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingLeft="8dp"
+        android:paddingRight="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <ImageButton
+            android:id="@+id/socket_ib_back"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="8dp"
+            android:background="?attr/selectableItemBackground"
+            app:srcCompat="@drawable/ic_arrow_back_white_32dp"/>
+
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"/>
+
+        <CheckedTextView
+            android:id="@+id/socket_ctv_timer"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:background="?attr/selectableItemBackground"
+            android:drawableTop="@drawable/selector_timer"
+            android:text="@string/timer"
+            android:textColor="@color/selector_text"
+            android:textAlignment="center"
+            android:textSize="@dimen/textSizeSecondary" />
+
+        <CheckedTextView
+            android:id="@+id/socket_ctv_thermostat"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:background="?attr/selectableItemBackground"
+            android:drawableTop="@drawable/selector_temperature"
+            android:text="@string/thermostat"
+            android:textColor="@color/selector_text"
+            android:textAlignment="center"
+            android:textSize="@dimen/textSizeSecondary"/>
+
+        <CheckedTextView
+            android:id="@+id/socket_ctv_hygrostat"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:background="?attr/selectableItemBackground"
+            android:drawableTop="@drawable/selector_humidity"
+            android:text="@string/hygrostat"
+            android:textColor="@color/selector_text"
+            android:textAlignment="center"
+            android:textSize="@dimen/textSizeSecondary" />
+    </LinearLayout>
+
+    <FrameLayout
+        android:id="@+id/socket_fl"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="4dp"
+        app:layout_constraintBottom_toTopOf="@+id/socket_mode_ll"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/socket_tabs"/>
+        app:layout_constraintTop_toBottomOf="@+id/gradientCornerLinearLayout7">
+
+    </FrameLayout>
 
 </android.support.constraint.ConstraintLayout>

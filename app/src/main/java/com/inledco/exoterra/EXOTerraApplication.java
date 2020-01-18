@@ -27,7 +27,6 @@ import com.inledco.exoterra.event.DeviceStateChangedEvent;
 import com.inledco.exoterra.event.HomeMemberChangedEvent;
 import com.inledco.exoterra.event.SubscribeChangedEvent;
 import com.inledco.exoterra.manager.DeviceManager;
-import com.inledco.exoterra.manager.Home2Manager;
 import com.inledco.exoterra.manager.HomeManager;
 import com.inledco.exoterra.manager.UserManager;
 import com.inledco.exoterra.splash.SplashActivity;
@@ -133,7 +132,7 @@ public class EXOTerraApplication extends Application {
         }
 
         //alipush
-//        PushServiceFactory.init(this);
+//        PushServiceFactory.initLineChart(this);
 //        final CloudPushService pushService = PushServiceFactory.getCloudPushService();
 //        pushService.register(this, new CommonCallback() {
 //            @Override
@@ -515,7 +514,7 @@ public class EXOTerraApplication extends Application {
                 Toast.makeText(mCurrentActivity.get(), "Join home success.", Toast.LENGTH_SHORT)
                      .show();
 //                EventBus.getDefault().post(new HomeChangedEvent());
-                Home2Manager.getInstance().refreshHomeList();
+                HomeManager.getInstance().refreshHomeList(null);
             }
         });
     }
@@ -536,7 +535,7 @@ public class EXOTerraApplication extends Application {
                 Toast.makeText(mCurrentActivity.get(), "Deny home share success.", Toast.LENGTH_SHORT)
                      .show();
 //                EventBus.getDefault().post(new HomeChangedEvent());
-                Home2Manager.getInstance().refreshHomeList();
+                HomeManager.getInstance().refreshHomeList(null);
             }
         });
     }
@@ -546,7 +545,7 @@ public class EXOTerraApplication extends Application {
         if (notify.type.equalsIgnoreCase(EventNotifyHelper.HomeMessageNotify.TYPE_DELETE)) {
             showDeleteHomeMessage(notify);
 //            EventBus.getDefault().post(new HomeChangedEvent());
-            Home2Manager.getInstance().refreshHomeList();
+            HomeManager.getInstance().refreshHomeList(null);
         }
     }
 
@@ -559,7 +558,7 @@ public class EXOTerraApplication extends Application {
             showLeaveHomeMessage(notify);
             EventBus.getDefault().post(new HomeMemberChangedEvent(notify.home_id));
 //            EventBus.getDefault().post(new HomeChangedEvent());
-            Home2Manager.getInstance().refreshHomeList();
+            HomeManager.getInstance().refreshHomeList(null);
         }
     }
 

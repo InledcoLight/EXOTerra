@@ -42,7 +42,7 @@ public class ZoneDevicesAdapter extends SimpleAdapter<RoomDevice, DeviceViewHold
         boolean state = device.isOnline;
         holder.ctv_state.setChecked(state);
         holder.ctv_state.setText(state ? R.string.cloud_online : R.string.cloud_offline);
-//        holder.tv_desc.setText(device.mac);
+//        holder.ctv_habitat.setText(device.mac);
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

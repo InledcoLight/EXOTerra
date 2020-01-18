@@ -11,245 +11,236 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.6"/>
+        app:layout_constraintGuide_percent="0.45" />
 
-    <android.support.constraint.Guideline
-        android:id="@+id/light_auto_gl2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.2"/>
-
-    <android.support.constraint.Guideline
-        android:id="@+id/light_auto_gl3"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.4"/>
-
-    <android.support.constraint.Guideline
-        android:id="@+id/light_auto_gl4"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.6"/>
-
-    <android.support.constraint.Guideline
-        android:id="@+id/light_auto_gl5"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.8"/>
-
-    <android.support.constraint.Guideline
-        android:id="@+id/light_auto_gl6"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.68"/>
-
-    <android.support.constraint.Guideline
-        android:id="@+id/light_auto_gl7"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.92"/>
-
-    <com.github.mikephil.charting.charts.LineChart
-        android:id="@+id/auto_line_chart"
-        android:layout_width="0dp"
+    <com.inledco.exoterra.view.GradientCornerLinearLayout
+        android:id="@+id/gradientCornerLinearLayout3"
+        android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:layout_marginTop="8dp"
+        android:orientation="vertical"
+        app:direction="horizontal"
+        app:gradientEnd="@color/gradientGreen"
+        app:gradientStart="@color/gradientYellow"
         app:layout_constraintBottom_toTopOf="@+id/light_auto_gl1"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
+        app:layout_constraintTop_toTopOf="parent"
+        app:radius="@dimen/cornerRadius"
+        app:strokeWidth="@dimen/strokeWidth">
 
-    <ImageView
-        android:id="@+id/auto_iv_sunrise"
+        <com.github.mikephil.charting.charts.LineChart
+            android:id="@+id/auto_line_chart"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+    </com.inledco.exoterra.view.GradientCornerLinearLayout>
+
+    <com.inledco.exoterra.view.GradientCornerLinearLayout
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:scaleType="centerCrop"
-        android:src="@mipmap/ic_sunrise"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="@+id/auto_title_sunrise"
-        app:layout_constraintStart_toStartOf="@+id/auto_title_sunrise"
-        app:layout_constraintTop_toTopOf="@+id/light_auto_gl1"/>
-
-    <ImageView
-        android:id="@+id/auto_iv_day"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:scaleType="centerCrop"
-        android:src="@mipmap/ic_midday"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/light_auto_gl3"
-        app:layout_constraintStart_toEndOf="@+id/light_auto_gl2"
-        app:layout_constraintTop_toTopOf="@+id/light_auto_gl1"/>
-
-    <ImageView
-        android:id="@+id/auto_iv_sunset"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:scaleType="centerCrop"
-        android:src="@mipmap/ic_sunset"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/light_auto_gl4"
-        app:layout_constraintStart_toEndOf="@+id/auto_iv_day"
-        app:layout_constraintTop_toTopOf="@+id/light_auto_gl1"/>
-
-    <ImageView
-        android:id="@+id/auto_iv_night"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:scaleType="centerCrop"
-        android:src="@mipmap/ic_night"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/light_auto_gl5"
-        app:layout_constraintStart_toEndOf="@+id/auto_iv_sunset"
-        app:layout_constraintTop_toTopOf="@+id/auto_iv_sunset"/>
-
-    <ImageView
-        android:id="@+id/auto_iv_turnoff"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:scaleType="centerCrop"
-        android:src="@mipmap/ic_turnoff"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        android:orientation="vertical"
+        app:direction="horizontal"
+        app:gradientEnd="@color/gradientGreen"
+        app:gradientStart="@color/gradientYellow"
+        app:layout_constraintBottom_toTopOf="@+id/gradientCornerLinearLayout4"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/light_auto_gl5"
-        app:layout_constraintTop_toTopOf="@+id/light_auto_gl1"/>
-
-    <TextView
-        android:id="@+id/auto_title_sunrise"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:background="#55000000"
-        android:gravity="center"
-        android:text="@string/sunrise"
-        android:textAlignment="center"
-        android:textColor="#FFFFFF"
-        app:layout_constraintBottom_toTopOf="@+id/light_auto_gl6"
-        app:layout_constraintEnd_toStartOf="@+id/light_auto_gl2"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/auto_iv_sunrise"/>
+        app:layout_constraintTop_toTopOf="@+id/light_auto_gl1"
+        app:radius="@dimen/cornerRadius"
+        app:strokeWidth="@dimen/strokeWidth">
 
-    <TextView
-        android:id="@+id/auto_title_day"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:background="#55000000"
-        android:gravity="center"
-        android:text="@string/day_light"
-        android:textAlignment="center"
-        android:textColor="#FFFFFF"
-        app:layout_constraintBottom_toTopOf="@+id/light_auto_gl6"
-        app:layout_constraintEnd_toStartOf="@+id/light_auto_gl3"
-        app:layout_constraintStart_toStartOf="@+id/light_auto_gl2"
-        app:layout_constraintTop_toTopOf="@+id/light_auto_gl1"/>
+        <com.github.mikephil.charting.charts.BarChart
+            android:id="@+id/light_auto_spectrum"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+    </com.inledco.exoterra.view.GradientCornerLinearLayout>
 
-    <TextView
-        android:id="@+id/auto_title_sunset"
+    <com.inledco.exoterra.view.GradientCornerLinearLayout
+        android:id="@+id/gradientCornerLinearLayout4"
         android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:background="#55000000"
-        android:gravity="center"
-        android:text="@string/sunset"
-        android:textAlignment="center"
-        android:textColor="#FFFFFF"
-        app:layout_constraintBottom_toTopOf="@+id/light_auto_gl6"
-        app:layout_constraintEnd_toStartOf="@+id/light_auto_gl4"
-        app:layout_constraintStart_toStartOf="@+id/light_auto_gl3"
-        app:layout_constraintTop_toTopOf="@+id/auto_iv_sunset"/>
-
-    <TextView
-        android:id="@+id/auto_title_night"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:background="#55000000"
-        android:gravity="center"
-        android:text="@string/night"
-        android:textAlignment="center"
-        android:textColor="#FFFFFF"
-        app:layout_constraintBottom_toTopOf="@+id/light_auto_gl6"
-        app:layout_constraintEnd_toStartOf="@+id/light_auto_gl5"
-        app:layout_constraintStart_toStartOf="@+id/light_auto_gl4"
-        app:layout_constraintTop_toTopOf="@+id/auto_iv_night"/>
-
-    <TextView
-        android:id="@+id/auto_title_turnoff"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:background="#55000000"
-        android:gravity="center"
-        android:text="@string/turnoff"
-        android:textAlignment="center"
-        android:textColor="#FFFFFF"
-        app:layout_constraintBottom_toTopOf="@+id/light_auto_gl6"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="@+id/light_auto_gl5"
-        app:layout_constraintTop_toTopOf="@+id/light_auto_gl1"/>
-
-    <TextView
-        android:id="@+id/auto_tv_sunrise"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:background="#55000000"
-        android:gravity="center"
-        android:textAlignment="center"
-        android:textColor="#FFFFFF"
-        app:layout_constraintBottom_toTopOf="@+id/light_auto_gl7"
-        app:layout_constraintEnd_toStartOf="@+id/light_auto_gl2"
-        app:layout_constraintStart_toStartOf="@+id/auto_iv_sunrise"
-        app:layout_constraintTop_toTopOf="@+id/light_auto_gl6"/>
-    <TextView
-        android:id="@+id/auto_tv_day"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:paddingTop="4dp"
+        android:paddingBottom="4dp"
         android:orientation="vertical"
-        android:gravity="left|center_vertical"
-        android:background="#55000000"
-        android:textColor="#FFFFFF"
-        app:layout_constraintBottom_toTopOf="@+id/light_auto_gl7"
-        app:layout_constraintEnd_toStartOf="@+id/auto_tv_sunset"
-        app:layout_constraintStart_toStartOf="@+id/light_auto_gl2"
-        app:layout_constraintTop_toBottomOf="@+id/auto_title_day"/>
-    <TextView
-        android:id="@+id/auto_tv_sunset"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:background="#55000000"
-        android:gravity="center"
-        android:textAlignment="center"
-        android:textColor="#FFFFFF"
-        app:layout_constraintBottom_toTopOf="@+id/light_auto_gl7"
-        app:layout_constraintEnd_toStartOf="@+id/auto_iv_night"
-        app:layout_constraintStart_toStartOf="@+id/auto_iv_sunset"
-        app:layout_constraintTop_toTopOf="@+id/light_auto_gl6"/>
-    <TextView
-        android:id="@+id/auto_tv_night"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:orientation="vertical"
-        android:gravity="left|center_vertical"
-        android:background="#55000000"
-        android:textColor="#FFFFFF"
-        app:layout_constraintBottom_toTopOf="@+id/light_auto_gl7"
-        app:layout_constraintEnd_toStartOf="@+id/auto_tv_turnoff"
-        app:layout_constraintStart_toEndOf="@+id/auto_tv_sunset"
-        app:layout_constraintTop_toBottomOf="@+id/auto_title_night"/>
-    <TextView
-        android:id="@+id/auto_tv_turnoff"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:background="#55000000"
-        android:gravity="center"
-        android:text="@string/disabled"
-        android:textAlignment="center"
-        android:textColor="#FFFFFF"
-        app:layout_constraintBottom_toTopOf="@+id/light_auto_gl7"
+        app:direction="horizontal"
+        app:gradientEnd="@color/gradientGreen"
+        app:gradientStart="@color/gradientYellow"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="@+id/light_auto_gl5"
-        app:layout_constraintTop_toTopOf="@+id/light_auto_gl6"/>
+        app:layout_constraintStart_toStartOf="parent"
+        app:radius="@dimen/cornerRadius"
+        app:strokeWidth="@dimen/strokeWidth">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="4dp"
+                android:layout_marginRight="4dp"
+                android:padding="4dp"
+                app:srcCompat="@drawable/ic_sunrise" />
+
+            <TextView
+                android:id="@+id/light_auto_sunrise"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_margin="4dp"
+                android:textSize="@dimen/textSizeTiny" />
+
+<!--            <TextView-->
+<!--                android:id="@+id/light_auto_sunrise_ramp"-->
+<!--                android:layout_width="0dp"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_weight="1"-->
+<!--                android:textSize="@dimen/textSizeTiny" />-->
+
+            <ImageButton
+                android:id="@+id/light_auto_sunrise_edit"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="?attr/selectableItemBackground"
+                android:padding="4dp"
+                app:srcCompat="@drawable/ic_edit_white_24dp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="4dp"
+                android:layout_marginRight="4dp"
+                android:padding="4dp"
+                app:srcCompat="@drawable/ic_sun" />
+
+            <include
+                android:id="@+id/light_auto_daylight"
+                layout="@layout/item_percent"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1" />
+
+            <ImageButton
+                android:id="@+id/light_auto_daylight_edit"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="?attr/selectableItemBackground"
+                android:padding="4dp"
+                app:srcCompat="@drawable/ic_edit_white_24dp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="4dp"
+                android:layout_marginRight="4dp"
+                android:padding="4dp"
+                app:srcCompat="@drawable/ic_sunset" />
+
+            <TextView
+                android:id="@+id/light_auto_sunset"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_margin="4dp"
+                android:textSize="@dimen/textSizeTiny" />
+
+<!--            <TextView-->
+<!--                android:id="@+id/light_auto_sunset_ramp"-->
+<!--                android:layout_width="0dp"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_weight="1"-->
+<!--                android:textSize="@dimen/textSizeTiny" />-->
+
+            <ImageButton
+                android:id="@+id/light_auto_sunset_edit"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="?attr/selectableItemBackground"
+                android:padding="4dp"
+                app:srcCompat="@drawable/ic_edit_white_24dp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="4dp"
+                android:layout_marginRight="4dp"
+                android:padding="4dp"
+                app:srcCompat="@drawable/ic_moon" />
+
+            <include
+                android:id="@+id/light_auto_nightlight"
+                layout="@layout/item_percent"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1" />
+
+            <ImageButton
+                android:id="@+id/light_auto_nightlight_edit"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="?attr/selectableItemBackground"
+                android:padding="4dp"
+                app:srcCompat="@drawable/ic_edit_white_24dp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="4dp"
+                android:layout_marginRight="4dp"
+                android:padding="4dp"
+                app:srcCompat="@drawable/ic_sleep" />
+
+            <TextView
+                android:id="@+id/light_auto_turnoff"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_margin="4dp"
+                android:textSize="@dimen/textSizeTiny" />
+
+            <ImageButton
+                android:id="@+id/light_auto_turnoff_edit"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="?attr/selectableItemBackground"
+                android:padding="4dp"
+                app:srcCompat="@drawable/ic_edit_white_24dp" />
+        </LinearLayout>
+
+    </com.inledco.exoterra.view.GradientCornerLinearLayout>
 
 </android.support.constraint.ConstraintLayout>

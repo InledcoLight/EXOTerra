@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:clickable="true"
+    android:background="@mipmap/ic_background"
+    android:orientation="vertical"
+    android:gravity="center_horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="@dimen/textSizeTitle"
+        android:textColor="@color/textColorPrimary"
+        android:text="@string/assign_to_habitat"/>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dividerWidth"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginBottom="4dp"
+        android:background="@drawable/shape_rect_gradient"/>
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp">
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/set_habitat_rv"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            app:layoutManager="android.support.v7.widget.LinearLayoutManager" />
+        <include
+            android:id="@+id/set_habitat_warning"
+            layout="@layout/layout_warning"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            android:layout_gravity="center"/>
+    </FrameLayout>
+
+    <ImageButton
+        android:id="@+id/set_habitat_add"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="4dp"
+        android:background="?attr/selectableItemBackground"
+        app:srcCompat="@drawable/ic_add"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <com.inledco.exoterra.view.GradientCornerButton
+            android:id="@+id/set_habitat_back"
+            style="?attr/buttonStyle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_margin="16dp"
+            android:background="?attr/selectableItemBackground"
+            android:text="@string/back"
+            app:radius="@dimen/cornerRadius"
+            app:strokeWidth="@dimen/strokeWidth"
+            app:gradientStart="@color/gradientYellow"
+            app:gradientEnd="@color/gradientWhite"
+            app:direction="horizontal"/>
+        <com.inledco.exoterra.view.GradientCornerButton
+            android:id="@+id/set_habitat_save"
+            style="?attr/buttonStyle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_margin="16dp"
+            android:background="?attr/selectableItemBackground"
+            android:text="@string/save"
+            app:radius="@dimen/cornerRadius"
+            app:strokeWidth="@dimen/strokeWidth"
+            app:gradientStart="@color/gradientYellow"
+            app:gradientEnd="@color/gradientWhite"
+            app:direction="horizontal"/>
+    </LinearLayout>
+
+</LinearLayout>

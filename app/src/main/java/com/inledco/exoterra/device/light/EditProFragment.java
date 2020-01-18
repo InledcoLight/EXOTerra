@@ -83,7 +83,7 @@ public class EditProFragment extends BaseFragment {
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onDataChangedEvent(DataChangedEvent event) {
-        LineChartHelper.setProfile(edit_pro_chart, mLight.getChannelCount(), mLight.getChannelNames(), mProfile);
+        ChartHelper.setProfile(edit_pro_chart, mLight.getChannelCount(), mLight.getChannelNames(), mProfile);
     }
 
     @Override
@@ -109,7 +109,7 @@ public class EditProFragment extends BaseFragment {
                 return df.format(progress*INTERVAL/60) + ":" + df.format((progress*INTERVAL)%60);
             }
         });
-        LineChartHelper.init(edit_pro_chart);
+        ChartHelper.initLineChart(edit_pro_chart);
     }
 
     @Override
@@ -196,7 +196,7 @@ public class EditProFragment extends BaseFragment {
     }
 
     private void init() {
-        LineChartHelper.setProfile(edit_pro_chart, mLight.getChannelCount(), mLight.getChannelNames(), mProfile);
+        ChartHelper.setProfile(edit_pro_chart, mLight.getChannelCount(), mLight.getChannelNames(), mProfile);
         if (mProfile != null && mProfile.isValid()) {
             edit_pro_mps.setPointCount(mProfile.getPointCount());
             List<TimePoint> points = mProfile.getPoints();
@@ -276,7 +276,7 @@ public class EditProFragment extends BaseFragment {
                     mProfile.getPoints().remove(point);
                     edit_pro_mps.removePoint(point);
                     edit_pro_mps.setSelectedPoint(0);
-                    LineChartHelper.setProfile(edit_pro_chart, mLight.getChannelCount(), mLight.getChannelNames(), mProfile);
+                    ChartHelper.setProfile(edit_pro_chart, mLight.getChannelCount(), mLight.getChannelNames(), mProfile);
                 }
             });
             builder.show();

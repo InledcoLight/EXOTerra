@@ -6,15 +6,10 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
-import com.github.lzyzsd.circleprogress.DonutProgress;
 import com.inledco.exoterra.R;
 import com.inledco.exoterra.bean.EXOLedstrip;
 import com.inledco.exoterra.common.OnItemClickListener;
-import com.inledco.exoterra.util.LightUtil;
-
-import java.text.DecimalFormat;
 
 public class SliderAdapter extends RecyclerView.Adapter<SliderAdapter.SliderViewHolder> {
 
@@ -43,12 +38,11 @@ public class SliderAdapter extends RecyclerView.Adapter<SliderAdapter.SliderView
         final int position = holder.getAdapterPosition();
         int progress = mLight.getBright(position);
         String name = mLight.getChannelName(position);
-        DecimalFormat df = new DecimalFormat("##0");
 
-        holder.progress.setFinishedStrokeColor(LightUtil.getColorValue(name));
-        holder.progress.setProgress(progress);
-        holder.progress.setText("" + progress/10 + " %");
-        holder.color.setText(name);
+//        holder.progress.setFinishedStrokeColor(LightUtil.getColorValue(name));
+//        holder.progress.setProgress(progress);
+//        holder.progress.setText("" + progress/10 + " %");
+//        holder.color.setText(name);
 
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -99,15 +93,15 @@ public class SliderAdapter extends RecyclerView.Adapter<SliderAdapter.SliderView
     }
 
     class SliderViewHolder extends RecyclerView.ViewHolder {
-        private DonutProgress progress;
-        private TextView color;
+//        private DonutProgress progress;
+//        private TextView color;
 //        private SeekBar sb_progress;
 //        private TextView tv_percent;
 
         public SliderViewHolder(View itemView) {
             super(itemView);
-            progress = itemView.findViewById(R.id.item_progress_percent);
-            color = itemView.findViewById(R.id.item_progress_color);
+//            progress = itemView.findViewById(R.id.item_progress_percent);
+//            color = itemView.findViewById(R.id.item_progress_color);
 //            sb_progress = itemView.findViewById(R.id.item_slider_progress);
 //            tv_percent = itemView.findViewById(R.id.item_slider_percent);
         }

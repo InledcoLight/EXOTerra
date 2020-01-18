@@ -1,15 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:clickable="true"
-    android:background="@mipmap/ic_background"
-    android:orientation="vertical"
-    android:gravity="center_horizontal"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@mipmap/ic_background"
+    android:clickable="true"
+    android:gravity="center_horizontal"
+    android:orientation="vertical">
 
     <com.inledco.exoterra.view.GradientCornerLinearLayout
+        android:id="@+id/gradientCornerLinearLayout9"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
@@ -37,18 +38,18 @@
                 android:id="@+id/netconfig_prdt"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="8dp"
                 android:layout_marginTop="8dp"
-                android:layout_marginBottom="8dp"/>
+                android:layout_marginBottom="8dp" />
+
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_gravity="center"
                 android:gravity="center"
-                android:textStyle="bold"
                 android:text="@string/add_device"
                 android:textColor="@color/textColorPrimary"
-                android:textSize="@dimen/textSizeTitle" />
+                android:textSize="@dimen/textSizeTitle"
+                android:textStyle="bold" />
         </FrameLayout>
 
         <LinearLayout
@@ -63,9 +64,9 @@
                 android:layout_height="wrap_content"
                 android:padding="8dp"
                 android:text="4"
-                android:textStyle="bold"
                 android:textColor="@color/textColorPrimary"
-                android:textSize="@dimen/textSizeSubTitle" />
+                android:textSize="@dimen/textSizeSubTitle"
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/netconfig_title"
@@ -77,107 +78,167 @@
         </LinearLayout>
     </com.inledco.exoterra.view.GradientCornerLinearLayout>
 
-    <com.github.lzyzsd.circleprogress.DonutProgress
-        android:id="@+id/netconfig_pb"
+    <com.inledco.exoterra.view.CircleSeekbar
+        android:id="@+id/netconfig_csb"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toTopOf="@+id/netconfig_back"
+        app:layout_constraintEnd_toStartOf="@+id/guideline3"
+        app:layout_constraintStart_toStartOf="@+id/guideline2"
+        app:layout_constraintTop_toBottomOf="@+id/gradientCornerLinearLayout9"
+        app:max="100"
+        app:min="0"
+        app:progressColor="@color/colorWhite"
+        app:progressWidth="8dp"
+        app:unreachedColor="@color/colorGray"
+        app:unreachedWidth="8dp">
+
+        <TextView
+            android:id="@+id/netconfig_progress"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/textColorPrimary"
+            android:textSize="@dimen/textSizePrimary" />
+    </com.inledco.exoterra.view.CircleSeekbar>
+
+    <!--    <com.github.lzyzsd.circleprogress.DonutProgress-->
+    <!--        android:id="@+id/netconfig_pb"-->
+    <!--        android:layout_width="wrap_content"-->
+    <!--        android:layout_height="wrap_content"-->
+    <!--        android:layout_margin="32dp"-->
+    <!--        app:donut_circle_starting_degree="270"-->
+    <!--        app:donut_finished_color="@color/colorWhite"-->
+    <!--        app:donut_finished_stroke_width="8dp"-->
+    <!--        app:donut_max="100"-->
+    <!--        app:donut_prefix_text=""-->
+    <!--        app:donut_progress="0"-->
+    <!--        app:donut_suffix_text=" %"-->
+    <!--        app:donut_text="0 %"-->
+    <!--        app:donut_text_color="@color/colorWhite"-->
+    <!--        app:donut_unfinished_color="@color/colorGray"-->
+    <!--        app:donut_unfinished_stroke_width="8dp"/>-->
+
+    <com.inledco.exoterra.view.GradientCornerButton
+        android:id="@+id/netconfig_back"
+        style="?attr/buttonStyle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        android:background="?attr/selectableItemBackground"
+        android:text="@string/back"
+        app:direction="horizontal"
+        app:gradientEnd="@color/gradientWhite"
+        app:gradientStart="@color/gradientYellow"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:radius="@dimen/cornerRadius"
+        app:strokeWidth="@dimen/strokeWidth" />
+
+    <android.support.constraint.Guideline
+        android:id="@+id/guideline2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="32dp"
-        app:donut_circle_starting_degree="270"
-        app:donut_finished_color="@color/colorWhite"
-        app:donut_finished_stroke_width="8dp"
-        app:donut_max="100"
-        app:donut_prefix_text=""
-        app:donut_progress="0"
-        app:donut_suffix_text=" %"
-        app:donut_text="0 %"
-        app:donut_text_color="@color/colorWhite"
-        app:donut_unfinished_color="@color/colorGray"
-        app:donut_unfinished_stroke_width="8dp"/>
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.25" />
 
-<!--    <android.support.design.widget.CheckableImageButton-->
-<!--        android:id="@+id/smart_config_cib_step1"-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:layout_marginStart="32dp"-->
-<!--        android:layout_marginTop="32dp"-->
-<!--        android:background="@android:color/transparent"-->
-<!--        android:src="@drawable/selector_circle"-->
-<!--        app:layout_constraintStart_toStartOf="parent"-->
-<!--        app:layout_constraintTop_toBottomOf="@+id/smart_config_pb"/>-->
+    <android.support.constraint.Guideline
+        android:id="@+id/guideline3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.75" />
 
-<!--    <android.support.design.widget.CheckableImageButton-->
-<!--        android:id="@+id/smart_config_cib_step2"-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:layout_marginStart="32dp"-->
-<!--        android:layout_marginTop="16dp"-->
-<!--        android:background="@android:color/transparent"-->
-<!--        android:src="@drawable/selector_circle"-->
-<!--        app:layout_constraintStart_toStartOf="parent"-->
-<!--        app:layout_constraintTop_toBottomOf="@+id/smart_config_cib_step1"/>-->
+    <!--    <android.support.design.widget.CheckableImageButton-->
+    <!--        android:id="@+id/smart_config_cib_step1"-->
+    <!--        android:layout_width="wrap_content"-->
+    <!--        android:layout_height="wrap_content"-->
+    <!--        android:layout_marginStart="32dp"-->
+    <!--        android:layout_marginTop="32dp"-->
+    <!--        android:background="@android:color/transparent"-->
+    <!--        android:src="@drawable/selector_circle"-->
+    <!--        app:layout_constraintStart_toStartOf="parent"-->
+    <!--        app:layout_constraintTop_toBottomOf="@+id/smart_config_pb"/>-->
 
-<!--    <android.support.design.widget.CheckableImageButton-->
-<!--        android:id="@+id/smart_config_cib_step3"-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:layout_marginStart="32dp"-->
-<!--        android:layout_marginTop="16dp"-->
-<!--        android:background="@android:color/transparent"-->
-<!--        android:src="@drawable/selector_circle"-->
-<!--        app:layout_constraintStart_toStartOf="parent"-->
-<!--        app:layout_constraintTop_toBottomOf="@+id/smart_config_cib_step2"/>-->
+    <!--    <android.support.design.widget.CheckableImageButton-->
+    <!--        android:id="@+id/smart_config_cib_step2"-->
+    <!--        android:layout_width="wrap_content"-->
+    <!--        android:layout_height="wrap_content"-->
+    <!--        android:layout_marginStart="32dp"-->
+    <!--        android:layout_marginTop="16dp"-->
+    <!--        android:background="@android:color/transparent"-->
+    <!--        android:src="@drawable/selector_circle"-->
+    <!--        app:layout_constraintStart_toStartOf="parent"-->
+    <!--        app:layout_constraintTop_toBottomOf="@+id/smart_config_cib_step1"/>-->
 
-<!--    <android.support.design.widget.CheckableImageButton-->
-<!--        android:id="@+id/smart_config_cib_step4"-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:layout_marginStart="32dp"-->
-<!--        android:layout_marginTop="16dp"-->
-<!--        android:background="@android:color/transparent"-->
-<!--        android:src="@drawable/selector_circle"-->
-<!--        app:layout_constraintStart_toStartOf="parent"-->
-<!--        app:layout_constraintTop_toBottomOf="@+id/smart_config_cib_step3"/>-->
+    <!--    <android.support.design.widget.CheckableImageButton-->
+    <!--        android:id="@+id/smart_config_cib_step3"-->
+    <!--        android:layout_width="wrap_content"-->
+    <!--        android:layout_height="wrap_content"-->
+    <!--        android:layout_marginStart="32dp"-->
+    <!--        android:layout_marginTop="16dp"-->
+    <!--        android:background="@android:color/transparent"-->
+    <!--        android:src="@drawable/selector_circle"-->
+    <!--        app:layout_constraintStart_toStartOf="parent"-->
+    <!--        app:layout_constraintTop_toBottomOf="@+id/smart_config_cib_step2"/>-->
 
-<!--    <TextView-->
-<!--        android:id="@+id/smart_config_tv_step1"-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:layout_marginStart="16dp"-->
-<!--        android:text="Device connected to router"-->
-<!--        app:layout_constraintBottom_toBottomOf="@+id/smart_config_cib_step1"-->
-<!--        app:layout_constraintStart_toEndOf="@+id/smart_config_cib_step1"-->
-<!--        app:layout_constraintTop_toTopOf="@+id/smart_config_cib_step1"/>-->
+    <!--    <android.support.design.widget.CheckableImageButton-->
+    <!--        android:id="@+id/smart_config_cib_step4"-->
+    <!--        android:layout_width="wrap_content"-->
+    <!--        android:layout_height="wrap_content"-->
+    <!--        android:layout_marginStart="32dp"-->
+    <!--        android:layout_marginTop="16dp"-->
+    <!--        android:background="@android:color/transparent"-->
+    <!--        android:src="@drawable/selector_circle"-->
+    <!--        app:layout_constraintStart_toStartOf="parent"-->
+    <!--        app:layout_constraintTop_toBottomOf="@+id/smart_config_cib_step3"/>-->
 
-<!--    <TextView-->
-<!--        android:id="@+id/smart_config_tv_step2"-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:layout_marginStart="16dp"-->
-<!--        android:text="Device scanned"-->
-<!--        app:layout_constraintBottom_toBottomOf="@+id/smart_config_cib_step2"-->
-<!--        app:layout_constraintStart_toEndOf="@+id/smart_config_cib_step2"-->
-<!--        app:layout_constraintTop_toTopOf="@+id/smart_config_cib_step2"/>-->
+    <!--    <TextView-->
+    <!--        android:id="@+id/smart_config_tv_step1"-->
+    <!--        android:layout_width="wrap_content"-->
+    <!--        android:layout_height="wrap_content"-->
+    <!--        android:layout_marginStart="16dp"-->
+    <!--        android:text="Device connected to router"-->
+    <!--        app:layout_constraintBottom_toBottomOf="@+id/smart_config_cib_step1"-->
+    <!--        app:layout_constraintStart_toEndOf="@+id/smart_config_cib_step1"-->
+    <!--        app:layout_constraintTop_toTopOf="@+id/smart_config_cib_step1"/>-->
 
-<!--    <TextView-->
-<!--        android:id="@+id/smart_config_tv_step3"-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:layout_marginStart="16dp"-->
-<!--        android:text="Device Initialized"-->
-<!--        app:layout_constraintBottom_toBottomOf="@+id/smart_config_cib_step3"-->
-<!--        app:layout_constraintStart_toEndOf="@+id/smart_config_cib_step3"-->
-<!--        app:layout_constraintTop_toTopOf="@+id/smart_config_cib_step3"/>-->
+    <!--    <TextView-->
+    <!--        android:id="@+id/smart_config_tv_step2"-->
+    <!--        android:layout_width="wrap_content"-->
+    <!--        android:layout_height="wrap_content"-->
+    <!--        android:layout_marginStart="16dp"-->
+    <!--        android:text="Device scanned"-->
+    <!--        app:layout_constraintBottom_toBottomOf="@+id/smart_config_cib_step2"-->
+    <!--        app:layout_constraintStart_toEndOf="@+id/smart_config_cib_step2"-->
+    <!--        app:layout_constraintTop_toTopOf="@+id/smart_config_cib_step2"/>-->
 
-<!--    <TextView-->
-<!--        android:id="@+id/smart_config_tv_step4"-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:layout_marginStart="16dp"-->
-<!--        android:text="Device subscribed"-->
-<!--        app:layout_constraintBottom_toBottomOf="@+id/smart_config_cib_step4"-->
-<!--        app:layout_constraintStart_toEndOf="@+id/smart_config_cib_step4"-->
-<!--        app:layout_constraintTop_toTopOf="@+id/smart_config_cib_step4"/>-->
-</LinearLayout>
+    <!--    <TextView-->
+    <!--        android:id="@+id/smart_config_tv_step3"-->
+    <!--        android:layout_width="wrap_content"-->
+    <!--        android:layout_height="wrap_content"-->
+    <!--        android:layout_marginStart="16dp"-->
+    <!--        android:text="Device Initialized"-->
+    <!--        app:layout_constraintBottom_toBottomOf="@+id/smart_config_cib_step3"-->
+    <!--        app:layout_constraintStart_toEndOf="@+id/smart_config_cib_step3"-->
+    <!--        app:layout_constraintTop_toTopOf="@+id/smart_config_cib_step3"/>-->
+
+    <!--    <TextView-->
+    <!--        android:id="@+id/smart_config_tv_step4"-->
+    <!--        android:layout_width="wrap_content"-->
+    <!--        android:layout_height="wrap_content"-->
+    <!--        android:layout_marginStart="16dp"-->
+    <!--        android:text="Device subscribed"-->
+    <!--        app:layout_constraintBottom_toBottomOf="@+id/smart_config_cib_step4"-->
+    <!--        app:layout_constraintStart_toEndOf="@+id/smart_config_cib_step4"-->
+    <!--        app:layout_constraintTop_toTopOf="@+id/smart_config_cib_step4"/>-->
+</android.support.constraint.ConstraintLayout>
 <!--<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"-->
 <!--                                             xmlns:app="http://schemas.android.com/apk/res-auto"-->
 <!--                                             xmlns:tools="http://schemas.android.com/tools"-->

@@ -18,7 +18,6 @@ import android.widget.Toast;
 import com.inledco.exoterra.R;
 import com.inledco.exoterra.base.BaseActivity;
 import com.inledco.exoterra.manager.VerifycodeManager;
-import com.inledco.exoterra.register.RegisterActivity;
 import com.inledco.exoterra.util.RegexUtil;
 import com.inledco.exoterra.view.AdvancedTextInputEditText;
 import com.inledco.exoterra.xlink.XlinkCloudManager;

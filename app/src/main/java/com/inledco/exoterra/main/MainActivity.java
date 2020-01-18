@@ -20,14 +20,15 @@ import com.alibaba.sdk.android.push.CloudPushService;
 import com.alibaba.sdk.android.push.noonesdk.PushServiceFactory;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
+import com.inledco.exoterra.GlobalSettings;
 import com.inledco.exoterra.R;
 import com.inledco.exoterra.adddevice.AddDeviceActivity;
 import com.inledco.exoterra.base.BaseActivity;
 import com.inledco.exoterra.main.devices.DevicesFragment;
 import com.inledco.exoterra.main.devices.LocalDevicesFragment;
 import com.inledco.exoterra.main.groups.GroupsFragment;
-import com.inledco.exoterra.main.home.HomeFragment;
 import com.inledco.exoterra.main.me.MeFragment;
+import com.inledco.exoterra.main.pref.PrefFragment;
 import com.inledco.exoterra.manager.DeviceManager;
 import com.inledco.exoterra.manager.HomeManager;
 import com.inledco.exoterra.manager.UserManager;
@@ -85,53 +86,24 @@ public class MainActivity extends BaseActivity {
         main_bnv = findViewById(R.id.main_bnv);
         main_me = main_bnv.findViewById(R.id.main_bnv_me);
 
-        main_bnv.getMenu()
-                .findItem(R.id.main_bnv_habitat)
-                .setVisible(XLinkUserManager.getInstance().isUserAuthorized());
+        boolean login = XLinkUserManager.getInstance().isUserAuthorized();
+        main_bnv.getMenu().findItem(R.id.main_bnv_home).setVisible(login);
+        main_bnv.getMenu().findItem(R.id.main_bnv_habitat).setVisible(login);
     }
 
     @Override
     protected void initData() {
+        GlobalSettings.init(this);
         XLinkSDK.start();
         DeviceManager.getInstance().syncSubcribeDevices(null);
         HomeManager.getInstance().refreshHomeList(null);
-        replaceFragment(R.id.main_fl_show, new HomeFragment());
-//        if (checkCameraPermissions() == false) {
-//            requestCameraPermission();
-//        } else {
-//            scanQrCode();
-//            test();
-//        }
-
-//        mHomeViewModel = ViewModelProviders.of(this).get(HomeViewModel.class);
-//        mHomeViewModel.setGetHomeInfoCallback(new XlinkRequestCallback<String>() {
-//            @Override
-//            public void onError(String error) {
-//                Toast.makeText(MainActivity.this, error, Toast.LENGTH_SHORT)
-//                     .show();
-//            }
-//
-//            @Override
-//            public void onSuccess(String s) {
-//
-//            }
-//        });
-//
-//        Home2Manager.getInstance().checkHome(new XlinkRequestCallback<String>() {
-//            @Override
-//            public void onError(String error) {
-//                Toast.makeText(MainActivity.this, error, Toast.LENGTH_SHORT)
-//                     .show();
-//                getMessageDialog().setTitle("Check home failed")
-//                                  .setMessage(error)
-//                                  .show();
-//            }
-//
-//            @Override
-//            public void onSuccess(final String s) {
-//                mHomeViewModel.refreshHomeInfo();
-//            }
-//        });
+        if (XLinkUserManager.getInstance().isUserAuthorized()) {
+            main_bnv.setSelectedItemId(R.id.main_bnv_home);
+            replaceFragment(R.id.main_fl_show, GroupsFragment.newInstance(true));
+        } else {
+            main_bnv.setSelectedItemId(R.id.main_bnv_devices);
+            replaceFragment(R.id.main_fl_show, new LocalDevicesFragment());
+        }
 
 //
 //        test();
@@ -152,7 +124,10 @@ public class MainActivity extends BaseActivity {
             public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
                 switch (menuItem.getItemId()) {
                     case R.id.main_bnv_home:
-                        replaceFragment(R.id.main_fl_show, new HomeFragment());
+                        replaceFragment(R.id.main_fl_show, GroupsFragment.newInstance(true));
+                        break;
+                    case R.id.main_bnv_habitat:
+                        replaceFragment(R.id.main_fl_show, GroupsFragment.newInstance(false));
                         break;
                     case R.id.main_bnv_devices:
                         if (XLinkUserManager.getInstance().isUserAuthorized()) {
@@ -161,11 +136,11 @@ public class MainActivity extends BaseActivity {
                             replaceFragment(R.id.main_fl_show, new LocalDevicesFragment());
                         }
                         break;
-                    case R.id.main_bnv_habitat:
-                        replaceFragment(R.id.main_fl_show, new GroupsFragment());
-                        break;
                     case R.id.main_bnv_me:
                         replaceFragment(R.id.main_fl_show, new MeFragment());
+                        break;
+                    case R.id.main_bnv_pref:
+                        replaceFragment(R.id.main_fl_show, new PrefFragment());
                         break;
                 }
                 return true;

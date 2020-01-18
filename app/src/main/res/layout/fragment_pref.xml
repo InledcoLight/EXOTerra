@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingLeft="16dp"
+    android:paddingRight="16dp"
+    android:paddingTop="8dp"
+    android:gravity="center_horizontal"
+    android:orientation="vertical">
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="8dp"
+        app:srcCompat="@drawable/ic_prefs_white_128dp"/>
+
+    <Switch
+        android:id="@+id/pref_timeformat"
+        style="@style/SwitchStyle2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="4dp"
+        android:paddingBottom="4dp"
+        android:checked="false"
+        android:textOn="@string/time12h"
+        android:textOff="@string/time24h"
+        android:showText="true"
+        android:textColor="@color/textColorPrimary"
+        android:textSize="@dimen/textSizePrimary"
+        android:text="@string/timeformat"/>
+    <Switch
+        android:id="@+id/pref_tempunit"
+        style="@style/SwitchStyle2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="4dp"
+        android:paddingBottom="4dp"
+        android:checked="false"
+        android:textOn="@string/fahrenheit"
+        android:textOff="@string/celsius"
+        android:showText="true"
+        android:textColor="@color/textColorPrimary"
+        android:textSize="@dimen/textSizePrimary"
+        android:text="@string/temperature_unit"/>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+
+    </LinearLayout>
+</LinearLayout>

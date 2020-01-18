@@ -15,7 +15,7 @@ public class DeviceViewHolder extends RecyclerView.ViewHolder {
     public TextView tv_name;
     public CheckedTextView ctv_state;
     public CheckBox cb_select;
-//    public TextView tv_desc;
+    public CheckedTextView ctv_habitat;
 
     public DeviceViewHolder(@NonNull View itemView) {
         super(itemView);
@@ -24,6 +24,6 @@ public class DeviceViewHolder extends RecyclerView.ViewHolder {
         tv_name = itemView.findViewById(R.id.item_device_name);
         ctv_state = itemView.findViewById(R.id.item_device_state);
         cb_select = itemView.findViewById(R.id.item_device_select);
-//        tv_desc = itemView.findViewById(R.id.item_device_desc);
+        ctv_habitat = itemView.findViewById(R.id.item_device_habitat);
     }
 }

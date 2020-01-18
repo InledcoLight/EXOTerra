@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:layout_margin="8dp"
+    android:layout_marginBottom="8dp"
     app:strokeWidth="@dimen/strokeWidth"
     app:radius="@dimen/cornerRadius"
     app:direction="horizontal"
@@ -45,7 +45,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="16dp"
+        android:padding="8dp"
         android:gravity="center_horizontal">
 
         <LinearLayout
@@ -59,14 +59,19 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@color/colorTransparent"
-                app:srcCompat="@drawable/ic_temperature"/>
+                app:srcCompat="@drawable/ic_temperature_color_64dp"/>
             <TextView
                 android:id="@+id/item_habitat_sensor1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="8dp"
+                android:textAlignment="textEnd"
+                android:textColor="#F7931D"
+                android:textSize="@dimen/textSizeSubTitle"/>
+            <Space
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:textColor="@color/textColorSencondary"
-                android:textSize="@dimen/textSizeSecondary"/>
+                android:layout_weight="1"/>
             <View
                 android:layout_width="@dimen/dividerWidth"
                 android:layout_height="match_parent"
@@ -78,29 +83,60 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@color/colorTransparent"
-                app:srcCompat="@drawable/ic_humidity"/>
+                app:srcCompat="@drawable/ic_humidity_color_64dp"/>
             <TextView
                 android:id="@+id/item_habitat_sensor2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="8dp"
+                android:textAlignment="textEnd"
+                android:textColor="#00AEEF"
+                android:textSize="@dimen/textSizeSubTitle"/>
+            <Space
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:textColor="@color/textColorSencondary"
-                android:textSize="@dimen/textSizeSecondary"/>
+                android:layout_weight="1"/>
         </LinearLayout>
         <View
             android:layout_width="match_parent"
             android:layout_height="@dimen/dividerWidth"
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="4dp"
             android:background="@color/colorDivider"/>
-        <TextView
-            android:id="@+id/item_habitat_time"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:textColor="@color/textColorSencondary"
-            android:textSize="@dimen/textSizeSecondary"/>
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="8dp"
+                app:srcCompat="@drawable/ic_time_white_24dp" />
+            <TextView
+                android:id="@+id/item_habitat_time"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="3"
+                android:layout_marginLeft="8dp"
+                android:textColor="@color/textColorPrimary"
+                android:textSize="@dimen/textSizeSecondary"/>
+            <TextView
+                android:id="@+id/item_habitat_daynight"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:drawablePadding="8dp"
+                android:gravity="center_vertical"
+                android:textColor="@color/textColorPrimary"
+                android:textSize="@dimen/textSizeSecondary"/>
+        </LinearLayout>
+
         <View
             android:layout_width="match_parent"
             android:layout_height="@dimen/dividerWidth"
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="4dp"
             android:background="@color/colorDivider"/>
         <LinearLayout
             android:layout_width="match_parent"
@@ -108,33 +144,45 @@
             android:orientation="horizontal"
             android:gravity="center_vertical">
 
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="8dp"
+                app:srcCompat="@drawable/ic_sunrise" />
             <TextView
                 android:id="@+id/item_habitat_sunrise"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:gravity="center_vertical"
-                android:textColor="@color/textColorSencondary"
+                android:layout_marginLeft="8dp"
+                android:textColor="@color/textColorPrimary"
                 android:textSize="@dimen/textSizeSecondary"/>
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="8dp"
+                app:srcCompat="@drawable/ic_sunset" />
             <TextView
                 android:id="@+id/item_habitat_sunset"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:gravity="center_vertical"
-                android:textColor="@color/textColorSencondary"
+                android:layout_marginLeft="8dp"
+                android:textColor="@color/textColorPrimary"
                 android:textSize="@dimen/textSizeSecondary"/>
         </LinearLayout>
         <View
             android:layout_width="match_parent"
             android:layout_height="@dimen/dividerWidth"
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="4dp"
             android:background="@color/colorDivider"/>
         <TextView
             android:id="@+id/item_habitat_devcnt"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:textColor="@color/textColorSencondary"
+            android:textColor="@color/textColorPrimary"
             android:textSize="@dimen/textSizeSecondary"
             android:text="@string/habitat_devcnt"/>
     </LinearLayout>

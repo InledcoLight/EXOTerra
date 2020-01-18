@@ -11,6 +11,13 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/brandHeight"
+            android:paddingLeft="8dp"
+            android:paddingRight="8dp"
+            android:scaleType="fitXY"
+            android:src="@mipmap/ic_brand"/>
         <FrameLayout
             android:id="@+id/main_fl_show"
             android:layout_width="match_parent"

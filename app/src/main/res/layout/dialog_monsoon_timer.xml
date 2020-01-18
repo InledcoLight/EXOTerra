@@ -1,30 +1,67 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              xmlns:app="http://schemas.android.com/apk/res-auto"
-              android:layout_width="match_parent"
-              android:layout_height="wrap_content"
-              android:orientation="vertical">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="8dp"
+    android:orientation="vertical">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:gravity="center_vertical"
-        android:padding="8dp">
-        <ImageView
+        android:gravity="center">
+
+        <LinearLayout
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:srcCompat="@drawable/ic_alarm_white_32dp"
-            android:background="@android:color/transparent"/>
-        <Space
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"/>
-        <TimePicker
-            android:id="@+id/dialog_monsoon_timer"
+            android:layout_height="match_parent"
+            android:layout_marginRight="8dp"
+            android:orientation="vertical"
+            android:gravity="center_horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:textColor="@color/textColorPrimary"
+                android:textSize="@dimen/textSizePrimary"
+                android:text="@string/time"/>
+
+            <TimePicker
+                android:id="@+id/dialog_monsoon_timer"
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:timePickerMode="spinner" />
+        </LinearLayout>
+
+        <LinearLayout
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:timePickerMode="spinner"/>
+            android:layout_height="match_parent"
+            android:layout_marginLeft="8dp"
+            android:orientation="vertical"
+            android:gravity="center_horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:textColor="@color/textColorPrimary"
+                android:textSize="@dimen/textSizePrimary"
+                android:text="@string/duration"/>
+            <Space
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:layout_weight="1"/>
+            <NumberPicker
+                android:id="@+id/dialog_monsoon_duration"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+            <Space
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:layout_weight="1"/>
+        </LinearLayout>
     </LinearLayout>
 
     <View
@@ -36,45 +73,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:gravity="center_vertical"
-        android:padding="8dp">
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:srcCompat="@mipmap/ic_monsoon_pulse_64"
-            android:background="@android:color/transparent"/>
-        <Space
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"/>
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="8dp"
-            android:layout_margin="8dp"
-            android:text="@string/spray_water_for"/>
-        <NumberPicker
-            android:id="@+id/dialog_monsoon_duration"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-    </LinearLayout>
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="@color/colorDivider"/>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center_vertical"
-        android:padding="8dp">
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:srcCompat="@drawable/ic_date_white_32dp"
-            android:background="@android:color/transparent"/>
+        android:gravity="center">
         <Space
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -88,6 +87,10 @@
             android:checked="true"
             android:textColor="@color/selector_week"
             android:text="@string/week_sun"/>
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"/>
         <CheckBox
             android:id="@+id/dialog_monsoon_mon"
             android:layout_width="wrap_content"
@@ -97,6 +100,10 @@
             android:checked="true"
             android:textColor="@color/selector_week"
             android:text="@string/week_mon"/>
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"/>
         <CheckBox
             android:id="@+id/dialog_monsoon_tue"
             android:layout_width="wrap_content"
@@ -106,6 +113,10 @@
             android:checked="true"
             android:textColor="@color/selector_week"
             android:text="@string/week_tue"/>
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"/>
         <CheckBox
             android:id="@+id/dialog_monsoon_wed"
             android:layout_width="wrap_content"
@@ -115,6 +126,10 @@
             android:checked="true"
             android:textColor="@color/selector_week"
             android:text="@string/week_wed"/>
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"/>
         <CheckBox
             android:id="@+id/dialog_monsoon_thu"
             android:layout_width="wrap_content"
@@ -124,6 +139,10 @@
             android:checked="true"
             android:textColor="@color/selector_week"
             android:text="@string/week_thu"/>
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"/>
         <CheckBox
             android:id="@+id/dialog_monsoon_fri"
             android:layout_width="wrap_content"
@@ -133,6 +152,10 @@
             android:button="@null"
             android:textColor="@color/selector_week"
             android:text="@string/week_fri"/>
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"/>
         <CheckBox
             android:id="@+id/dialog_monsoon_sat"
             android:layout_width="wrap_content"
@@ -142,6 +165,10 @@
             android:checked="true"
             android:textColor="@color/selector_week"
             android:text="@string/week_sat"/>
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"/>
     </LinearLayout>
 
     <View
@@ -150,3 +177,154 @@
         android:background="@color/colorDivider"/>
 
 </LinearLayout>
+<!--<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"-->
+<!--              xmlns:app="http://schemas.android.com/apk/res-auto"-->
+<!--              android:layout_width="match_parent"-->
+<!--              android:layout_height="wrap_content"-->
+<!--              android:orientation="vertical">-->
+
+<!--    <LinearLayout-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:orientation="horizontal"-->
+<!--        android:gravity="center_vertical"-->
+<!--        android:padding="8dp">-->
+<!--        <ImageView-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            app:srcCompat="@drawable/ic_alarm_white_32dp"-->
+<!--            android:background="@android:color/transparent"/>-->
+<!--        <Space-->
+<!--            android:layout_width="0dp"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_weight="1"/>-->
+<!--        <TimePicker-->
+<!--            android:id="@+id/dialog_monsoon_timer"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:timePickerMode="spinner"/>-->
+<!--    </LinearLayout>-->
+
+<!--    <View-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="1dp"-->
+<!--        android:background="@color/colorDivider"/>-->
+
+<!--    <LinearLayout-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:orientation="horizontal"-->
+<!--        android:gravity="center_vertical"-->
+<!--        android:padding="8dp">-->
+<!--        <ImageView-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            app:srcCompat="@mipmap/ic_monsoon_pulse_64"-->
+<!--            android:background="@android:color/transparent"/>-->
+<!--        <Space-->
+<!--            android:layout_width="0dp"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_weight="1"/>-->
+<!--        <TextView-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:padding="8dp"-->
+<!--            android:layout_margin="8dp"-->
+<!--            android:text="@string/spray_water_for"/>-->
+<!--        <NumberPicker-->
+<!--            android:id="@+id/dialog_monsoon_duration"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content" />-->
+<!--    </LinearLayout>-->
+
+<!--    <View-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="1dp"-->
+<!--        android:background="@color/colorDivider"/>-->
+
+<!--    <LinearLayout-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:orientation="horizontal"-->
+<!--        android:gravity="center_vertical"-->
+<!--        android:padding="8dp">-->
+<!--        <ImageView-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            app:srcCompat="@drawable/ic_date_white_32dp"-->
+<!--            android:background="@android:color/transparent"/>-->
+<!--        <Space-->
+<!--            android:layout_width="0dp"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_weight="1"/>-->
+<!--        <CheckBox-->
+<!--            android:id="@+id/dialog_monsoon_sun"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:padding="8dp"-->
+<!--            android:button="@null"-->
+<!--            android:checked="true"-->
+<!--            android:textColor="@color/selector_week"-->
+<!--            android:text="@string/week_sun"/>-->
+<!--        <CheckBox-->
+<!--            android:id="@+id/dialog_monsoon_mon"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:padding="8dp"-->
+<!--            android:button="@null"-->
+<!--            android:checked="true"-->
+<!--            android:textColor="@color/selector_week"-->
+<!--            android:text="@string/week_mon"/>-->
+<!--        <CheckBox-->
+<!--            android:id="@+id/dialog_monsoon_tue"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:padding="8dp"-->
+<!--            android:button="@null"-->
+<!--            android:checked="true"-->
+<!--            android:textColor="@color/selector_week"-->
+<!--            android:text="@string/week_tue"/>-->
+<!--        <CheckBox-->
+<!--            android:id="@+id/dialog_monsoon_wed"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:padding="8dp"-->
+<!--            android:button="@null"-->
+<!--            android:checked="true"-->
+<!--            android:textColor="@color/selector_week"-->
+<!--            android:text="@string/week_wed"/>-->
+<!--        <CheckBox-->
+<!--            android:id="@+id/dialog_monsoon_thu"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:padding="8dp"-->
+<!--            android:button="@null"-->
+<!--            android:checked="true"-->
+<!--            android:textColor="@color/selector_week"-->
+<!--            android:text="@string/week_thu"/>-->
+<!--        <CheckBox-->
+<!--            android:id="@+id/dialog_monsoon_fri"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:padding="8dp"-->
+<!--            android:checked="true"-->
+<!--            android:button="@null"-->
+<!--            android:textColor="@color/selector_week"-->
+<!--            android:text="@string/week_fri"/>-->
+<!--        <CheckBox-->
+<!--            android:id="@+id/dialog_monsoon_sat"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:padding="8dp"-->
+<!--            android:button="@null"-->
+<!--            android:checked="true"-->
+<!--            android:textColor="@color/selector_week"-->
+<!--            android:text="@string/week_sat"/>-->
+<!--    </LinearLayout>-->
+
+<!--    <View-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="1dp"-->
+<!--        android:background="@color/colorDivider"/>-->
+
+<!--</LinearLayout>-->

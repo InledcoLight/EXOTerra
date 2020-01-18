@@ -127,13 +127,13 @@ public class SelectProfileFragment extends BaseFragment {
             holder.radioButton.setOnCheckedChangeListener(null);
             holder.radioButton.setChecked(select == position);
             holder.radioButton.setText(mLightViewModel.getData().getProfileName(position));
-//            LineChartHelper.setProfile(holder.lineChart, chnCount, colors, profile);
+//            ChartHelper.setProfile(holder.lineChart, chnCount, colors, profile);
 //            holder.lineChart.setVisibility(View.VISIBLE);
             if (select == position) {
-                LineChartHelper.setProfile(holder.lineChart, chnCount, colors, profile);
+                ChartHelper.setProfile(holder.lineChart, chnCount, colors, profile);
                 holder.lineChart.setVisibility(View.VISIBLE);
             } else {
-                LineChartHelper.setProfile(holder.lineChart, chnCount, colors, null);
+                ChartHelper.setProfile(holder.lineChart, chnCount, colors, null);
                 holder.lineChart.setVisibility(View.GONE);
             }
             holder.radioButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -143,7 +143,7 @@ public class SelectProfileFragment extends BaseFragment {
                         int old = select;
                         notifyItemChanged(old);
                         select = position;
-                        LineChartHelper.setProfile(holder.lineChart, chnCount, colors, profile);
+                        ChartHelper.setProfile(holder.lineChart, chnCount, colors, profile);
                         holder.lineChart.setVisibility(View.VISIBLE);
                     }
                 }
@@ -163,7 +163,7 @@ public class SelectProfileFragment extends BaseFragment {
             super(itemView);
             radioButton = itemView.findViewById(R.id.item_profile_rb);
             lineChart = itemView.findViewById(R.id.item_profile_chart);
-            LineChartHelper.init(lineChart);
+            ChartHelper.initLineChart(lineChart);
         }
     }
 }

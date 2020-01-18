@@ -19,11 +19,6 @@ public class SplashActivity extends BaseActivity {
 
     private final int DURATION = 1500;
 
-//    private VideoView splash_vv;
-
-//    private boolean mPause;
-//    private int mProgress;
-//    private boolean mVideoCompleted;
     private final XlinkTaskHandler<UserApi.TokenRefreshResponse> mAuthinListener = new XlinkTaskHandler<>();
     private Runnable mRunnable;
 
@@ -35,38 +30,13 @@ public class SplashActivity extends BaseActivity {
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
-//        if (!mVideoCompleted && mPause) {
-//            splash_vv.seekTo(mProgress);
-//            splash_vv.resume();
-//        }
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-//        if (!mVideoCompleted) {
-//            splash_vv.pause();
-//            mPause = true;
-//            mProgress = splash_vv.getCurrentPosition();
-//        }
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-//        splash_vv.stopPlayback();
-    }
-
-    @Override
     protected int getLayoutRes() {
         return R.layout.activity_splash;
     }
 
     @Override
     protected void initView() {
-//        splash_vv = findViewById(R.id.splash_vv);
+
     }
 
     @Override
@@ -81,7 +51,6 @@ public class SplashActivity extends BaseActivity {
             mRunnable = new Runnable() {
                 @Override
                 public void run() {
-//                    while (!mVideoCompleted);
                     while (System.currentTimeMillis() - time < DURATION);
                     gotoLoginActivity();
                 }
@@ -92,7 +61,6 @@ public class SplashActivity extends BaseActivity {
             mRunnable = new Runnable() {
                 @Override
                 public void run() {
-//                    while (!mVideoCompleted || !mAuthinListener.isOver());
                     while (System.currentTimeMillis() - time < DURATION || !mAuthinListener.isOver());
                     if (mAuthinListener.isSuccess()) {
                         gotoMainActivity();
@@ -102,34 +70,6 @@ public class SplashActivity extends BaseActivity {
                 }
             };
         }
-
-//        splash_vv.setOnErrorListener(new MediaPlayer.OnErrorListener() {
-//            @Override
-//            public boolean onError(MediaPlayer mp, int what, int extra) {
-//                mVideoCompleted = true;
-//                mPause = false;
-//                return false;
-//            }
-//        });
-//        splash_vv.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-//            @Override
-//            public void onPrepared(MediaPlayer mp) {
-//                Log.e(TAG, "onPrepared: " );
-//                mVideoCompleted = false;
-//                mPause = false;
-//                splash_vv.requestFocus();
-//                splash_vv.seekTo(0);
-//                splash_vv.start();
-//            }
-//        });
-//        splash_vv.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-//            @Override
-//            public void onCompletion(MediaPlayer mp) {
-//                mVideoCompleted = true;
-//                mPause = false;
-//            }
-//        });
-//        splash_vv.setVideoPath("android.resource://" + getPackageName() + "/" + R.raw.splash);
         new Thread(mRunnable).start();
     }
 

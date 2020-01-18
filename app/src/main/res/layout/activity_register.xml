@@ -18,12 +18,24 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"/>
 
+    <ImageView
+        android:id="@+id/imageView9"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="48dp"
+        android:layout_marginEnd="32dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@mipmap/ic_microtope" />
+
     <android.support.constraint.Guideline
         android:id="@+id/register_gl1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.15"/>
+        app:layout_constraintGuide_percent="0.25" />
 
     <android.support.design.widget.TextInputLayout
         android:id="@+id/register_til_email"
@@ -31,7 +43,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="8dp"
         android:layout_marginEnd="16dp"
         android:hint="@string/hint_email"
         app:errorEnabled="true"
@@ -46,19 +58,9 @@
             android:drawablePadding="8dp"
             android:inputType="textEmailAddress"
             android:maxLength="@integer/email_text_length_max"
-            android:maxLines="1"/>
+            android:maxLines="1" />
 
     </android.support.design.widget.TextInputLayout>
-
-<!--    <Button-->
-<!--        android:id="@+id/register_btn_send"-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:layout_marginEnd="16dp"-->
-<!--        android:text="@string/send_verifycode"-->
-<!--        app:layout_constraintBottom_toBottomOf="@+id/register_til_verifycode"-->
-<!--        app:layout_constraintEnd_toEndOf="parent"-->
-<!--        app:layout_constraintTop_toTopOf="@+id/register_til_verifycode"/>-->
 
     <android.support.design.widget.TextInputLayout
         android:id="@+id/register_til_verifycode"
@@ -66,12 +68,11 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="8dp"
         android:layout_marginEnd="16dp"
         android:hint="@string/hint_verifycode"
-        app:errorEnabled="true"
         app:counterEnabled="true"
         app:counterMaxLength="@integer/verifycode_text_length_max"
+        app:errorEnabled="true"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/register_til_email">
@@ -92,12 +93,9 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="8dp"
         android:layout_marginEnd="16dp"
         android:hint="@string/password"
         app:errorEnabled="true"
-        app:counterEnabled="true"
-        app:counterMaxLength="@integer/password_text_length_max"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/register_til_verifycode">
@@ -110,7 +108,7 @@
             android:inputType="textPassword"
             android:maxLength="@integer/password_text_length_max"
             android:maxLines="1"
-            android:singleLine="true"/>
+            android:singleLine="true" />
     </android.support.design.widget.TextInputLayout>
 
     <com.inledco.exoterra.view.GradientSemiCircleButton
@@ -128,5 +126,17 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/register_til_password" />
+
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="32dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:srcCompat="@mipmap/ic_exoterra" />
 
 </android.support.constraint.ConstraintLayout>

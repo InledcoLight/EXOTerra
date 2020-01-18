@@ -9,9 +9,9 @@ import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.inledco.exoterra.R;
@@ -21,6 +21,7 @@ import com.inledco.exoterra.event.HomesRefreshedEvent;
 import com.inledco.exoterra.main.groups.AddHabitatFragment;
 import com.inledco.exoterra.manager.HomeManager;
 import com.inledco.exoterra.util.DeviceUtil;
+import com.inledco.exoterra.view.GradientCornerButton;
 import com.inledco.exoterra.xlink.XlinkCloudManager;
 import com.inledco.exoterra.xlink.XlinkRequestCallback;
 
@@ -34,7 +35,9 @@ public class AssignHabitatFragment extends BaseFragment {
     private ImageView assign_habitat_prdt;
     private ImageButton assign_habitat_add;
     private RecyclerView assign_habitat_rv;
-    private Button assign_habitat_save;
+    private View assign_habitat_warning;
+    private TextView warning_tv_msg;
+    private GradientCornerButton assign_habitat_save;
 
     private ConnectNetViewModel mConnectNetViewModel;
     private ConnectNetBean mConnectNetBean;
@@ -71,7 +74,11 @@ public class AssignHabitatFragment extends BaseFragment {
         assign_habitat_prdt = view.findViewById(R.id.assign_habitat_prdt);
         assign_habitat_add = view.findViewById(R.id.assign_habitat_add);
         assign_habitat_rv = view.findViewById(R.id.assign_habitat_rv);
+        assign_habitat_warning = view.findViewById(R.id.assign_habitat_warning);
+        warning_tv_msg = assign_habitat_warning.findViewById(R.id.warning_tv_msg);
         assign_habitat_save = view.findViewById(R.id.assign_habitat_save);
+
+        warning_tv_msg.setText(R.string.no_habitat_warning);
     }
 
     @Override
@@ -93,7 +100,7 @@ public class AssignHabitatFragment extends BaseFragment {
         assign_habitat_add.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                addFragmentToStack(R.id.adddevice_fl, new AddHabitatFragment());
+                addFragmentToStack(R.id.adddevice_root, new AddHabitatFragment());
             }
         });
 
@@ -122,6 +129,7 @@ public class AssignHabitatFragment extends BaseFragment {
 
     @Subscribe (threadMode = ThreadMode.MAIN)
     public void onHomesRefreshedEvent(HomesRefreshedEvent event) {
+        assign_habitat_warning.setVisibility(mHomes.size() == 0 ? View.VISIBLE : View.GONE);
         mAdapter.notifyDataSetChanged();
     }
 }

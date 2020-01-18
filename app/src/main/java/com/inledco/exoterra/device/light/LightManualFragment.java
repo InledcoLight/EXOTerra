@@ -3,65 +3,59 @@ package com.inledco.exoterra.device.light;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.graphics.Color;
-import android.graphics.drawable.GradientDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v7.widget.AppCompatImageButton;
-import android.support.v7.widget.RecyclerView;
-import android.text.SpannableStringBuilder;
-import android.text.Spanned;
-import android.text.style.ImageSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.SeekBar;
+import android.widget.CheckedTextView;
+import android.widget.CompoundButton;
 import android.widget.TextView;
+import android.widget.ToggleButton;
 
 import com.github.mikephil.charting.charts.BarChart;
-import com.github.mikephil.charting.components.XAxis;
-import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
-import com.github.mikephil.charting.formatter.ValueFormatter;
 import com.github.mikephil.charting.interfaces.datasets.IBarDataSet;
 import com.inledco.exoterra.R;
 import com.inledco.exoterra.base.BaseFragment;
 import com.inledco.exoterra.bean.EXOLedstrip;
 import com.inledco.exoterra.bean.LightSpectrum;
-import com.inledco.exoterra.common.OnItemClickListener;
 import com.inledco.exoterra.util.LightUtil;
 import com.inledco.exoterra.util.SpectrumUtil;
+import com.inledco.exoterra.view.CircleSeekbar;
 import com.inledco.exoterra.view.MultiCircleProgress;
-import com.inledco.exoterra.view.VerticalSeekBar;
+import com.inledco.exoterra.view.TurningWheel;
 
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 public class LightManualFragment extends BaseFragment {
 
-    private RecyclerView light_manual_rv;
-    private MultiCircleProgress[] light_manual_custom;
-    private AppCompatImageButton light_manual_power;
-    private TextView light_manual_desc;
-    private VerticalSeekBar light_manual_slider_all;
-    private TextView light_manual_progress;
+    private View light_manual_show;
+
+    private ToggleButton light_manual_presets;
+    private View light_manual_presets_detail;
+    private MultiCircleProgress[] mCustoms;
+    private CheckedTextView[] mPresets;
     private BarChart light_manual_spectrum;
+    private TurningWheel light_manual_csb;
+    private CheckedTextView light_manual_power;
+    private View[] includes;
+    private CircleSeekbar[] mCircleSeekbars;
+    private TextView[] mPercents;
+    private TextView[] mColors;
 
     private LightViewModel mLightViewModel;
     private EXOLedstrip mLight;
-//    private VerticalSliderAdapter mAdapter;
-    private SliderAdapter mAdapter;
 
     private int mSelected = -1;
 
     private LightSpectrum mLightSpectrum;
-
-    private final int mSpectrumWaveStart = 360;
-    private final int mSpectrumWaveEnd = 800;
 
     @Nullable
     @Override
@@ -80,102 +74,50 @@ public class LightManualFragment extends BaseFragment {
 
     @Override
     protected void initView(View view) {
-        light_manual_spectrum = view.findViewById(R.id.light_manual_spectrum);
-        light_manual_rv = view.findViewById(R.id.light_manual_rv);
-        light_manual_desc = view.findViewById(R.id.light_manual_desc);
-        light_manual_custom = new MultiCircleProgress[4];
-        light_manual_custom[0] = view.findViewById(R.id.light_manual_custom1);
-        light_manual_custom[1] = view.findViewById(R.id.light_manual_custom2);
-        light_manual_custom[2] = view.findViewById(R.id.light_manual_custom3);
-        light_manual_custom[3] = view.findViewById(R.id.light_manual_custom4);
+        light_manual_show = view.findViewById(R.id.light_manual_show);
+        light_manual_presets = view.findViewById(R.id.light_manual_presets);
+        light_manual_presets_detail = view.findViewById(R.id.light_manual_presets_detail);
+        mCustoms = new MultiCircleProgress[4];
+        mPresets = new CheckedTextView[8];
+        mCustoms[0] = view.findViewById(R.id.light_p1);
+        mCustoms[1] = view.findViewById(R.id.light_p2);
+        mCustoms[2] = view.findViewById(R.id.light_p3);
+        mCustoms[3] = view.findViewById(R.id.light_p4);
+        mPresets[0] = view.findViewById(R.id.light_p5);
+        mPresets[1] = view.findViewById(R.id.light_p6);
+        mPresets[2] = view.findViewById(R.id.light_p7);
+        mPresets[3] = view.findViewById(R.id.light_p8);
+        mPresets[4] = view.findViewById(R.id.light_p9);
+        mPresets[5] = view.findViewById(R.id.light_p10);
+        mPresets[6] = view.findViewById(R.id.light_p11);
+        mPresets[7] = view.findViewById(R.id.light_p12);
         light_manual_power = view.findViewById(R.id.light_manual_power);
-        light_manual_slider_all = view.findViewById(R.id.light_manual_slider_all);
-        light_manual_progress = view.findViewById(R.id.light_manual_progress);
+        light_manual_csb = view.findViewById(R.id.light_manual_csb);
 
-        //动态设置SeekBar progressDrawable
-        light_manual_slider_all.setProgressDrawable(LightUtil.getProgressDrawable(getContext(), "white"));
-        //动态设置SeekBar thumb
-        GradientDrawable thumb = (GradientDrawable) light_manual_slider_all.getThumb();
-        thumb.setColor(Color.WHITE);
+        includes = new View[6];
+        mCircleSeekbars = new CircleSeekbar[6];
+        mPercents = new TextView[6];
+        mColors = new TextView[6];
+        light_manual_spectrum = light_manual_show.findViewById(R.id.light_manual_spectrum);
+        includes[0] = light_manual_show.findViewById(R.id.light_manual_include1);
+        includes[1] = light_manual_show.findViewById(R.id.light_manual_include2);
+        includes[2] = light_manual_show.findViewById(R.id.light_manual_include3);
+        includes[3] = light_manual_show.findViewById(R.id.light_manual_include4);
+        includes[4] = light_manual_show.findViewById(R.id.light_manual_include5);
+        includes[5] = light_manual_show.findViewById(R.id.light_manual_include6);
+        for (int i = 0; i < 6; i++) {
+            mCircleSeekbars[i] = includes[i].findViewById(R.id.item_progress_scb);
+            mPercents[i] = includes[i].findViewById(R.id.item_progress_pct);
+            mColors[i] = includes[i].findViewById(R.id.item_progress_color);
+        }
 
-        XAxis xAxis = light_manual_spectrum.getXAxis();
-        YAxis axisLeft = light_manual_spectrum.getAxisLeft();
-        YAxis axisRight = light_manual_spectrum.getAxisRight();
-        xAxis.setGranularity(1f);
-        xAxis.setGranularityEnabled(true);
-        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
-        xAxis.setDrawGridLines(false);
-        xAxis.setDrawAxisLine(false);
-        xAxis.setAxisLineColor(Color.WHITE);
-        xAxis.setTextColor(Color.WHITE);
-        xAxis.setAxisMaximum(getResources().getInteger(R.integer.spectrum_wavelength_max));
-        xAxis.setAxisMinimum(getResources().getInteger(R.integer.spectrum_wavelength_min));
-        xAxis.setLabelCount(5, false);
-        xAxis.setDrawLabels(false);
-        xAxis.setValueFormatter(new ValueFormatter() {
-            @Override
-            public String getFormattedValue(float value) {
-                return String.valueOf(((int) value));
-            }
-        });
-        xAxis.setEnabled(true);
-
-        ValueFormatter formatter = new ValueFormatter() {
-            @Override
-            public String getFormattedValue(float value) {
-                DecimalFormat df = new DecimalFormat("0.0");
-                return df.format(value);
-            }
-        };
-        axisLeft.setAxisMaximum(1.0f);
-        axisLeft.setAxisMinimum(0);
-        axisLeft.setLabelCount(6, false);
-        axisLeft.setDrawLabels(false);
-        axisLeft.setValueFormatter(formatter);
-        axisLeft.setPosition(YAxis.YAxisLabelPosition.OUTSIDE_CHART);
-        axisLeft.setTextColor(Color.WHITE);
-        axisLeft.setDrawGridLines(false);
-        axisLeft.setDrawAxisLine(false);
-        axisLeft.setAxisLineColor(Color.WHITE);
-        axisLeft.setGranularity(0.1f);
-        axisLeft.setGranularityEnabled(true);
-        axisLeft.setSpaceTop(0);
-        axisLeft.setSpaceBottom(0);
-        axisLeft.setEnabled(true);
-        
-        axisRight.setEnabled(false);
-
-        light_manual_spectrum.setTouchEnabled(false);
-        light_manual_spectrum.setDragEnabled(false);
-        light_manual_spectrum.setScaleEnabled(false);
-        light_manual_spectrum.setPinchZoom(false);
-        light_manual_spectrum.setDoubleTapToZoomEnabled(false);
-        light_manual_spectrum.setDrawValueAboveBar(true);
-        light_manual_spectrum.setBorderWidth(1);
-        light_manual_spectrum.setDrawBorders(false);
-        light_manual_spectrum.setDrawGridBackground(true);
-        light_manual_spectrum.setGridBackgroundColor(Color.TRANSPARENT);
-        light_manual_spectrum.setDescription(null);
-        light_manual_spectrum.setFitBars(true);
-//        light_manual_spectrum.getLegend().setTextColor(Color.WHITE);
-//        light_manual_spectrum.getLegend().setHorizontalAlignment(Legend.LegendHorizontalAlignment.CENTER);
-        light_manual_spectrum.getLegend().setEnabled(false);
+        ChartHelper.initBarChart(light_manual_spectrum);
     }
 
     @Override
     protected void initData() {
         mLightViewModel = ViewModelProviders.of(getActivity()).get(LightViewModel.class);
         mLight = mLightViewModel.getData();
-        mAdapter = new SliderAdapter(getContext(), mLight);
-        mAdapter.setOnItemClickListener(new OnItemClickListener() {
-            @Override
-            public void onItemClick(int position) {
-                if (mSelected == position) {
-                    mSelected = -1;
-                }
-            }
-        });
-        light_manual_rv.setAdapter(mAdapter);
         mLightViewModel.observe(this, new Observer<EXOLedstrip>() {
             @Override
             public void onChanged(@Nullable EXOLedstrip exoLedstrip) {
@@ -189,50 +131,6 @@ public class LightManualFragment extends BaseFragment {
 
     @Override
     protected void initEvent() {
-        light_manual_custom[0].setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                int[] prgs = light_manual_custom[0].getProgress();
-                int[] progress = Arrays.copyOf(prgs, prgs.length);
-                for (int i = 0; i < progress.length; i++) {
-                    progress[i] *= 10;
-                }
-                mLightViewModel.setAllBrights(progress);
-            }
-        });
-        light_manual_custom[1].setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                int[] prgs = light_manual_custom[1].getProgress();
-                int[] progress = Arrays.copyOf(prgs, prgs.length);
-                for (int i = 0; i < progress.length; i++) {
-                    progress[i] *= 10;
-                }
-                mLightViewModel.setAllBrights(progress);
-            }
-        });
-        light_manual_custom[2].setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                int[] prgs = light_manual_custom[2].getProgress();
-                int[] progress = Arrays.copyOf(prgs, prgs.length);
-                for (int i = 0; i < progress.length; i++) {
-                    progress[i] *= 10;
-                }
-                mLightViewModel.setAllBrights(progress);
-            }
-        });
-        light_manual_custom[3].setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                int[] prgs = light_manual_custom[3].getProgress();
-                int[] progress = Arrays.copyOf(prgs, prgs.length);
-                for (int i = 0; i < progress.length; i++) {
-                    progress[i] *= 10;
-                }
-                mLightViewModel.setAllBrights(progress);
-            }
-        });
         light_manual_power.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -240,87 +138,146 @@ public class LightManualFragment extends BaseFragment {
             }
         });
 
-        light_manual_custom[0].setOnLongClickListener(new View.OnLongClickListener() {
+        light_manual_presets.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
-            public boolean onLongClick(View v) {
-                mLightViewModel.setCustomBrights(0, mAdapter.getBrights());
-                return true;
-            }
-        });
-        light_manual_custom[1].setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                mLightViewModel.setCustomBrights(1, mAdapter.getBrights());
-                return true;
-            }
-        });
-        light_manual_custom[2].setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                mLightViewModel.setCustomBrights(2, mAdapter.getBrights());
-                return true;
-            }
-        });
-        light_manual_custom[3].setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                mLightViewModel.setCustomBrights(3, mAdapter.getBrights());
-                return true;
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                light_manual_csb.setVisibility(isChecked ? View.INVISIBLE : View.VISIBLE);
+                light_manual_presets_detail.setVisibility(isChecked ? View.VISIBLE : View.GONE);
             }
         });
 
-        light_manual_slider_all.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-
-            }
-
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-
-            }
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-                int progress = seekBar.getProgress();
-                int[] brights = new int[mLight.getChannelCount()];
-                for (int i = 0; i < brights.length; i++) {
-                    brights[i] = progress;
+        for (int i = 0; i < 4; i++) {
+            final int pos = i;
+            mCustoms[i].setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    int[] prgs = mCustoms[pos].getProgress();
+                    int[] progress = Arrays.copyOf(prgs, prgs.length);
+                    for (int i = 0; i < progress.length; i++) {
+                        progress[i] *= 10;
+                    }
+                    mLightViewModel.setAllBrights(progress);
+                    for (int j = 0; j < 8; j++) {
+                        mPresets[j].setChecked(false);
+                    }
                 }
-                mLightViewModel.setAllBrights(brights);
-                DecimalFormat df = new DecimalFormat("##0");
-                light_manual_progress.setText(df.format(progress/10) + "%");
+            });
+            mCustoms[i].setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    byte[] brights = new byte[mLight.getChannelCount()];
+                    for (int i = 0; i < mLight.getChannelCount(); i++) {
+                        brights[i] = (byte) (mLight.getBright(i) / 10);
+                    }
+                    mLightViewModel.setCustomBrights(pos, brights);
+                    return true;
+                }
+            });
+        }
+
+        for (int i = 0; i < 8; i++) {
+            final int pos = i;
+            mPresets[pos].setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    for (int j = 0; j < mLight.getChannelCount(); j++) {
+
+                    }
+                    for (int j = 0; j < 8; j++) {
+                        mPresets[j].setChecked(pos == j ? true : false);
+                    }
+                }
+            });
+        }
+
+        for (int i = 0; i < 6; i++) {
+            final int pos = i;
+            includes[i].setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (mSelected == pos) {
+                        mSelected = -1;
+                        light_manual_csb.setProgressColor(Color.WHITE);
+                        light_manual_csb.setProgress(0);
+                    } else {
+                        mSelected = pos;
+                        String name = mLight.getChannelName(pos);
+                        int color = LightUtil.getColorValue(name);
+                        light_manual_csb.setProgressColor(color);
+                        light_manual_csb.setProgress(mLight.getBright(pos));
+                    }
+                    for (int j = 0; j < 6; j++) {
+                        if (mSelected == j) {
+                            Drawable drawable = getContext().getResources().getDrawable(R.drawable.shape_round_white);
+                            mCircleSeekbars[j].setBackground(drawable);
+                        } else {
+                            mCircleSeekbars[j].setBackground(null);
+                        }
+                    }
+                }
+            });
+        }
+
+        light_manual_csb.setListener(new TurningWheel.OnProgressChangedListener() {
+            @Override
+            public void onProgressChanged(int progress) {
+
+            }
+
+            @Override
+            public void onSeekStop() {
+                int progress = light_manual_csb.getProgress();
+                if (mSelected >= 0 && mSelected < mLight.getChannelCount()) {
+                    mLightViewModel.setBright(mSelected, progress);
+                } else {
+                    int[] brights = new int[mLight.getChannelCount()];
+                    for (int i = 0; i < brights.length; i++) {
+                        brights[i] = progress;
+                    }
+                    mLightViewModel.setAllBrights(brights);
+                }
             }
         });
     }
 
     private void refreshData() {
-        mAdapter.notifyDataSetChanged();
-        light_manual_power.setImageResource(mLight.getPower() ? R.drawable.ic_power_white : R.drawable.ic_power_red);
+        if (mLight == null || mLight.getChannelCount() > 6) {
+            return;
+        }
+        for (int i = 0; i < mLight.getChannelCount(); i++) {
+            includes[i].setVisibility(View.VISIBLE);
+            int brt = mLight.getBright(i);
+            String color = mLight.getChannelName(i);
+            mCircleSeekbars[i].setProgressColor(LightUtil.getColorValue(color));
+            mCircleSeekbars[i].setProgress(brt);
+            if (brt > 0 && brt < 10) {
+                mPercents[i].setText("0." + brt + " %");
+            } else {
+                mPercents[i].setText("" + brt / 10 + " %");
+            }
+            mColors[i].setText(color);
+            if (mSelected == i) {
+                light_manual_csb.setProgress(brt);
+            }
+        }
+        for (int i = mLight.getChannelCount(); i < 6; i++) {
+            includes[i].setVisibility(View.GONE);
+        }
+        light_manual_power.setChecked(mLight.getPower());
+        light_manual_power.setText(mLight.getPower() ? R.string.on : R.string.off);
         int count = mLight.getChannelCount();
         for (int i = 0; i < 4; i++) {
-            light_manual_custom[i].setCircleCount(count);
+            mCustoms[i].setCircleCount(count);
             byte[] array = mLight.getCustomBrights(i);
             if (array != null && array.length == count) {
                 for (int j = 0; j < count; j++) {
-                    light_manual_custom[i].setProgress(j, array[j]);
+                    mCustoms[i].setProgress(j, array[j]);
                     String color = mLight.getChannelName(j);
-                    light_manual_custom[i].setCircleColor(j, LightUtil.getColorValue(color));
+                    mCustoms[i].setCircleColor(j, LightUtil.getColorValue(color));
                 }
             }
-            light_manual_custom[i].invalidate();
+            mCustoms[i].invalidate();
         }
-
-        SpannableStringBuilder sp = new SpannableStringBuilder("");
-        for (int i = 0; i < mLight.getChannelCount(); i++) {
-            String name = mLight.getChannelName(i);
-            ImageSpan icon = new ImageSpan(getContext(), LightUtil.getIconRes(name));
-
-            sp.append(" ");
-            sp.setSpan(icon, sp.length()-1, sp.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-            sp.append(" " + name + " ");
-        }
-        light_manual_desc.setText(sp, TextView.BufferType.SPANNABLE);
 
         if (mLightSpectrum == null) {
             return;

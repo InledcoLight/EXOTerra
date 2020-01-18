@@ -31,7 +31,6 @@ public class RegisterActivity extends BaseActivity {
     private AdvancedTextInputEditText register_et_verifycode;
     private TextInputLayout register_til_password;
     private AdvancedTextInputEditText register_et_password;
-//    private Button register_btn_send;
     private Button register_btn_signup;
     private LoadDialog mLoadDialog;
     private ProgressDialog mProgressDialog;
@@ -65,7 +64,6 @@ public class RegisterActivity extends BaseActivity {
         register_et_verifycode = findViewById(R.id.register_et_verifycode);
         register_til_password = findViewById(R.id.register_til_password);
         register_et_password = findViewById(R.id.register_et_password);
-//        register_btn_send = findViewById(R.id.register_btn_send);
         register_btn_signup = findViewById(R.id.register_btn_signup);
 
         setSupportActionBar(register_toolbar);
@@ -169,19 +167,6 @@ public class RegisterActivity extends BaseActivity {
                 }
             }
         });
-
-//        register_btn_send.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                String email = getEmailText();
-//                if (!RegexUtil.isEmail(email)) {
-//                    register_til_email.setError(getString(R.string.error_email));
-//                    register_et_email.requestFocus();
-//                    return;
-//                }
-//                XlinkCloudManager.getInstance().requestRegisterEmailVerifycode(email, mVerifycodeCallback);
-//            }
-//        });
 
         register_btn_signup.setOnClickListener(new View.OnClickListener() {
             @Override

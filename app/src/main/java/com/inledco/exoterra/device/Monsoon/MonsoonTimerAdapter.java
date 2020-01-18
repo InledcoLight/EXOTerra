@@ -2,12 +2,10 @@ package com.inledco.exoterra.device.Monsoon;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
-import android.support.annotation.StringRes;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
-import android.widget.Switch;
+import android.widget.CheckedTextView;
 import android.widget.TextView;
 
 import com.inledco.exoterra.R;
@@ -64,7 +62,7 @@ public abstract class MonsoonTimerAdapter extends SimpleAdapter<EXOMonsoonTimer,
 
     @Override
     protected int getItemLayoutResId() {
-        return R.layout.item_monsoon_timer;
+        return R.layout.item_timer;
     }
 
     @NonNull
@@ -74,22 +72,16 @@ public abstract class MonsoonTimerAdapter extends SimpleAdapter<EXOMonsoonTimer,
     }
 
     @Override
-    public void onBindViewHolder(@NonNull final MonsoonTimerViewHolder holder, final int position) {
-        final EXOMonsoonTimer timer = mData.get(holder.getAdapterPosition());
-        DecimalFormat df = new DecimalFormat("00");
-        holder.tv_action.setText(getDurationDesc(timer.getDuration()));
-        holder.tv_time.setText(df.format(timer.getTimer()/60) + ":" + df.format(timer.getTimer()%60));
-        @StringRes int[] week = new int[]{R.string.week_sun, R.string.week_mon, R.string.week_tue, R.string.week_wed,
-                                          R.string.week_thu, R.string.week_fri, R.string.week_sat};
-        String wk = "";
+    public void onBindViewHolder(@NonNull final MonsoonTimerViewHolder holder, int pos) {
+        final int position = holder.getAdapterPosition();
+        EXOMonsoonTimer tmr = mData.get(position);
+        holder.tv_ontime.setText(getTimeText(tmr.getTimer()));
+        holder.tv_offtime.setText("" + tmr.getDuration() + " s");
+        holder.ctv_enable.setChecked(tmr.isEnable());
         for (int i = 0; i < 7; i++) {
-            if (timer.getWeeks()[i]) {
-                wk += mContext.getString(week[i]) + "  ";
-            }
+            holder.ctv_week[i].setChecked(tmr.getWeek(i));
         }
-        wk = wk.trim();
-        holder.tv_week.setText(wk);
-        holder.sw_enable.setChecked(timer.isEnable());
+
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -107,11 +99,10 @@ public abstract class MonsoonTimerAdapter extends SimpleAdapter<EXOMonsoonTimer,
                 return false;
             }
         });
-
-        holder.sw_fl.setOnClickListener(new View.OnClickListener() {
+        holder.ctv_enable.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (holder.sw_enable.isChecked()) {
+                if (holder.ctv_enable.isChecked()) {
                     onDisableTimer(position);
                 } else {
                     onEnableTimer(position);
@@ -120,20 +111,30 @@ public abstract class MonsoonTimerAdapter extends SimpleAdapter<EXOMonsoonTimer,
         });
     }
 
+    private String getTimeText(int time) {
+        DecimalFormat df = new DecimalFormat("00");
+        return df.format(time/60) + ":" + df.format(time%60);
+    }
+
     class MonsoonTimerViewHolder extends RecyclerView.ViewHolder {
-        private TextView tv_action;
-        private TextView tv_time;
-        private TextView tv_week;
-        private FrameLayout sw_fl;
-        private Switch sw_enable;
+        private TextView tv_ontime;
+        private TextView tv_offtime;
+        private CheckedTextView ctv_enable;
+        private CheckedTextView[] ctv_week;
 
         public MonsoonTimerViewHolder(@NonNull View itemView) {
             super(itemView);
-            tv_action = itemView.findViewById(R.id.item_monsoon_timer_action);
-            tv_time = itemView.findViewById(R.id.item_monsoon_timer_time);
-            tv_week = itemView.findViewById(R.id.item_monsoon_timer_week);
-            sw_fl = itemView.findViewById(R.id.item_monsoon_timer_fl);
-            sw_enable = itemView.findViewById(R.id.item_monsoon_timer_enable);
+            tv_ontime = itemView.findViewById(R.id.item_timer_time);
+            tv_offtime = itemView.findViewById(R.id.item_timer_offtime);
+            ctv_enable = itemView.findViewById(R.id.item_timer_enable);
+            ctv_week = new CheckedTextView[7];
+            ctv_week[0] = itemView.findViewById(R.id.item_timer_sun);
+            ctv_week[1] = itemView.findViewById(R.id.item_timer_mon);
+            ctv_week[2] = itemView.findViewById(R.id.item_timer_tue);
+            ctv_week[3] = itemView.findViewById(R.id.item_timer_wed);
+            ctv_week[4] = itemView.findViewById(R.id.item_timer_thu);
+            ctv_week[5] = itemView.findViewById(R.id.item_timer_fri);
+            ctv_week[6] = itemView.findViewById(R.id.item_timer_sat);
         }
     }
 

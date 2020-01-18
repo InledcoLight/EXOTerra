@@ -1,233 +1,369 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:clickable="true"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center_horizontal"
+    android:clickable="true">
 
-    <android.support.constraint.Guideline
-        android:id="@+id/monsoon_now_gl1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+    <com.inledco.exoterra.view.GradientCornerLinearLayout
+        android:id="@+id/gradientCornerLinearLayout7"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.5"/>
-
-    <android.support.constraint.Guideline
-        android:id="@+id/monsoon_now_gl4"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.45" />
-
-    <android.support.constraint.Guideline
-        android:id="@+id/monsoon_now_gl5"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.65" />
-
-    <android.support.constraint.Guideline
-        android:id="@+id/monsoon_now_gl2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.25"/>
-
-    <android.support.constraint.Guideline
-        android:id="@+id/monsoon_now_gl3"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.75"/>
-
-    <Button
-        android:id="@+id/monsoon_ctrl_custom1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginBottom="8dp"
-        android:background="?attr/selectableItemBackground"
-        android:text=""
-        android:visibility="invisible"
-        app:layout_constraintBottom_toTopOf="@+id/monsoon_now_gl5"
-        app:layout_constraintEnd_toStartOf="@+id/monsoon_now_gl2"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/monsoon_now_gl4"/>
-
-    <Button
-        android:id="@+id/monsoon_ctrl_custom2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginBottom="8dp"
-        android:background="?attr/selectableItemBackground"
-        android:text=""
-        android:visibility="invisible"
-        app:layout_constraintBottom_toTopOf="@+id/monsoon_now_gl5"
-        app:layout_constraintEnd_toStartOf="@+id/monsoon_now_gl1"
-        app:layout_constraintStart_toStartOf="@+id/monsoon_now_gl2"
-        app:layout_constraintTop_toTopOf="@+id/monsoon_now_gl4"/>
-
-    <Button
-        android:id="@+id/monsoon_ctrl_custom3"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginBottom="8dp"
-        android:background="?attr/selectableItemBackground"
-        android:text=""
-        android:visibility="invisible"
-        app:layout_constraintBottom_toTopOf="@+id/monsoon_now_gl5"
-        app:layout_constraintEnd_toStartOf="@+id/monsoon_now_gl3"
-        app:layout_constraintStart_toStartOf="@+id/monsoon_now_gl1"
-        app:layout_constraintTop_toTopOf="@+id/monsoon_now_gl4"/>
-
-    <Button
-        android:id="@+id/monsoon_ctrl_custom4"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginBottom="8dp"
-        android:background="?attr/selectableItemBackground"
-        android:text=""
-        android:visibility="invisible"
-        app:layout_constraintBottom_toTopOf="@+id/monsoon_now_gl5"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="@+id/monsoon_now_gl3"
-        app:layout_constraintTop_toTopOf="@+id/monsoon_now_gl4"/>
-
-    <Button
-        android:id="@+id/monsoon_ctrl_custom5"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginBottom="8dp"
-        android:background="?attr/selectableItemBackground"
-        android:text=""
-        android:visibility="invisible"
-        app:layout_constraintBottom_toTopOf="@+id/monsoon_now_gl6"
-        app:layout_constraintEnd_toStartOf="@+id/monsoon_now_gl2"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/monsoon_now_gl5"/>
-
-    <Button
-        android:id="@+id/monsoon_ctrl_custom6"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginBottom="8dp"
-        android:background="?attr/selectableItemBackground"
-        android:text=""
-        android:visibility="invisible"
-        app:layout_constraintBottom_toTopOf="@+id/monsoon_now_gl6"
-        app:layout_constraintEnd_toStartOf="@+id/monsoon_now_gl1"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="@+id/monsoon_now_gl2"
-        app:layout_constraintTop_toTopOf="@+id/monsoon_now_gl5"/>
-
-    <Button
-        android:id="@+id/monsoon_ctrl_custom7"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginBottom="8dp"
-        android:background="?attr/selectableItemBackground"
-        android:text=""
-        android:visibility="invisible"
-        app:layout_constraintBottom_toTopOf="@+id/monsoon_now_gl6"
-        app:layout_constraintEnd_toStartOf="@+id/monsoon_now_gl3"
-        app:layout_constraintStart_toStartOf="@+id/monsoon_now_gl1"
-        app:layout_constraintTop_toTopOf="@+id/monsoon_now_gl5"/>
-
-    <Button
-        android:id="@+id/monsoon_ctrl_custom8"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginBottom="8dp"
-        android:background="?attr/selectableItemBackground"
-        android:text=""
-        android:visibility="invisible"
-        app:layout_constraintBottom_toTopOf="@+id/monsoon_now_gl6"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="@+id/monsoon_now_gl3"
-        app:layout_constraintTop_toTopOf="@+id/monsoon_now_gl5"/>
-
-    <android.support.constraint.Guideline
-        android:id="@+id/monsoon_now_gl6"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.85" />
-
-    <TextView
-        android:id="@+id/monsoon_key"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginBottom="8dp"
         android:padding="8dp"
-        android:textSize="16sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:direction="horizontal"
+        app:gradientEnd="@color/gradientGreen"
+        app:gradientStart="@color/gradientYellow"
+        app:radius="@dimen/cornerRadius"
+        app:strokeWidth="@dimen/strokeWidth">
 
-    <ImageView
-        android:id="@+id/monsoon_ctrl_status"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@mipmap/ic_monsoon_turnoff" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/monsoon_ctrl_period"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:text=""
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/monsoon_ctrl_status" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/textSizePrimary"
+                android:textColor="@color/textColorPrimary"
+                android:text="@string/device_key_action"/>
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"/>
+            <TextView
+                android:id="@+id/monsoon_key"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="right"
+                android:padding="8dp"
+                android:gravity="center_vertical"
+                android:textAlignment="center"
+                android:drawablePadding="8dp"
+                android:background="?attr/selectableItemBackground"
+                android:textSize="@dimen/textSizeSecondary"
+                android:textColor="@color/textColorSencondary"/>
+        </LinearLayout>
 
-    <CheckedTextView
-        android:id="@+id/monsoon_ctrl_turn"
-        style="@android:style/Widget.DeviceDefault.Button.Toggle"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginBottom="8dp"
-        android:text=""
-        android:textAlignment="center"
-        app:layout_constraintBottom_toTopOf="@+id/monsoon_now_gl4"
-        app:layout_constraintEnd_toStartOf="@+id/monsoon_now_gl3"
-        app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toStartOf="@+id/monsoon_now_gl2"
-        app:layout_constraintTop_toBottomOf="@+id/monsoon_ctrl_period" />
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/dividerWidth"
+            android:background="@drawable/shape_rect_gradient"/>
 
-</android.support.constraint.ConstraintLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <Button
+                android:id="@+id/monsoon_ctrl_custom1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="?attr/selectableItemBackground"
+                android:visibility="invisible"/>
+
+            <Button
+                android:id="@+id/monsoon_ctrl_custom2"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="?attr/selectableItemBackground"
+                android:visibility="invisible"/>
+
+            <Button
+                android:id="@+id/monsoon_ctrl_custom3"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="?attr/selectableItemBackground"
+                android:visibility="invisible"/>
+
+            <Button
+                android:id="@+id/monsoon_ctrl_custom4"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="?attr/selectableItemBackground"
+                android:visibility="invisible"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+            <Button
+                android:id="@+id/monsoon_ctrl_custom5"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="?attr/selectableItemBackground"
+                android:visibility="invisible"/>
+
+            <Button
+                android:id="@+id/monsoon_ctrl_custom6"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="?attr/selectableItemBackground"
+                android:visibility="invisible"/>
+
+            <Button
+                android:id="@+id/monsoon_ctrl_custom7"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="?attr/selectableItemBackground"
+                android:visibility="invisible"/>
+
+            <Button
+                android:id="@+id/monsoon_ctrl_custom8"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="?attr/selectableItemBackground"
+                android:visibility="invisible"/>
+        </LinearLayout>
+
+    </com.inledco.exoterra.view.GradientCornerLinearLayout>
+</LinearLayout>
+    <!--<android.support.constraint.ConstraintLayout-->
+    <!--    xmlns:android="http://schemas.android.com/apk/res/android"-->
+    <!--    xmlns:app="http://schemas.android.com/apk/res-auto"-->
+    <!--    xmlns:tools="http://schemas.android.com/tools"-->
+    <!--    android:clickable="true"-->
+    <!--    android:layout_width="match_parent"-->
+    <!--    android:layout_height="match_parent">-->
+
+    <!--    <android.support.constraint.Guideline-->
+    <!--        android:id="@+id/monsoon_now_gl1"-->
+    <!--        android:layout_width="wrap_content"-->
+    <!--        android:layout_height="wrap_content"-->
+    <!--        android:orientation="vertical"-->
+    <!--        app:layout_constraintGuide_percent="0.5"/>-->
+
+    <!--    <android.support.constraint.Guideline-->
+    <!--        android:id="@+id/monsoon_now_gl4"-->
+    <!--        android:layout_width="wrap_content"-->
+    <!--        android:layout_height="wrap_content"-->
+    <!--        android:orientation="horizontal"-->
+    <!--        app:layout_constraintGuide_percent="0.45" />-->
+
+    <!--    <android.support.constraint.Guideline-->
+    <!--        android:id="@+id/monsoon_now_gl5"-->
+    <!--        android:layout_width="wrap_content"-->
+    <!--        android:layout_height="wrap_content"-->
+    <!--        android:orientation="horizontal"-->
+    <!--        app:layout_constraintGuide_percent="0.65" />-->
+
+    <!--    <android.support.constraint.Guideline-->
+    <!--        android:id="@+id/monsoon_now_gl2"-->
+    <!--        android:layout_width="wrap_content"-->
+    <!--        android:layout_height="wrap_content"-->
+    <!--        android:orientation="vertical"-->
+    <!--        app:layout_constraintGuide_percent="0.25"/>-->
+
+    <!--    <android.support.constraint.Guideline-->
+    <!--        android:id="@+id/monsoon_now_gl3"-->
+    <!--        android:layout_width="wrap_content"-->
+    <!--        android:layout_height="wrap_content"-->
+    <!--        android:orientation="vertical"-->
+    <!--        app:layout_constraintGuide_percent="0.75"/>-->
+
+    <!--    <Button-->
+    <!--        android:id="@+id/monsoon_ctrl_custom1"-->
+    <!--        android:layout_width="wrap_content"-->
+    <!--        android:layout_height="wrap_content"-->
+    <!--        android:layout_marginStart="8dp"-->
+    <!--        android:layout_marginTop="8dp"-->
+    <!--        android:layout_marginEnd="8dp"-->
+    <!--        android:layout_marginBottom="8dp"-->
+    <!--        android:background="?attr/selectableItemBackground"-->
+    <!--        android:text=""-->
+    <!--        android:visibility="invisible"-->
+    <!--        app:layout_constraintBottom_toTopOf="@+id/monsoon_now_gl5"-->
+    <!--        app:layout_constraintEnd_toStartOf="@+id/monsoon_now_gl2"-->
+    <!--        app:layout_constraintStart_toStartOf="parent"-->
+    <!--        app:layout_constraintTop_toTopOf="@+id/monsoon_now_gl4"/>-->
+
+    <!--    <Button-->
+    <!--        android:id="@+id/monsoon_ctrl_custom2"-->
+    <!--        android:layout_width="wrap_content"-->
+    <!--        android:layout_height="wrap_content"-->
+    <!--        android:layout_marginStart="8dp"-->
+    <!--        android:layout_marginTop="8dp"-->
+    <!--        android:layout_marginEnd="8dp"-->
+    <!--        android:layout_marginBottom="8dp"-->
+    <!--        android:background="?attr/selectableItemBackground"-->
+    <!--        android:text=""-->
+    <!--        android:visibility="invisible"-->
+    <!--        app:layout_constraintBottom_toTopOf="@+id/monsoon_now_gl5"-->
+    <!--        app:layout_constraintEnd_toStartOf="@+id/monsoon_now_gl1"-->
+    <!--        app:layout_constraintStart_toStartOf="@+id/monsoon_now_gl2"-->
+    <!--        app:layout_constraintTop_toTopOf="@+id/monsoon_now_gl4"/>-->
+
+    <!--    <Button-->
+    <!--        android:id="@+id/monsoon_ctrl_custom3"-->
+    <!--        android:layout_width="wrap_content"-->
+    <!--        android:layout_height="wrap_content"-->
+    <!--        android:layout_marginStart="8dp"-->
+    <!--        android:layout_marginTop="8dp"-->
+    <!--        android:layout_marginEnd="8dp"-->
+    <!--        android:layout_marginBottom="8dp"-->
+    <!--        android:background="?attr/selectableItemBackground"-->
+    <!--        android:text=""-->
+    <!--        android:visibility="invisible"-->
+    <!--        app:layout_constraintBottom_toTopOf="@+id/monsoon_now_gl5"-->
+    <!--        app:layout_constraintEnd_toStartOf="@+id/monsoon_now_gl3"-->
+    <!--        app:layout_constraintStart_toStartOf="@+id/monsoon_now_gl1"-->
+    <!--        app:layout_constraintTop_toTopOf="@+id/monsoon_now_gl4"/>-->
+
+    <!--    <Button-->
+    <!--        android:id="@+id/monsoon_ctrl_custom4"-->
+    <!--        android:layout_width="wrap_content"-->
+    <!--        android:layout_height="wrap_content"-->
+    <!--        android:layout_marginStart="8dp"-->
+    <!--        android:layout_marginTop="8dp"-->
+    <!--        android:layout_marginEnd="8dp"-->
+    <!--        android:layout_marginBottom="8dp"-->
+    <!--        android:background="?attr/selectableItemBackground"-->
+    <!--        android:text=""-->
+    <!--        android:visibility="invisible"-->
+    <!--        app:layout_constraintBottom_toTopOf="@+id/monsoon_now_gl5"-->
+    <!--        app:layout_constraintEnd_toEndOf="parent"-->
+    <!--        app:layout_constraintStart_toStartOf="@+id/monsoon_now_gl3"-->
+    <!--        app:layout_constraintTop_toTopOf="@+id/monsoon_now_gl4"/>-->
+
+    <!--    <Button-->
+    <!--        android:id="@+id/monsoon_ctrl_custom5"-->
+    <!--        android:layout_width="wrap_content"-->
+    <!--        android:layout_height="wrap_content"-->
+    <!--        android:layout_marginStart="8dp"-->
+    <!--        android:layout_marginTop="8dp"-->
+    <!--        android:layout_marginEnd="8dp"-->
+    <!--        android:layout_marginBottom="8dp"-->
+    <!--        android:background="?attr/selectableItemBackground"-->
+    <!--        android:text=""-->
+    <!--        android:visibility="invisible"-->
+    <!--        app:layout_constraintBottom_toTopOf="@+id/monsoon_now_gl6"-->
+    <!--        app:layout_constraintEnd_toStartOf="@+id/monsoon_now_gl2"-->
+    <!--        app:layout_constraintStart_toStartOf="parent"-->
+    <!--        app:layout_constraintTop_toTopOf="@+id/monsoon_now_gl5"/>-->
+
+    <!--    <Button-->
+    <!--        android:id="@+id/monsoon_ctrl_custom6"-->
+    <!--        android:layout_width="wrap_content"-->
+    <!--        android:layout_height="wrap_content"-->
+    <!--        android:layout_marginStart="8dp"-->
+    <!--        android:layout_marginTop="8dp"-->
+    <!--        android:layout_marginEnd="8dp"-->
+    <!--        android:layout_marginBottom="8dp"-->
+    <!--        android:background="?attr/selectableItemBackground"-->
+    <!--        android:text=""-->
+    <!--        android:visibility="invisible"-->
+    <!--        app:layout_constraintBottom_toTopOf="@+id/monsoon_now_gl6"-->
+    <!--        app:layout_constraintEnd_toStartOf="@+id/monsoon_now_gl1"-->
+    <!--        app:layout_constraintHorizontal_bias="0.0"-->
+    <!--        app:layout_constraintStart_toStartOf="@+id/monsoon_now_gl2"-->
+    <!--        app:layout_constraintTop_toTopOf="@+id/monsoon_now_gl5"/>-->
+
+    <!--    <Button-->
+    <!--        android:id="@+id/monsoon_ctrl_custom7"-->
+    <!--        android:layout_width="wrap_content"-->
+    <!--        android:layout_height="wrap_content"-->
+    <!--        android:layout_marginStart="8dp"-->
+    <!--        android:layout_marginTop="8dp"-->
+    <!--        android:layout_marginEnd="8dp"-->
+    <!--        android:layout_marginBottom="8dp"-->
+    <!--        android:background="?attr/selectableItemBackground"-->
+    <!--        android:text=""-->
+    <!--        android:visibility="invisible"-->
+    <!--        app:layout_constraintBottom_toTopOf="@+id/monsoon_now_gl6"-->
+    <!--        app:layout_constraintEnd_toStartOf="@+id/monsoon_now_gl3"-->
+    <!--        app:layout_constraintStart_toStartOf="@+id/monsoon_now_gl1"-->
+    <!--        app:layout_constraintTop_toTopOf="@+id/monsoon_now_gl5"/>-->
+
+    <!--    <Button-->
+    <!--        android:id="@+id/monsoon_ctrl_custom8"-->
+    <!--        android:layout_width="wrap_content"-->
+    <!--        android:layout_height="wrap_content"-->
+    <!--        android:layout_marginStart="8dp"-->
+    <!--        android:layout_marginTop="8dp"-->
+    <!--        android:layout_marginEnd="8dp"-->
+    <!--        android:layout_marginBottom="8dp"-->
+    <!--        android:background="?attr/selectableItemBackground"-->
+    <!--        android:text=""-->
+    <!--        android:visibility="invisible"-->
+    <!--        app:layout_constraintBottom_toTopOf="@+id/monsoon_now_gl6"-->
+    <!--        app:layout_constraintEnd_toEndOf="parent"-->
+    <!--        app:layout_constraintStart_toStartOf="@+id/monsoon_now_gl3"-->
+    <!--        app:layout_constraintTop_toTopOf="@+id/monsoon_now_gl5"/>-->
+
+    <!--    <android.support.constraint.Guideline-->
+    <!--        android:id="@+id/monsoon_now_gl6"-->
+    <!--        android:layout_width="wrap_content"-->
+    <!--        android:layout_height="wrap_content"-->
+    <!--        android:orientation="horizontal"-->
+    <!--        app:layout_constraintGuide_percent="0.85" />-->
+
+    <!--    <TextView-->
+    <!--        android:id="@+id/monsoon_key"-->
+    <!--        android:layout_width="wrap_content"-->
+    <!--        android:layout_height="wrap_content"-->
+    <!--        android:layout_marginStart="8dp"-->
+    <!--        android:layout_marginEnd="8dp"-->
+    <!--        android:layout_marginBottom="8dp"-->
+    <!--        android:padding="8dp"-->
+    <!--        android:textSize="16sp"-->
+    <!--        app:layout_constraintBottom_toBottomOf="parent"-->
+    <!--        app:layout_constraintEnd_toEndOf="parent"-->
+    <!--        app:layout_constraintStart_toStartOf="parent" />-->
+
+    <!--    <ImageView-->
+    <!--        android:id="@+id/monsoon_ctrl_status"-->
+    <!--        android:layout_width="wrap_content"-->
+    <!--        android:layout_height="wrap_content"-->
+    <!--        android:layout_marginTop="16dp"-->
+    <!--        app:layout_constraintEnd_toEndOf="parent"-->
+    <!--        app:layout_constraintStart_toStartOf="parent"-->
+    <!--        app:layout_constraintTop_toTopOf="parent"-->
+    <!--        app:srcCompat="@mipmap/ic_monsoon_turnoff" />-->
+
+    <!--    <TextView-->
+    <!--        android:id="@+id/monsoon_ctrl_period"-->
+    <!--        android:layout_width="wrap_content"-->
+    <!--        android:layout_height="wrap_content"-->
+    <!--        android:layout_marginStart="8dp"-->
+    <!--        android:layout_marginTop="8dp"-->
+    <!--        android:layout_marginEnd="8dp"-->
+    <!--        android:text=""-->
+    <!--        app:layout_constraintEnd_toEndOf="parent"-->
+    <!--        app:layout_constraintStart_toStartOf="parent"-->
+    <!--        app:layout_constraintTop_toBottomOf="@+id/monsoon_ctrl_status" />-->
+
+    <!--    <CheckedTextView-->
+    <!--        android:id="@+id/monsoon_ctrl_turn"-->
+    <!--        style="@android:style/Widget.DeviceDefault.Button.Toggle"-->
+    <!--        android:layout_width="0dp"-->
+    <!--        android:layout_height="wrap_content"-->
+    <!--        android:layout_marginStart="8dp"-->
+    <!--        android:layout_marginTop="8dp"-->
+    <!--        android:layout_marginEnd="8dp"-->
+    <!--        android:layout_marginBottom="8dp"-->
+    <!--        android:text=""-->
+    <!--        android:textAlignment="center"-->
+    <!--        app:layout_constraintBottom_toTopOf="@+id/monsoon_now_gl4"-->
+    <!--        app:layout_constraintEnd_toStartOf="@+id/monsoon_now_gl3"-->
+    <!--        app:layout_constraintHorizontal_bias="1.0"-->
+    <!--        app:layout_constraintStart_toStartOf="@+id/monsoon_now_gl2"-->
+    <!--        app:layout_constraintTop_toBottomOf="@+id/monsoon_ctrl_period" />-->
+
+    <!--</android.support.constraint.ConstraintLayout>-->

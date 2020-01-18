@@ -107,6 +107,10 @@ public class DeviceViewModel<T extends Device> extends BaseViewModel<T> {
         setDeviceDatapoint(getData().setSyncDatetime());
     }
 
+    public void setDaytime(int start, int end) {
+        setDeviceDatapoints(getData().setDaytime(start, end));
+    }
+
     public void getDatapoints() {
         XlinkCloudManager.getInstance().getDeviceDatapoints(getData().getXDevice(), mGetCallback);
     }

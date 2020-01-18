@@ -12,6 +12,10 @@ public class SocketViewModel extends DeviceViewModel<EXOSocket> {
         setApplicationSetDatapoint(getData().setConnectDevice(devname));
     }
 
+    public void setMode(byte mode) {
+        setDeviceDatapoint(getData().setMode(mode));
+    }
+
     public void setPower(boolean power) {
         setDeviceDatapoint(getData().setPower(power));
     }
@@ -46,5 +50,21 @@ public class SocketViewModel extends DeviceViewModel<EXOSocket> {
 
     public void setSensor2Args(byte[] args) {
 //        setDeviceDatapoints(getData().setSV2LinkageArgs(args));
+    }
+
+    public void setSensor1DayThreshold(int value) {
+        setDeviceDatapoint(getData().setSV1DayThreshold(value));
+    }
+
+    public void setSensor1NightThreshold(int value) {
+        setDeviceDatapoint(getData().setSV1NightThreshold(value));
+    }
+
+    public void setSensor2DayThreshold(int value) {
+        setDeviceDatapoint(getData().setSV2DayThreshold(value));
+    }
+
+    public void setSensor2NightThreshold(int value) {
+        setDeviceDatapoint(getData().setSV2NightThreshold(value));
     }
 }

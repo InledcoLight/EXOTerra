@@ -60,7 +60,7 @@ public class DeviceManager {
             } else if (TextUtils.equals(pid, XlinkConstants.PRODUCT_ID_SOCKET)) {
                 mSubcribedDevices.put(key, new EXOSocket(xDevice));
             } else if (TextUtils.equals(pid, XlinkConstants.PRODUCT_ID_MONSOON)) {
-                mSubcribedDevices.put(pid, new EXOMonsoon(xDevice));
+                mSubcribedDevices.put(key, new EXOMonsoon(xDevice));
             }
         }
     }

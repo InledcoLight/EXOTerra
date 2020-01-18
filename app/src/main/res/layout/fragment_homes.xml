@@ -46,5 +46,5 @@
         android:clickable="true"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:srcCompat="@drawable/ic_add_white_64dp" />
+        app:srcCompat="@drawable/ic_add_white_48dp" />
 </android.support.constraint.ConstraintLayout>

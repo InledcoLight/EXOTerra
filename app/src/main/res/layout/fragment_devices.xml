@@ -6,42 +6,56 @@
                                              android:layout_width="match_parent"
                                              android:layout_height="match_parent">
 
-    <android.support.v7.widget.Toolbar
-        android:id="@+id/devices_toolbar"
-        android:layout_width="0dp"
+    <FrameLayout
+        android:id="@+id/frameLayout"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:minHeight="?attr/actionBarSize"
-        android:theme="?attr/actionBarTheme"
-        android:gravity="center_horizontal"
+        android:layout_marginBottom="8dp"
+        android:background="@drawable/shape_round_white_2dp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-        <TextView
+        app:layout_constraintStart_toStartOf="parent">
+
+        <ImageButton
+            android:id="@+id/devices_ib_add"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:text="@string/devices"
-            android:textSize="@dimen/textSizeTitle"
-            android:textColor="@color/textColorPrimary"/>
-    </android.support.v7.widget.Toolbar>
+            android:background="?attr/selectableItemBackground"
+            app:srcCompat="@drawable/ic_add_white_48dp" />
+    </FrameLayout>
+
 
     <android.support.v4.widget.SwipeRefreshLayout
         android:id="@+id/devices_swipe_refresh"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginLeft="16dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintBottom_toTopOf="@+id/frameLayout"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/devices_toolbar">
+        app:layout_constraintTop_toTopOf="parent">
 
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/devices_rv_show"
+        <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical"
-            app:layoutManager="android.support.v7.widget.LinearLayoutManager"/>
+            android:layout_height="match_parent">
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/devices_rv_show"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                app:layoutManager="android.support.v7.widget.LinearLayoutManager" />
+            <include
+                android:id="@+id/devices_warning"
+                layout="@layout/layout_warning"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                android:layout_gravity="center"/>
+        </FrameLayout>
     </android.support.v4.widget.SwipeRefreshLayout>
-
-
 
 </android.support.constraint.ConstraintLayout>

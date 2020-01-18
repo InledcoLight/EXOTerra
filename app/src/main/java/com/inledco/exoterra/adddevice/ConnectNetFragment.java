@@ -42,6 +42,7 @@ public class ConnectNetFragment extends BaseFragment {
     private AdvancedTextInputEditText connect_net_password;
     private Button connect_net_smartconfig;
     private Button connect_net_apconfig;
+    private Button connect_net_back;
 
     private WifiHelper mWifiHelper;
     private ConnectNetViewModel mConnectNetViewModel;
@@ -106,6 +107,7 @@ public class ConnectNetFragment extends BaseFragment {
         connect_net_password = view.findViewById(R.id.connect_net_password);
         connect_net_smartconfig = view.findViewById(R.id.connect_net_smartconfig);
         connect_net_apconfig = view.findViewById(R.id.connect_net_apconfig);
+        connect_net_back = view.findViewById(R.id.connect_net_back);
 
         connect_net_router.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_router_white_24dp, 0, R.drawable.ic_search_white_24dp, 0);
         connect_net_password.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_lock_white_24dp, 0, R.drawable.design_ic_visibility_off, 0);
@@ -171,6 +173,13 @@ public class ConnectNetFragment extends BaseFragment {
                 mConnectNetViewModel.getData().setPassword(getPassword());
                 mConnectNetViewModel.getData().setCompatibleMode(true);
                 addFragmentToStack(R.id.adddevice_fl, new ConfigGuideFragment());
+            }
+        });
+
+        connect_net_back.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getActivity().onBackPressed();
             }
         });
     }

@@ -1,6 +1,7 @@
 package com.inledco.exoterra.device;
 
 import android.annotation.SuppressLint;
+import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -8,36 +9,41 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.design.widget.CheckableImageButton;
 import android.support.design.widget.TextInputEditText;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.inledco.exoterra.AppConstants;
 import com.inledco.exoterra.R;
 import com.inledco.exoterra.base.BaseActivity;
 import com.inledco.exoterra.bean.Device;
+import com.inledco.exoterra.bean.EXOSocket;
+import com.inledco.exoterra.bean.Home;
 import com.inledco.exoterra.device.Monsoon.MonsoonFragment;
+import com.inledco.exoterra.device.Monsoon.MonsoonPowerFragment;
 import com.inledco.exoterra.device.Monsoon.MonsoonViewModel;
 import com.inledco.exoterra.device.detail.DeviceDetailFragment;
 import com.inledco.exoterra.device.light.LightFragment;
+import com.inledco.exoterra.device.light.LightPowerFragment;
 import com.inledco.exoterra.device.light.LightViewModel;
 import com.inledco.exoterra.device.socket.SocketFragment;
+import com.inledco.exoterra.device.socket.SocketPowerFragment;
 import com.inledco.exoterra.device.socket.SocketViewModel;
 import com.inledco.exoterra.event.DatapointChangedEvent;
 import com.inledco.exoterra.event.DevicePropertyChangedEvent;
 import com.inledco.exoterra.event.DeviceStateChangedEvent;
 import com.inledco.exoterra.manager.DeviceManager;
+import com.inledco.exoterra.manager.HomeManager;
 import com.inledco.exoterra.util.DeviceUtil;
 import com.inledco.exoterra.util.RegexUtil;
 import com.inledco.exoterra.xlink.XlinkCloudManager;
@@ -60,20 +66,23 @@ import cn.xlink.sdk.v5.model.XDevice;
 import cn.xlink.sdk.v5.module.main.XLinkSDK;
 
 public class DeviceActivity extends BaseActivity {
-    private Toolbar device_toolbar;
-    private CheckableImageButton device_cib_cloud;
-    private CheckableImageButton device_cib_wifi;
+    private ImageView device_icon;
+    private TextView device_name;
+    private ImageButton device_detail;
+    private TextView device_habitat_name;
+    private ImageView device_status_local;
+    private ImageView device_status_cloud;
+    private ImageView device_status_sensor;
 
     private Device mDevice;
     private DeviceViewModel mDeviceViewModel;
     private DeviceBaseViewModel mDeviceBaseViewModel;
 
+    private Fragment mPowerFragment;
     private Fragment mDeviceFragment;
 
     private XlinkTaskCallback<XDevice> mSetCallback;
     private XlinkTaskCallback<List<XLinkDataPoint>> mGetCallback;
-
-    private boolean syncDatetime;
 
     private final Handler mHandler = new Handler();
 
@@ -98,36 +107,6 @@ public class DeviceActivity extends BaseActivity {
         }
     }
 
-    @SuppressLint ("RestrictedApi")
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_device, menu);
-        View view = menu.findItem(R.id.menu_device_status).getActionView();
-        device_cib_cloud = view.findViewById(R.id.device_cib_cloud);
-        device_cib_wifi = view.findViewById(R.id.device_cib_wifi);
-        if (mDevice != null) {
-            device_cib_cloud.setChecked(mDevice.getXDevice().getCloudConnectionState() == XDevice.State.CONNECTED ? true : false);
-            device_cib_wifi.setChecked(mDevice.getXDevice().getLocalConnectionState() == XDevice.State.CONNECTED ? true : false);
-        }
-        MenuItem device_share = menu.findItem(R.id.menu_device_share);
-        MenuItem device_detail = menu.findItem(R.id.menu_device_detail);
-        device_share.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                showShareDeviceDialog();
-                return true;
-            }
-        });
-        device_detail.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                addFragmentToStack(R.id.device_root, new DeviceDetailFragment());
-                return true;
-            }
-        });
-        return super.onCreateOptionsMenu(menu);
-    }
-
     @Override
     protected int getLayoutRes() {
         return R.layout.activity_device;
@@ -135,8 +114,13 @@ public class DeviceActivity extends BaseActivity {
 
     @Override
     protected void initView() {
-        device_toolbar = findViewById(R.id.device_toolbar);
-        setSupportActionBar(device_toolbar);
+        device_icon = findViewById(R.id.device_icon);
+        device_name = findViewById(R.id.device_name);
+        device_detail = findViewById(R.id.device_detail);
+        device_habitat_name = findViewById(R.id.device_habitat_name);
+        device_status_local = findViewById(R.id.device_status_local);
+        device_status_cloud = findViewById(R.id.device_status_cloud);
+        device_status_sensor = findViewById(R.id.device_status_sensor);
     }
 
     @Override
@@ -154,8 +138,14 @@ public class DeviceActivity extends BaseActivity {
 
         final String pid = mDevice.getXDevice().getProductId();
         final String name = mDevice.getXDevice().getDeviceName();
-        device_toolbar.setTitle(TextUtils.isEmpty(name) ? DeviceUtil.getDefaultName(pid) : name);
-        setSupportActionBar(device_toolbar);
+        final Home home = HomeManager.getInstance().getDeviceHome(mDevice);
+        device_icon.setImageResource(DeviceUtil.getProductIconSmall(pid));
+        device_name.setText(TextUtils.isEmpty(name) ? DeviceUtil.getDefaultName(pid) : name);
+        if (home != null) {
+            device_habitat_name.setText(home.getHome().name);
+        }
+        device_status_local.setImageResource(mDevice.getXDevice().getLocalConnectionState() == XDevice.State.CONNECTED ? R.drawable.ic_wifi_on : R.drawable.ic_wifi);
+        device_status_cloud.setImageResource(mDevice.getXDevice().getCloudConnectionState() == XDevice.State.CONNECTED ? R.drawable.ic_cloud_green_16dp : R.drawable.ic_cloud_grey_16dp);
 
         mDeviceBaseViewModel = ViewModelProviders.of(this).get(DeviceBaseViewModel.class);
         mDeviceBaseViewModel.setData(mDevice);
@@ -166,14 +156,27 @@ public class DeviceActivity extends BaseActivity {
         if (TextUtils.equals(pid, XlinkConstants.PRODUCT_ID_LEDSTRIP)) {
             mDeviceViewModel = ViewModelProviders.of(DeviceActivity.this).get(LightViewModel.class);
             mDeviceViewModel.setData(mDevice);
+            mPowerFragment = new LightPowerFragment();
             mDeviceFragment = new LightFragment();
         } else if (TextUtils.equals(pid, XlinkConstants.PRODUCT_ID_MONSOON)) {
             mDeviceViewModel = ViewModelProviders.of(DeviceActivity.this).get(MonsoonViewModel.class);
             mDeviceViewModel.setData(mDevice);
+            mPowerFragment = new MonsoonPowerFragment();
             mDeviceFragment = new MonsoonFragment();
         } else if (TextUtils.equals(pid, XlinkConstants.PRODUCT_ID_SOCKET)) {
             mDeviceViewModel = ViewModelProviders.of(DeviceActivity.this).get(SocketViewModel.class);
             mDeviceViewModel.setData(mDevice);
+            mDeviceViewModel.observe(this, new Observer() {
+                @Override
+                public void onChanged(@Nullable Object o) {
+                    EXOSocket exoSocket = (EXOSocket) mDevice;
+                    device_status_sensor.setImageResource(exoSocket.getS1Available() ? R.drawable.ic_sensor_on : R.drawable.ic_sensor);
+                }
+            });
+            EXOSocket socket = (EXOSocket) mDevice;
+            device_status_sensor.setVisibility(View.VISIBLE);
+            device_status_sensor.setImageResource(socket.getS1Available() ? R.drawable.ic_sensor_on : R.drawable.ic_sensor);
+            mPowerFragment = new SocketPowerFragment();
             mDeviceFragment = new SocketFragment();
         } else {
             throw new RuntimeException("Invalid ProductID.");
@@ -206,13 +209,16 @@ public class DeviceActivity extends BaseActivity {
                 });
                 mDevice.setDataPointList(dataPoints);
 
-                StringBuilder sb = new StringBuilder();
-                for (XLinkDataPoint dp : dataPoints) {
-                    sb.append(dp.toString()).append("\n");
-                }
-                Log.e(TAG, "onComplete: " + "    " + sb);
+//                StringBuilder sb = new StringBuilder();
+//                for (XLinkDataPoint dp : dataPoints) {
+//                    sb.append(dp.toString()).append("\n");
+//                }
+//                Log.e(TAG, "onComplete: " + "    " + sb);
                 mDeviceBaseViewModel.postValue();
                 mDeviceViewModel.postValue();
+                if (mPowerFragment != null) {
+                    replaceFragment(R.id.device_fl_power, mPowerFragment);
+                }
                 replaceFragment(R.id.device_fl_show, mDeviceFragment);
 
                 if (!XLinkUserManager.getInstance().isUserAuthorized()) {
@@ -275,10 +281,10 @@ public class DeviceActivity extends BaseActivity {
 
     @Override
     protected void initEvent() {
-        device_toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+        device_detail.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                onBackPressed();
+                addFragmentToStack(R.id.device_root, new DeviceDetailFragment());
             }
         });
     }
@@ -289,15 +295,15 @@ public class DeviceActivity extends BaseActivity {
         Log.e(TAG, "onDeviceStateChangedEvent: ");
         if (event != null && mDevice != null
             && TextUtils.equals(event.getDeviceTag(), mDevice.getDeviceTag())) {
-            device_cib_cloud.setChecked(mDevice.getXDevice().getCloudConnectionState() == XDevice.State.CONNECTED ? true : false);
-            device_cib_wifi.setChecked(mDevice.getXDevice().getLocalConnectionState() == XDevice.State.CONNECTED ? true : false);
+            device_status_local.setImageResource(mDevice.getXDevice().getLocalConnectionState() == XDevice.State.CONNECTED ? R.drawable.ic_wifi_on : R.drawable.ic_wifi);
+            device_status_cloud.setImageResource(mDevice.getXDevice().getCloudConnectionState() == XDevice.State.CONNECTED ? R.drawable.ic_cloud_green_16dp : R.drawable.ic_cloud_grey_16dp);
         }
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onDevicePropertyChangedEvent(DevicePropertyChangedEvent event) {
         if (event != null && mDevice != null && mDevice.getXDevice().getDeviceId() == event.getDeviceId()) {
-            device_toolbar.setTitle(event.getDeviceName());
+            device_name.setText(event.getDeviceName());
         }
     }
 

@@ -6,7 +6,7 @@
 
     <color name="mtrl_textinput_default_box_stroke_color" tools:override="true">#FFFFFF</color>
 
-    <color name="gradientYellow">#FFD7CC05</color>
+    <color name="gradientYellow">#FFD7Df23</color>
     <color name="gradientGreen">#FF61A33E</color>
     <color name="gradientWhite">#FFDEE4E8</color>
 

@@ -101,8 +101,8 @@ public class MultiPointSeekbar extends View {
         mThumbColor = a.getColor(R.styleable.MultiPointSeekbar_thumbColor, Color.WHITE);
         mSelectedThumbColor = a.getColor(R.styleable.MultiPointSeekbar_selectedThumbColor, getResources().getColor(R.color.colorAccent));
         mLineColor = a.getColor(R.styleable.MultiPointSeekbar_lineColor, Color.WHITE);
-        mMax = a.getInt(R.styleable.MultiPointSeekbar_maximum, 100);
-        mMin = a.getInt(R.styleable.MultiPointSeekbar_minimum, 0);
+        mMax = a.getInt(R.styleable.MultiPointSeekbar_max, 100);
+        mMin = a.getInt(R.styleable.MultiPointSeekbar_min, 0);
         mThumb = a.getDrawable(R.styleable.MultiPointSeekbar_thumbDrawable);
         mSelectedThumb = a.getDrawable(R.styleable.MultiPointSeekbar_selectedThumDrawable);
         mHintBackgroundColor = a.getColor(R.styleable.MultiPointSeekbar_hintBackgroundColor, getResources().getColor(R.color.colorAccent));

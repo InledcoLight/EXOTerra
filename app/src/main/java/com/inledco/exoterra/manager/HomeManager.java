@@ -3,6 +3,7 @@ package com.inledco.exoterra.manager;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.inledco.exoterra.bean.Device;
 import com.inledco.exoterra.bean.Home;
@@ -208,6 +209,9 @@ public class HomeManager {
     }
 
     public void refreshHomeDevices(final Home home) {
+        if (home == null) {
+            return;
+        }
         final String homeid = home.getHome().id;
         XlinkCloudManager.getInstance().getHomeDeviceList(homeid, new XlinkRequestCallback<HomeApi.HomeDevicesResponse>() {
             @Override
@@ -217,6 +221,7 @@ public class HomeManager {
 
             @Override
             public void onSuccess(HomeApi.HomeDevicesResponse response) {
+                Log.e(TAG, "onSuccess: " + response.count);
                 home.setDevices(response.list);
                 EventBus.getDefault().post(new HomeDeviceChangedEvent(homeid));
             }
@@ -225,9 +230,6 @@ public class HomeManager {
 
     public void refreshHomeDevices(final String homeid) {
         final Home home = getHome(homeid);
-        if (home == null) {
-            return;
-        }
         refreshHomeDevices(home);
     }
 

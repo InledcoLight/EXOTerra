@@ -6,8 +6,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.widget.Toolbar;
-import android.view.View;
 
 import com.inledco.exoterra.AppConstants;
 import com.inledco.exoterra.R;
@@ -15,7 +13,7 @@ import com.inledco.exoterra.base.BaseActivity;
 
 public class AddDeviceActivity extends BaseActivity {
 
-    private Toolbar adddevice_toolbar;
+//    private Toolbar adddevice_toolbar;
 
     private ConnectNetBean mConnectNetBean;
     private ConnectNetViewModel mConnectNetViewModel;
@@ -35,9 +33,9 @@ public class AddDeviceActivity extends BaseActivity {
 
     @Override
     protected void initView() {
-        adddevice_toolbar = findViewById(R.id.adddevice_toolbar);
-
-        setSupportActionBar(adddevice_toolbar);
+//        adddevice_toolbar = findViewById(R.id.adddevice_toolbar);
+//
+//        setSupportActionBar(adddevice_toolbar);
     }
 
     @Override
@@ -55,12 +53,12 @@ public class AddDeviceActivity extends BaseActivity {
 
     @Override
     protected void initEvent() {
-        adddevice_toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onBackPressed();
-            }
-        });
+//        adddevice_toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                onBackPressed();
+//            }
+//        });
     }
 
     @Override

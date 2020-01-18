@@ -7,9 +7,7 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -19,6 +17,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.NumberPicker;
 import android.widget.RadioButton;
@@ -42,7 +41,7 @@ import java.util.List;
 public class SocketTimersFragment extends BaseFragment {
 
     private RecyclerView socket_timers_rv;
-    private FloatingActionButton socket_timers_add;
+    private ImageButton socket_timers_add;
 
     private SocketViewModel mSocketViewModel;
     private EXOSocket mSocket;
@@ -68,7 +67,6 @@ public class SocketTimersFragment extends BaseFragment {
     protected void initView(View view) {
         socket_timers_rv = view.findViewById(R.id.socket_timers_rv);
         socket_timers_add = view.findViewById(R.id.socket_timers_add);
-        socket_timers_rv.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL));
     }
 
     @Override
@@ -334,6 +332,7 @@ public class SocketTimersFragment extends BaseFragment {
             np_second.setOnValueChangedListener(new NumberPicker.OnValueChangeListener() {
                 @Override
                 public void onValueChange(NumberPicker picker, int oldVal, int newVal) {
+                    Log.e(TAG, "onValueChange: " + oldVal + " " + newVal);
                     if (oldVal == np_second.getMinValue() && newVal == np_second.getMaxValue()) {
                         if (np_minute.getValue() == np_minute.getMinValue()) {
                             np_minute.setValue(np_minute.getMaxValue());

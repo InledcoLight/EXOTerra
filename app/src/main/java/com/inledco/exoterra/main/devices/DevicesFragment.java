@@ -5,14 +5,13 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
+import android.widget.TextView;
 
 import com.inledco.exoterra.R;
 import com.inledco.exoterra.adddevice.AddDeviceActivity;
@@ -23,6 +22,7 @@ import com.inledco.exoterra.device.DeviceActivity;
 import com.inledco.exoterra.event.DatapointChangedEvent;
 import com.inledco.exoterra.event.DeviceStateChangedEvent;
 import com.inledco.exoterra.event.DevicesRefreshedEvent;
+import com.inledco.exoterra.event.HomesRefreshedEvent;
 import com.inledco.exoterra.manager.DeviceManager;
 import com.inledco.exoterra.scan.ScanActivity;
 import com.inledco.exoterra.smartconfig.SmartconfigActivity;
@@ -35,9 +35,11 @@ import org.greenrobot.eventbus.ThreadMode;
 import java.util.List;
 
 public class DevicesFragment extends BaseFragment {
-    private Toolbar devices_toolbar;
     private SwipeRefreshLayout devices_swipe_refresh;
+    private View devices_warning;
+    private TextView warning_tv_msg;
     private RecyclerView devices_rv_show;
+    private ImageButton devices_ib_add;
 
     private final List<Device> mDevices = DeviceManager.getInstance().getAllDevices();
     private DevicesAdapter mAdapter;
@@ -71,12 +73,13 @@ public class DevicesFragment extends BaseFragment {
 
     @Override
     protected void initView(View view) {
-        devices_toolbar = view.findViewById(R.id.devices_toolbar);
         devices_swipe_refresh = view.findViewById(R.id.devices_swipe_refresh);
+        devices_warning = view.findViewById(R.id.devices_warning);
+        warning_tv_msg = view.findViewById(R.id.warning_tv_msg);
         devices_rv_show = view.findViewById(R.id.devices_rv_show);
+        devices_ib_add = view.findViewById(R.id.devices_ib_add);
 
-        devices_toolbar.inflateMenu(R.menu.menu_devices);
-        devices_rv_show.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL));
+        warning_tv_msg.setText(R.string.no_device_warning);
     }
 
     @Override
@@ -97,35 +100,49 @@ public class DevicesFragment extends BaseFragment {
 
     @Override
     protected void initEvent() {
-        devices_toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem menuItem) {
-                switch (menuItem.getItemId()) {
-                    case R.id.menu_devices_smartconfig:
-                        startSmartconfigActivity();
-                        break;
-                    case R.id.menu_devices_scan:
-                        startScanActivity();
-                        break;
-                    case R.id.menu_devices_add:
-                        startAdddeviceActivity();
-                        break;
-                }
-                return true;
-            }
-        });
+//        devices_toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
+//            @Override
+//            public boolean onMenuItemClick(MenuItem menuItem) {
+//                switch (menuItem.getItemId()) {
+//                    case R.id.menu_devices_smartconfig:
+//                        startSmartconfigActivity();
+//                        break;
+//                    case R.id.menu_devices_scan:
+//                        startScanActivity();
+//                        break;
+//                    case R.id.menu_devices_add:
+//                        startAdddeviceActivity();
+//                        break;
+//                }
+//                return true;
+//            }
+//        });
         devices_swipe_refresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
                 refreshDevices();
             }
         });
+
+        devices_ib_add.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startAdddeviceActivity();
+//                startScanActivity();
+            }
+        });
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onHomesRefreshedEvent(HomesRefreshedEvent event) {
+        mAdapter.notifyDataSetChanged();
     }
 
     @Subscribe (threadMode = ThreadMode.MAIN)
     public void onDevicesRefreshedEvent(DevicesRefreshedEvent event) {
-        mAdapter.notifyDataSetChanged();
         devices_swipe_refresh.setRefreshing(false);
+        devices_warning.setVisibility(mDevices.size() == 0 ? View.VISIBLE : View.GONE);
+        mAdapter.notifyDataSetChanged();
     }
 
     @Subscribe (threadMode = ThreadMode.MAIN)

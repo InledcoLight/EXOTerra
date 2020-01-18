@@ -11,17 +11,15 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.github.lzyzsd.circleprogress.DonutProgress;
 import com.inledco.exoterra.R;
 import com.inledco.exoterra.base.BaseFragment;
-import com.inledco.exoterra.event.SubscribeChangedEvent;
 import com.inledco.exoterra.util.DeviceUtil;
 import com.inledco.exoterra.util.RouterUtil;
-
-import org.greenrobot.eventbus.EventBus;
+import com.inledco.exoterra.view.CircleSeekbar;
 
 import cn.xlink.sdk.v5.manager.XLinkUserManager;
 
@@ -29,18 +27,16 @@ public class SmartConfigFragment extends BaseFragment {
 
     private ImageView netconfig_prdt;
     private TextView netconfig_title;
-    private DonutProgress netconfig_pb;
-//    private CheckableImageButton smart_config_cib_step1;
-//    private CheckableImageButton smart_config_cib_step2;
-//    private CheckableImageButton smart_config_cib_step3;
-//    private CheckableImageButton smart_config_cib_step4;
+    private CircleSeekbar netconfig_csb;
+    private TextView netconfig_progress;
+    private Button netconfig_back;
 
     private SmartConfigLinker mSmartConfigLinker;
     private SmartConfigListener mSmartConfigListener = new SmartConfigListener() {
         @Override
         public void onProgressUpdate(final int progress) {
-            netconfig_pb.setProgress(progress);
-            netconfig_pb.setText("" + progress + " %");
+            netconfig_csb.setProgress(progress);
+            netconfig_progress.setText("" + progress + " %");
         }
 
         @Override
@@ -57,28 +53,26 @@ public class SmartConfigFragment extends BaseFragment {
             mConnectNetViewModel.getData().setResultDevid(devid);
             mConnectNetViewModel.getData().setResultAddress(mac);
             mConnectNetViewModel.postValue();
-//            smart_config_cib_step4.setChecked(true);
-//            showSmartConfigSuccessDialog();
-            addFragmentToStack(R.id.adddevice_fl, new ConfigDeviceFragment());
+            getActivity().getSupportFragmentManager().popBackStack(null, 1);
+            replaceFragment(R.id.adddevice_fl, new ConfigDeviceFragment());
         }
 
         @SuppressLint ("RestrictedApi")
         @Override
         public void onEsptouchSuccess() {
             RouterUtil.putRouterPassword(getContext(), mConnectNetViewModel.getData().getSsid(), mConnectNetViewModel.getData().getPassword());
-//            smart_config_cib_step1.setChecked(true);
         }
 
         @SuppressLint ("RestrictedApi")
         @Override
         public void onDeviceScanned() {
-//            smart_config_cib_step2.setChecked(true);
+
         }
 
         @SuppressLint ("RestrictedApi")
         @Override
         public void onDeviceInitialized() {
-//            smart_config_cib_step3.setChecked(true);
+
         }
     };
 
@@ -112,11 +106,9 @@ public class SmartConfigFragment extends BaseFragment {
     protected void initView(View view) {
         netconfig_prdt = view.findViewById(R.id.netconfig_prdt);
         netconfig_title = view.findViewById(R.id.netconfig_title);
-        netconfig_pb = view.findViewById(R.id.netconfig_pb);
-//        smart_config_cib_step1 = view.findViewById(R.id.smart_config_cib_step1);
-//        smart_config_cib_step2 = view.findViewById(R.id.smart_config_cib_step2);
-//        smart_config_cib_step3 = view.findViewById(R.id.smart_config_cib_step3);
-//        smart_config_cib_step4 = view.findViewById(R.id.smart_config_cib_step4);
+        netconfig_csb = view.findViewById(R.id.netconfig_csb);
+        netconfig_progress = view.findViewById(R.id.netconfig_progress);
+        netconfig_back = view.findViewById(R.id.netconfig_back);
     }
 
     @Override
@@ -142,36 +134,12 @@ public class SmartConfigFragment extends BaseFragment {
 
     @Override
     protected void initEvent() {
-//        smart_config_start.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-//            @SuppressLint ("RestrictedApi")
-//            @Override
-//            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-//                if (isChecked) {
-//                    smart_config_cib_step1.setChecked(false);
-//                    smart_config_cib_step2.setChecked(false);
-//                    smart_config_cib_step3.setChecked(false);
-//                    smart_config_cib_step4.setChecked(false);
-//                    mSmartConfigLinker.startTask();
-//                } else {
-//                    mSmartConfigLinker.stopTask();
-//                }
-//                mConnectNetViewModel.getData().setRunning(isChecked);
-//                mConnectNetViewModel.postValue();
-//            }
-//        });
-    }
-
-    private void showSmartConfigSuccessDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-        builder.setTitle("SmartConfig Success")
-               .setPositiveButton(R.string.close, new DialogInterface.OnClickListener() {
-                   @Override
-                   public void onClick(DialogInterface dialog, int which) {
-                       EventBus.getDefault().post(new SubscribeChangedEvent());
-                       getActivity().finish();
-                   }
-               })
-               .show();
+        netconfig_back.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getActivity().onBackPressed();
+            }
+        });
     }
 
     private void showSmartConfigFailedDialog(String error) {

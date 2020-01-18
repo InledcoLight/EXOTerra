@@ -32,16 +32,16 @@ public class UserManager {
         return mEmail;
     }
 
-    public static void setEmail(String mEmail) {
-        UserManager.mEmail = mEmail;
+    public static void setEmail(String email) {
+        mEmail = email;
     }
 
     public static String getNickname() {
         return mNickname;
     }
 
-    public static void setNickname(String mNickname) {
-        UserManager.mNickname = mNickname;
+    public static void setNickname(String nickname) {
+        mNickname = nickname;
     }
 
     public static void setAccount(Context context, String account) {

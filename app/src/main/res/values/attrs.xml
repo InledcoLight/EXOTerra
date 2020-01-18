@@ -1,11 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <attr name="min" format="integer"/>
+    <attr name="max" format="integer"/>
+    <attr name="progress" format="integer"/>
+
     <declare-styleable name="MultiCircleProgress">
         <attr name="circleCount" format="integer"/>
         <attr name="startAngle" format="integer"/>
         <attr name="sweepAngle" format="integer"/>
-        <attr name="progress" format="integer"/>
-        <attr name="max" format="integer"/>
+        <attr name="progress"/>
+        <attr name="max"/>
         <attr name="circleBackgroundColor" format="color|reference"/>
         <attr name="circleWidth" format="dimension|reference"/>
         <attr name="dividerWidth" format="dimension|reference"/>
@@ -21,18 +25,16 @@
         <attr name="lineColor" format="color|reference"/>
         <attr name="thumbDrawable" format="reference"/>
         <attr name="selectedThumDrawable" format="reference"/>
-        <attr name="thumbDrawableTint" format="integer"/>
-        <attr name="thumbDrawableTintMode" format="integer"/>
         <attr name="thumbColor" format="color|reference"/>
         <attr name="selectedThumbColor" format="color|reference"/>
-        <attr name="maximum" format="integer"/>
-        <attr name="minimum" format="integer"/>
+        <attr name="max"/>
+        <attr name="min"/>
         <attr name="showHint" format="boolean"/>
         <attr name="hintBackgroundColor" format="color|reference"/>
         <attr name="maxLengthHint" format="string|reference"/>
-        <attr name="hintSize" format="dimension"/>
+        <attr name="hintSize" format="dimension|reference"/>
         <attr name="hintColor" format="color|reference"/>
-        <attr name="hintPadding" format="dimension"/>
+        <attr name="hintPadding" format="dimension|reference"/>
     </declare-styleable>
 
     <declare-styleable name="CustomTimePicker">
@@ -68,17 +70,38 @@
         <attr name="colorEnd" format="color|reference"/>
     </declare-styleable>
 
+
+    <attr name="unreachedColor" format="color|reference"/>
+    <attr name="progressColor" format="color|reference"/>
+    <attr name="unreachedWidth" format="dimension|reference"/>
+    <attr name="progressWidth" format="dimension|reference"/>
+    <attr name="seekable" format="boolean"/>
+    <attr name="scrollOnce" format="boolean"/>
     <declare-styleable name="CircleSeekbar">
-        <attr name="minProgress" format="integer"/>
-        <attr name="maxProgress" format="integer"/>
-        <attr name="curProgress" format="integer"/>
-        <attr name="unreachedColor" format="color|reference"/>
-        <attr name="progressColor" format="color|reference"/>
+        <attr name="min"/>
+        <attr name="max"/>
+        <attr name="progress" />
+        <attr name="unreachedColor"/>
+        <attr name="progressColor"/>
+        <attr name="unreachedWidth"/>
+        <attr name="progressWidth"/>
         <attr name="pointerColor" format="color|reference"/>
-        <attr name="unreachedWidth" format="dimension|reference"/>
-        <attr name="progressWidth" format="dimension|reference"/>
         <attr name="pointerRadius" format="dimension|reference"/>
-        <attr name="seekable" format="boolean"/>
-        <attr name="scrollOnce" format="boolean"/>
+        <attr name="seekable"/>
+        <attr name="scrollOnce"/>
+    </declare-styleable>
+
+    <declare-styleable name="TurningWheel">
+        <attr name="min"/>
+        <attr name="max"/>
+        <attr name="progress"/>
+        <attr name="unreachedColor"/>
+        <attr name="progressColor"/>
+        <attr name="unreachedWidth"/>
+        <attr name="progressWidth"/>
+        <attr name="wheelDrawable" format="reference"/>
+        <attr name="pointerDrawable" format="reference"/>
+        <attr name="seekable"/>
+        <attr name="scrollOnce"/>
     </declare-styleable>
 </resources>

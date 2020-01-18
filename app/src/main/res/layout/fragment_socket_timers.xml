@@ -12,43 +12,73 @@
         android:orientation="horizontal"
         android:gravity="center_vertical">
 
-        <Switch
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="16dp"
-            android:visibility="invisible"/>
-        <ImageView
+        <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            app:srcCompat="@drawable/ic_power_blue_24dp"/>
-        <ImageView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            app:srcCompat="@drawable/ic_power_red_24dp"/>
-    </LinearLayout>
-
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1">
-
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/socket_timers_rv"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical"
-            app:layoutManager="android.support.v7.widget.LinearLayoutManager" />
-
-        <android.support.design.widget.FloatingActionButton
+            android:padding="4dp"
+            android:textSize="@dimen/textSizeSubTitle"
+            android:textColor="@color/textColorPrimary"
+            android:text="@string/timers"/>
+        <ImageButton
             android:id="@+id/socket_timers_add"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="bottom|right"
-            android:layout_marginEnd="32dp"
-            android:layout_marginBottom="32dp"
-            app:srcCompat="@drawable/ic_add_alarm_white_32dp" />
-    </FrameLayout>
+            android:padding="4dp"
+            android:background="?attr/selectableItemBackground"
+            app:srcCompat="@drawable/ic_add_alarm_white_32dp"/>
+    </LinearLayout>
+    <com.inledco.exoterra.view.GradientCornerLinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:gravity="center_horizontal"
+        app:direction="horizontal"
+        app:strokeWidth="@dimen/strokeWidth"
+        app:radius="@dimen/cornerRadius"
+        app:gradientStart="@color/gradientYellow"
+        app:gradientEnd="@color/gradientGreen">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <CheckedTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="?attr/selectableItemBackground"
+                android:drawableRight="@drawable/selector_switch"
+                android:visibility="invisible"
+                android:padding="8dp" />
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:padding="4dp"
+                android:textAlignment="center"
+                android:textColor="@color/textColorPrimary"
+                android:textSize="@dimen/textSizePrimary"
+                android:text="@string/on"/>
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:padding="4dp"
+                android:textAlignment="center"
+                android:textColor="@color/textColorPrimary"
+                android:textSize="@dimen/textSizePrimary"
+                android:text="@string/off"/>
+        </LinearLayout>
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/socket_timers_rv"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            app:layoutManager="android.support.v7.widget.LinearLayoutManager" />
+    </com.inledco.exoterra.view.GradientCornerLinearLayout>
 
 </LinearLayout>

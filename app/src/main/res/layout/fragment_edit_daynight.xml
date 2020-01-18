@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@mipmap/ic_background"
+    android:clickable="true"
+    android:orientation="vertical"
+    android:paddingLeft="16dp"
+    android:paddingRight="16dp"
+    android:paddingTop="8dp"
+    android:paddingBottom="16dp">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+        <include
+            android:id="@+id/edit_daynight_show"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            layout="@layout/layout_light_manual"/>
+        <ImageView
+            android:id="@+id/edit_daynight_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top|right"
+            android:layout_margin="8dp"
+            android:scaleType="center"
+            app:srcCompat="@drawable/ic_moon"/>
+    </FrameLayout>
+
+    <com.inledco.exoterra.view.GradientCornerLinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        android:layout_gravity="right"
+        app:direction="horizontal"
+        app:strokeWidth="@dimen/strokeWidth"
+        app:radius="@dimen/cornerRadius"
+        app:gradientStart="@color/gradientYellow"
+        app:gradientEnd="@color/gradientWhite">
+        <ToggleButton
+            android:id="@+id/edit_daynight_presets"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="?attr/selectableItemBackground"
+            android:textOn="@string/back"
+            android:textOff="@string/presets"/>
+    </com.inledco.exoterra.view.GradientCornerLinearLayout>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginBottom="8dp">
+
+        <com.inledco.exoterra.view.TurningWheel
+            android:id="@+id/edit_daynight_csb"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:layout_gravity="center"
+            app:seekable="true"
+            app:min="0"
+            app:max="1000"
+            app:wheelDrawable="@drawable/ic_wheel"
+            app:pointerDrawable="@drawable/ic_thumb"
+            app:progressColor="@color/colorWhite"
+            app:progressWidth="8dp"
+            app:unreachedWidth="8dp"/>
+        <include
+            android:id="@+id/edit_daynight_presets_detail"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:visibility="gone"
+            layout="@layout/layout_light_presets"/>
+    </FrameLayout>
+
+    <include
+        android:id="@+id/edit_daynight_action"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        layout="@layout/layout_savecancel"/>
+
+</LinearLayout>

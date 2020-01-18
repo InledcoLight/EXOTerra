@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="8dp"
+    android:orientation="vertical"
+    android:gravity="center_horizontal">
+
+    <CheckBox
+        android:id="@+id/dialog_daytime_cb"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/selectableItemBackground"
+        android:textSize="@dimen/textSizePrimary"
+        android:textColor="@color/textColorPrimary"
+        android:text="@string/use_habitat_daytime"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center_vertical">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="8dp"
+                android:textColor="@color/textColorPrimary"
+                android:textSize="@dimen/textSizePrimary"
+                android:text="@string/start"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="8dp"
+                android:textColor="@color/textColorPrimary"
+                android:textSize="@dimen/textSizePrimary"
+                android:text="@string/end"/>
+        </LinearLayout>
+        <RadioGroup
+            android:id="@+id/dialog_daytime_rg"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+            <RadioButton
+                android:id="@+id/dialog_daytime_start"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="?attr/selectableItemBackground"
+                android:padding="8dp"
+                android:gravity="right"
+                android:button="@null"
+                android:textColor="@color/selector_text"/>
+            <RadioButton
+                android:id="@+id/dialog_daytime_end"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="?attr/selectableItemBackground"
+                android:padding="8dp"
+                android:gravity="right"
+                android:button="@null"
+                android:textColor="@color/selector_text"/>
+        </RadioGroup>
+    </LinearLayout>
+
+    <TimePicker
+        android:id="@+id/dialog_daytime_tp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:timePickerMode="spinner"/>
+
+</LinearLayout>

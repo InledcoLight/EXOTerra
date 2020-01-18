@@ -1,123 +1,97 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-             xmlns:app="http://schemas.android.com/apk/res-auto"
-             android:layout_width="match_parent"
-             android:layout_height="wrap_content">
-
-    <android.support.design.widget.CheckableImageButton
-        android:id="@+id/dialog_sunrs_bg"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@android:color/transparent"
-        android:scaleType="fitXY"
-        app:srcCompat="@drawable/selector_sunrise_sunset_bg"/>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@mipmap/ic_background"
+    android:clickable="true"
+    android:orientation="vertical"
+    android:gravity="center_horizontal"
+    android:paddingLeft="16dp"
+    android:paddingRight="16dp"
+    android:paddingTop="8dp"
+    android:paddingBottom="16dp">
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="#55000000"
-        android:gravity="center"
-        android:orientation="vertical">
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:orientation="horizontal">
 
         <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:orientation="horizontal">
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:gravity="center_horizontal"
+            android:orientation="vertical">
 
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:gravity="center_horizontal"
-                android:orientation="vertical">
+            <TextView
+                android:id="@+id/dialog_sunrs_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="@string/sunrise"
+                android:textColor="@color/colorWhite"
+                android:textSize="16sp" />
 
-                <TextView
-                    android:id="@+id/dialog_sunrs_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:text="@string/sunrise"
-                    android:textColor="@color/colorWhite"
-                    android:textSize="16sp"/>
+            <Space
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:layout_weight="1" />
 
-                <Space
-                    android:layout_width="wrap_content"
-                    android:layout_height="0dp"
-                    android:layout_weight="1"/>
+            <TimePicker
+                android:id="@+id/dialog_sunrs_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:numbersInnerTextColor="@color/colorWhite"
+                android:numbersSelectorColor="@color/colorWhite"
+                android:numbersTextColor="@color/colorWhite"
+                android:timePickerMode="spinner" />
 
-                <TimePicker
-                    android:id="@+id/dialog_sunrs_time"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:numbersInnerTextColor="@color/colorWhite"
-                    android:numbersSelectorColor="@color/colorWhite"
-                    android:numbersTextColor="@color/colorWhite"
-                    android:padding="4dp"
-                    android:timePickerMode="spinner"/>
-
-                <Space
-                    android:layout_width="wrap_content"
-                    android:layout_height="0dp"
-                    android:layout_weight="1"/>
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:gravity="center_horizontal"
-                android:orientation="vertical">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:text="@string/ramp"
-                    android:textColor="@color/colorWhite"
-                    android:textSize="16sp"/>
-
-                <Space
-                    android:layout_width="wrap_content"
-                    android:layout_height="0dp"
-                    android:layout_weight="1"/>
-
-                <NumberPicker
-                    android:id="@+id/dialog_sunrs_ramp"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:padding="4dp"/>
-
-                <Space
-                    android:layout_width="wrap_content"
-                    android:layout_height="0dp"
-                    android:layout_weight="1"/>
-            </LinearLayout>
+            <Space
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:layout_weight="1" />
         </LinearLayout>
 
-        <android.support.v7.widget.ButtonBarLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
             android:gravity="center_horizontal"
-            android:orientation="horizontal">
+            android:orientation="vertical">
 
-            <Button
-                android:id="@+id/dialog_sunrs_cancel"
+            <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="right"
-                android:layout_marginRight="8dp"
-                android:text="@string/cancel"/>
+                android:gravity="center"
+                android:text="@string/duration"
+                android:textColor="@color/colorWhite"
+                android:textSize="16sp" />
 
-            <Button
-                android:id="@+id/dialog_sunrs_save"
+            <Space
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="left"
-                android:layout_marginLeft="8dp"
-                android:text="@string/save"/>
-        </android.support.v7.widget.ButtonBarLayout>
+                android:layout_height="0dp"
+                android:layout_weight="1" />
 
+            <NumberPicker
+                android:id="@+id/dialog_sunrs_ramp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+
+            <Space
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:layout_weight="1" />
+        </LinearLayout>
     </LinearLayout>
 
-</FrameLayout>
+    <Space
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_weight="1"/>
+
+    <include
+        android:id="@+id/dialog_sunrs_action"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        layout="@layout/layout_savecancel"/>
+</LinearLayout>

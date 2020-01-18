@@ -65,7 +65,7 @@
     <string name="remove">Remove</string>
     <string name="title_set_timer">Set Timer</string>
     <string name="sunrise">Sunrise</string>
-    <string name="day_light">Daylight</string>
+    <string name="day_light">Day Light</string>
     <string name="sunset">Sunset</string>
     <string name="night">Night</string>
     <string name="turnoff">Turn off</string>
@@ -111,7 +111,7 @@
     <string name="upgrade">Upgrade</string>
     <string name="devices">Devices</string>
     <string name="me">Me</string>
-    <string name="home2">Home</string>
+    <string name="home">Home</string>
     <string name="invalid_profile">Invalid Profile</string>
     <string name="imort_from_default">Import profile from default</string>
     <string name="msg_import_from_default">Invalid profile, import from default?</string>
@@ -274,10 +274,10 @@
     <string name="habitat_time">Habitat time</string>
     <string name="favourite_habitat">Favourite habitat</string>
     <string name="habitat_time_setting">Habitat Time Setting:</string>
-    <string name="local_datetime">Local DateTime: %1$s</string>
-    <string name="habitat_datetime">Habitat DateTime: %1$s</string>
-    <string name="sunrise_time">Sunrise: %1$s</string>
-    <string name="sunset_time">Sunset: %1$s</string>
+    <string name="local_datetime">Local DateTime: </string>
+    <string name="habitat_datetime">Habitat DateTime: </string>
+    <string name="sunrise_time">Sunrise: </string>
+    <string name="sunset_time">Sunset: </string>
     <string name="favourite">Favourite</string>
     <string name="share_habitat">Share Habitat</string>
     <string name="habitat_detail">Habitat Detail</string>
@@ -289,4 +289,48 @@
     <string name="daytime">Day Time</string>
     <string name="nighttime">Night Time</string>
     <string name="assign_to_habitat">Assign to a habitat</string>
+    <string name="manual">Manual</string>
+    <string name="timer">Timer</string>
+    <string name="Pro">Pro</string>
+    <string name="duration">Duration</string>
+    <string name="night_light">Night Light</string>
+    <string name="power">Switch</string>
+    <string name="hygrostat">Hygrostat</string>
+    <string name="thermostat">Thermostat</string>
+    <string name="timers">Timers</string>
+    <string name="end">End</string>
+    <string name="use_habitat_daytime">Use Habitat Daytime</string>
+    <string name="time">Time</string>
+    <string name="device_key_action">Device Key Action</string>
+    <string name="device_timezone">Device timezone</string>
+    <string name="technical_details">Technical details</string>
+    <string name="back">Back</string>
+    <string name="second">Second</string>
+    <string name="minute">Minute</string>
+    <string name="spray">Spray</string>
+    <string name="system_time">System Time:</string>
+    <string name="warning">Warning</string>
+    <string name="no_habitat_warning">
+        You haven\'t add any habitats!\n
+        \n
+        Add your first habitat.
+    </string>
+    <string name="no_device_warning">
+        You haven\'t add any devices!\n
+        \n
+        Add your first device.
+    </string>
+    <string name="modify_password">Modify password</string>
+    <string name="change_nickname">Change nickname</string>
+    <string name="current_password">Current password</string>
+    <string name="prefs">Prefs</string>
+    <string name="temperature_unit">Temperature unit</string>
+    <string name="celsius">℃</string>
+    <string name="fahrenheit">℉</string>
+    <string name="timeformat">Time format</string>
+    <string name="time24h">24h</string>
+    <string name="time12h">12h</string>
+    <string name="favourites">Favourites</string>
+    <string name="status">status</string>
+    <string name="presets">Presets</string>
 </resources>

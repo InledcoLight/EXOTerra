@@ -8,6 +8,7 @@
                                              android:layout_height="match_parent">
 
     <com.inledco.exoterra.view.GradientCornerLinearLayout
+        android:id="@+id/gradientCornerLinearLayout8"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
@@ -35,18 +36,18 @@
                 android:id="@+id/connect_net_prdt"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="8dp"
                 android:layout_marginTop="8dp"
-                android:layout_marginBottom="8dp"/>
+                android:layout_marginBottom="8dp" />
+
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_gravity="center"
                 android:gravity="center"
-                android:textStyle="bold"
                 android:text="@string/add_device"
                 android:textColor="@color/textColorPrimary"
-                android:textSize="@dimen/textSizeTitle" />
+                android:textSize="@dimen/textSizeTitle"
+                android:textStyle="bold" />
         </FrameLayout>
 
         <LinearLayout
@@ -61,9 +62,9 @@
                 android:layout_height="wrap_content"
                 android:padding="8dp"
                 android:text="2"
-                android:textStyle="bold"
                 android:textColor="@color/textColorPrimary"
-                android:textSize="@dimen/textSizeSubTitle" />
+                android:textSize="@dimen/textSizeSubTitle"
+                android:textStyle="bold" />
 
             <TextView
                 android:layout_width="match_parent"
@@ -74,6 +75,26 @@
         </LinearLayout>
     </com.inledco.exoterra.view.GradientCornerLinearLayout>
 
+    <com.inledco.exoterra.view.GradientCornerButton
+        android:id="@+id/connect_net_back"
+        style="?attr/buttonStyle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        android:background="?attr/selectableItemBackground"
+        android:text="@string/back"
+        app:direction="horizontal"
+        app:gradientEnd="@color/gradientWhite"
+        app:gradientStart="@color/gradientYellow"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:radius="@dimen/cornerRadius"
+        app:strokeWidth="@dimen/strokeWidth" />
+
     <com.inledco.exoterra.view.GradientSemiCircleButton
         android:id="@+id/connect_net_apconfig"
         style="?attr/buttonStyle"
@@ -81,13 +102,13 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
-        android:layout_marginBottom="16dp"
+        android:layout_marginBottom="32dp"
+        android:background="?attr/selectableItemBackground"
         android:text="@string/compatible_mode"
         android:visibility="visible"
-        android:background="?attr/selectableItemBackground"
         app:colorEnd="@color/gradientGreen"
         app:colorStart="@color/gradientYellow"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/connect_net_back"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
@@ -122,6 +143,7 @@
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="8dp"
+        android:hint="@string/router"
         app:errorEnabled="true"
         app:layout_constraintBottom_toTopOf="@+id/connect_net_tl2"
         app:layout_constraintEnd_toStartOf="@+id/connect_net_search"
@@ -148,6 +170,7 @@
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="8dp"
+        android:hint="@string/password"
         app:errorEnabled="true"
         app:layout_constraintBottom_toTopOf="@+id/connect_net_gl1"
         app:layout_constraintEnd_toStartOf="@+id/connect_net_showpsw"
