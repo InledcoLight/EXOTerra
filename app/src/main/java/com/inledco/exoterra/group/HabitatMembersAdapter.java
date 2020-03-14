@@ -1,4 +1,4 @@
-package com.inledco.exoterra.main.homes;
+package com.inledco.exoterra.group;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
@@ -10,16 +10,15 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.inledco.exoterra.R;
-import com.inledco.exoterra.bean.Home2;
 import com.inledco.exoterra.common.SimpleAdapter;
 
 import java.util.List;
 
-import cn.xlink.restful.XLinkRestfulEnum;
+import cn.xlink.restful.api.app.HomeApi;
 
-public class HomeMembersAdapter extends SimpleAdapter<Home2.User, HomeMembersAdapter.HomeMemberViewHolder> {
+public class HabitatMembersAdapter extends SimpleAdapter<HomeApi.HomesResponse.Home.User, HabitatMembersAdapter.HomeMemberViewHolder> {
 
-    public HomeMembersAdapter(@NonNull Context context, List<Home2.User> data) {
+    public HabitatMembersAdapter(@NonNull Context context, List<HomeApi.HomesResponse.Home.User> data) {
         super(context, data);
     }
 
@@ -36,19 +35,30 @@ public class HomeMembersAdapter extends SimpleAdapter<Home2.User, HomeMembersAda
 
     @Override
     public void onBindViewHolder(@NonNull HomeMemberViewHolder holder, final int position) {
-        Home2.User user = mData.get(position);
-        int suAdmin = XLinkRestfulEnum.HomeUserType.SUPER_ADMIN.getValue();
-        int admin = XLinkRestfulEnum.HomeUserType.ADMIN.getValue();
-        int usr = XLinkRestfulEnum.HomeUserType.USER.getValue();
-        int visitor = XLinkRestfulEnum.HomeUserType.VISITOR.getValue();
-        if (user.role == suAdmin || user.role == admin) {
-            holder.icon.setImageResource(R.drawable.ic_admin_white_32dp);
-            holder.role.setText(R.string.admin);
-        } else {
-            holder.icon.setImageResource(R.drawable.ic_person_white_32dp);
-            holder.role.setText(R.string.user);
+        HomeApi.HomesResponse.Home.User user = mData.get(position);
+        String nickname = user.nicketName;
+        if (TextUtils.isEmpty(nickname)) {
+            nickname = "" + user.userId;
         }
-        holder.nickname.setText(TextUtils.isEmpty(user.nickname) ? "" + user.user_id : user.nickname);
+        switch (user.role) {
+            case SUPER_ADMIN:
+                holder.icon.setImageResource(R.drawable.ic_admin_white_32dp);
+                holder.role.setText(R.string.creator);
+                break;
+            case ADMIN:
+                holder.icon.setImageResource(R.drawable.ic_admin_white_32dp);
+                holder.role.setText(R.string.admin);
+                break;
+            case USER:
+                holder.icon.setImageResource(R.drawable.ic_person_white_32dp);
+                holder.role.setText(R.string.user);
+                break;
+            case VISITOR:
+                holder.icon.setImageResource(R.drawable.ic_person_white_32dp);
+                holder.role.setText(R.string.visitor);
+                break;
+        }
+        holder.nickname.setText(nickname);
 
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override

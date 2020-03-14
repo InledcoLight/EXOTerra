@@ -3,8 +3,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:clickable="true"
     android:background="?attr/selectableItemBackground"
+    android:paddingTop="4dp"
+    android:paddingBottom="4dp"
     android:orientation="horizontal"
     android:gravity="center_vertical">
 
@@ -12,14 +13,15 @@
         android:id="@+id/item_homember_icon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="8dp"
         app:srcCompat="@drawable/ic_person_white_32dp"/>
 
     <TextView
         android:id="@+id/item_homember_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:padding="8dp"
+        android:layout_marginLeft="8dp"
+        android:lines="1"
+        android:ellipsize="end"
         android:textSize="@dimen/textSizePrimary"
         android:textColor="@color/textColorPrimary"/>
 
@@ -38,7 +40,6 @@
     <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginRight="8dp"
         app:srcCompat="@drawable/ic_arrow_right_white_32dp"/>
 
 </LinearLayout>

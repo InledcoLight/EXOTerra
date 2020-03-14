@@ -1,20 +1,21 @@
 package com.inledco.exoterra;
 
 import android.app.Activity;
-import android.app.Application;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
+import android.support.multidex.MultiDexApplication;
 import android.support.v4.app.NotificationCompat;
-import android.support.v7.app.AlertDialog;
+import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
@@ -25,10 +26,10 @@ import com.inledco.exoterra.device.DeviceActivity;
 import com.inledco.exoterra.event.DatapointChangedEvent;
 import com.inledco.exoterra.event.DeviceStateChangedEvent;
 import com.inledco.exoterra.event.HomeMemberChangedEvent;
-import com.inledco.exoterra.event.SubscribeChangedEvent;
 import com.inledco.exoterra.manager.DeviceManager;
 import com.inledco.exoterra.manager.HomeManager;
 import com.inledco.exoterra.manager.UserManager;
+import com.inledco.exoterra.receiver.HomeInviteBroadcastReceiver;
 import com.inledco.exoterra.splash.SplashActivity;
 import com.inledco.exoterra.util.DeviceUtil;
 import com.inledco.exoterra.util.LogUtil;
@@ -36,7 +37,6 @@ import com.inledco.exoterra.xlink.XlinkCloudManager;
 import com.inledco.exoterra.xlink.XlinkConstants;
 import com.inledco.exoterra.xlink.XlinkDataPointAlertNotify;
 import com.inledco.exoterra.xlink.XlinkRequestCallback;
-import com.inledco.exoterra.xlink.XlinkTaskCallback;
 
 import org.greenrobot.eventbus.EventBus;
 
@@ -62,7 +62,7 @@ import cn.xlink.sdk.v5.module.main.XLinkConfig;
 import cn.xlink.sdk.v5.module.notify.EventNotifyHelper;
 import cn.xlink.wrapper.XLinkAndroidSDK;
 
-public class EXOTerraApplication extends Application {
+public class EXOTerraApplication extends MultiDexApplication {
     private static final String TAG = "EXOTerraApplication";
 
     private WeakReference<BaseActivity> mCurrentActivity;
@@ -74,6 +74,8 @@ public class EXOTerraApplication extends Application {
     private XLinkDeviceEventListener mXLinkDeviceEventListener;
 
     private NotificationManager mNotificationManager;
+
+    private BroadcastReceiver mHomeInviteReceiver = new HomeInviteBroadcastReceiver();
 
     @Override
     public void onCreate() {
@@ -231,9 +233,6 @@ public class EXOTerraApplication extends Application {
                         Log.e(TAG, "onEventNotify: dataPointChanged - " + dataPointChangedNotify.toString());
                         break;
                     case EventNotify.MSG_TYPE_DATA_POINT_ALERT:         //2
-//                        short var2 = ByteUtil.byteToShort(notify.payload);
-//                        String var3 = StringUtil.getStringEmptyDefault(notify.payload, 2, var2);
-//                        Log.e(TAG, "onEventNotify: " + var3);
                         // 自定义数据端点报警通知 仅支持单个数据端点
                         XlinkDataPointAlertNotify dataPointAlertNotify = EventNotifyHelper.parseNotifyEntityFromJson(notify.payload, XlinkDataPointAlertNotify.class);
                         //  xlink sdk 自带解码数据端点报警通知 功能异常  (控制台可设置多个数据端点共同触发报警)
@@ -244,7 +243,7 @@ public class EXOTerraApplication extends Application {
                     case EventNotify.MSG_TYPE_DEVICE_SHARE:             //3
                         final EventNotifyHelper.DeviceShareNotify deviceShareNotify = EventNotifyHelper.parseDeviceShareNotify(notify.payload);
                         Log.e(TAG, "onEventNotify: deviceShare - " + deviceShareNotify.toString());
-                        handleDeviceShareNotify(notify.fromId, deviceShareNotify);
+//                        handleDeviceShareNotify(notify.fromId, deviceShareNotify);
                         break;
                     case EventNotify.MSG_TYPE_PUSH_MSG:                 //4
                         final EventNotifyHelper.PushMsgNotify pushMsgNotify = EventNotifyHelper.parsePushMsgNotify(notify.payload);
@@ -370,181 +369,211 @@ public class EXOTerraApplication extends Application {
         XLinkAndroidSDK.init(config);
 
         XlinkCloudManager.getInstance().init(XlinkConstants.CORPORATION_ID);
+
+        IntentFilter filter = new IntentFilter(AppConstants.HOME_INVITE);
+        LocalBroadcastManager.getInstance(this).registerReceiver(mHomeInviteReceiver, filter);
     }
 
-    private void handleDeviceShareNotify(int fromId, @NonNull EventNotifyHelper.DeviceShareNotify notify) {
-        switch (notify.type) {
-            case EventNotifyHelper.DeviceShareNotify.TYPE_RECV_SHARE:
-                showReceiveDeviceShareDialog(fromId, notify);
-                break;
-            case EventNotifyHelper.DeviceShareNotify.TYPE_ACCEPT_SHARE:
-                showDeviceShareAccpetMessage(fromId, notify);
-                break;
-            case EventNotifyHelper.DeviceShareNotify.TYPE_CANCEL_SHARE:
-                Toast.makeText(this, "User(" + fromId + ") cancel the device share." , Toast.LENGTH_SHORT)
-                     .show();
-                break;
-            case EventNotifyHelper.DeviceShareNotify.TYPE_DENY_SHARE:
-                showDeviceShareDenyMessage(fromId, notify);
-                break;
-        }
-    }
+//    private void handleDeviceShareNotify(int fromId, @NonNull EventNotifyHelper.DeviceShareNotify notify) {
+//        switch (notify.type) {
+//            case EventNotifyHelper.DeviceShareNotify.TYPE_RECV_SHARE:
+//                showReceiveDeviceShareDialog(fromId, notify);
+//                break;
+//            case EventNotifyHelper.DeviceShareNotify.TYPE_ACCEPT_SHARE:
+//                showDeviceShareAccpetMessage(fromId, notify);
+//                break;
+//            case EventNotifyHelper.DeviceShareNotify.TYPE_CANCEL_SHARE:
+//                Toast.makeText(this, "User(" + fromId + ") cancel the device share." , Toast.LENGTH_SHORT)
+//                     .show();
+//                break;
+//            case EventNotifyHelper.DeviceShareNotify.TYPE_DENY_SHARE:
+//                showDeviceShareDenyMessage(fromId, notify);
+//                break;
+//        }
+//    }
 
-    private void showReceiveDeviceShareDialog(int fromId, @NonNull final EventNotifyHelper.DeviceShareNotify notify) {
-        if (mCurrentActivity == null || mCurrentActivity.get() == null) {
-            return;
-        }
-        AlertDialog.Builder builder = new AlertDialog.Builder(mCurrentActivity.get());
-        builder.setTitle(R.string.receive_device_share)
-               .setMessage("User(" + fromId + ") share with you the device(device id: " + notify.device_id + ").")
-               .setPositiveButton(R.string.accept, new DialogInterface.OnClickListener() {
-                   @Override
-                   public void onClick(DialogInterface dialog, int which) {
-                       acceptDeviceShare(notify);
-                   }
-               })
-               .setNegativeButton(R.string.deny, new DialogInterface.OnClickListener() {
-                   @Override
-                   public void onClick(DialogInterface dialog, int which) {
-                       denyDeviceShare(notify);
-                   }
-               })
-               .setNeutralButton(R.string.later, null)
-               .setCancelable(false)
-               .show();
-    }
-
-    private void acceptDeviceShare(@NonNull EventNotifyHelper.DeviceShareNotify notify) {
-        if (mCurrentActivity == null || mCurrentActivity.get() == null) {
-            return;
-        }
-        XlinkCloudManager.getInstance().acceptShareDevice(notify.invite_code, new XlinkTaskCallback<String>() {
-            @Override
-            public void onError(String error) {
-                Toast.makeText(mCurrentActivity.get(), error, Toast.LENGTH_SHORT)
-                     .show();
-            }
-
-            @Override
-            public void onComplete(String s) {
-                Toast.makeText(mCurrentActivity.get(), "Accept device share success.", Toast.LENGTH_SHORT)
-                     .show();
-                EventBus.getDefault().post(new SubscribeChangedEvent());
-            }
-        });
-    }
-
-    private void denyDeviceShare(@NonNull EventNotifyHelper.DeviceShareNotify notify) {
-        if (mCurrentActivity == null || mCurrentActivity.get() == null) {
-            return;
-        }
-        XlinkCloudManager.getInstance().denyShareDevice(notify.invite_code, new XlinkTaskCallback<String>() {
-            @Override
-            public void onError(String error) {
-                Toast.makeText(mCurrentActivity.get(), error, Toast.LENGTH_SHORT)
-                     .show();
-            }
-
-            @Override
-            public void onStart() {
-
-            }
-
-            @Override
-            public void onComplete(String s) {
-                Toast.makeText(mCurrentActivity.get(), "Deny device share success.", Toast.LENGTH_SHORT)
-                     .show();
-            }
-        });
-    }
+//    private void showReceiveDeviceShareDialog(int fromId, @NonNull final EventNotifyHelper.DeviceShareNotify notify) {
+//        if (mCurrentActivity == null || mCurrentActivity.get() == null) {
+//            return;
+//        }
+//        AlertDialog.Builder builder = new AlertDialog.Builder(mCurrentActivity.get());
+//        builder.setTitle(R.string.receive_device_share)
+//               .setMessage("User(" + fromId + ") share with you the device(device id: " + notify.device_id + ").")
+//               .setPositiveButton(R.string.accept, new DialogInterface.OnClickListener() {
+//                   @Override
+//                   public void onClick(DialogInterface dialog, int which) {
+//                       acceptDeviceShare(notify);
+//                   }
+//               })
+//               .setNegativeButton(R.string.deny, new DialogInterface.OnClickListener() {
+//                   @Override
+//                   public void onClick(DialogInterface dialog, int which) {
+//                       denyDeviceShare(notify);
+//                   }
+//               })
+//               .setNeutralButton(R.string.later, null)
+//               .setCancelable(false)
+//               .show();
+//    }
+//
+//    private void acceptDeviceShare(@NonNull EventNotifyHelper.DeviceShareNotify notify) {
+//        if (mCurrentActivity == null || mCurrentActivity.get() == null) {
+//            return;
+//        }
+//        XlinkCloudManager.getInstance().acceptShareDevice(notify.invite_code, new XlinkTaskCallback<String>() {
+//            @Override
+//            public void onError(String error) {
+//                Toast.makeText(mCurrentActivity.get(), error, Toast.LENGTH_SHORT)
+//                     .show();
+//            }
+//
+//            @Override
+//            public void onComplete(String s) {
+//                Toast.makeText(mCurrentActivity.get(), "Accept device share success.", Toast.LENGTH_SHORT)
+//                     .show();
+//                EventBus.getDefault().post(new SubscribeChangedEvent());
+//            }
+//        });
+//    }
+//
+//    private void denyDeviceShare(@NonNull EventNotifyHelper.DeviceShareNotify notify) {
+//        if (mCurrentActivity == null || mCurrentActivity.get() == null) {
+//            return;
+//        }
+//        XlinkCloudManager.getInstance().denyShareDevice(notify.invite_code, new XlinkTaskCallback<String>() {
+//            @Override
+//            public void onError(String error) {
+//                Toast.makeText(mCurrentActivity.get(), error, Toast.LENGTH_SHORT)
+//                     .show();
+//            }
+//
+//            @Override
+//            public void onStart() {
+//
+//            }
+//
+//            @Override
+//            public void onComplete(String s) {
+//                Toast.makeText(mCurrentActivity.get(), "Deny device share success.", Toast.LENGTH_SHORT)
+//                     .show();
+//            }
+//        });
+//    }
 
     private void handleHomeShareNotify(@NonNull final EventNotifyHelper.HomeMemberInvitedNotify notify) {
         Log.e(TAG, "handleHomeShareNotify: " + notify.toString());
         if (notify.opt.equalsIgnoreCase(EventNotifyHelper.HomeMemberInvitedNotify.OPERATION_INVITED)) {
-            showReceiveHomeShareDialog(notify);
+            showReceiveHomeInviteMessage(notify);
         }
-//        else if (notify.opt.equalsIgnoreCase(EventNotifyHelper.HomeMemberInvitedNotify.OPERATION_DENY)) {
-//            showHomeInviteDenyMessage(notify);
-//        } else if (notify.opt.equalsIgnoreCase(EventNotifyHelper.HomeMemberInvitedNotify.OPERATION_ACCEPT)) {
-//            showHomeInviteAccpetMessage(notify);
-//        }
     }
 
-    private void showReceiveHomeShareDialog(@NonNull final EventNotifyHelper.HomeMemberInvitedNotify notify) {
-        if (mCurrentActivity == null || mCurrentActivity.get() == null) {
-            return;
-        }
+//    private void showReceiveHomeShareDialog(@NonNull final EventNotifyHelper.HomeMemberInvitedNotify notify) {
+//        if (mCurrentActivity == null || mCurrentActivity.get() == null) {
+//            return;
+//        }
+//        String from = TextUtils.isEmpty(notify.from_name) ? String.valueOf(notify.from_id) : notify.from_name;
+//        String home = TextUtils.isEmpty(notify.home_name) ? notify.home_id : notify.home_name;
+//        final String homeid = notify.home_id;
+//        final String inviteid = notify.invite_id;
+//        AlertDialog.Builder builder = new AlertDialog.Builder(mCurrentActivity.get());
+//        builder.setTitle(R.string.receive_home_share)
+//               .setMessage("User " + from + " invite you join home " + home + ".")
+//               .setPositiveButton(R.string.accept, new DialogInterface.OnClickListener() {
+//                   @Override
+//                   public void onClick(DialogInterface dialog, int which) {
+//                       acceptHomeInvite(homeid, inviteid);
+//                   }
+//               })
+//               .setNegativeButton(R.string.deny, new DialogInterface.OnClickListener() {
+//                   @Override
+//                   public void onClick(DialogInterface dialog, int which) {
+//                       denyHomeInvite(homeid, inviteid);
+//                   }
+//               })
+//               .setNeutralButton(R.string.later, null)
+//               .setCancelable(false)
+//               .show();
+//    }
+
+    private void showReceiveHomeInviteMessage(@NonNull final EventNotifyHelper.HomeMemberInvitedNotify notify) {
         String from = TextUtils.isEmpty(notify.from_name) ? String.valueOf(notify.from_id) : notify.from_name;
         String home = TextUtils.isEmpty(notify.home_name) ? notify.home_id : notify.home_name;
         final String homeid = notify.home_id;
         final String inviteid = notify.invite_id;
-        AlertDialog.Builder builder = new AlertDialog.Builder(mCurrentActivity.get());
-        builder.setTitle(R.string.receive_home_share)
-               .setMessage("User " + from + " invite you join home " + home + ".")
-               .setPositiveButton(R.string.accept, new DialogInterface.OnClickListener() {
-                   @Override
-                   public void onClick(DialogInterface dialog, int which) {
-                       acceptHomeInvite(homeid, inviteid);
-                   }
-               })
-               .setNegativeButton(R.string.deny, new DialogInterface.OnClickListener() {
-                   @Override
-                   public void onClick(DialogInterface dialog, int which) {
-                       denyHomeInvite(homeid, inviteid);
-                   }
-               })
-               .setNeutralButton(R.string.later, null)
-               .setCancelable(false)
-               .show();
+
+        Intent acceptIntent = new Intent(this, HomeInviteBroadcastReceiver.class);
+        acceptIntent.setAction(AppConstants.HOME_INVITE);
+        acceptIntent.putExtra(AppConstants.NOTIFICATION_ID, notify.from_id);
+        acceptIntent.putExtra(AppConstants.INVITE_ID, inviteid);
+        acceptIntent.putExtra(AppConstants.HOME_ID, homeid);
+        acceptIntent.putExtra(AppConstants.ACTION, AppConstants.ACCEPT);
+        PendingIntent acceptPendingIntent = PendingIntent.getBroadcast(this, notify.from_id, acceptIntent, PendingIntent.FLAG_ONE_SHOT);
+
+        Intent denyIntent = new Intent(this, HomeInviteBroadcastReceiver.class);
+        denyIntent.setAction(AppConstants.HOME_INVITE);
+        denyIntent.putExtra(AppConstants.NOTIFICATION_ID, notify.from_id);
+        denyIntent.putExtra(AppConstants.INVITE_ID, inviteid);
+        denyIntent.putExtra(AppConstants.HOME_ID, homeid);
+        denyIntent.putExtra(AppConstants.ACTION, AppConstants.DENY);
+        PendingIntent denyPendingIntent = PendingIntent.getBroadcast(this, notify.from_id^0xFFFFFFFF, denyIntent, PendingIntent.FLAG_ONE_SHOT);
+
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, getString(R.string.notify_chnid_share_receipt));
+        Notification notification = builder.setContentTitle(getString(R.string.habitat_invite_member))
+                                           .setContentText("User " + from + " invite you join habitat " + home + ".")
+                                           .setWhen(System.currentTimeMillis())
+                                           .setSmallIcon(R.drawable.ic_device_default_black_64dp)
+                                           .setAutoCancel(true)
+                                           .setOngoing(true)
+                                           .addAction(R.drawable.ic_device_default_black_64dp, getString(R.string.accept), acceptPendingIntent)
+                                           .addAction(R.drawable.ic_device_default_black_64dp, getString(R.string.deny), denyPendingIntent)
+                                           .build();
+        getNotificationManager().notify(inviteid, notify.from_id, notification);
     }
 
-    private void acceptHomeInvite(@NonNull final String homeid, @NonNull final String inviteid) {
-        if (mCurrentActivity == null || mCurrentActivity.get() == null) {
-            return;
-        }
-        XlinkCloudManager.getInstance().acceptHomeInvite(homeid, inviteid, new XlinkRequestCallback<String>() {
-            @Override
-            public void onError(String error) {
-                Toast.makeText(mCurrentActivity.get(), error, Toast.LENGTH_SHORT)
-                     .show();
-            }
-
-            @Override
-            public void onSuccess(String s) {
-                Toast.makeText(mCurrentActivity.get(), "Join home success.", Toast.LENGTH_SHORT)
-                     .show();
-//                EventBus.getDefault().post(new HomeChangedEvent());
-                HomeManager.getInstance().refreshHomeList(null);
-            }
-        });
-    }
-
-    private void denyHomeInvite(@NonNull final String homeid, @NonNull final String inviteid) {
-        if (mCurrentActivity == null || mCurrentActivity.get() == null) {
-            return;
-        }
-        XlinkCloudManager.getInstance().denyHomeInvite(homeid, inviteid, new XlinkRequestCallback<String>() {
-            @Override
-            public void onError(String error) {
-                Toast.makeText(mCurrentActivity.get(), error, Toast.LENGTH_SHORT)
-                     .show();
-            }
-
-            @Override
-            public void onSuccess(String s) {
-                Toast.makeText(mCurrentActivity.get(), "Deny home share success.", Toast.LENGTH_SHORT)
-                     .show();
-//                EventBus.getDefault().post(new HomeChangedEvent());
-                HomeManager.getInstance().refreshHomeList(null);
-            }
-        });
-    }
+//    private void acceptHomeInvite(@NonNull final String homeid, @NonNull final String inviteid) {
+//        if (mCurrentActivity == null || mCurrentActivity.get() == null) {
+//            return;
+//        }
+//        XlinkCloudManager.getInstance().acceptHomeInvite(homeid, inviteid, new XlinkRequestCallback<String>() {
+//            @Override
+//            public void onError(String error) {
+//                Toast.makeText(mCurrentActivity.get(), error, Toast.LENGTH_SHORT)
+//                     .show();
+//            }
+//
+//            @Override
+//            public void onSuccess(String s) {
+//                Toast.makeText(mCurrentActivity.get(), "Join home success.", Toast.LENGTH_SHORT)
+//                     .show();
+//                HomeManager.getInstance().refreshHomeList(null);
+//            }
+//        });
+//    }
+//
+//    private void denyHomeInvite(@NonNull final String homeid, @NonNull final String inviteid) {
+//        if (mCurrentActivity == null || mCurrentActivity.get() == null) {
+//            return;
+//        }
+//        XlinkCloudManager.getInstance().denyHomeInvite(homeid, inviteid, new XlinkRequestCallback<String>() {
+//            @Override
+//            public void onError(String error) {
+//                Toast.makeText(mCurrentActivity.get(), error, Toast.LENGTH_SHORT)
+//                     .show();
+//            }
+//
+//            @Override
+//            public void onSuccess(String s) {
+//                Toast.makeText(mCurrentActivity.get(), "Deny home share success.", Toast.LENGTH_SHORT)
+//                     .show();
+//                HomeManager.getInstance().refreshHomeList(null);
+//            }
+//        });
+//    }
 
     private void handleHomeMessageNotify(@NonNull final EventNotifyHelper.HomeMessageNotify notify) {
         Log.e(TAG, "handleHomeMessageNotify: " + notify.toString());
         if (notify.type.equalsIgnoreCase(EventNotifyHelper.HomeMessageNotify.TYPE_DELETE)) {
             showDeleteHomeMessage(notify);
-//            EventBus.getDefault().post(new HomeChangedEvent());
             HomeManager.getInstance().refreshHomeList(null);
         }
     }
@@ -554,10 +583,10 @@ public class EXOTerraApplication extends Application {
         if (notify.type.equalsIgnoreCase(EventNotifyHelper.HomeMemberChangedNotify.TYPE_ADD)) {
             showJoinHomeMessage(notify);
             EventBus.getDefault().post(new HomeMemberChangedEvent(notify.home_id));
+            HomeManager.getInstance().refreshHomeList(null);
         } else if (notify.type.equalsIgnoreCase(EventNotifyHelper.HomeMemberChangedNotify.TYPE_REMOVE)) {
             showLeaveHomeMessage(notify);
             EventBus.getDefault().post(new HomeMemberChangedEvent(notify.home_id));
-//            EventBus.getDefault().post(new HomeChangedEvent());
             HomeManager.getInstance().refreshHomeList(null);
         }
     }
@@ -569,29 +598,35 @@ public class EXOTerraApplication extends Application {
         manager.createNotificationChannel(channel);
     }
 
-    private void showDeviceShareAccpetMessage(int fromId, @NonNull EventNotifyHelper.DeviceShareNotify notify) {
-        NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(mCurrentActivity.get(), "share_receipt");
-        Notification notification = builder.setContentTitle("Accpet Device Share")
-                                           .setContentText("User(" + fromId + ") accept the device(" + notify.device_id + ") you share.")
-                                           .setWhen(System.currentTimeMillis())
-                                           .setSmallIcon(R.drawable.ic_device_default_black_64dp)
-                                           .setAutoCancel(true)
-                                           .build();
-        manager.notify(1, notification);
-    }
-
-    private void showDeviceShareDenyMessage(int fromId, @NonNull EventNotifyHelper.DeviceShareNotify notify) {
-        NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, "share_receipt");
-        Notification notification = builder.setContentTitle("Deny Device Share")
-                                           .setContentText("User(" + fromId + ") deny the device(" + notify.device_id + ") you share.")
-                                           .setWhen(System.currentTimeMillis())
-                                           .setSmallIcon(R.drawable.ic_device_default_black_64dp)
-                                           .setAutoCancel(true)
-                                           .build();
-        manager.notify(2, notification);
-    }
+//    private void showDeviceShareAccpetMessage(int fromId, @NonNull EventNotifyHelper.DeviceShareNotify notify) {
+//        Intent intent = new Intent();
+//        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_ONE_SHOT);
+//        NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+//        NotificationCompat.Builder builder = new NotificationCompat.Builder(mCurrentActivity.get(), "share_receipt");
+//        Notification notification = builder.setContentTitle("Accpet Device Share")
+//                                           .setContentText("User(" + fromId + ") accept the device(" + notify.device_id + ") you share.")
+//                                           .setWhen(System.currentTimeMillis())
+//                                           .setSmallIcon(R.drawable.ic_device_default_black_64dp)
+//                                           .setAutoCancel(true)
+//                                           .setContentIntent(pendingIntent)
+//                                           .build();
+//        manager.notify(1, notification);
+//    }
+//
+//    private void showDeviceShareDenyMessage(int fromId, @NonNull EventNotifyHelper.DeviceShareNotify notify) {
+//        Intent intent = new Intent();
+//        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_ONE_SHOT);
+//        NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+//        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, "share_receipt");
+//        Notification notification = builder.setContentTitle("Deny Device Share")
+//                                           .setContentText("User(" + fromId + ") deny the device(" + notify.device_id + ") you share.")
+//                                           .setWhen(System.currentTimeMillis())
+//                                           .setSmallIcon(R.drawable.ic_device_default_black_64dp)
+//                                           .setAutoCancel(true)
+//                                           .setContentIntent(pendingIntent)
+//                                           .build();
+//        manager.notify(2, notification);
+//    }
 
 //    private void showHomeInviteAccpetMessage(@NonNull final EventNotifyHelper.HomeMemberInvitedNotify notify) {
 //        String from = TextUtils.isEmpty(notify.from_name) ? String.valueOf(notify.from_id) : notify.from_name;
@@ -622,6 +657,8 @@ public class EXOTerraApplication extends Application {
 //    }
 
     private void showJoinHomeMessage(@NonNull final EventNotifyHelper.HomeMemberChangedNotify notify) {
+        Intent intent = new Intent();
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_ONE_SHOT);
         String home = TextUtils.isEmpty(notify.home_name) ? notify.home_id : notify.home_name;
         NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         NotificationCompat.Builder builder = new NotificationCompat.Builder(mCurrentActivity.get(), "home_member_changed");
@@ -630,11 +667,14 @@ public class EXOTerraApplication extends Application {
                                            .setWhen(System.currentTimeMillis())
                                            .setSmallIcon(R.drawable.ic_device_default_black_64dp)
                                            .setAutoCancel(true)
+                                           .setContentIntent(pendingIntent)
                                            .build();
-        manager.notify(3, notification);
+        manager.notify(AppConstants.JOIN_HOME + "_" + notify.home_id, notify.user_id, notification);
     }
 
     private void showLeaveHomeMessage(@NonNull final EventNotifyHelper.HomeMemberChangedNotify notify) {
+        Intent intent = new Intent();
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_ONE_SHOT);
         String home = TextUtils.isEmpty(notify.home_name) ? notify.home_id : notify.home_name;
         NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, "home_member_changed");
@@ -643,12 +683,15 @@ public class EXOTerraApplication extends Application {
                                            .setWhen(System.currentTimeMillis())
                                            .setSmallIcon(R.drawable.ic_device_default_black_64dp)
                                            .setAutoCancel(true)
+                                           .setContentIntent(pendingIntent)
                                            .build();
-        manager.notify(4, notification);
+        manager.notify(AppConstants.LEAVE_HOME + "_" + notify.home_id, notify.user_id, notification);
     }
 
     private void showDeleteHomeMessage(@NonNull final EventNotifyHelper.HomeMessageNotify notify) {
         if (getNotificationManager() != null) {
+            Intent intent = new Intent();
+            PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_ONE_SHOT);
             String home = TextUtils.isEmpty(notify.home_name) ? notify.home_id : notify.home_name;
             NotificationCompat.Builder builder = new NotificationCompat.Builder(this, getString(R.string.notify_chnid_delete_home));
             Notification notification = builder.setContentTitle("Delete Habitat")
@@ -656,8 +699,9 @@ public class EXOTerraApplication extends Application {
                                                .setWhen(System.currentTimeMillis())
                                                .setSmallIcon(R.drawable.ic_device_default_black_64dp)
                                                .setAutoCancel(true)
+                                               .setContentIntent(pendingIntent)
                                                .build();
-            getNotificationManager().notify(5, notification);
+            getNotificationManager().notify(AppConstants.DELETE_HOME + "_" + notify.home_id, notify.from_id, notification);
         }
     }
 
@@ -668,6 +712,8 @@ public class EXOTerraApplication extends Application {
             if (device != null) {
                 icon = DeviceUtil.getProductIcon(device.getXDevice().getProductId());
             }
+            Intent intent = new Intent();
+            PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_ONE_SHOT);
             NotificationCompat.Builder builder = new NotificationCompat.Builder(this, getString(R.string.notify_chnid_alarm));
             Notification notification = builder.setContentTitle(getString(R.string.notify_chn_alarm))
                                                .setContentText(notify.msg)
@@ -675,9 +721,9 @@ public class EXOTerraApplication extends Application {
                                                .setWhen(System.currentTimeMillis())
                                                .setSmallIcon(icon)
                                                .setAutoCancel(true)
+                                               .setContentIntent(pendingIntent)
                                                .build();
-            notification.flags |= Notification.FLAG_AUTO_CANCEL;
-            getNotificationManager().notify(notify.device_id, notification);
+            getNotificationManager().notify(AppConstants.DEVICE_ONLINE_STATE_ALARM, notify.device_id, notification);
         }
     }
 
@@ -689,7 +735,7 @@ public class EXOTerraApplication extends Application {
                 icon = DeviceUtil.getProductIcon(device.getXDevice().getProductId());
             }
             Intent intent = new Intent(this, DeviceActivity.class);
-            intent.putExtra("device_tag", device.getDeviceTag());
+            intent.putExtra(AppConstants.DEVICE_TAG, device.getDeviceTag());
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             PendingIntent pendingIntent = PendingIntent.getActivity(this, notify.getIndex(), intent, PendingIntent.FLAG_ONE_SHOT);
             NotificationCompat.Builder builder = new NotificationCompat.Builder(this, getString(R.string.notify_chnid_alarm));
@@ -701,7 +747,7 @@ public class EXOTerraApplication extends Application {
                                                .setAutoCancel(true)
                                                .setContentIntent(pendingIntent)
                                                .build();
-            getNotificationManager().notify(""+devid, notify.getIndex(), notification);
+            getNotificationManager().notify(AppConstants.DATAPOINT_ALARM + "_" + devid, notify.getIndex(), notification);
         }
     }
 

@@ -113,6 +113,8 @@ public class MeFragment extends BaseFragment {
                 if (!XLinkUserManager.getInstance().isUserAuthorized()) {
                     login();
                     getActivity().finish();
+                } else {
+                    addFragmentToStack(R.id.main_fl, new MessagesFragment());
                 }
             }
         });
@@ -161,6 +163,7 @@ public class MeFragment extends BaseFragment {
         builder.setView(view);
         builder.setNegativeButton(R.string.cancel, null);
         builder.setPositiveButton(R.string.ok, null);
+        builder.setCancelable(false);
         final AlertDialog dialog = builder.show();
         et.requestFocus();
         dialog.getButton(DialogInterface.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
@@ -231,6 +234,7 @@ public class MeFragment extends BaseFragment {
         builder.setView(view);
         builder.setNegativeButton(R.string.cancel, null);
         builder.setPositiveButton(R.string.ok, null);
+        builder.setCancelable(false);
         final AlertDialog dialog = builder.show();
         et_old.requestFocus();
         dialog.getButton(DialogInterface.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {

@@ -185,6 +185,20 @@ public class GroupsAdapter extends SimpleAdapter<Home, GroupsAdapter.GroupViewHo
     }
 
     public void updateTime() {
+        if (mSelectedHomeid != null) {
+            boolean flag = false;
+            for (Home home : mData) {
+                if (TextUtils.equals(home.getHome().id, mSelectedHomeid)) {
+                    flag = true;
+                    break;
+                }
+            }
+            if (!flag) {
+                mSelectedHomeid = null;
+                mSelectedHolder = null;
+                return;
+            }
+        }
         if (mSelectedHolder != null) {
             int position = mSelectedHolder.getAdapterPosition();
             int zone = mData.get(position).getZone();

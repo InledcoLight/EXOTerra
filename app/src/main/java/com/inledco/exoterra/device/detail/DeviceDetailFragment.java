@@ -177,11 +177,12 @@ public class DeviceDetailFragment extends BaseFragment {
                 if (device == null) {
                     return;
                 }
+                if (mUpgradeDialog == null) {
+                    return;
+                }
                 byte state = device.getUpgradeState();
                 if (state == 0) {
-                    if (mUpgradeDialog != null) {
-                        mUpgradeDialog.dismiss();
-                    }
+                    mUpgradeDialog.dismiss();
                 }
                 if (state == 1) {
                     showUpgradeProgress();
@@ -490,6 +491,7 @@ public class DeviceDetailFragment extends BaseFragment {
                                           .create();
         dialog.setCanceledOnTouchOutside(false);
         dialog.show();
+        et_name.requestFocus();
         dialog.getButton(DialogInterface.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

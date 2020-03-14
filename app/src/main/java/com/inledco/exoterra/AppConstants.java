@@ -19,9 +19,6 @@ public class AppConstants {
     public static final String  NICKNAME                = "nickname";
     public static final String  HOME_ID                 = "home_id";
     public static final String  DEVICE_ID               = "device_id";
-    public static final String  ZONE_ID                 = "zone_id";
-    public static final String  ZONE_NAME               = "zone_name";
-    public static final String  ROOM_ID                 = "room_id";
     public static final String  DEVICE_TAG              = "device_tag";
     public static final String  PRODUCT_ID              = "product_id";
     public static final String  TIMEZONE                = "timezone";
@@ -65,4 +62,18 @@ public class AppConstants {
 
     public static final String  KEY_TIMEFORMAT = "timeformat";
     public static final String  KEY_TEMPUNIT = "tempunit";
+
+    public static final String  HOME_INVITE = "home_invite";
+    public static final String  NOTIFICATION_ID = "notification_id";
+    public static final String  INVITE_ID = "invite_id";
+    public static final String  DENY = "deny";
+    public static final String  ACCEPT = "accept";
+    public static final String  ACTION = "action";
+
+    public static final String  JOIN_HOME = "join_home";
+    public static final String  LEAVE_HOME = "leave_home";
+    public static final String  DELETE_HOME = "delete_home";
+
+    public static final String  DEVICE_ONLINE_STATE_ALARM = "device_status";
+    public static final String  DATAPOINT_ALARM = "datapoint";
 }

@@ -19,13 +19,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
 import cn.xlink.restful.XLinkCallback;
@@ -200,6 +197,16 @@ public class XlinkCloudManager {
     }
 
     public void getUserInfo(final int userid, XlinkRequestCallback<UserApi.UserInfoResponse> callback) {
+        XLinkRestful.getApplicationApi()
+                    .getUserInfo(userid)
+                    .enqueue(callback);
+        if (callback != null) {
+            callback.onStart();
+        }
+    }
+
+    public void getUserInfo(XlinkRequestCallback<UserApi.UserInfoResponse> callback) {
+        final int userid = XLinkUserManager.getInstance().getUid();
         XLinkRestful.getApplicationApi()
                     .getUserInfo(userid)
                     .enqueue(callback);
@@ -790,40 +797,6 @@ public class XlinkCloudManager {
                     .enqueue(callback);
     }
 
-    public void createDefaultHome(final XlinkRequestCallback<HomeApi.HomeResponse> callback) {
-        final int userid = XLinkUserManager.getInstance().getUid();
-        getUserInfo(userid, new XlinkRequestCallback<UserApi.UserInfoResponse>() {
-            @Override
-            public void onError(String error) {
-                if (callback != null) {
-                    callback.onError(error);
-                }
-            }
-
-            @Override
-            public void onSuccess(UserApi.UserInfoResponse response) {
-                String nickname = response.nickname;
-                if (TextUtils.isEmpty(nickname)) {
-                    nickname = "" + userid;
-                }
-                createHome(nickname + "'s Home2", callback);
-            }
-        });
-        if (callback != null) {
-            callback.onStart();
-        }
-    }
-
-    public void addHome(@NonNull final String homeName, final XlinkRequestCallback<HomeApi.HomeResponse> callback) {
-//        if (TextUtils.equals(homeName, XlinkConstants.DEFAULT_HOME_NAME)) {
-//            if (callback != null) {
-//                callback.onError("Invalid Input");
-//            }
-//            return;
-//        }
-        createHome(homeName, callback);
-    }
-
     public void setHomeProperty(final String homeid, final int zone, final int sunrise, final int sunset, final XlinkRequestCallback<String> callback) {
         if (zone < -720 || zone > 720) {
             return;
@@ -853,6 +826,14 @@ public class XlinkCloudManager {
         if (callback != null) {
             callback.onStart();
         }
+    }
+
+    public void setHomeRole(final String homeid, final int usrid, final XLinkRestfulEnum.HomeUserType role, final XlinkRequestCallback<String> callback) {
+        HomeApi.HomeUserRequest request = new HomeApi.HomeUserRequest();
+        request.role = role;
+        XLinkRestful.getApplicationApi()
+                    .updateHomeUser(homeid, usrid, request)
+                    .enqueue(callback);
     }
 
     public XlinkResult<HomeProperty> getHomeProperty(final String homeid) {
@@ -1121,10 +1102,10 @@ public class XlinkCloudManager {
         request.authority = XLinkRestfulEnum.DeviceAuthority.RW;
         request.mode = XLinkRestfulEnum.InvitationType.USER_ID;
         request.role = XLinkRestfulEnum.HomeUserType.USER;
-        Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.DATE, calendar.get(Calendar.DATE) + 2);
-        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault());
-        request.expireTime = df.format(calendar.getTime());
+//        Calendar calendar = Calendar.getInstance();
+//        calendar.set(Calendar.DATE, calendar.get(Calendar.DATE) + 2);
+//        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault());
+//        request.expireTime = df.format(calendar.getTime());
         XLinkRestful.getApplicationApi()
                     .inviteHomeUser(homeid, request)
                     .enqueue(callback);

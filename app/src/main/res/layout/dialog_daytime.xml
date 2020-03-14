@@ -31,14 +31,14 @@
                 android:padding="8dp"
                 android:textColor="@color/textColorPrimary"
                 android:textSize="@dimen/textSizePrimary"
-                android:text="@string/start"/>
+                android:text="@string/sunrise"/>
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:padding="8dp"
                 android:textColor="@color/textColorPrimary"
                 android:textSize="@dimen/textSizePrimary"
-                android:text="@string/end"/>
+                android:text="@string/sunset"/>
         </LinearLayout>
         <RadioGroup
             android:id="@+id/dialog_daytime_rg"

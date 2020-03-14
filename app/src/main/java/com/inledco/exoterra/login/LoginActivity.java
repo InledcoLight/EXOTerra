@@ -191,42 +191,6 @@ public class LoginActivity extends BaseActivity {
         return login_et_password.getText().toString();
     }
 
-//    private void checkHome() {
-//        Home2Manager.getInstance().syncHomeList(new XlinkRequestCallback<List<HomeExtendApi.HomesResponse.Home2>>() {
-//            @Override
-//            public void onError(String error) {
-//                Log.e(TAG, "onError: " + error);
-//            }
-//
-//            @Override
-//            public void onSuccess(List<HomeExtendApi.HomesResponse.Home2> homes) {
-//                if (homes != null && homes.size() > 0) {
-//                    for (int i = 0; i < homes.size(); i++) {
-//                        HomeExtendApi.HomesResponse.Home2 home = homes.get(i);
-//                        if (home.creator == XLinkUserManager.getInstance().getUid() && home.name == XlinkConstants.DEFAULT_HOME_NAME)     {
-//                            return;
-//                        }
-//                    }
-//                }
-//                createDefaultHome();
-//            }
-//        });
-//    }
-//
-//    private void createDefaultHome() {
-//        XlinkCloudManager.getInstance().createDefaultHome(new XlinkRequestCallback<HomeApi.HomeResponse>() {
-//            @Override
-//            public void onError(String error) {
-//                Log.e(TAG, "onError: " + error);
-//            }
-//
-//            @Override
-//            public void onSuccess(HomeApi.HomeResponse response) {
-//                Log.e(TAG, "onSuccess: " + response.id + " " + response.name);
-//            }
-//        });
-//    }
-
     public void showLoading() {
 //        mLoadDialog.show();
         mProgressDialog.show();

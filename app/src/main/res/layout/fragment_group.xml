@@ -7,17 +7,6 @@
                                              android:layout_width="match_parent"
                                              android:layout_height="match_parent">
 
-<!--    <android.support.v7.widget.Toolbar-->
-<!--        android:id="@+id/group_toolbar"-->
-<!--        android:layout_width="0dp"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:minHeight="?attr/actionBarSize"-->
-<!--        android:theme="?attr/actionBarTheme"-->
-<!--        app:layout_constraintEnd_toEndOf="parent"-->
-<!--        app:layout_constraintStart_toStartOf="parent"-->
-<!--        app:layout_constraintTop_toTopOf="parent"-->
-<!--        app:navigationIcon="@drawable/ic_arrow_back_white_32dp"/>-->
-
     <ImageView
         android:id="@+id/imageView11"
         android:layout_width="match_parent"
@@ -63,16 +52,15 @@
 
             <TextView
                 android:id="@+id/group_title"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="8dp"
-                android:textColor="@color/textColorPrimary"
-                android:textSize="@dimen/textSizeTitle"
-                android:textStyle="bold" />
-            <Space
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"/>
+                android:layout_weight="1"
+                android:layout_marginLeft="8dp"
+                android:lines="1"
+                android:ellipsize="end"
+                android:textColor="@color/textColorPrimary"
+                android:textSize="@dimen/textSizeSubTitle"
+                android:textStyle="bold" />
             <ImageButton
                 android:id="@+id/group_detail"
                 android:layout_width="wrap_content"

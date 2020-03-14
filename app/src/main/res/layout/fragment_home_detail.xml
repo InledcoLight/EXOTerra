@@ -119,7 +119,7 @@
             android:layout_height="wrap_content"
             android:textColor="@color/textColorPrimary"
             android:textSize="@dimen/textSizeSecondary"
-            android:text="@string/home_members"/>
+            android:text="@string/members"/>
         <android.support.v7.widget.RecyclerView
             android:id="@+id/home_detail_rv"
             android:layout_width="match_parent"

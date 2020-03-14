@@ -41,7 +41,6 @@ public class ConfigGuideFragment extends BaseFragment {
     private ImageView config_guide_prdt;
     private ImageView config_guide_icon;
     private TextView config_guide_step;
-    private ImageView config_guide_led;
     private Button config_guide_back;
     private Button config_guide_next;
 
@@ -93,7 +92,6 @@ public class ConfigGuideFragment extends BaseFragment {
         config_guide_prdt = view.findViewById(R.id.config_guide_prdt);
         config_guide_icon = view.findViewById(R.id.config_guide_icon);
         config_guide_step = view.findViewById(R.id.config_guide_step);
-//        config_guide_led = view.findViewById(R.id.config_guide_led);
         config_guide_back = view.findViewById(R.id.config_guide_back);
         config_guide_next = view.findViewById(R.id.config_guide_next);
     }
@@ -111,7 +109,6 @@ public class ConfigGuideFragment extends BaseFragment {
                 refreshData();
             }
         });
-//        config_guide_icon.setImageResource(DeviceUtil.getProductIcon(mConnectNetBean.getProductId()));
 
         refreshData();
 

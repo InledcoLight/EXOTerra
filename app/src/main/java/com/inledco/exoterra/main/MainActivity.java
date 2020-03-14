@@ -16,8 +16,12 @@ import android.util.Base64;
 import android.util.Log;
 import android.view.MenuItem;
 
-import com.alibaba.sdk.android.push.CloudPushService;
-import com.alibaba.sdk.android.push.noonesdk.PushServiceFactory;
+import com.aliyuncs.DefaultAcsClient;
+import com.aliyuncs.exceptions.ClientException;
+import com.aliyuncs.iot.model.v20180120.SetDevicePropertyRequest;
+import com.aliyuncs.iot.model.v20180120.SetDevicePropertyResponse;
+import com.aliyuncs.profile.DefaultProfile;
+import com.aliyuncs.profile.IClientProfile;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 import com.inledco.exoterra.GlobalSettings;
@@ -32,7 +36,6 @@ import com.inledco.exoterra.main.pref.PrefFragment;
 import com.inledco.exoterra.manager.DeviceManager;
 import com.inledco.exoterra.manager.HomeManager;
 import com.inledco.exoterra.manager.UserManager;
-import com.inledco.exoterra.push.AlipushService;
 import com.inledco.exoterra.push.FCMMessageService;
 import com.inledco.exoterra.push.FCMTokenListener;
 import com.inledco.exoterra.scan.ScanActivity;
@@ -40,7 +43,6 @@ import com.inledco.exoterra.smartconfig.SmartconfigActivity;
 import com.inledco.exoterra.xlink.XlinkCloudManager;
 import com.inledco.exoterra.xlink.XlinkRequestCallback;
 
-import cn.xlink.restful.XLinkRestfulEnum;
 import cn.xlink.sdk.v5.manager.XLinkUserManager;
 import cn.xlink.sdk.v5.module.main.XLinkSDK;
 import q.rorbin.badgeview.Badge;
@@ -50,8 +52,6 @@ public class MainActivity extends BaseActivity {
     private BottomNavigationView main_bnv;
     private BottomNavigationItemView main_me;
     private Badge badge;
-
-    private HomeViewModel mHomeViewModel;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -63,6 +63,7 @@ public class MainActivity extends BaseActivity {
 
         initData();
         initEvent();
+//        initAliot();
     }
 
     @Override
@@ -148,38 +149,59 @@ public class MainActivity extends BaseActivity {
         });
     }
 
-    private void initAlipush() {
-        if (XLinkUserManager.getInstance().isUserAuthorized()) {
-            CloudPushService pushService = PushServiceFactory.getCloudPushService();
-            String deviceToken = pushService.getDeviceId();
-            Log.e(TAG, "initAlipush: " + deviceToken);
-            pushService.setPushIntentService(AlipushService.class);
-            XlinkCloudManager.getInstance()
-                             .registerAlipush(deviceToken, XLinkRestfulEnum.PushMessageOpenType.NONE, null, new XlinkRequestCallback<String>() {
-                                 @Override
-                                 public void onError(String error) {
-                                     Log.e(TAG, "onError: registerAlipush - " + error);
-                                 }
+    private void initAliot() {
+//        String accessKey = "";
+//        String accessSecret = "";
+//        String accessKey = "LTAI4FwGrXTiyWhizBnf6NJq";
+//        String accessSecret = "2chF61ExE3HvQ3Si3PhalcGibvjPha";//
+        String accessKey = "LTAI4Fe6PdzpbzqhNV9y8bv7";
+        String accessSecret = "ggNfjFlBO2KIzvo1BOnymFVEvprcFM";
+        try {
+            DefaultProfile.addEndpoint("cn-shanghai", "cn-shanghai", "Iot", "iot.cn-shanghai.aliyuncs.com");
+            IClientProfile profile = DefaultProfile.getProfile("cn-shanghai", accessKey, accessSecret);
+            final DefaultAcsClient client = new DefaultAcsClient(profile);
 
-                                 @Override
-                                 public void onSuccess(String s) {
-                                     Log.e(TAG, "onSuccess: registerAlipush - " + s);
-                                 }
-                             });
-        } else {
-            int usrid = UserManager.getUserId(MainActivity.this);
-            XlinkCloudManager.getInstance().unregisterAlipush(usrid, new XlinkRequestCallback<String>() {
+            new Thread(new Runnable() {
                 @Override
-                public void onError(String error) {
-                    Log.e(TAG, "onError: unregisterAlipush - " + error);
+                public void run() {
+                    SetDevicePropertyResponse response = null;
+                    try {
+                        response = client.getAcsResponse(setLedPower(null, "a1layga4ANI", "2CF432121FC9", false));
+                    } catch (ClientException e) {
+                        e.printStackTrace();
+                    }
+                    Log.e(TAG, "initAliot: " + response.getSuccess());
                 }
+            }).start();
 
-                @Override
-                public void onSuccess(String s) {
-                    Log.e(TAG, "onSuccess: unregisterAlipush - " + s);
-                }
-            });
+//            final RegisterDeviceRequest request = new RegisterDeviceRequest();
+//            request.setRegionId("cn-shanghai");
+//            request.setDeviceName("18FE34D4178D");
+//            request.setProductKey("a1layga4ANI");
+//            new Thread(new Runnable() {
+//                @Override
+//                public void run() {
+//                    RegisterDeviceResponse response = null;
+//                    try {
+//                        response = client.getAcsResponse(request);
+//                    } catch (ClientException e) {
+//                        e.printStackTrace();
+//                    }
+//                    Log.e(TAG, "initAliot: " + new Gson().toJson(response));
+//                }
+//            }).start();
+        } catch (ClientException e) {
+            e.printStackTrace();
         }
+    }
+
+    private SetDevicePropertyRequest setLedPower(String iotid, String pkey, String dname, boolean power) {
+        SetDevicePropertyRequest request = new SetDevicePropertyRequest();
+        request.setProductKey(pkey);
+        request.setDeviceName(dname);
+        request.setIotId(iotid);
+        request.setItems("{\"Power\":" + (power ? 1 : 0) + "}");
+        return request;
     }
 
     private void initFCMService() {

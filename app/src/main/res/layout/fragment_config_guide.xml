@@ -149,13 +149,4 @@
         android:orientation="vertical"
         app:layout_constraintGuide_percent="0.5" />
 
-    <!--    <ImageView-->
-    <!--        android:id="@+id/config_guide_led"-->
-    <!--        android:layout_width="wrap_content"-->
-    <!--        android:layout_height="wrap_content"-->
-    <!--        android:layout_marginStart="16dp"-->
-    <!--        android:layout_marginTop="32dp"-->
-    <!--        android:visibility="visible"-->
-    <!--        app:srcCompat="@drawable/ic_power_green"/>-->
-
 </android.support.constraint.ConstraintLayout>

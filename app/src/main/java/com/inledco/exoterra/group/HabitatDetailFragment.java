@@ -12,6 +12,8 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputEditText;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.DividerItemDecoration;
+import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -29,6 +31,7 @@ import com.inledco.exoterra.GlobalSettings;
 import com.inledco.exoterra.R;
 import com.inledco.exoterra.base.BaseFragment;
 import com.inledco.exoterra.bean.Home;
+import com.inledco.exoterra.common.OnItemClickListener;
 import com.inledco.exoterra.event.HomeChangedEvent;
 import com.inledco.exoterra.event.HomePropertyChangedEvent;
 import com.inledco.exoterra.event.HomesRefreshedEvent;
@@ -41,8 +44,12 @@ import com.inledco.exoterra.xlink.XlinkCloudManager;
 import com.inledco.exoterra.xlink.XlinkRequestCallback;
 
 import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.text.DateFormat;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 import java.util.TimeZone;
 
@@ -59,6 +66,7 @@ public class HabitatDetailFragment extends BaseFragment {
     private Switch habitat_detail_favourite;
     private ImageButton habitat_detail_share;
     private ImageButton habitat_detail_delete;
+    private RecyclerView habitat_detail_rv;
     private GradientCornerButton habitat_detail_back;
 
     private static final String KEY_HOMEID = "homeid";
@@ -75,6 +83,8 @@ public class HabitatDetailFragment extends BaseFragment {
     private BroadcastReceiver mTimeReceiver;
 
     private boolean mHomeAdmin;
+    private final List<HomeApi.HomesResponse.Home.User> mUsers = new ArrayList<>();
+    private HabitatMembersAdapter mAdapter;
 
     public static HabitatDetailFragment newInstance(@NonNull final String homeid) {
         Bundle args = new Bundle();
@@ -89,6 +99,7 @@ public class HabitatDetailFragment extends BaseFragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = super.onCreateView(inflater, container, savedInstanceState);
 
+        EventBus.getDefault().register(this);
         initData();
         initEvent();
         return view;
@@ -97,6 +108,9 @@ public class HabitatDetailFragment extends BaseFragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
+        if (EventBus.getDefault().isRegistered(this)) {
+            EventBus.getDefault().unregister(this);
+        }
         if (mTimeReceiver != null) {
             getActivity().unregisterReceiver(mTimeReceiver);
         }
@@ -117,12 +131,10 @@ public class HabitatDetailFragment extends BaseFragment {
         habitat_detail_favourite = view.findViewById(R.id.habitat_detail_favourite);
         habitat_detail_share = view.findViewById(R.id.habitat_detail_share);
         habitat_detail_delete = view.findViewById(R.id.habitat_detail_delete);
+        habitat_detail_rv = view.findViewById(R.id.habitat_detail_rv);
         habitat_detail_back = view.findViewById(R.id.habitat_detail_back);
 
-        habitat_detail_name.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_edit_white_24dp, 0);
-        habitat_detail_datetime.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_edit_white_24dp, 0);
-        habitat_detail_sunrise.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_edit_white_24dp, 0);
-        habitat_detail_sunset.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_edit_white_24dp, 0);
+        habitat_detail_rv.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL));
     }
 
     @Override
@@ -159,8 +171,32 @@ public class HabitatDetailFragment extends BaseFragment {
                     }
                 }
 
+                if (mHomeAdmin) {
+                    habitat_detail_name.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_edit_white_24dp, 0);
+                    habitat_detail_datetime.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_edit_white_24dp, 0);
+                    habitat_detail_sunrise.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_edit_white_24dp, 0);
+                    habitat_detail_sunset.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_edit_white_24dp, 0);
+                }
+                habitat_detail_name.setEnabled(mHomeAdmin);
+                habitat_detail_datetime.setEnabled(mHomeAdmin);
+                habitat_detail_sunrise.setEnabled(mHomeAdmin);
+                habitat_detail_sunset.setEnabled(mHomeAdmin);
+                habitat_detail_share.setVisibility(mHomeAdmin ? View.VISIBLE : View.GONE);
+
                 final Set<String> favourites = FavouriteUtil.getFavourites(getContext());
                 habitat_detail_favourite.setChecked(favourites.contains(mHomeid));
+
+                mUsers.addAll(mHome.getHome().userList);
+                mAdapter = new HabitatMembersAdapter(getContext(), mUsers);
+                mAdapter.setOnItemClickListener(new OnItemClickListener() {
+                    @Override
+                    public void onItemClick(int position) {
+                        HomeApi.HomesResponse.Home.User user = mUsers.get(position);
+                        addFragmentToStack(R.id.main_fl, HabitatMemberFragment.newInstance(mHomeid, user.userId));
+                    }
+                });
+                habitat_detail_rv.setAdapter(mAdapter);
+
                 refreshData();
             }
         }
@@ -235,7 +271,6 @@ public class HabitatDetailFragment extends BaseFragment {
         habitat_detail_favourite.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                Log.e(TAG, "onCheckedChanged: " + isChecked);
                 if (isChecked) {
                     FavouriteUtil.addFavourite(getContext(), mHomeid);
                 } else {
@@ -324,6 +359,7 @@ public class HabitatDetailFragment extends BaseFragment {
                                           .create();
         dialog.setCanceledOnTouchOutside(false);
         dialog.show();
+        et_name.requestFocus();
         dialog.getButton(DialogInterface.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -359,8 +395,10 @@ public class HabitatDetailFragment extends BaseFragment {
         final AlertDialog dialog = builder.setTitle(R.string.invite_member)
                                           .setView(view)
                                           .setNegativeButton(R.string.cancel, null)
-                                          .setPositiveButton(R.string.share, null)
+                                          .setPositiveButton(R.string.invite, null)
+                                          .setCancelable(false)
                                           .show();
+        et_email.requestFocus();
         Button btn_share = dialog.getButton(DialogInterface.BUTTON_POSITIVE);
         btn_share.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -424,5 +462,14 @@ public class HabitatDetailFragment extends BaseFragment {
                })
                .setCancelable(false)
                .show();
+    }
+
+    @Subscribe (threadMode = ThreadMode.MAIN)
+    public void onHomesRefreshedEvent(HomesRefreshedEvent event) {
+        if (event != null) {
+            mUsers.clear();
+            mUsers.addAll(mHome.getHome().userList);
+            mAdapter.notifyDataSetChanged();
+        }
     }
 }

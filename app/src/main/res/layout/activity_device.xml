@@ -52,16 +52,15 @@
 
             <TextView
                 android:id="@+id/device_name"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="8dp"
-                android:textColor="@color/textColorPrimary"
-                android:textSize="@dimen/textSizeTitle"
-                android:textStyle="bold"/>
-            <Space
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"/>
+                android:layout_weight="1"
+                android:layout_marginLeft="8dp"
+                android:lines="1"
+                android:ellipsize="end"
+                android:textColor="@color/textColorPrimary"
+                android:textSize="@dimen/textSizeSubTitle"
+                android:textStyle="bold"/>
             <ImageButton
                 android:id="@+id/device_detail"
                 android:layout_width="wrap_content"

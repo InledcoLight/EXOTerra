@@ -20,6 +20,7 @@ import com.inledco.exoterra.bean.Device;
 import com.inledco.exoterra.common.OnItemClickListener;
 import com.inledco.exoterra.device.DeviceActivity;
 import com.inledco.exoterra.event.DatapointChangedEvent;
+import com.inledco.exoterra.event.DevicePropertyChangedEvent;
 import com.inledco.exoterra.event.DeviceStateChangedEvent;
 import com.inledco.exoterra.event.DevicesRefreshedEvent;
 import com.inledco.exoterra.event.HomesRefreshedEvent;
@@ -100,23 +101,6 @@ public class DevicesFragment extends BaseFragment {
 
     @Override
     protected void initEvent() {
-//        devices_toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
-//            @Override
-//            public boolean onMenuItemClick(MenuItem menuItem) {
-//                switch (menuItem.getItemId()) {
-//                    case R.id.menu_devices_smartconfig:
-//                        startSmartconfigActivity();
-//                        break;
-//                    case R.id.menu_devices_scan:
-//                        startScanActivity();
-//                        break;
-//                    case R.id.menu_devices_add:
-//                        startAdddeviceActivity();
-//                        break;
-//                }
-//                return true;
-//            }
-//        });
         devices_swipe_refresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
@@ -128,9 +112,21 @@ public class DevicesFragment extends BaseFragment {
             @Override
             public void onClick(View v) {
                 startAdddeviceActivity();
-//                startScanActivity();
             }
         });
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onDevicePropertyChangedEvent(DevicePropertyChangedEvent event) {
+        if (event != null) {
+            for (int i = 0; i < mDevices.size(); i++) {
+                if (event.getDeviceId() == mDevices.get(i).getXDevice().getDeviceId()) {
+                    mDevices.get(i).getXDevice().setDeviceName(event.getDeviceName());
+                    mAdapter.notifyDataSetChanged();
+                    return;
+                }
+            }
+        }
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)

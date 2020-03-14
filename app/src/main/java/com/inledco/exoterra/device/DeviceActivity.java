@@ -3,21 +3,14 @@ package com.inledco.exoterra.device;
 import android.annotation.SuppressLint;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.design.widget.TextInputEditText;
-import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -45,7 +38,6 @@ import com.inledco.exoterra.event.DeviceStateChangedEvent;
 import com.inledco.exoterra.manager.DeviceManager;
 import com.inledco.exoterra.manager.HomeManager;
 import com.inledco.exoterra.util.DeviceUtil;
-import com.inledco.exoterra.util.RegexUtil;
 import com.inledco.exoterra.xlink.XlinkCloudManager;
 import com.inledco.exoterra.xlink.XlinkConstants;
 import com.inledco.exoterra.xlink.XlinkTaskCallback;
@@ -83,8 +75,6 @@ public class DeviceActivity extends BaseActivity {
 
     private XlinkTaskCallback<XDevice> mSetCallback;
     private XlinkTaskCallback<List<XLinkDataPoint>> mGetCallback;
-
-    private final Handler mHandler = new Handler();
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -334,31 +324,6 @@ public class DeviceActivity extends BaseActivity {
             public void onComplete(DeviceApi.ShareDeviceResponse response) {
                 Toast.makeText(DeviceActivity.this, "Share Success.", Toast.LENGTH_SHORT)
                      .show();
-            }
-        });
-    }
-
-    private void showShareDeviceDialog() {
-        View view = LayoutInflater.from(DeviceActivity.this).inflate(R.layout.dialog_share, null, false);
-        final TextInputLayout til = view.findViewById(R.id.dialog_share_til);
-        final TextInputEditText et_email = view.findViewById(R.id.dialog_share_email);
-        AlertDialog.Builder builder = new AlertDialog.Builder(DeviceActivity.this);
-        final AlertDialog dialog = builder.setTitle(R.string.share_device)
-                                          .setView(view)
-                                          .setNegativeButton(R.string.cancel, null)
-                                          .setPositiveButton(R.string.share, null)
-                                          .show();
-        Button btn_share = dialog.getButton(DialogInterface.BUTTON_POSITIVE);
-        btn_share.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String email = et_email.getText().toString();
-                if (RegexUtil.isEmail(email)) {
-                    shareDevice(email);
-                    dialog.dismiss();
-                } else {
-                    til.setError(getString(R.string.error_email));
-                }
             }
         });
     }

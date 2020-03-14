@@ -249,7 +249,7 @@
     <string name="msg_delete">Confirm delete %1$s?</string>
     <string name="home2s">Homes</string>
     <string name="add_home">Add home</string>
-    <string name="home_members">Home members</string>
+    <string name="members">Members</string>
     <string name="admin">Administrator</string>
     <string name="user">User</string>
     <string name="rename_home">Rename home</string>
@@ -333,4 +333,9 @@
     <string name="favourites">Favourites</string>
     <string name="status">status</string>
     <string name="presets">Presets</string>
+    <string name="visitor">Visitor</string>
+    <string name="delete_user">Delete user</string>
+    <string name="habitat_invite_member">Habitat invite member</string>
+    <string name="creator">Creator</string>
+    <string name="change_role">Change role</string>
 </resources>
