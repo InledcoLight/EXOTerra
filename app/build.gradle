@@ -65,11 +65,12 @@ dependencies {
 //    implementation 'com.google.firebase:firebase-analytics:16.5.0'
     implementation 'com.google.firebase:firebase-messaging:18.0.0'
 
-    implementation 'com.aliyun:aliyun-java-sdk-iot:7.5.0'
-    implementation 'com.aliyun:aliyun-java-sdk-core:3.5.1'
-
-    implementation 'javax.xml.bind:jaxb-api:2.3.1'
-    implementation 'xerces:xercesImpl:2.12.0'
+//    implementation 'com.aliyun:aliyun-java-sdk-iot:7.5.0'
+//    implementation 'com.aliyun:aliyun-java-sdk-core:3.5.1'
+//    implementation 'com.aliyun.alink.linksdk:iot-linkkit:1.6.6'
+//
+//    implementation 'javax.xml.bind:jaxb-api:2.3.1'
+//    implementation 'xerces:xercesImpl:2.12.0'
 
     implementation 'com.android.support:multidex:1.0.3'
 }

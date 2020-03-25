@@ -16,12 +16,6 @@ import android.util.Base64;
 import android.util.Log;
 import android.view.MenuItem;
 
-import com.aliyuncs.DefaultAcsClient;
-import com.aliyuncs.exceptions.ClientException;
-import com.aliyuncs.iot.model.v20180120.SetDevicePropertyRequest;
-import com.aliyuncs.iot.model.v20180120.SetDevicePropertyResponse;
-import com.aliyuncs.profile.DefaultProfile;
-import com.aliyuncs.profile.IClientProfile;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 import com.inledco.exoterra.GlobalSettings;
@@ -149,30 +143,30 @@ public class MainActivity extends BaseActivity {
         });
     }
 
-    private void initAliot() {
-//        String accessKey = "";
-//        String accessSecret = "";
-//        String accessKey = "LTAI4FwGrXTiyWhizBnf6NJq";
-//        String accessSecret = "2chF61ExE3HvQ3Si3PhalcGibvjPha";//
-        String accessKey = "LTAI4Fe6PdzpbzqhNV9y8bv7";
-        String accessSecret = "ggNfjFlBO2KIzvo1BOnymFVEvprcFM";
-        try {
-            DefaultProfile.addEndpoint("cn-shanghai", "cn-shanghai", "Iot", "iot.cn-shanghai.aliyuncs.com");
-            IClientProfile profile = DefaultProfile.getProfile("cn-shanghai", accessKey, accessSecret);
-            final DefaultAcsClient client = new DefaultAcsClient(profile);
-
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    SetDevicePropertyResponse response = null;
-                    try {
-                        response = client.getAcsResponse(setLedPower(null, "a1layga4ANI", "2CF432121FC9", false));
-                    } catch (ClientException e) {
-                        e.printStackTrace();
-                    }
-                    Log.e(TAG, "initAliot: " + response.getSuccess());
-                }
-            }).start();
+//    private void initAliot() {
+////        String accessKey = "";
+////        String accessSecret = "";
+////        String accessKey = "LTAI4FwGrXTiyWhizBnf6NJq";
+////        String accessSecret = "2chF61ExE3HvQ3Si3PhalcGibvjPha";//
+//        String accessKey = "LTAI4Fe6PdzpbzqhNV9y8bv7";
+//        String accessSecret = "ggNfjFlBO2KIzvo1BOnymFVEvprcFM";
+//        try {
+//            DefaultProfile.addEndpoint("cn-shanghai", "cn-shanghai", "Iot", "iot.cn-shanghai.aliyuncs.com");
+//            IClientProfile profile = DefaultProfile.getProfile("cn-shanghai", accessKey, accessSecret);
+//            final DefaultAcsClient client = new DefaultAcsClient(profile);
+//
+//            new Thread(new Runnable() {
+//                @Override
+//                public void run() {
+//                    SetDevicePropertyResponse response = null;
+//                    try {
+//                        response = client.getAcsResponse(setLedPower(null, "a1layga4ANI", "2CF432121FC9", false));
+//                    } catch (ClientException e) {
+//                        e.printStackTrace();
+//                    }
+//                    Log.e(TAG, "initAliot: " + response.getSuccess());
+//                }
+//            }).start();
 
 //            final RegisterDeviceRequest request = new RegisterDeviceRequest();
 //            request.setRegionId("cn-shanghai");
@@ -190,19 +184,19 @@ public class MainActivity extends BaseActivity {
 //                    Log.e(TAG, "initAliot: " + new Gson().toJson(response));
 //                }
 //            }).start();
-        } catch (ClientException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private SetDevicePropertyRequest setLedPower(String iotid, String pkey, String dname, boolean power) {
-        SetDevicePropertyRequest request = new SetDevicePropertyRequest();
-        request.setProductKey(pkey);
-        request.setDeviceName(dname);
-        request.setIotId(iotid);
-        request.setItems("{\"Power\":" + (power ? 1 : 0) + "}");
-        return request;
-    }
+//        } catch (ClientException e) {
+//            e.printStackTrace();
+//        }
+//    }
+//
+//    private SetDevicePropertyRequest setLedPower(String iotid, String pkey, String dname, boolean power) {
+//        SetDevicePropertyRequest request = new SetDevicePropertyRequest();
+//        request.setProductKey(pkey);
+//        request.setDeviceName(dname);
+//        request.setIotId(iotid);
+//        request.setItems("{\"Power\":" + (power ? 1 : 0) + "}");
+//        return request;
+//    }
 
     private void initFCMService() {
         if (XLinkUserManager.getInstance().isUserAuthorized()) {
