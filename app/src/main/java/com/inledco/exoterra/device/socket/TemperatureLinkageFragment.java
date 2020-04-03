@@ -10,13 +10,13 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.inledco.exoterra.R;
+import com.inledco.exoterra.aliot.ExoSocket;
+import com.inledco.exoterra.aliot.SocketViewModel;
 import com.inledco.exoterra.base.BaseFragment;
-import com.inledco.exoterra.bean.EXOSocket;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -37,7 +37,7 @@ public class TemperatureLinkageFragment extends BaseFragment {
     private TemperatureAdapter mAdapter;
 
     private SocketViewModel mSocketViewModel;
-    private EXOSocket mSocket;
+    private ExoSocket mSocket;
 
     private byte[][] mTempArgs;
 
@@ -76,30 +76,30 @@ public class TemperatureLinkageFragment extends BaseFragment {
 
     @Override
     protected void initEvent() {
-        linkage_toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                getActivity().getSupportFragmentManager().popBackStack();
-            }
-        });
-
-        linkage_toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem menuItem) {
-                if (menuItem.getItemId() == R.id.menu_save) {
-                    boolean enable = linkage_enable.isChecked();
-                    byte[] args = new byte[256];
-                    for (int i = 0; i < 12; i++) {
-                        for (int j = 0; j < 12; j++) {
-                            args[i*12+j] = mTempArgs[i][j];
-                        }
-                    }
-                    mSocketViewModel.setSensorLinkage(enable, args);
-                    getActivity().getSupportFragmentManager().popBackStack();
-                }
-                return false;
-            }
-        });
+//        linkage_toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                getActivity().getSupportFragmentManager().popBackStack();
+//            }
+//        });
+//
+//        linkage_toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
+//            @Override
+//            public boolean onMenuItemClick(MenuItem menuItem) {
+//                if (menuItem.getItemId() == R.id.menu_save) {
+//                    boolean enable = linkage_enable.isChecked();
+//                    byte[] args = new byte[256];
+//                    for (int i = 0; i < 12; i++) {
+//                        for (int j = 0; j < 12; j++) {
+//                            args[i*12+j] = mTempArgs[i][j];
+//                        }
+//                    }
+//                    mSocketViewModel.setSensorLinkage(enable, args);
+//                    getActivity().getSupportFragmentManager().popBackStack();
+//                }
+//                return false;
+//            }
+//        });
     }
 
     private void refreshData() {

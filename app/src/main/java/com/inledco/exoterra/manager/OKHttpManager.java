@@ -2,7 +2,7 @@ package com.inledco.exoterra.manager;
 
 import android.text.TextUtils;
 
-import com.google.gson.Gson;
+import com.alibaba.fastjson.JSON;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -21,7 +21,7 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 
 public class OKHttpManager {
-    private static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
+    private static final MediaType CONTENT_TYPE_JSON = MediaType.parse("application/json; charset=utf-8");
 
     private final OkHttpClient mHttpClient;
 
@@ -74,7 +74,7 @@ public class OKHttpManager {
         try {
             Response response = mHttpClient.newCall(request).execute();
             if (response != null && response.isSuccessful()) {
-                return new Gson().fromJson(response.body().string(), clazz);
+                return JSON.parseObject(response.body().string(), clazz);
             }
         }
         catch (IOException e) {
@@ -122,7 +122,7 @@ public class OKHttpManager {
         if (TextUtils.isEmpty(url) || TextUtils.isEmpty(json)) {
             return false;
         }
-        RequestBody body = RequestBody.create(JSON, json);
+        RequestBody body = RequestBody.create(CONTENT_TYPE_JSON, json);
         Request request;
         if (headers == null) {
             request = new Request.Builder().url(url)
@@ -160,7 +160,7 @@ public class OKHttpManager {
         try {
             Response response = mHttpClient.newCall(request).execute();
             if (response != null && response.isSuccessful()) {
-                return new Gson().fromJson(response.body().string(), clazz);
+                return JSON.parseObject(response.body().string(), clazz);
             }
         }
         catch (IOException e) {
@@ -173,7 +173,7 @@ public class OKHttpManager {
         if (TextUtils.isEmpty(url) || TextUtils.isEmpty(json)) {
             return null;
         }
-        RequestBody body = RequestBody.create(JSON, json);
+        RequestBody body = RequestBody.create(CONTENT_TYPE_JSON, json);
         Request request;
         if (headers == null) {
             request = new Request.Builder().url(url)
@@ -190,7 +190,7 @@ public class OKHttpManager {
         try {
             Response response = mHttpClient.newCall(request).execute();
             if (response.isSuccessful()) {
-                return new Gson().fromJson(response.body().string(), clazz);
+                return JSON.parseObject(response.body().string(), clazz);
             }
         }
         catch (IOException e) {
@@ -199,23 +199,165 @@ public class OKHttpManager {
         return null;
     }
 
+    public boolean put(String url, Headers headers, RequestBody body, Callback callback) {
+        if (TextUtils.isEmpty(url) || body == null) {
+            return false;
+        }
+        Request request;
+        if (headers == null) {
+            request = new Request.Builder().url(url)
+                                           .put(body)
+                                           .build();
+        }
+        else {
+            request = new Request.Builder().url(url)
+                                           .headers(headers)
+                                           .put(body)
+                                           .build();
+        }
+        mHttpClient.newCall(request)
+                   .enqueue(callback);
+        return true;
+    }
+
+    public boolean put(String url, Headers headers, String json, Callback callback) {
+        if (TextUtils.isEmpty(url) || TextUtils.isEmpty(json)) {
+            return false;
+        }
+        RequestBody body = RequestBody.create(CONTENT_TYPE_JSON, json);
+        Request request;
+        if (headers == null) {
+            request = new Request.Builder().url(url)
+                                           .put(body)
+                                           .build();
+        }
+        else {
+            request = new Request.Builder().url(url)
+                                           .headers(headers)
+                                           .put(body)
+                                           .build();
+        }
+
+        mHttpClient.newCall(request)
+                   .enqueue(callback);
+        return true;
+    }
+
+    public <T> T blockPut(String url, Headers headers, RequestBody body, Class<T> clazz) {
+        if (TextUtils.isEmpty(url) || body == null) {
+            return null;
+        }
+        Request request;
+        if (headers == null) {
+            request = new Request.Builder().url(url)
+                                           .put(body)
+                                           .build();
+        }
+        else {
+            request = new Request.Builder().url(url)
+                                           .headers(headers)
+                                           .put(body)
+                                           .build();
+        }
+        try {
+            Response response = mHttpClient.newCall(request).execute();
+            if (response != null && response.isSuccessful()) {
+                return JSON.parseObject(response.body().string(), clazz);
+            }
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public <T> T blockPut(String url, Headers headers, String json, Class<T> clazz) {
+        if (TextUtils.isEmpty(url) || TextUtils.isEmpty(json)) {
+            return null;
+        }
+        RequestBody body = RequestBody.create(CONTENT_TYPE_JSON, json);
+        Request request;
+        if (headers == null) {
+            request = new Request.Builder().url(url)
+                                           .put(body)
+                                           .build();
+        }
+        else {
+            request = new Request.Builder().url(url)
+                                           .headers(headers)
+                                           .put(body)
+                                           .build();
+        }
+
+        try {
+            Response response = mHttpClient.newCall(request).execute();
+            if (response.isSuccessful()) {
+                return JSON.parseObject(response.body().string(), clazz);
+            }
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public boolean delete(String url, Headers headers, RequestBody body, Callback callback) {
+        if (TextUtils.isEmpty(url) || body == null) {
+            return false;
+        }
+        Request request;
+        if (headers == null) {
+            request = new Request.Builder().url(url)
+                                           .delete(body)
+                                           .build();
+        }
+        else {
+            request = new Request.Builder().url(url)
+                                           .headers(headers)
+                                           .delete(body)
+                                           .build();
+        }
+        mHttpClient.newCall(request)
+                   .enqueue(callback);
+        return true;
+    }
+
+    public boolean delete(String url, Headers headers, String json, Callback callback) {
+        if (TextUtils.isEmpty(url) || TextUtils.isEmpty(json)) {
+            return false;
+        }
+        RequestBody body = RequestBody.create(CONTENT_TYPE_JSON, json);
+        Request request;
+        if (headers == null) {
+            request = new Request.Builder().url(url)
+                                           .delete(body)
+                                           .build();
+        }
+        else {
+            request = new Request.Builder().url(url)
+                                           .headers(headers)
+                                           .delete(body)
+                                           .build();
+        }
+
+        mHttpClient.newCall(request)
+                   .enqueue(callback);
+        return true;
+    }
+
     /**
      * @param url
      * @param file
      * @param callback
      */
     public boolean download(String url, final File file, final DownloadCallback callback) {
-        if (url == null || "".equals(url)) {
-            return false;
-        }
-        if (file == null) {
+        if (TextUtils.isEmpty(url) || file == null) {
             return false;
         }
         if (file.exists()) {
             return false;
         }
-        Request request = new Request.Builder().url(url)
-                                               .build();
+        Request request = new Request.Builder().url(url).build();
         mHttpClient.newCall(request)
                    .enqueue(new Callback() {
                        @Override
@@ -278,13 +420,14 @@ public class OKHttpManager {
         private static final OKHttpManager INSTANCE = new OKHttpManager();
     }
 
+    /**
+     *
+     * @param <T>   必须为外部类或静态内部类
+     */
     public abstract static class HttpCallback<T> implements Callback {
-
-        private Gson mGson;
         private Type mType;
 
         public HttpCallback() {
-            mGson = new Gson();
             Type superClass = getClass().getGenericSuperclass();
             if (superClass instanceof ParameterizedType) {
                 mType = ((ParameterizedType) superClass).getActualTypeArguments()[0];
@@ -295,22 +438,20 @@ public class OKHttpManager {
         public void onResponse(Call call, Response response) throws IOException {
             if (response.isSuccessful()) {
                 String json = response.body().string();
-                if (json == null) {
+                if (json == null ) {
                     onError(response.code(), null);
                     return;
                 }
-                if (mType != null) {
-                    try {
-                        T result = mGson.fromJson(json, mType);
-                        if (result != null) {
-                            onSuccess(result);
-                        } else {
-                            onError(response.code(), null);
-                        }
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        onError(response.code(), response.message());
+                try {
+                    T result = JSON.parseObject(json, mType);
+                    if (result != null) {
+                        onSuccess(result);
+                    } else {
+                        onError(response.code(), null);
                     }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    onError(response.code(), response.message());
                 }
             } else {
                 onError(response.code(), response.message());

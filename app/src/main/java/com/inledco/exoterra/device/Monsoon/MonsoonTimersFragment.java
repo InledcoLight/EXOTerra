@@ -19,12 +19,13 @@ import android.widget.Toast;
 
 import com.inledco.exoterra.GlobalSettings;
 import com.inledco.exoterra.R;
+import com.inledco.exoterra.aliot.ExoMonsoon;
+import com.inledco.exoterra.aliot.MonsoonViewModel;
 import com.inledco.exoterra.base.BaseFragment;
-import com.inledco.exoterra.bean.EXOMonsoon;
-import com.inledco.exoterra.bean.EXOMonsoonTimer;
 import com.inledco.exoterra.common.OnItemClickListener;
 import com.inledco.exoterra.common.OnItemLongClickListener;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class MonsoonTimersFragment extends BaseFragment {
@@ -33,8 +34,8 @@ public class MonsoonTimersFragment extends BaseFragment {
     private ImageButton monsoon_timers_add;
 
     private MonsoonViewModel mMonsoonViewModel;
-    private EXOMonsoon mMonsoon;
-    private List<EXOMonsoonTimer> mTimers;
+    private ExoMonsoon mMonsoon;
+    private List<ExoMonsoon.Timer> mTimers = new ArrayList<>();
     private MonsoonTimerAdapter mAdapter;
 
     @Nullable
@@ -62,32 +63,32 @@ public class MonsoonTimersFragment extends BaseFragment {
     protected void initData() {
         mMonsoonViewModel = ViewModelProviders.of(getActivity()).get(MonsoonViewModel.class);
         mMonsoon = mMonsoonViewModel.getData();
-        mMonsoonViewModel.observe(this, new Observer<EXOMonsoon>() {
+        mMonsoonViewModel.observe(this, new Observer<ExoMonsoon>() {
             @Override
-            public void onChanged(@Nullable EXOMonsoon exoMonsoon) {
+            public void onChanged(@Nullable ExoMonsoon exoMonsoon) {
                 mTimers.clear();
-                mTimers.addAll(mMonsoon.getAllTimers());
+                mTimers.addAll(mMonsoon.getTimers());
                 mAdapter.notifyDataSetChanged();
             }
         });
 
-        mTimers = mMonsoon.getAllTimers();
+        mTimers.addAll(mMonsoon.getTimers());
         mAdapter = new MonsoonTimerAdapter(getContext(), mTimers) {
             @Override
             protected void onEnableTimer(int position) {
                 if (position >= 0 && position < mTimers.size()) {
-                    EXOMonsoonTimer tmr = new EXOMonsoonTimer(mTimers.get(position).getValue());
+                    ExoMonsoon.Timer tmr = mTimers.get(position);
                     tmr.setEnable(true);
-                    mMonsoonViewModel.setTimer(position, tmr);
+                    mMonsoonViewModel.setTimers(mTimers);
                 }
             }
 
             @Override
             protected void onDisableTimer(int position) {
                 if (position >= 0 && position < mTimers.size()) {
-                    EXOMonsoonTimer tmr = new EXOMonsoonTimer(mTimers.get(position).getValue());
+                    ExoMonsoon.Timer tmr = mTimers.get(position);
                     tmr.setEnable(false);
-                    mMonsoonViewModel.setTimer(position, tmr);
+                    mMonsoonViewModel.setTimers(mTimers);
                 }
             }
         };
@@ -118,13 +119,17 @@ public class MonsoonTimersFragment extends BaseFragment {
     }
 
     private void showRemoveDialog(final int position) {
+        if (position < 0 || position >= mTimers.size()) {
+            return;
+        }
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         builder.setTitle(R.string.remove_timer);
         builder.setNegativeButton(R.string.cancel, null);
         builder.setPositiveButton(R.string.remove, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                mMonsoonViewModel.removeTimer(position);
+                mTimers.remove(position);
+                mMonsoonViewModel.setTimers(mTimers);
             }
         });
         builder.show();
@@ -132,7 +137,7 @@ public class MonsoonTimersFragment extends BaseFragment {
 
     private void showEditTimerDialog(final int idx) {
         if (idx >= 0 && idx < mTimers.size()) {
-            final EXOMonsoonTimer timer = new EXOMonsoonTimer(mTimers.get(idx).getValue());
+            final ExoMonsoon.Timer timer = mTimers.get(idx);
             AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
             builder.setTitle(R.string.title_set_timer);
             View view = LayoutInflater.from(getContext())
@@ -162,20 +167,25 @@ public class MonsoonTimersFragment extends BaseFragment {
             tp_tmr.setIs24HourView(GlobalSettings.is24HourFormat());
             tp_tmr.setCurrentHour(timer.getTimer() / 60);
             tp_tmr.setCurrentMinute(timer.getTimer() % 60);
-            np.setValue(timer.getDuration());
+            np.setValue(timer.getPeriod());
+            int repeat = timer.getRepeat();
             for (int i = 0; i < 7; i++) {
-                cb_week[i].setChecked(timer.getWeek(i));
+                cb_week[i].setChecked((repeat&(1<<i)) != 0);
             }
             builder.setNegativeButton(R.string.cancel, null);
             builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     timer.setTimer(tp_tmr.getCurrentHour() * 60 + tp_tmr.getCurrentMinute());
-                    timer.setDuration(np.getValue());
+                    timer.setPeriod(np.getValue());
+                    int rpt = 0;
                     for (int i = 0; i < 7; i++) {
-                        timer.setWeek(i, cb_week[i].isChecked());
+                        if (cb_week[i].isChecked()) {
+                            rpt |= (1<<i);
+                        }
+                        timer.setRepeat(rpt);
                     }
-                    mMonsoonViewModel.setTimer(idx, timer);
+                    mMonsoonViewModel.setTimers(mTimers);
                 }
             });
             builder.setView(view);
@@ -186,7 +196,7 @@ public class MonsoonTimersFragment extends BaseFragment {
     }
 
     private void showAddTimerDialog() {
-        if (mTimers.size() >= EXOMonsoon.TIMER_COUNT_MAX) {
+        if (mTimers.size() >= ExoMonsoon.TIMER_COUNT_MAX) {
             Toast.makeText(getContext(), R.string.timer_count_over, Toast.LENGTH_SHORT)
                  .show();
             return;
@@ -207,8 +217,8 @@ public class MonsoonTimersFragment extends BaseFragment {
             values[i] = "1 Min " + (i - 59) + " Sec";
         }
         values[119] = "2 Min";
-        np.setMinValue(1);
-        np.setMaxValue(120);
+        np.setMinValue(ExoMonsoon.SPRAY_MIN);
+        np.setMaxValue(ExoMonsoon.SPRAY_MAX);
         np.setDisplayedValues(values);
         cb_week[0] = view.findViewById(R.id.dialog_monsoon_sun);
         cb_week[1] = view.findViewById(R.id.dialog_monsoon_mon);
@@ -223,14 +233,19 @@ public class MonsoonTimersFragment extends BaseFragment {
         builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                EXOMonsoonTimer tmr = new EXOMonsoonTimer();
+                ExoMonsoon.Timer tmr = new ExoMonsoon.Timer();
                 tmr.setTimer(tp_tmr.getCurrentHour() * 60 + tp_tmr.getCurrentMinute());
-                tmr.setDuration(np.getValue());
+                tmr.setPeriod(np.getValue());
+                int rpt = 0;
                 for (int i = 0; i < 7; i++) {
-                    tmr.setWeek(i, cb_week[i].isChecked());
+                    if (cb_week[i].isChecked()) {
+                        rpt |= (1<<i);
+                    }
                 }
+                tmr.setRepeat(rpt);
                 tmr.setEnable(true);
-                mMonsoonViewModel.addTimer(tmr);
+                mTimers.add(tmr);
+                mMonsoonViewModel.setTimers(mTimers);
             }
         });
         builder.setView(view);

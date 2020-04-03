@@ -9,44 +9,30 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.inledco.exoterra.AppConstants;
 import com.inledco.exoterra.GlobalSettings;
 import com.inledco.exoterra.R;
 import com.inledco.exoterra.adddevice.AddDeviceActivity;
 import com.inledco.exoterra.base.BaseFragment;
-import com.inledco.exoterra.bean.Device;
-import com.inledco.exoterra.bean.EXOSocket;
 import com.inledco.exoterra.bean.Home;
-import com.inledco.exoterra.common.OnItemClickListener;
 import com.inledco.exoterra.device.DeviceActivity;
-import com.inledco.exoterra.event.DatapointChangedEvent;
 import com.inledco.exoterra.event.HomeChangedEvent;
 import com.inledco.exoterra.event.HomeDeviceChangedEvent;
 import com.inledco.exoterra.event.HomePropertyChangedEvent;
-import com.inledco.exoterra.manager.DeviceManager;
-import com.inledco.exoterra.manager.HomeManager;
-import com.inledco.exoterra.util.TimeFormatUtil;
-import com.inledco.exoterra.xlink.XlinkConstants;
-import com.inledco.exoterra.xlink.XlinkRequestCallback;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
 import java.text.DateFormat;
-import java.util.List;
 import java.util.TimeZone;
-
-import cn.xlink.restful.api.app.HomeApi;
 
 public class GroupFragment extends BaseFragment {
     private TextView group_title;
@@ -64,7 +50,7 @@ public class GroupFragment extends BaseFragment {
 
     private String mHomeId;
     private Home mHome;
-    private List<HomeApi.HomeDevicesResponse.Device> mDevices;
+//    private List<HomeApi.HomeDevicesResponse.Device> mDevices;
     private GroupDevicesAdapter mAdapter;
 
     private DateFormat mDateFormat;
@@ -82,25 +68,25 @@ public class GroupFragment extends BaseFragment {
         }
     };
 
-    private final XlinkRequestCallback<HomeApi.HomeDevicesResponse> mHomeDevicesCallback = new XlinkRequestCallback<HomeApi.HomeDevicesResponse>() {
-        @Override
-        public void onError(final String error) {
-            getActivity().runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    Toast.makeText(getContext(), error, Toast.LENGTH_SHORT)
-                         .show();
-                }
-            });
-        }
-
-        @Override
-        public void onSuccess(HomeApi.HomeDevicesResponse response) {
-            mDevices.clear();
-            mDevices.addAll(response.list);
-            mAdapter.notifyDataSetChanged();
-        }
-    };
+//    private final XlinkRequestCallback<HomeApi.HomeDevicesResponse> mHomeDevicesCallback = new XlinkRequestCallback<HomeApi.HomeDevicesResponse>() {
+//        @Override
+//        public void onError(final String error) {
+//            getActivity().runOnUiThread(new Runnable() {
+//                @Override
+//                public void run() {
+//                    Toast.makeText(getContext(), error, Toast.LENGTH_SHORT)
+//                         .show();
+//                }
+//            });
+//        }
+//
+//        @Override
+//        public void onSuccess(HomeApi.HomeDevicesResponse response) {
+//            mDevices.clear();
+//            mDevices.addAll(response.list);
+//            mAdapter.notifyDataSetChanged();
+//        }
+//    };
 
     public static GroupFragment newInstance(@NonNull final String homeid, @NonNull final String homename) {
         Bundle args = new Bundle();
@@ -133,10 +119,10 @@ public class GroupFragment extends BaseFragment {
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onHomeChangedEvent(HomeChangedEvent event) {
-        Log.e(TAG, "onHomeChangedEvent: " + mHomeId + " " + event.getHomeid());
-        if (TextUtils.equals(mHomeId, event.getHomeid())) {
-            group_title.setText(mHome.getHome().name);
-        }
+//        Log.e(TAG, "onHomeChangedEvent: " + mHomeId + " " + event.getHomeid());
+//        if (TextUtils.equals(mHomeId, event.getHomeid())) {
+//            group_title.setText(mHome.getHome().name);
+//        }
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -148,22 +134,10 @@ public class GroupFragment extends BaseFragment {
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onHomeDeviceChangedEvent(HomeDeviceChangedEvent event) {
-        if (TextUtils.equals(mHomeId, event.getHomeid())) {
-            group_connected_devices.setText(getString(R.string.habitat_devcnt, mHome.getDeviceCount()));
-            mAdapter.notifyDataSetChanged();
-        }
-    }
-
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onDatapointChangedEvent(DatapointChangedEvent event) {
-        for (int j = 0; j < mHome.getDevices().size(); j++) {
-            HomeApi.HomeDevicesResponse.Device device = mHome.getDevices().get(j);
-            String tag = device.productId + "_" + device.mac;
-            if (TextUtils.equals(device.productId, XlinkConstants.PRODUCT_ID_SOCKET) && TextUtils.equals(tag, event.getDeviceTag())) {
-                refreshSensor();
-                return;
-            }
-        }
+//        if (TextUtils.equals(mHomeId, event.getHomeid())) {
+//            group_connected_devices.setText(getString(R.string.habitat_devcnt, mHome.getDeviceCount()));
+//            mAdapter.notifyDataSetChanged();
+//        }
     }
 
     @Override
@@ -192,26 +166,26 @@ public class GroupFragment extends BaseFragment {
         mTimeFormat = GlobalSettings.getTimeFormat();
         Bundle args = getArguments();
         if (args != null) {
-            mHomeId = args.getString("homeid");
-            mHome = HomeManager.getInstance().getHome(mHomeId);
-            if (mHome != null) {
-                mDevices = mHome.getDevices();
-                mAdapter = new GroupDevicesAdapter(getContext(), mDevices);
-                mAdapter.setOnItemClickListener(new OnItemClickListener() {
-                    @Override
-                    public void onItemClick(int position) {
-                        HomeApi.HomeDevicesResponse.Device device = mDevices.get(position);
-                        String deviceTag = device.productId + "_" + device.mac;
-                        gotoDeviceActivity(deviceTag);
-                    }
-                });
-                group_rv.setAdapter(mAdapter);
-
-                group_title.setText(mHome.getHome().name);
-                refreshData();
-                group_connected_devices.setText(getString(R.string.habitat_devcnt, mHome.getDeviceCount()));
-                HomeManager.getInstance().refreshHome(mHome);
-            }
+//            mHomeId = args.getString("homeid");
+//            mHome = HomeManager.getInstance().getHome(mHomeId);
+//            if (mHome != null) {
+//                mDevices = mHome.getDevices();
+//                mAdapter = new GroupDevicesAdapter(getContext(), mDevices);
+//                mAdapter.setOnItemClickListener(new OnItemClickListener() {
+//                    @Override
+//                    public void onItemClick(int position) {
+//                        HomeApi.HomeDevicesResponse.Device device = mDevices.get(position);
+//                        String deviceTag = device.productId + "_" + device.mac;
+//                        gotoDeviceActivity(deviceTag);
+//                    }
+//                });
+//                group_rv.setAdapter(mAdapter);
+//
+//                group_title.setText(mHome.getHome().name);
+//                refreshData();
+//                group_connected_devices.setText(getString(R.string.habitat_devcnt, mHome.getDeviceCount()));
+//                HomeManager.getInstance().refreshHome(mHome);
+//            }
         }
 
         IntentFilter filter = new IntentFilter(Intent.ACTION_TIME_TICK);
@@ -243,63 +217,43 @@ public class GroupFragment extends BaseFragment {
     }
 
     private void refreshTime() {
-        int zone = mHome.getZone();
-        long time = System.currentTimeMillis() + (zone-defaultZone)*60000;
-        group_time.setText(mDateFormat.format(time));
-//        int dt = date.getHours()*60 + date.getMinutes();
-//        int sunrise = mHome.getSunrise();
-//        int sunset = mHome.getSunset();
-//        if (sunrise < sunset) {
-//            if (dt >= sunrise && dt < sunset) {
-//                group_daynight.setText(R.string.daytime);
-//                group_daynight.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_sun, 0, 0, 0);
-//            } else {
-//                group_daynight.setText(R.string.nighttime);
-//                group_daynight.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_moon, 0, 0, 0);
-//            }
-//        } else {
-//            if (dt >= sunrise || dt < sunset) {
-//                group_daynight.setText(R.string.daytime);
-//                group_daynight.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_sun, 0, 0, 0);
-//            } else {
-//                group_daynight.setText(R.string.nighttime);
-//                group_daynight.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_moon, 0, 0, 0);
+//        int zone = mHome.getZone();
+//        long time = System.currentTimeMillis() + (zone-defaultZone)*60000;
+//        group_time.setText(mDateFormat.format(time));
+    }
+
+    private void refreshSensor() {
+//        for (HomeApi.HomeDevicesResponse.Device dev : mHome.getDevices()) {
+//            if (TextUtils.equals(dev.productId, XlinkConstants.PRODUCT_ID_SOCKET)) {
+//                String tag = dev.productId + "_" + dev.mac;
+//                Device device = DeviceManager.getInstance().getDevice(tag);
+//                if (device != null && device instanceof EXOSocket) {
+//                    EXOSocket socket = (EXOSocket) device;
+//                    boolean res = false;
+//                    if (socket.getS1Available()) {
+//                        group_sensor1.setText(GlobalSettings.getTemperatureText(socket.getS1Value()));
+//                        res = true;
+//                    } else {
+//                        group_sensor1.setText(null);
+//                    }
+//                    if (socket.getS2Available()) {
+//                        group_sensor2.setText(GlobalSettings.getHumidityText(socket.getS2Value()));
+//                        res = true;
+//                    } else {
+//                        group_sensor2.setText(null);
+//                    }
+//                    if (res) {
+//                        break;
+//                    }
+//                }
 //            }
 //        }
     }
 
-    private void refreshSensor() {
-        for (HomeApi.HomeDevicesResponse.Device dev : mHome.getDevices()) {
-            if (TextUtils.equals(dev.productId, XlinkConstants.PRODUCT_ID_SOCKET)) {
-                String tag = dev.productId + "_" + dev.mac;
-                Device device = DeviceManager.getInstance().getDevice(tag);
-                if (device != null && device instanceof EXOSocket) {
-                    EXOSocket socket = (EXOSocket) device;
-                    boolean res = false;
-                    if (socket.getS1Available()) {
-                        group_sensor1.setText(GlobalSettings.getTemperatureText(socket.getS1Value()));
-                        res = true;
-                    } else {
-                        group_sensor1.setText(null);
-                    }
-                    if (socket.getS2Available()) {
-                        group_sensor2.setText(GlobalSettings.getHumidityText(socket.getS2Value()));
-                        res = true;
-                    } else {
-                        group_sensor2.setText(null);
-                    }
-                    if (res) {
-                        break;
-                    }
-                }
-            }
-        }
-    }
-
     private void refreshData() {
         refreshTime();
-        group_sunrise.setText(TimeFormatUtil.formatMinutesTime(mTimeFormat, mHome.getSunrise()));
-        group_sunset.setText(TimeFormatUtil.formatMinutesTime(mTimeFormat, mHome.getSunset()));
+//        group_sunrise.setText(TimeFormatUtil.formatMinutesTime(mTimeFormat, mHome.getSunrise()));
+//        group_sunset.setText(TimeFormatUtil.formatMinutesTime(mTimeFormat, mHome.getSunset()));
         refreshSensor();
     }
 

@@ -13,21 +13,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ImageButton;
-import android.widget.Toast;
 
 import com.inledco.exoterra.R;
+import com.inledco.exoterra.aliot.Device;
+import com.inledco.exoterra.aliot.DeviceBaseViewModel;
 import com.inledco.exoterra.base.BaseFragment;
-import com.inledco.exoterra.bean.Device;
-import com.inledco.exoterra.xlink.XlinkCloudManager;
-import com.inledco.exoterra.xlink.XlinkRequestCallback;
-import com.inledco.exoterra.xlink.XlinkTaskCallback;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import cn.xlink.restful.api.app.DeviceApi;
-import cn.xlink.sdk.core.model.XLinkDataPoint;
-import cn.xlink.sdk.v5.model.XDevice;
 
 public class LocationFragment extends BaseFragment {
     private Toolbar location_toolbar;
@@ -73,10 +63,10 @@ public class LocationFragment extends BaseFragment {
     protected void initData() {
         mDeviceViewModel = ViewModelProviders.of(getActivity()).get(DeviceBaseViewModel.class);
         mDevice = mDeviceViewModel.getData();
-        if (mDevice != null) {
-            location_longitude.setText("" + mDevice.getLongitude());
-            location_latitude.setText("" + mDevice.getLatitude());
-        }
+//        if (mDevice != null) {
+//            location_longitude.setText("" + mDevice.getLongitude());
+//            location_latitude.setText("" + mDevice.getLatitude());
+//        }
     }
 
     @Override
@@ -99,20 +89,20 @@ public class LocationFragment extends BaseFragment {
         location_position.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (mDevice != null) {
-                    XlinkCloudManager.getInstance().getDeviceLocation(mDevice.getXDevice(), new XlinkRequestCallback<DeviceApi.DeviceGeographyResponse>() {
-                        @Override
-                        public void onError(String error) {
-
-                        }
-
-                        @Override
-                        public void onSuccess(DeviceApi.DeviceGeographyResponse response) {
-                            location_longitude.setText("" + (float) response.lon);
-                            location_latitude.setText("" + (float) response.lat);
-                        }
-                    });
-                }
+//                if (mDevice != null) {
+//                    XlinkCloudManager.getInstance().getDeviceLocation(mDevice.getXDevice(), new XlinkRequestCallback<DeviceApi.DeviceGeographyResponse>() {
+//                        @Override
+//                        public void onError(String error) {
+//
+//                        }
+//
+//                        @Override
+//                        public void onSuccess(DeviceApi.DeviceGeographyResponse response) {
+//                            location_longitude.setText("" + (float) response.lon);
+//                            location_latitude.setText("" + (float) response.lat);
+//                        }
+//                    });
+//                }
             }
         });
     }
@@ -135,36 +125,36 @@ public class LocationFragment extends BaseFragment {
     }
 
     private void saveLocation() {
-        if (mDevice != null) {
-            float lon = getLongitudeValue();
-            if (lon < -180 || lon > 180) {
-                location_longitude.setError(getString(R.string.error_longitude));
-                return;
-            }
-            float lat = getLatitudeValue();
-            if (lat < -60 || lat > 60) {
-                location_latitude.setError(getString(R.string.error_latitude));
-                return;
-            }
-            XLinkDataPoint dp1 = mDevice.setLongitude(lon);
-            XLinkDataPoint dp2 = mDevice.setLatitude(lat);
-            if (dp1 != null && dp2 != null) {
-                List<XLinkDataPoint> dps = new ArrayList<>();
-                dps.add(dp1);
-                dps.add(dp2);
-                XlinkCloudManager.getInstance().setDeviceDatapoints(mDevice.getXDevice(), dps, new XlinkTaskCallback<XDevice>() {
-                    @Override
-                    public void onError(String error) {
-                        Toast.makeText(getContext(), error, Toast.LENGTH_SHORT)
-                             .show();
-                    }
-
-                    @Override
-                    public void onComplete(XDevice device) {
-                        getActivity().getSupportFragmentManager().popBackStack();
-                    }
-                });
-            }
-        }
+//        if (mDevice != null) {
+//            float lon = getLongitudeValue();
+//            if (lon < -180 || lon > 180) {
+//                location_longitude.setError(getString(R.string.error_longitude));
+//                return;
+//            }
+//            float lat = getLatitudeValue();
+//            if (lat < -60 || lat > 60) {
+//                location_latitude.setError(getString(R.string.error_latitude));
+//                return;
+//            }
+//            XLinkDataPoint dp1 = mDevice.setLongitude(lon);
+//            XLinkDataPoint dp2 = mDevice.setLatitude(lat);
+//            if (dp1 != null && dp2 != null) {
+//                List<XLinkDataPoint> dps = new ArrayList<>();
+//                dps.add(dp1);
+//                dps.add(dp2);
+//                XlinkCloudManager.getInstance().setDeviceDatapoints(mDevice.getXDevice(), dps, new XlinkTaskCallback<XDevice>() {
+//                    @Override
+//                    public void onError(String error) {
+//                        Toast.makeText(getContext(), error, Toast.LENGTH_SHORT)
+//                             .show();
+//                    }
+//
+//                    @Override
+//                    public void onComplete(XDevice device) {
+//                        getActivity().getSupportFragmentManager().popBackStack();
+//                    }
+//                });
+//            }
+//        }
     }
 }

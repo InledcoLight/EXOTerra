@@ -52,11 +52,9 @@ public class MessagesFragment extends BaseFragment {
 
     @Override
     protected void initData() {
-        ShareMsgFragment shareMsgFragment = new ShareMsgFragment();
         InviteMsgFragment inviteMsgFragment = new InviteMsgFragment();
-        mFragments.add(shareMsgFragment);
         mFragments.add(inviteMsgFragment);
-        mTitles = new String[] {getString(R.string.device_share), getString(R.string.home_invite)};
+        mTitles = new String[] {getString(R.string.home_invite)};
         mAdapter = new MessagesAdapter(getActivity().getSupportFragmentManager(), mFragments, mTitles);
         message_vp.setAdapter(mAdapter);
         message_tab.setupWithViewPager(message_vp);

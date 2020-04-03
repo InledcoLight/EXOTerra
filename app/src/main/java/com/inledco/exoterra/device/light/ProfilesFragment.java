@@ -1,6 +1,5 @@
 package com.inledco.exoterra.device.light;
 
-import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -15,9 +14,9 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.inledco.exoterra.R;
+import com.inledco.exoterra.aliot.LightViewModel;
 import com.inledco.exoterra.base.BaseFragment;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class ProfilesFragment extends BaseFragment {
@@ -54,21 +53,21 @@ public class ProfilesFragment extends BaseFragment {
 
     @Override
     protected void initData() {
-        mFragments = new ArrayList<>();
-        mProfileNames = new String[13];
-        mLightViewModel = ViewModelProviders.of(getActivity()).get(LightViewModel.class);
-
-        for (int i = 0; i < 13; i++) {
-            mFragments.add(ProfileFragment.newInstance(i));
-            mProfileNames[i] = mLightViewModel.getData().getProfileName(i);
-        }
-        mAdapter = new ProfileAdapter(getActivity().getSupportFragmentManager(), mFragments, mProfileNames);
-        profiles_vp.setAdapter(mAdapter);
-        profiles_tab.setupWithViewPager(profiles_vp);
-        int select = mLightViewModel.getData().getSelectProfile();
-        if (select >= 0 && select <= 12) {
-            profiles_vp.setCurrentItem(select);
-        }
+//        mFragments = new ArrayList<>();
+//        mProfileNames = new String[13];
+//        mLightViewModel = ViewModelProviders.of(getActivity()).get(LightViewModel.class);
+//
+//        for (int i = 0; i < 13; i++) {
+//            mFragments.add(ProfileFragment.newInstance(i));
+//            mProfileNames[i] = mLightViewModel.getData().getProfileName(i);
+//        }
+//        mAdapter = new ProfileAdapter(getActivity().getSupportFragmentManager(), mFragments, mProfileNames);
+//        profiles_vp.setAdapter(mAdapter);
+//        profiles_tab.setupWithViewPager(profiles_vp);
+//        int select = mLightViewModel.getData().getSelectProfile();
+//        if (select >= 0 && select <= 12) {
+//            profiles_vp.setCurrentItem(select);
+//        }
     }
 
     @Override

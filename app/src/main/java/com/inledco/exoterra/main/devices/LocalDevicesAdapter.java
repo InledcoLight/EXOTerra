@@ -12,7 +12,6 @@ import android.widget.TextView;
 import com.inledco.exoterra.R;
 import com.inledco.exoterra.bean.LocalDevice;
 import com.inledco.exoterra.common.SimpleAdapter;
-import com.inledco.exoterra.util.DeviceUtil;
 
 import java.util.List;
 
@@ -36,32 +35,32 @@ public class LocalDevicesAdapter extends SimpleAdapter<LocalDevice, LocalDevices
 
     @Override
     public void onBindViewHolder(@NonNull final DevicesViewHolder holder, int i) {
-        LocalDevice device = mData.get(i);
-        String pid = device.getPid();
-        String name = DeviceUtil.getDefaultName(pid);
-        String mac = device.getMac();
-        holder.iv_icon.setImageResource(DeviceUtil.getProductIcon(pid));
-        holder.tv_name.setText(name);
-        boolean state = device.getxDevice() != null ? true : false;
-        holder.ctv_state.setChecked(state);
-        holder.ctv_state.setText(state ? R.string.local_online : R.string.local_offline);
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (mItemClickListener != null) {
-                    mItemClickListener.onItemClick(holder.getAdapterPosition());
-                }
-            }
-        });
-        holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                if (mItemLongClickListener != null) {
-                    mItemLongClickListener.onItemLongClick(holder.getAdapterPosition());
-                }
-                return false;
-            }
-        });
+//        LocalDevice device = mData.get(i);
+//        String pid = device.getPid();
+//        String name = DeviceUtil.getDefaultName(pid);
+//        String mac = device.getMac();
+//        holder.iv_icon.setImageResource(DeviceUtil.getProductIcon(pid));
+//        holder.tv_name.setText(name);
+//        boolean state = device.getxDevice() != null ? true : false;
+//        holder.ctv_state.setChecked(state);
+//        holder.ctv_state.setText(state ? R.string.local_online : R.string.local_offline);
+//        holder.itemView.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                if (mItemClickListener != null) {
+//                    mItemClickListener.onItemClick(holder.getAdapterPosition());
+//                }
+//            }
+//        });
+//        holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
+//            @Override
+//            public boolean onLongClick(View v) {
+//                if (mItemLongClickListener != null) {
+//                    mItemLongClickListener.onItemLongClick(holder.getAdapterPosition());
+//                }
+//                return false;
+//            }
+//        });
     }
 
     public class DevicesViewHolder extends RecyclerView.ViewHolder {

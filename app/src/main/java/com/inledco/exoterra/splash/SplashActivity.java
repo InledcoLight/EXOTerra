@@ -9,17 +9,11 @@ import com.inledco.exoterra.base.BaseActivity;
 import com.inledco.exoterra.login.LoginActivity;
 import com.inledco.exoterra.main.MainActivity;
 import com.inledco.exoterra.manager.UserManager;
-import com.inledco.exoterra.xlink.XlinkCloudManager;
-import com.inledco.exoterra.xlink.XlinkTaskHandler;
-
-import cn.xlink.restful.api.app.UserApi;
-import cn.xlink.sdk.v5.module.main.XLinkSDK;
 
 public class SplashActivity extends BaseActivity {
 
     private final int DURATION = 1500;
 
-    private final XlinkTaskHandler<UserApi.TokenRefreshResponse> mAuthinListener = new XlinkTaskHandler<>();
     private Runnable mRunnable;
 
     @Override
@@ -41,13 +35,8 @@ public class SplashActivity extends BaseActivity {
 
     @Override
     protected void initData() {
-        XLinkSDK.start();
-
-        int userid = UserManager.getUserId(this);
-        String authorize = UserManager.getAuthorize(this);
-        final String refresh_token = UserManager.getRefreshToken(this);
         final long time = System.currentTimeMillis();
-        if (!UserManager.checkAuthorize(userid, authorize, refresh_token)) {
+        if (!UserManager.checkAuthorize(this)) {
             mRunnable = new Runnable() {
                 @Override
                 public void run() {
@@ -56,17 +45,10 @@ public class SplashActivity extends BaseActivity {
                 }
             };
         } else {
-            XlinkCloudManager.getInstance()
-                             .refreshToken(userid, authorize, refresh_token, mAuthinListener);
             mRunnable = new Runnable() {
                 @Override
                 public void run() {
-                    while (System.currentTimeMillis() - time < DURATION || !mAuthinListener.isOver());
-                    if (mAuthinListener.isSuccess()) {
-                        gotoMainActivity();
-                    } else {
-                        gotoLoginActivity();
-                    }
+                    while (System.currentTimeMillis() - time < DURATION);
                 }
             };
         }

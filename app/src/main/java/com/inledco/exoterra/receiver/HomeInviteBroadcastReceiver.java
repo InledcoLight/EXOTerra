@@ -6,12 +6,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.text.TextUtils;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.inledco.exoterra.AppConstants;
-import com.inledco.exoterra.manager.HomeManager;
-import com.inledco.exoterra.xlink.XlinkCloudManager;
-import com.inledco.exoterra.xlink.XlinkRequestCallback;
 
 public class HomeInviteBroadcastReceiver extends BroadcastReceiver {
     @Override
@@ -26,42 +22,16 @@ public class HomeInviteBroadcastReceiver extends BroadcastReceiver {
                 return;
             }
             final NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-            switch (action) {
-                case AppConstants.ACCEPT:
-                    XlinkCloudManager.getInstance().acceptHomeInvite(homeid, inviteid, new XlinkRequestCallback<String>() {
-                        @Override
-                        public void onError(String error) {
-                            Toast.makeText(context, error, Toast.LENGTH_SHORT)
-                                 .show();
-                        }
-
-                        @Override
-                        public void onSuccess(String s) {
-                            Toast.makeText(context, "Join habitat success.", Toast.LENGTH_SHORT)
-                                 .show();
-                            HomeManager.getInstance().refreshHomeList(null);
-                        }
-                    });
-                    notificationManager.cancel(inviteid, notification_id);
-                    break;
-                case AppConstants.DENY:
-                    XlinkCloudManager.getInstance().denyHomeInvite(homeid, inviteid, new XlinkRequestCallback<String>() {
-                        @Override
-                        public void onError(String error) {
-                            Toast.makeText(context, error, Toast.LENGTH_SHORT)
-                                 .show();
-                        }
-
-                        @Override
-                        public void onSuccess(String s) {
-                            Toast.makeText(context, "Deny habitat invite success.", Toast.LENGTH_SHORT)
-                                 .show();
-                            HomeManager.getInstance().refreshHomeList(null);
-                        }
-                    });
-                    notificationManager.cancel(inviteid, notification_id);
-                    break;
-            }
+//            switch (action) {
+//                case AppConstants.ACCEPT:
+//
+//                    notificationManager.cancel(inviteid, notification_id);
+//                    break;
+//                case AppConstants.DENY:
+//
+//                    notificationManager.cancel(inviteid, notification_id);
+//                    break;
+//            }
         }
     }
 }

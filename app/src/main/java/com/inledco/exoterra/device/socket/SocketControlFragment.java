@@ -7,7 +7,6 @@ import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.AppCompatImageButton;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,8 +16,9 @@ import android.widget.TextView;
 
 import com.inledco.exoterra.AppConstants;
 import com.inledco.exoterra.R;
+import com.inledco.exoterra.aliot.ExoSocket;
+import com.inledco.exoterra.aliot.SocketViewModel;
 import com.inledco.exoterra.base.BaseFragment;
-import com.inledco.exoterra.bean.EXOSocket;
 
 public class SocketControlFragment extends BaseFragment {
 
@@ -35,7 +35,7 @@ public class SocketControlFragment extends BaseFragment {
     private TextView socket_control_life;
 
     private SocketViewModel mSocketViewModel;
-    private EXOSocket mSocket;
+    private ExoSocket mSocket;
 
     @Nullable
     @Override
@@ -76,9 +76,9 @@ public class SocketControlFragment extends BaseFragment {
     protected void initData() {
         mSocketViewModel = ViewModelProviders.of(getActivity()).get(SocketViewModel.class);
         mSocket = mSocketViewModel.getData();
-        mSocketViewModel.observe(this, new Observer<EXOSocket>() {
+        mSocketViewModel.observe(this, new Observer<ExoSocket>() {
             @Override
-            public void onChanged(@Nullable EXOSocket exoSocket) {
+            public void onChanged(@Nullable ExoSocket exoSocket) {
                 refreshData();
             }
         });
@@ -86,72 +86,72 @@ public class SocketControlFragment extends BaseFragment {
 
     @Override
     protected void initEvent() {
-        socket_control_ll.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-            }
-        });
-        socket_control_s1linkage.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                addFragmentToStack(R.id.device_root, new TemperatureLinkageFragment());
-            }
-        });
-
-        socket_control_s1notify.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                switch (mSocket.getS1Type()) {
-                    case AppConstants.SENSOR_TYPE_REPTILE_TEMPERATURE:
-                        addFragmentToStack(R.id.device_root, NotifyFragment.newInstance(getString(R.string.temperature), false, 10, 40, "℃"));
-                        break;
-                }
-            }
-        });
-
-        socket_control_s2notify.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                switch (mSocket.getS2Type()) {
-                    case AppConstants.SENSOR_TYPE_REPTILE_HUMIDITY:
-                        addFragmentToStack(R.id.device_root, NotifyFragment.newInstance(getString(R.string.humidity), true, 20, 80, "%RH"));
-                        break;
-                }
-            }
-        });
-
-        socket_control_power.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mSocketViewModel.setPower(!mSocket.getPower());
-            }
-        });
+//        socket_control_ll.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//
+//            }
+//        });
+//        socket_control_s1linkage.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                addFragmentToStack(R.id.device_root, new TemperatureLinkageFragment());
+//            }
+//        });
+//
+//        socket_control_s1notify.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                switch (mSocket.getS1Type()) {
+//                    case AppConstants.SENSOR_TYPE_REPTILE_TEMPERATURE:
+//                        addFragmentToStack(R.id.device_root, NotifyFragment.newInstance(getString(R.string.temperature), false, 10, 40, "℃"));
+//                        break;
+//                }
+//            }
+//        });
+//
+//        socket_control_s2notify.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                switch (mSocket.getS2Type()) {
+//                    case AppConstants.SENSOR_TYPE_REPTILE_HUMIDITY:
+//                        addFragmentToStack(R.id.device_root, NotifyFragment.newInstance(getString(R.string.humidity), true, 20, 80, "%RH"));
+//                        break;
+//                }
+//            }
+//        });
+//
+//        socket_control_power.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                mSocketViewModel.setPower(!mSocket.getPower());
+//            }
+//        });
     }
 
     private void refreshData() {
-        if (mSocket == null) {
-            return;
-        }
-        if (mSocket.getS1Available()) {
-            socket_control_ll.setVisibility(View.VISIBLE);
-            socket_control_s1value.setCompoundDrawablesRelativeWithIntrinsicBounds(getSensorIcon(mSocket.getS1Type()), 0, 0, 0);
-            socket_control_s1value.setText(getSensorValueText(mSocket.getS1Type(), mSocket.getS1Value()));
-            boolean available2 = mSocket.getS2Available();
-            if (available2) {
-                socket_control_s2value.setCompoundDrawablesRelativeWithIntrinsicBounds(getSensorIcon(mSocket.getS2Type()), 0, 0, 0);
-                socket_control_s2value.setText(getSensorValueText(mSocket.getS2Type(), mSocket.getS2Value()));
-            }
-            socket_control_div.setVisibility(available2 ? View.VISIBLE : View.GONE);
-            socket_control_ll2.setVisibility(available2 ? View.VISIBLE : View.GONE);
-        } else {
-            socket_control_ll.setVisibility(View.INVISIBLE);
-        }
-
-        Log.e(TAG, "refreshData: " + mSocket.getPower());
-        socket_control_power.setImageResource(mSocket.getPower() ? R.drawable.ic_power_blue : R.drawable.ic_power_red);
-        socket_control_status.setText(getString(R.string.current_status) + (mSocket.getPower() ? getString(R.string.on) : getString(R.string.off)));
-        socket_control_life.setText("" + mSocket.getSwitchCount() + "/" + mSocket.getSwitchCountMax());
+//        if (mSocket == null) {
+//            return;
+//        }
+//        if (mSocket.getS1Available()) {
+//            socket_control_ll.setVisibility(View.VISIBLE);
+//            socket_control_s1value.setCompoundDrawablesRelativeWithIntrinsicBounds(getSensorIcon(mSocket.getS1Type()), 0, 0, 0);
+//            socket_control_s1value.setText(getSensorValueText(mSocket.getS1Type(), mSocket.getS1Value()));
+//            boolean available2 = mSocket.getS2Available();
+//            if (available2) {
+//                socket_control_s2value.setCompoundDrawablesRelativeWithIntrinsicBounds(getSensorIcon(mSocket.getS2Type()), 0, 0, 0);
+//                socket_control_s2value.setText(getSensorValueText(mSocket.getS2Type(), mSocket.getS2Value()));
+//            }
+//            socket_control_div.setVisibility(available2 ? View.VISIBLE : View.GONE);
+//            socket_control_ll2.setVisibility(available2 ? View.VISIBLE : View.GONE);
+//        } else {
+//            socket_control_ll.setVisibility(View.INVISIBLE);
+//        }
+//
+//        Log.e(TAG, "refreshData: " + mSocket.getPower());
+//        socket_control_power.setImageResource(mSocket.getPower() ? R.drawable.ic_power_blue : R.drawable.ic_power_red);
+//        socket_control_status.setText(getString(R.string.current_status) + (mSocket.getPower() ? getString(R.string.on) : getString(R.string.off)));
+//        socket_control_life.setText("" + mSocket.getSwitchCount() + "/" + mSocket.getSwitchCountMax());
     }
 
     private String getSensorValueText(int type, int value) {

@@ -9,19 +9,19 @@ import android.widget.CheckedTextView;
 import android.widget.TextView;
 
 import com.inledco.exoterra.R;
-import com.inledco.exoterra.bean.EXOMonsoonTimer;
+import com.inledco.exoterra.aliot.ExoMonsoon;
 import com.inledco.exoterra.common.SimpleAdapter;
 
 import java.text.DecimalFormat;
 import java.util.List;
 
-public abstract class MonsoonTimerAdapter extends SimpleAdapter<EXOMonsoonTimer, MonsoonTimerAdapter.MonsoonTimerViewHolder> {
+public abstract class MonsoonTimerAdapter extends SimpleAdapter<ExoMonsoon.Timer, MonsoonTimerAdapter.MonsoonTimerViewHolder> {
 
-    public MonsoonTimerAdapter(@NonNull Context context, List<EXOMonsoonTimer> data) {
+    public MonsoonTimerAdapter(@NonNull Context context, List<ExoMonsoon.Timer> data) {
         super(context, data);
     }
 
-    public void setTimers(List<EXOMonsoonTimer> timers) {
+    public void setTimers(List<ExoMonsoon.Timer> timers) {
         mData = timers;
         notifyDataSetChanged();
     }
@@ -74,12 +74,13 @@ public abstract class MonsoonTimerAdapter extends SimpleAdapter<EXOMonsoonTimer,
     @Override
     public void onBindViewHolder(@NonNull final MonsoonTimerViewHolder holder, int pos) {
         final int position = holder.getAdapterPosition();
-        EXOMonsoonTimer tmr = mData.get(position);
+        ExoMonsoon.Timer tmr = mData.get(position);
         holder.tv_ontime.setText(getTimeText(tmr.getTimer()));
-        holder.tv_offtime.setText("" + tmr.getDuration() + " s");
+        holder.tv_offtime.setText("" + tmr.getPeriod() + " s");
         holder.ctv_enable.setChecked(tmr.isEnable());
+        int repeat = tmr.getRepeat();
         for (int i = 0; i < 7; i++) {
-            holder.ctv_week[i].setChecked(tmr.getWeek(i));
+            holder.ctv_week[i].setChecked((repeat&(1<<i)) != 0);
         }
 
         holder.itemView.setOnClickListener(new View.OnClickListener() {

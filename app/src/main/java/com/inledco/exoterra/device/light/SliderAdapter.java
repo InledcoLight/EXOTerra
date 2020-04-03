@@ -8,16 +8,16 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.inledco.exoterra.R;
-import com.inledco.exoterra.bean.EXOLedstrip;
+import com.inledco.exoterra.aliot.ExoLed;
 import com.inledco.exoterra.common.OnItemClickListener;
 
 public class SliderAdapter extends RecyclerView.Adapter<SliderAdapter.SliderViewHolder> {
 
     private Context mContext;
-    private EXOLedstrip mLight;
+    private ExoLed mLight;
     private OnItemClickListener mItemClickListener;
 
-    public SliderAdapter(Context context, EXOLedstrip light) {
+    public SliderAdapter(Context context, ExoLed light) {
         mContext = context;
         mLight = light;
     }
@@ -35,23 +35,23 @@ public class SliderAdapter extends RecyclerView.Adapter<SliderAdapter.SliderView
 
     @Override
     public void onBindViewHolder(@NonNull final SliderViewHolder holder, final int pos) {
-        final int position = holder.getAdapterPosition();
-        int progress = mLight.getBright(position);
-        String name = mLight.getChannelName(position);
-
-//        holder.progress.setFinishedStrokeColor(LightUtil.getColorValue(name));
-//        holder.progress.setProgress(progress);
-//        holder.progress.setText("" + progress/10 + " %");
-//        holder.color.setText(name);
-
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (mItemClickListener != null) {
-                    mItemClickListener.onItemClick(position);
-                }
-            }
-        });
+//        final int position = holder.getAdapterPosition();
+//        int progress = mLight.getBright(position);
+//        String name = mLight.getChannelName(position);
+//
+////        holder.progress.setFinishedStrokeColor(LightUtil.getColorValue(name));
+////        holder.progress.setProgress(progress);
+////        holder.progress.setText("" + progress/10 + " %");
+////        holder.color.setText(name);
+//
+//        holder.itemView.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                if (mItemClickListener != null) {
+//                    mItemClickListener.onItemClick(position);
+//                }
+//            }
+//        });
 
 //        //动态设置SeekBar progressDrawable
 //        holder.sb_progress.setProgressDrawable(LightUtil.getProgressDrawable(mContext, name));
@@ -81,15 +81,17 @@ public class SliderAdapter extends RecyclerView.Adapter<SliderAdapter.SliderView
 
     @Override
     public int getItemCount() {
-        return mLight.getChannelCount();
+//        return mLight.getChannelCount();
+        return 0;
     }
 
     public byte[] getBrights() {
-        byte[] brights = new byte[mLight.getChannelCount()];
-        for (int i = 0; i < mLight.getChannelCount(); i++) {
-            brights[i] = (byte) (mLight.getBright(i) / 10);
-        }
-        return brights;
+//        byte[] brights = new byte[mLight.getChannelCount()];
+//        for (int i = 0; i < mLight.getChannelCount(); i++) {
+//            brights[i] = (byte) (mLight.getBright(i) / 10);
+//        }
+//        return brights;
+        return null;
     }
 
     class SliderViewHolder extends RecyclerView.ViewHolder {

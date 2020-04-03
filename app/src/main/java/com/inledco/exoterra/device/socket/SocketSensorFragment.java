@@ -4,28 +4,23 @@ import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.NumberPicker;
-import android.widget.RadioButton;
-import android.widget.RadioGroup;
 import android.widget.TextView;
-import android.widget.TimePicker;
 
 import com.inledco.exoterra.GlobalSettings;
 import com.inledco.exoterra.R;
+import com.inledco.exoterra.aliot.ExoSocket;
+import com.inledco.exoterra.aliot.SocketViewModel;
 import com.inledco.exoterra.base.BaseFragment;
-import com.inledco.exoterra.bean.EXOSocket;
-import com.inledco.exoterra.bean.Home;
-import com.inledco.exoterra.manager.HomeManager;
 import com.inledco.exoterra.util.TimeFormatUtil;
 
 import java.text.DateFormat;
@@ -42,12 +37,12 @@ public class SocketSensorFragment extends BaseFragment {
     private ImageButton socket_sensor_night_edit;
 
     private SocketViewModel mSocketViewModel;
-    private EXOSocket mSocket;
+    private ExoSocket mSocket;
 
     private DateFormat mTimeFormat;
 
-    private int mDaytimeStart;
-    private int mDaytimeEnd;
+    private int mSunrise;
+    private int mSunsrt;
     private int mDayThrd;
     private int mNightThrd;
 
@@ -86,9 +81,9 @@ public class SocketSensorFragment extends BaseFragment {
         mTimeFormat = GlobalSettings.getTimeFormat();
         mSocketViewModel = ViewModelProviders.of(getActivity()).get(SocketViewModel.class);
         mSocket = mSocketViewModel.getData();
-        mSocketViewModel.observe(this, new Observer<EXOSocket>() {
+        mSocketViewModel.observe(this, new Observer<ExoSocket>() {
             @Override
-            public void onChanged(@Nullable EXOSocket exoSocket) {
+            public void onChanged(@Nullable ExoSocket exoSocket) {
                 refreshData();
             }
         });
@@ -128,132 +123,141 @@ public class SocketSensorFragment extends BaseFragment {
         if (mSocket == null) {
             return;
         }
-        String tempunit = GlobalSettings.getTemperatureUnit();
-        socket_sensor_daytime.setText(getTimeText(mSocket.getDaytimeStart()) + " ~ " + getTimeText(mSocket.getDaytimeEnd()));
-        if (mSocket.getMode() == EXOSocket.MODE_SENSOR1) {
-            socket_sensor_title.setText(R.string.thermostat);
-            socket_sensor_icon.setImageResource(R.drawable.ic_temperature_color_64dp);
-            mDayThrd = mSocket.getSV1DayThreshold();
-            mNightThrd = mSocket.getSV1NightThreshold();
-//            if (mSocket.getSV1Type() != mSocket.getS1Type() || mSocket.getSV2Type() != mSocket.getS2Type()) {
-//                mDayThrd = 10;
-//                mNightThrd = 40;
-//            }
-            socket_sensor_day.setText("" + mDayThrd + " " + tempunit);
-            socket_sensor_night.setText("" + mNightThrd + " " + tempunit);
-        } else if (mSocket.getMode() == EXOSocket.MODE_SENSOR2) {
-            socket_sensor_title.setText(R.string.hygrostat);
-            socket_sensor_icon.setImageResource(R.drawable.ic_humidity_color_64dp);
-            mDayThrd = mSocket.getSV2DayThreshold();
-            mNightThrd = mSocket.getSV2NightThreshold();
-//            if (mSocket.getSV1Type() != mSocket.getS1Type() || mSocket.getSV2Type() != mSocket.getS2Type()) {
-//                mDayThrd = 20;
-//                mNightThrd = 80;
-//            }
-            socket_sensor_day.setText("" + mDayThrd + " %");
-            socket_sensor_night.setText("" + mNightThrd + " %");
+        socket_sensor_daytime.setText(getTimeText(mSocket.getSunrise()) + " ~ " + getTimeText(mSocket.getSunset()));
+        ExoSocket.SensorConfig[] configs = mSocket.getSensorConfig();
+        ExoSocket.SensorConfig config = null;
+        if (configs == null || configs.length == 0 || configs.length > ExoSocket.SENSOR_COUNT_MAX) {
+            return;
         }
+        if (mSocket.getMode() == ExoSocket.MODE_SENSOR1) {
+            config = configs[0];
+        } else if (mSocket.getMode() == ExoSocket.MODE_SENSOR2) {
+            config = configs[1];
+        }
+        if (config == null) {
+            return;
+        }
+        int type = config.getType();
+        String unit = getSensorUnit(type);
+        socket_sensor_title.setText(getSensorName(type));
+        socket_sensor_icon.setImageResource(getSensorDrawable(type));
+        mDayThrd = config.getDay();
+        mNightThrd = config.getNight();
+        socket_sensor_day.setText("" + mDayThrd + " " + unit);
+        socket_sensor_night.setText("" + mNightThrd + " " + unit);
     }
 
     private void showDaytimeDialog() {
-        final Home home = HomeManager.getInstance().getDeviceHome(mSocket);
-        mDaytimeStart = mSocket.getDaytimeStart();
-        mDaytimeEnd = mSocket.getDaytimeEnd();
-        View view = LayoutInflater.from(getContext()).inflate(R.layout.dialog_daytime, null, false);
-        CheckBox cb = view.findViewById(R.id.dialog_daytime_cb);
-        final RadioGroup rg = view.findViewById(R.id.dialog_daytime_rg);
-        final RadioButton start = view.findViewById(R.id.dialog_daytime_start);
-        final RadioButton end = view.findViewById(R.id.dialog_daytime_end);
-        final TimePicker tp = view.findViewById(R.id.dialog_daytime_tp);
-        cb.setVisibility(home != null ? View.VISIBLE : View.GONE);
-        rg.check(R.id.dialog_daytime_start);
-        start.setText(getTimeText(mDaytimeStart));
-        end.setText(getTimeText(mDaytimeEnd));
-        tp.setIs24HourView(GlobalSettings.is24HourFormat());
-        tp.setCurrentHour(mDaytimeStart/60);
-        tp.setCurrentMinute(mDaytimeStart%60);
-        final TimePicker.OnTimeChangedListener listener = new TimePicker.OnTimeChangedListener() {
-            @Override
-            public void onTimeChanged(TimePicker view, int hourOfDay, int minute) {
-                int value = hourOfDay*60+minute;
-                if (start.isChecked()) {
-                    mDaytimeStart = value;
-                    start.setText(getTimeText(mDaytimeStart));
-                } else if (end.isChecked()) {
-                    mDaytimeEnd = value;
-                    start.setText(getTimeText(mDaytimeEnd));
-                }
-            }
-        };
-        cb.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (home != null) {
-                    if (isChecked) {
-                        mDaytimeStart = home.getSunrise();
-                        mDaytimeEnd = home.getSunset();
-                        rg.clearCheck();
-                    } else {
-                        mDaytimeStart = mSocket.getDaytimeStart();
-                        mDaytimeEnd = mSocket.getDaytimeEnd();
-                        rg.check(R.id.dialog_daytime_start);
-                    }
-                    start.setEnabled(!isChecked);
-                    end.setEnabled(!isChecked);
-                    start.setText(getTimeText(mDaytimeStart));
-                    end.setText(getTimeText(mDaytimeEnd));
-                    tp.setVisibility(isChecked ? View.GONE : View.VISIBLE);
-                }
-            }
-        });
-        rg.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(RadioGroup group, int checkedId) {
-                switch (checkedId) {
-                    case R.id.dialog_daytime_start:
-                        tp.setOnTimeChangedListener(null);
-                        tp.setCurrentHour(mDaytimeStart/60);
-                        tp.setCurrentMinute(mDaytimeStart%60);
-                        tp.setOnTimeChangedListener(listener);
-                        break;
-                    case R.id.dialog_daytime_end:
-                        tp.setOnTimeChangedListener(null);
-                        tp.setCurrentHour(mDaytimeEnd/60);
-                        tp.setCurrentMinute(mDaytimeEnd%60);
-                        tp.setOnTimeChangedListener(listener);
-                        break;
-                }
-            }
-        });
-        tp.setOnTimeChangedListener(listener);
-        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-        builder.setTitle(R.string.daytime);
-        builder.setView(view);
-        builder.setNegativeButton(R.string.cancel, null);
-        builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                mSocketViewModel.setDaytime(mDaytimeStart, mDaytimeEnd);
-            }
-        });
-        builder.show();
+//        final Home home = HomeManager.getInstance().getDeviceHome(mSocket);
+//        mSunrise = mSocket.getSunrise();
+//        mSunsrt = mSocket.getSunset();
+//        View view = LayoutInflater.from(getContext()).inflate(R.layout.dialog_daytime, null, false);
+//        CheckBox cb = view.findViewById(R.id.dialog_daytime_cb);
+//        final RadioGroup rg = view.findViewById(R.id.dialog_daytime_rg);
+//        final RadioButton start = view.findViewById(R.id.dialog_daytime_start);
+//        final RadioButton end = view.findViewById(R.id.dialog_daytime_end);
+//        final TimePicker tp = view.findViewById(R.id.dialog_daytime_tp);
+//        cb.setVisibility(home != null ? View.VISIBLE : View.GONE);
+//        rg.check(R.id.dialog_daytime_start);
+//        start.setText(getTimeText(mSunrise));
+//        end.setText(getTimeText(mSunsrt));
+//        tp.setIs24HourView(GlobalSettings.is24HourFormat());
+//        tp.setCurrentHour(mSunrise / 60);
+//        tp.setCurrentMinute(mSunrise % 60);
+//        final TimePicker.OnTimeChangedListener listener = new TimePicker.OnTimeChangedListener() {
+//            @Override
+//            public void onTimeChanged(TimePicker view, int hourOfDay, int minute) {
+//                int value = hourOfDay*60+minute;
+//                if (start.isChecked()) {
+//                    mSunrise = value;
+//                    start.setText(getTimeText(mSunrise));
+//                } else if (end.isChecked()) {
+//                    mSunsrt = value;
+//                    start.setText(getTimeText(mSunsrt));
+//                }
+//            }
+//        };
+//        cb.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+//            @Override
+//            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+//                if (home != null) {
+//                    if (isChecked) {
+//                        mSunrise = home.getSunrise();
+//                        mSunsrt = home.getSunset();
+//                        rg.clearCheck();
+//                    } else {
+//                        mSunrise = mSocket.getSunrise();
+//                        mSunsrt = mSocket.getSunset();
+//                        rg.check(R.id.dialog_daytime_start);
+//                    }
+//                    start.setEnabled(!isChecked);
+//                    end.setEnabled(!isChecked);
+//                    start.setText(getTimeText(mSunrise));
+//                    end.setText(getTimeText(mSunsrt));
+//                    tp.setVisibility(isChecked ? View.GONE : View.VISIBLE);
+//                }
+//            }
+//        });
+//        rg.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+//            @Override
+//            public void onCheckedChanged(RadioGroup group, int checkedId) {
+//                switch (checkedId) {
+//                    case R.id.dialog_daytime_start:
+//                        tp.setOnTimeChangedListener(null);
+//                        tp.setCurrentHour(mSunrise / 60);
+//                        tp.setCurrentMinute(mSunrise % 60);
+//                        tp.setOnTimeChangedListener(listener);
+//                        break;
+//                    case R.id.dialog_daytime_end:
+//                        tp.setOnTimeChangedListener(null);
+//                        tp.setCurrentHour(mSunsrt / 60);
+//                        tp.setCurrentMinute(mSunsrt % 60);
+//                        tp.setOnTimeChangedListener(listener);
+//                        break;
+//                }
+//            }
+//        });
+//        tp.setOnTimeChangedListener(listener);
+//        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+//        builder.setTitle(R.string.daytime);
+//        builder.setView(view);
+//        builder.setNegativeButton(R.string.cancel, null);
+//        builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+//            @Override
+//            public void onClick(DialogInterface dialog, int which) {
+//                mSocketViewModel.setDaytime(mSunrise, mSunsrt);
+//            }
+//        });
+//        builder.show();
     }
 
     private void showThresholdDialog(final boolean night) {
-        int min;
-        int max;
-        String unit;
-        if (mSocket.getMode() == EXOSocket.MODE_SENSOR1) {
-            min = 10;
-            max = 40;
-            unit = "℃";
-        } else if (mSocket.getMode() == EXOSocket.MODE_SENSOR2) {
-            min = 20;
-            max = 80;
-            unit = "%";
-        } else {
+        if (mSocket.getSensorAvailable() == false) {
             return;
         }
+        ExoSocket.Sensor[] sensors = mSocket.getSensor();
+        final ExoSocket.SensorConfig[] configs = mSocket.getSensorConfig();
+        if (sensors == null || sensors.length < 1 || sensors.length > ExoSocket.SENSOR_COUNT_MAX) {
+            return;
+        }
+        if (configs == null || configs.length < 1 || configs.length > ExoSocket.SENSOR_COUNT_MAX) {
+            return;
+        }
+        ExoSocket.Sensor sensor = null;
+        ExoSocket.SensorConfig config = null;
+        if (mSocket.getMode() == ExoSocket.MODE_SENSOR1) {
+            sensor = sensors[0];
+            config = configs[0];
+        } else if (mSocket.getMode() == ExoSocket.MODE_SENSOR2) {
+            sensor = sensors[1];
+            config = configs[1];
+        }
+        if (sensor == null || config == null) {
+            return;
+        }
+        int min = sensor.getThrdLower();
+        int max = sensor.getThrdUpper();
+        String unit = getSensorUnit(sensor.getType());
         String[] values = new String[max-min+1];
         for (int i = 0; i < values.length; i++) {
             values[i] = "" + (min+i) + " " + unit;
@@ -269,88 +273,59 @@ public class SocketSensorFragment extends BaseFragment {
         builder.setTitle(night ? "Night Threshold" : "Daytime Threshold");
         builder.setView(view);
         builder.setNegativeButton(R.string.cancel, null);
+        final ExoSocket.SensorConfig cfg = config;
         builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
+//                ExoSocket.SensorConfig[] configs = mSocket.getSensorConfig();
                 int val = np.getValue();
-                if (mSocket.getMode() == EXOSocket.MODE_SENSOR1) {
-                    if (night) {
-                        mSocketViewModel.setSensor1NightThreshold(val);
-                    } else {
-                        mSocketViewModel.setSensor1DayThreshold(val);
-                    }
-                } else if (mSocket.getMode() == EXOSocket.MODE_SENSOR2) {
-                    if (night) {
-                        mSocketViewModel.setSensor2NightThreshold(val);
-                    } else {
-                        mSocketViewModel.setSensor2DayThreshold(val);
-                    }
+                if (night) {
+                    cfg.setNight(val);
+                } else {
+                    cfg.setDay(val);
                 }
+                mSocketViewModel.setSensorConfig(configs);
             }
         });
         builder.show();
     }
 
-//    public interface ISensor {
-//        int getMin();
-//        int getMax();
-//        String getUnit();
-//        void setDayThreshold(int thrd);
-//        void setNightThreshold(int thrd);
-//    }
-//
-//    public enum Sensor implements ISensor {
-//        Temperature {
-//            @Override
-//            public int getMin() {
-//                return 10;
-//            }
-//
-//            @Override
-//            public int getMax() {
-//                return 40;
-//            }
-//
-//            @Override
-//            public String getUnit() {
-//                return "℃";
-//            }
-//
-//            @Override
-//            public void setDayThreshold(int thrd) {
-//                mSocketViewModel.setSensor1DayThreshold(thrd);
-//            }
-//
-//            @Override
-//            public void setNightThreshold(int thrd) {
-//                mSocketViewModel.setSensor1NightThreshold(thrd);
-//            }
-//        },
-//        Humidity {
-//            @Override
-//            public int getMin() {
-//                return 20;
-//            }
-//
-//            @Override
-//            public int getMax() {
-//                return 80;
-//            }
-//
-//            @Override
-//            public String getUnit() {
-//                return "%";
-//            }
-//
-//            @Override
-//            public void setDayThreshold(int thrd) {
-//                mSocketViewModel.setSensor2DayThreshold(thrd);
-//            }
-//
-//            @Override
-//            public void setNightThreshold(int thrd) {
-//                mSocketViewModel.setSensor2NightThreshold(thrd);
-//            }
-//        }
-//    }
+    private String getSensorUnit(int type) {
+        String text = "";
+        switch (type) {
+            case ExoSocket.SENSOR_TEMPERATURE:
+                text = "℃";
+                break;
+            case ExoSocket.SENSOR_HUMIDITY:
+                text = "%";
+                break;
+        }
+        return text;
+    }
+
+    private String getSensorName(int type) {
+        String text = "";
+        switch (type) {
+            case ExoSocket.SENSOR_TEMPERATURE:
+                text = getString(R.string.thermostat);
+                break;
+            case ExoSocket.SENSOR_HUMIDITY:
+                text = getString(R.string.hygrostat);
+                break;
+        }
+        return text;
+    }
+
+    private @DrawableRes int getSensorDrawable(int type) {
+        int res = 0;
+        switch (type) {
+            case ExoSocket.SENSOR_TEMPERATURE:
+                res = R.drawable.ic_temperature_color_64dp;
+                break;
+            case ExoSocket.SENSOR_HUMIDITY:
+                res = R.drawable.ic_humidity_color_64dp;
+                break;
+        }
+        return res;
+    }
 }

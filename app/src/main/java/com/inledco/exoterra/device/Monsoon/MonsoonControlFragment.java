@@ -15,8 +15,9 @@ import android.widget.NumberPicker;
 import android.widget.TextView;
 
 import com.inledco.exoterra.R;
+import com.inledco.exoterra.aliot.ExoMonsoon;
+import com.inledco.exoterra.aliot.MonsoonViewModel;
 import com.inledco.exoterra.base.BaseFragment;
-import com.inledco.exoterra.bean.EXOMonsoon;
 
 import java.util.List;
 
@@ -28,7 +29,7 @@ public class MonsoonControlFragment extends BaseFragment {
     private final String[] mKeyActions = new String[120];
 
     private MonsoonViewModel mMonsoonViewModel;
-    private EXOMonsoon mMonsoon;
+    private ExoMonsoon mMonsoon;
 
     @Nullable
     @Override
@@ -64,9 +65,9 @@ public class MonsoonControlFragment extends BaseFragment {
         mMonsoonViewModel = ViewModelProviders.of(getActivity())
                                               .get(MonsoonViewModel.class);
         mMonsoon = mMonsoonViewModel.getData();
-        mMonsoonViewModel.observe(this, new Observer<EXOMonsoon>() {
+        mMonsoonViewModel.observe(this, new Observer<ExoMonsoon>() {
             @Override
-            public void onChanged(@Nullable EXOMonsoon exoMonsoon) {
+            public void onChanged(@Nullable ExoMonsoon exoMonsoon) {
                 refreshData();
             }
         });
@@ -106,7 +107,7 @@ public class MonsoonControlFragment extends BaseFragment {
 
     private void refreshData() {
         if (mMonsoon != null) {
-            final List<Byte> actions = mMonsoon.getCustomActions();
+            final List<Integer> actions = mMonsoon.getCustomActions();
             int addIdx = 0;
             if (actions != null) {
                 addIdx = actions.size();
@@ -119,7 +120,7 @@ public class MonsoonControlFragment extends BaseFragment {
                 monsoon_ctrl_custom[i].setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        mMonsoonViewModel.setPower((byte) (actions.get(idx) + 0x80));
+                        mMonsoonViewModel.setPower(actions.get(idx));
                     }
                 });
                 monsoon_ctrl_custom[i].setOnLongClickListener(new View.OnLongClickListener() {
@@ -154,7 +155,7 @@ public class MonsoonControlFragment extends BaseFragment {
     }
 
     private String getKeyActionText() {
-        if (mMonsoon == null || mMonsoon.getKeyAction() < 1 || mMonsoon.getKeyAction() > 120) {
+        if (mMonsoon == null || mMonsoon.getKeyAction() < ExoMonsoon.SPRAY_MIN || mMonsoon.getKeyAction() > ExoMonsoon.SPRAY_MAX) {
             return "";
         }
         return mKeyActions[mMonsoon.getKeyAction()-1];
@@ -167,8 +168,8 @@ public class MonsoonControlFragment extends BaseFragment {
         View view = LayoutInflater.from(getContext()).inflate(R.layout.dialog_key_action, null, false);
         final NumberPicker np = view.findViewById(R.id.dialog_key_action_np);
         np.setDisplayedValues(mKeyActions);
-        np.setMinValue(1);
-        np.setMaxValue(120);
+        np.setMinValue(ExoMonsoon.SPRAY_MIN);
+        np.setMaxValue(ExoMonsoon.SPRAY_MAX);
         np.setValue(mMonsoon.getKeyAction());
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         builder.setView(view);
@@ -184,21 +185,21 @@ public class MonsoonControlFragment extends BaseFragment {
     }
 
     private void showEditCustomActionDialog(final int idx) {
-        if (idx < 0 || idx >= 8) {
+        if (idx < 0 || idx >= ExoMonsoon.CUSTOM_ACTIONS_MAX) {
             return;
         }
         if (mMonsoon != null) {
-            final List<Byte> actions = mMonsoon.getCustomActions();
+            final List<Integer> actions = mMonsoon.getCustomActions();
             if (idx > actions.size()) {
                 return;
             }
             View view = LayoutInflater.from(getContext()).inflate(R.layout.dialog_custom_actions, null, false);
             final NumberPicker np = view.findViewById(R.id.dialog_custom_np);
-            np.setMinValue(1);
-            np.setMaxValue(120);
+            np.setMinValue(ExoMonsoon.SPRAY_MIN);
+            np.setMaxValue(ExoMonsoon.SPRAY_MAX);
             np.setDisplayedValues(mPeriods);
             if (idx >= actions.size()) {
-                np.setValue(5);
+                np.setValue(ExoMonsoon.SPRAY_DEFAULT);
             } else {
                 np.setValue(actions.get(idx));
             }
@@ -210,10 +211,10 @@ public class MonsoonControlFragment extends BaseFragment {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     if (idx >= actions.size()) {
-                        actions.add((byte) np.getValue());
+                        actions.add(np.getValue());
                     }
                     else {
-                        actions.set(idx, (byte) np.getValue());
+                        actions.set(idx, np.getValue());
                     }
                     mMonsoonViewModel.setCustomActions(actions);
                 }
@@ -223,11 +224,11 @@ public class MonsoonControlFragment extends BaseFragment {
     }
 
     private void showDialog(final int idx) {
-        if (idx < 0 || idx >= 8 ) {
+        if (idx < 0 || idx >= ExoMonsoon.CUSTOM_ACTIONS_MAX) {
             return;
         }
         if (mMonsoon != null) {
-            final List<Byte> actions = mMonsoon.getCustomActions();
+            final List<Integer> actions = mMonsoon.getCustomActions();
             if (actions == null) {
                 return;
             }

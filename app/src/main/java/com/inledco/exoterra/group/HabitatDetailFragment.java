@@ -2,10 +2,7 @@ package com.inledco.exoterra.group;
 
 import android.app.TimePickerDialog;
 import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
-import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -14,8 +11,6 @@ import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.RecyclerView;
-import android.text.TextUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,37 +20,23 @@ import android.widget.ImageButton;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.TimePicker;
-import android.widget.Toast;
 
 import com.inledco.exoterra.GlobalSettings;
 import com.inledco.exoterra.R;
 import com.inledco.exoterra.base.BaseFragment;
 import com.inledco.exoterra.bean.Home;
-import com.inledco.exoterra.common.OnItemClickListener;
-import com.inledco.exoterra.event.HomeChangedEvent;
-import com.inledco.exoterra.event.HomePropertyChangedEvent;
 import com.inledco.exoterra.event.HomesRefreshedEvent;
-import com.inledco.exoterra.manager.HomeManager;
 import com.inledco.exoterra.util.FavouriteUtil;
 import com.inledco.exoterra.util.RegexUtil;
 import com.inledco.exoterra.util.TimeFormatUtil;
 import com.inledco.exoterra.view.GradientCornerButton;
-import com.inledco.exoterra.xlink.XlinkCloudManager;
-import com.inledco.exoterra.xlink.XlinkRequestCallback;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
 import java.text.DateFormat;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
 import java.util.TimeZone;
-
-import cn.xlink.restful.XLinkRestfulEnum;
-import cn.xlink.restful.api.app.HomeApi;
-import cn.xlink.sdk.v5.manager.XLinkUserManager;
 
 public class HabitatDetailFragment extends BaseFragment {
     private TextView habitat_detail_name;
@@ -83,7 +64,7 @@ public class HabitatDetailFragment extends BaseFragment {
     private BroadcastReceiver mTimeReceiver;
 
     private boolean mHomeAdmin;
-    private final List<HomeApi.HomesResponse.Home.User> mUsers = new ArrayList<>();
+//    private final List<HomeApi.HomesResponse.Home.User> mUsers = new ArrayList<>();
     private HabitatMembersAdapter mAdapter;
 
     public static HabitatDetailFragment newInstance(@NonNull final String homeid) {
@@ -139,67 +120,58 @@ public class HabitatDetailFragment extends BaseFragment {
 
     @Override
     protected void initData() {
-        mDateFormat = GlobalSettings.getDateTimeFormat();
-        mTimeFormat = GlobalSettings.getTimeFormat();
-        Bundle args = getArguments();
-        if (args != null) {
-            mHomeid = args.getString(KEY_HOMEID);
-            mHome = HomeManager.getInstance().getHome(mHomeid);
-            if (mHome != null) {
-                mZone = mHome.getZone();
-                mSunrise = mHome.getSunrise();
-                mSunset = mHome.getSunset();
-                mTimeReceiver = new BroadcastReceiver() {
-                    @Override
-                    public void onReceive(Context context, Intent intent) {
-                        switch (intent.getAction()) {
-                            case Intent.ACTION_TIME_TICK:
-                                refreshTime();
-                                break;
-                        }
-                    }
-                };
-                IntentFilter filter = new IntentFilter(Intent.ACTION_TIME_TICK);
-                getActivity().registerReceiver(mTimeReceiver, filter);
+//        mDateFormat = GlobalSettings.getDateTimeFormat();
+//        mTimeFormat = GlobalSettings.getTimeFormat();
+//        Bundle args = getArguments();
+//        if (args != null) {
+//            mHomeid = args.getString(KEY_HOMEID);
+//            mHome = HomeManager.getInstance().getHome(mHomeid);
+//            if (mHome != null) {
+//                mZone = mHome.getZone();
+//                mSunrise = mHome.getSunrise();
+//                mSunset = mHome.getSunset();
+//                mTimeReceiver = new BroadcastReceiver() {
+//                    @Override
+//                    public void onReceive(Context context, Intent intent) {
+//                        switch (intent.getAction()) {
+//                            case Intent.ACTION_TIME_TICK:
+//                                refreshTime();
+//                                break;
+//                        }
+//                    }
+//                };
+//                IntentFilter filter = new IntentFilter(Intent.ACTION_TIME_TICK);
+//                getActivity().registerReceiver(mTimeReceiver, filter);
+//
+//                if (mHomeAdmin) {
+//                    habitat_detail_name.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_edit_white_24dp, 0);
+//                    habitat_detail_datetime.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_edit_white_24dp, 0);
+//                    habitat_detail_sunrise.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_edit_white_24dp, 0);
+//                    habitat_detail_sunset.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_edit_white_24dp, 0);
+//                }
+//                habitat_detail_name.setEnabled(mHomeAdmin);
+//                habitat_detail_datetime.setEnabled(mHomeAdmin);
+//                habitat_detail_sunrise.setEnabled(mHomeAdmin);
+//                habitat_detail_sunset.setEnabled(mHomeAdmin);
+//                habitat_detail_share.setVisibility(mHomeAdmin ? View.VISIBLE : View.GONE);
+//
+//                final Set<String> favourites = FavouriteUtil.getFavourites(getContext());
+//                habitat_detail_favourite.setChecked(favourites.contains(mHomeid));
 
-                for (HomeApi.HomesResponse.Home.User usr : mHome.getHome().userList) {
-                    if (usr.userId == XLinkUserManager.getInstance().getUid()) {
-                        if (usr.role == XLinkRestfulEnum.HomeUserType.SUPER_ADMIN || usr.role == XLinkRestfulEnum.HomeUserType.ADMIN) {
-                            mHomeAdmin = true;
-                            break;
-                        }
-                    }
-                }
+//                mUsers.addAll(mHome.getHome().userList);
+//                mAdapter = new HabitatMembersAdapter(getContext(), mUsers);
+//                mAdapter.setOnItemClickListener(new OnItemClickListener() {
+//                    @Override
+//                    public void onItemClick(int position) {
+//                        HomeApi.HomesResponse.Home.User user = mUsers.get(position);
+//                        addFragmentToStack(R.id.main_fl, HabitatMemberFragment.newInstance(mHomeid, user.userId));
+//                    }
+//                });
+//                habitat_detail_rv.setAdapter(mAdapter);
 
-                if (mHomeAdmin) {
-                    habitat_detail_name.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_edit_white_24dp, 0);
-                    habitat_detail_datetime.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_edit_white_24dp, 0);
-                    habitat_detail_sunrise.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_edit_white_24dp, 0);
-                    habitat_detail_sunset.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_edit_white_24dp, 0);
-                }
-                habitat_detail_name.setEnabled(mHomeAdmin);
-                habitat_detail_datetime.setEnabled(mHomeAdmin);
-                habitat_detail_sunrise.setEnabled(mHomeAdmin);
-                habitat_detail_sunset.setEnabled(mHomeAdmin);
-                habitat_detail_share.setVisibility(mHomeAdmin ? View.VISIBLE : View.GONE);
-
-                final Set<String> favourites = FavouriteUtil.getFavourites(getContext());
-                habitat_detail_favourite.setChecked(favourites.contains(mHomeid));
-
-                mUsers.addAll(mHome.getHome().userList);
-                mAdapter = new HabitatMembersAdapter(getContext(), mUsers);
-                mAdapter.setOnItemClickListener(new OnItemClickListener() {
-                    @Override
-                    public void onItemClick(int position) {
-                        HomeApi.HomesResponse.Home.User user = mUsers.get(position);
-                        addFragmentToStack(R.id.main_fl, HabitatMemberFragment.newInstance(mHomeid, user.userId));
-                    }
-                });
-                habitat_detail_rv.setAdapter(mAdapter);
-
-                refreshData();
-            }
-        }
+//                refreshData();
+//            }
+//        }
     }
 
     @Override
@@ -296,27 +268,27 @@ public class HabitatDetailFragment extends BaseFragment {
     }
 
     private void setHome(final int zone, final int sunrise, final int sunset) {
-        XlinkCloudManager.getInstance().setHomeProperty(mHomeid, zone, sunrise, sunset, new XlinkRequestCallback<String>() {
-            @Override
-            public void onError(String error) {
-                Toast.makeText(getContext(), error, Toast.LENGTH_SHORT)
-                     .show();
-            }
-
-            @Override
-            public void onSuccess(String s) {
-                mZone = zone;
-                mSunrise = sunrise;
-                mSunset = sunset;
-                mHome.getProperty().setZone(mZone);
-                mHome.getProperty().setSunrise(mSunrise);
-                mHome.getProperty().setSunset(mSunset);
-                refreshTime();
-                habitat_detail_sunrise.setText(getTimeText(mSunrise));
-                habitat_detail_sunset.setText(getTimeText(mSunset));
-                EventBus.getDefault().post(new HomePropertyChangedEvent(mHomeid));
-            }
-        });
+//        XlinkCloudManager.getInstance().setHomeProperty(mHomeid, zone, sunrise, sunset, new XlinkRequestCallback<String>() {
+//            @Override
+//            public void onError(String error) {
+//                Toast.makeText(getContext(), error, Toast.LENGTH_SHORT)
+//                     .show();
+//            }
+//
+//            @Override
+//            public void onSuccess(String s) {
+//                mZone = zone;
+//                mSunrise = sunrise;
+//                mSunset = sunset;
+//                mHome.getProperty().setZone(mZone);
+//                mHome.getProperty().setSunrise(mSunrise);
+//                mHome.getProperty().setSunset(mSunset);
+//                refreshTime();
+//                habitat_detail_sunrise.setText(getTimeText(mSunrise));
+//                habitat_detail_sunset.setText(getTimeText(mSunset));
+//                EventBus.getDefault().post(new HomePropertyChangedEvent(mHomeid));
+//            }
+//        });
     }
 
     private String getTimeText(int time) {
@@ -324,11 +296,11 @@ public class HabitatDetailFragment extends BaseFragment {
     }
 
     private void refreshData() {
-        String name = mHome.getHome().name;
-        habitat_detail_name.setText(name);
-        refreshTime();
-        habitat_detail_sunrise.setText(getTimeText(mSunrise));
-        habitat_detail_sunset.setText(getTimeText(mSunset));
+//        String name = mHome.getHome().name;
+//        habitat_detail_name.setText(name);
+//        refreshTime();
+//        habitat_detail_sunrise.setText(getTimeText(mSunrise));
+//        habitat_detail_sunset.setText(getTimeText(mSunset));
     }
 
     private void refreshTime() {
@@ -345,46 +317,46 @@ public class HabitatDetailFragment extends BaseFragment {
     }
 
     private void showRenameDialog() {
-        String name = mHome.getHome().name;
-        View view = LayoutInflater.from(getContext()).inflate(R.layout.dialog_rename, null, false);
-        final TextInputLayout til = view.findViewById(R.id.dialog_rename_til);
-        final TextInputEditText et_name = view.findViewById(R.id.dialog_rename_et);
-        til.setHint(getString(R.string.habitat_name));
-        et_name.setText(name);
-        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-        final AlertDialog dialog = builder.setTitle(R.string.rename_device)
-                                          .setNegativeButton(R.string.cancel, null)
-                                          .setPositiveButton(R.string.ok, null)
-                                          .setView(view)
-                                          .create();
-        dialog.setCanceledOnTouchOutside(false);
-        dialog.show();
-        et_name.requestFocus();
-        dialog.getButton(DialogInterface.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                final String name = et_name.getText().toString();
-                if (TextUtils.isEmpty(name)) {
-                    et_name.setError(getString(R.string.input_empty));
-                    return;
-                }
-                XlinkCloudManager.getInstance().renameHome(mHomeid, name, new XlinkRequestCallback<String>() {
-                    @Override
-                    public void onError(String error) {
-                        Toast.makeText(getContext(), error, Toast.LENGTH_SHORT)
-                             .show();
-                    }
-
-                    @Override
-                    public void onSuccess(String s) {
-                        dialog.dismiss();
-                        mHome.getHome().name = name;
-                        habitat_detail_name.setText(name);
-                        EventBus.getDefault().post(new HomeChangedEvent(mHomeid));
-                    }
-                });
-            }
-        });
+//        String name = mHome.getHome().name;
+//        View view = LayoutInflater.from(getContext()).inflate(R.layout.dialog_rename, null, false);
+//        final TextInputLayout til = view.findViewById(R.id.dialog_rename_til);
+//        final TextInputEditText et_name = view.findViewById(R.id.dialog_rename_et);
+//        til.setHint(getString(R.string.habitat_name));
+//        et_name.setText(name);
+//        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+//        final AlertDialog dialog = builder.setTitle(R.string.rename_device)
+//                                          .setNegativeButton(R.string.cancel, null)
+//                                          .setPositiveButton(R.string.ok, null)
+//                                          .setView(view)
+//                                          .create();
+//        dialog.setCanceledOnTouchOutside(false);
+//        dialog.show();
+//        et_name.requestFocus();
+//        dialog.getButton(DialogInterface.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                final String name = et_name.getText().toString();
+//                if (TextUtils.isEmpty(name)) {
+//                    et_name.setError(getString(R.string.input_empty));
+//                    return;
+//                }
+//                XlinkCloudManager.getInstance().renameHome(mHomeid, name, new XlinkRequestCallback<String>() {
+//                    @Override
+//                    public void onError(String error) {
+//                        Toast.makeText(getContext(), error, Toast.LENGTH_SHORT)
+//                             .show();
+//                    }
+//
+//                    @Override
+//                    public void onSuccess(String s) {
+//                        dialog.dismiss();
+//                        mHome.getHome().name = name;
+//                        habitat_detail_name.setText(name);
+//                        EventBus.getDefault().post(new HomeChangedEvent(mHomeid));
+//                    }
+//                });
+//            }
+//        });
     }
 
     private void showShareHabitatDialog() {
@@ -415,61 +387,61 @@ public class HabitatDetailFragment extends BaseFragment {
     }
 
     private void shareHome(@NonNull final String email) {
-        XlinkCloudManager.getInstance().inviteHomeMember(mHome.getHome().id, email, new XlinkRequestCallback<HomeApi.UserInviteResponse>() {
-            @Override
-            public void onError(String error) {
-                Toast.makeText(getContext(), error, Toast.LENGTH_SHORT)
-                     .show();
-            }
-
-            @Override
-            public void onSuccess(HomeApi.UserInviteResponse response) {
-                Toast.makeText(getContext(), "Share Habitat Success.", Toast.LENGTH_SHORT)
-                     .show();
-            }
-        });
+//        XlinkCloudManager.getInstance().inviteHomeMember(mHome.getHome().id, email, new XlinkRequestCallback<HomeApi.UserInviteResponse>() {
+//            @Override
+//            public void onError(String error) {
+//                Toast.makeText(getContext(), error, Toast.LENGTH_SHORT)
+//                     .show();
+//            }
+//
+//            @Override
+//            public void onSuccess(HomeApi.UserInviteResponse response) {
+//                Toast.makeText(getContext(), "Share Habitat Success.", Toast.LENGTH_SHORT)
+//                     .show();
+//            }
+//        });
     }
 
     private void showDeleteHabitatDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-        builder.setTitle(R.string.delete_habitat)
-               .setMessage(getString(R.string.msg_delete, mHome.getHome().name))
-               .setNegativeButton(R.string.cancel, null)
-               .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-                   @Override
-                   public void onClick(DialogInterface dialog, int which) {
-                       final XlinkRequestCallback<String> callback = new XlinkRequestCallback<String>() {
-                           @Override
-                           public void onError(String error) {
-                               Toast.makeText(getContext(), error, Toast.LENGTH_SHORT)
-                                    .show();
-                           }
-
-                           @Override
-                           public void onSuccess(String s) {
-                               Log.e(TAG, "onSuccess: " + mHomeid);
-                               HomeManager.getInstance().remove(mHomeid);
-                               EventBus.getDefault().post(new HomesRefreshedEvent());
-                               getActivity().getSupportFragmentManager().popBackStack(null, 1);
-                           }
-                       };
-                       if (mHomeAdmin) {
-                           XlinkCloudManager.getInstance().deleteHome(mHomeid, callback);
-                       } else {
-                           XlinkCloudManager.getInstance().deleteHomeUser(mHomeid, XLinkUserManager.getInstance().getUid(), callback);
-                       }
-                   }
-               })
-               .setCancelable(false)
-               .show();
+//        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+//        builder.setTitle(R.string.delete_habitat)
+//               .setMessage(getString(R.string.msg_delete, mHome.getHome().name))
+//               .setNegativeButton(R.string.cancel, null)
+//               .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+//                   @Override
+//                   public void onClick(DialogInterface dialog, int which) {
+//                       final XlinkRequestCallback<String> callback = new XlinkRequestCallback<String>() {
+//                           @Override
+//                           public void onError(String error) {
+//                               Toast.makeText(getContext(), error, Toast.LENGTH_SHORT)
+//                                    .show();
+//                           }
+//
+//                           @Override
+//                           public void onSuccess(String s) {
+//                               Log.e(TAG, "onSuccess: " + mHomeid);
+//                               HomeManager.getInstance().remove(mHomeid);
+//                               EventBus.getDefault().post(new HomesRefreshedEvent());
+//                               getActivity().getSupportFragmentManager().popBackStack(null, 1);
+//                           }
+//                       };
+//                       if (mHomeAdmin) {
+//                           XlinkCloudManager.getInstance().deleteHome(mHomeid, callback);
+//                       } else {
+//                           XlinkCloudManager.getInstance().deleteHomeUser(mHomeid, XLinkUserManager.getInstance().getUid(), callback);
+//                       }
+//                   }
+//               })
+//               .setCancelable(false)
+//               .show();
     }
 
     @Subscribe (threadMode = ThreadMode.MAIN)
     public void onHomesRefreshedEvent(HomesRefreshedEvent event) {
-        if (event != null) {
-            mUsers.clear();
-            mUsers.addAll(mHome.getHome().userList);
-            mAdapter.notifyDataSetChanged();
-        }
+//        if (event != null) {
+//            mUsers.clear();
+//            mUsers.addAll(mHome.getHome().userList);
+//            mAdapter.notifyDataSetChanged();
+//        }
     }
 }

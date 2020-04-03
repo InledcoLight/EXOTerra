@@ -11,15 +11,16 @@ import android.view.ViewGroup;
 import android.widget.CheckedTextView;
 
 import com.inledco.exoterra.R;
+import com.inledco.exoterra.aliot.ExoSocket;
+import com.inledco.exoterra.aliot.SocketViewModel;
 import com.inledco.exoterra.base.BaseFragment;
-import com.inledco.exoterra.bean.EXOSocket;
 
 public class SocketPowerFragment extends BaseFragment {
 
     private CheckedTextView power_ctv;
 
     private SocketViewModel mSocketViewModel;
-    private EXOSocket mSocket;
+    private ExoSocket mSocket;
 
     @Nullable
     @Override
@@ -45,9 +46,9 @@ public class SocketPowerFragment extends BaseFragment {
     protected void initData() {
         mSocketViewModel = ViewModelProviders.of(getActivity()).get(SocketViewModel.class);
         mSocket = mSocketViewModel.getData();
-        mSocketViewModel.observe(this, new Observer<EXOSocket>() {
+        mSocketViewModel.observe(this, new Observer<ExoSocket>() {
             @Override
-            public void onChanged(@Nullable EXOSocket exoSocket) {
+            public void onChanged(@Nullable ExoSocket exoSocket) {
                 refreshData();
             }
         });

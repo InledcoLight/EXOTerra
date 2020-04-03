@@ -10,17 +10,9 @@ import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.inledco.exoterra.R;
 import com.inledco.exoterra.base.BaseFragment;
-import com.inledco.exoterra.xlink.XlinkCloudManager;
-import com.inledco.exoterra.xlink.XlinkRequestCallback;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import cn.xlink.restful.api.app.DeviceApi;
 
 public class UserListFragment extends BaseFragment {
     private Toolbar frag_toolbar;
@@ -29,7 +21,7 @@ public class UserListFragment extends BaseFragment {
 
     private int mDeviceId;
 
-    private final List<DeviceApi.DeviceSubscribeUsersResponse.UserBean> mUsers = new ArrayList<>();
+//    private final List<DeviceApi.DeviceSubscribeUsersResponse.UserBean> mUsers = new ArrayList<>();
     private DeviceUserAdapter mAdapter;
 
     public static UserListFragment newInstance(final int devid) {
@@ -67,21 +59,21 @@ public class UserListFragment extends BaseFragment {
 
     @Override
     protected void initData() {
-        mAdapter = new DeviceUserAdapter(getContext(), mUsers);
-        frag_rv.setAdapter(mAdapter);
-
-        Bundle args = getArguments();
-        if (args != null && args.containsKey("deviceid")) {
-            mDeviceId = args.getInt("deviceid");
-            frag_swipe.setRefreshing(true);
-            getUserList();
-            frag_swipe.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-                @Override
-                public void onRefresh() {
-                    getUserList();
-                }
-            });
-        }
+//        mAdapter = new DeviceUserAdapter(getContext(), mUsers);
+//        frag_rv.setAdapter(mAdapter);
+//
+//        Bundle args = getArguments();
+//        if (args != null && args.containsKey("deviceid")) {
+//            mDeviceId = args.getInt("deviceid");
+//            frag_swipe.setRefreshing(true);
+//            getUserList();
+//            frag_swipe.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+//                @Override
+//                public void onRefresh() {
+//                    getUserList();
+//                }
+//            });
+//        }
     }
 
     @Override
@@ -95,27 +87,27 @@ public class UserListFragment extends BaseFragment {
     }
 
     private void getUserList() {
-        XlinkCloudManager.getInstance()
-                         .getDeviceUserList(mDeviceId, new XlinkRequestCallback<DeviceApi.DeviceSubscribeUsersResponse>() {
-                             @Override
-                             public void onError(final String error) {
-                                 getActivity().runOnUiThread(new Runnable() {
-                                     @Override
-                                     public void run() {
-                                         Toast.makeText(getContext(), error, Toast.LENGTH_SHORT)
-                                              .show();
-                                         frag_swipe.setRefreshing(false);
-                                     }
-                                 });
-                             }
-
-                             @Override
-                             public void onSuccess(DeviceApi.DeviceSubscribeUsersResponse response) {
-                                 frag_swipe.setRefreshing(false);
-                                 mUsers.clear();
-                                 mUsers.addAll(response.list);
-                                 mAdapter.notifyDataSetChanged();
-                             }
-                         });
+//        XlinkCloudManager.getInstance()
+//                         .getDeviceUserList(mDeviceId, new XlinkRequestCallback<DeviceApi.DeviceSubscribeUsersResponse>() {
+//                             @Override
+//                             public void onError(final String error) {
+//                                 getActivity().runOnUiThread(new Runnable() {
+//                                     @Override
+//                                     public void run() {
+//                                         Toast.makeText(getContext(), error, Toast.LENGTH_SHORT)
+//                                              .show();
+//                                         frag_swipe.setRefreshing(false);
+//                                     }
+//                                 });
+//                             }
+//
+//                             @Override
+//                             public void onSuccess(DeviceApi.DeviceSubscribeUsersResponse response) {
+//                                 frag_swipe.setRefreshing(false);
+//                                 mUsers.clear();
+//                                 mUsers.addAll(response.list);
+//                                 mAdapter.notifyDataSetChanged();
+//                             }
+//                         });
     }
 }

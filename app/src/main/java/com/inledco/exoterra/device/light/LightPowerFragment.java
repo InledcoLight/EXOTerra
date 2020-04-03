@@ -11,15 +11,16 @@ import android.view.ViewGroup;
 import android.widget.CheckedTextView;
 
 import com.inledco.exoterra.R;
+import com.inledco.exoterra.aliot.ExoLed;
+import com.inledco.exoterra.aliot.LightViewModel;
 import com.inledco.exoterra.base.BaseFragment;
-import com.inledco.exoterra.bean.EXOLedstrip;
 
 public class LightPowerFragment extends BaseFragment {
 
     private CheckedTextView power_ctv;
 
     private LightViewModel mLightViewModel;
-    private EXOLedstrip mLight;
+    private ExoLed mLight;
 
     @Nullable
     @Override
@@ -45,9 +46,9 @@ public class LightPowerFragment extends BaseFragment {
     protected void initData() {
         mLightViewModel = ViewModelProviders.of(getActivity()).get(LightViewModel.class);
         mLight = mLightViewModel.getData();
-        mLightViewModel.observe(this, new Observer<EXOLedstrip>() {
+        mLightViewModel.observe(this, new Observer<ExoLed>() {
             @Override
-            public void onChanged(@Nullable EXOLedstrip exoLedstrip) {
+            public void onChanged(@Nullable ExoLed exoLed) {
                 refreshData();
             }
         });
@@ -69,7 +70,7 @@ public class LightPowerFragment extends BaseFragment {
     }
 
     private void refreshData() {
-        if (mLight.getMode() == EXOLedstrip.MODE_MANUAL) {
+        if (mLight.getMode() == ExoLed.MODE_MANUAL) {
             power_ctv.setVisibility(View.VISIBLE);
             boolean power = mLight.getPower();
             power_ctv.setChecked(power);

@@ -17,22 +17,15 @@ import android.widget.Button;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.TimePicker;
-import android.widget.Toast;
 
 import com.inledco.exoterra.GlobalSettings;
 import com.inledco.exoterra.R;
 import com.inledco.exoterra.base.BaseFragment;
-import com.inledco.exoterra.manager.HomeManager;
-import com.inledco.exoterra.util.FavouriteUtil;
 import com.inledco.exoterra.util.TimeFormatUtil;
 import com.inledco.exoterra.view.AdvancedTextInputEditText;
-import com.inledco.exoterra.xlink.XlinkCloudManager;
-import com.inledco.exoterra.xlink.XlinkRequestCallback;
 
 import java.text.DateFormat;
 import java.util.TimeZone;
-
-import cn.xlink.restful.api.app.HomeApi;
 
 public class AddHabitatFragment extends BaseFragment {
     private TextView add_habitat_systime;
@@ -218,35 +211,35 @@ public class AddHabitatFragment extends BaseFragment {
     }
 
     private void createHome(final String name, final int zone, final int sunrise, final int sunset) {
-        XlinkCloudManager.getInstance().createHome(name, new XlinkRequestCallback<HomeApi.HomeResponse>() {
-            @Override
-            public void onError(String error) {
-                Toast.makeText(getContext(), error, Toast.LENGTH_SHORT)
-                     .show();
-            }
-
-            @Override
-            public void onSuccess(HomeApi.HomeResponse response) {
-                final String homeid = response.id;
-                XlinkCloudManager.getInstance().setHomeProperty(homeid, zone, sunrise, sunset, new XlinkRequestCallback<String>() {
-                    @Override
-                    public void onError(String error) {
-                        Toast.makeText(getContext(), error, Toast.LENGTH_SHORT)
-                             .show();
-                        HomeManager.getInstance().refreshHomeList(null);
-                        getActivity().getSupportFragmentManager().popBackStack();
-                    }
-
-                    @Override
-                    public void onSuccess(String s) {
-                        HomeManager.getInstance().refreshHomeList(null);
-                        getActivity().getSupportFragmentManager().popBackStack();
-                    }
-                });
-                if (add_habitat_favourite.isChecked()) {
-                    FavouriteUtil.addFavourite(getContext(), homeid);
-                }
-            }
-        });
+//        XlinkCloudManager.getInstance().createHome(name, new XlinkRequestCallback<HomeApi.HomeResponse>() {
+//            @Override
+//            public void onError(String error) {
+//                Toast.makeText(getContext(), error, Toast.LENGTH_SHORT)
+//                     .show();
+//            }
+//
+//            @Override
+//            public void onSuccess(HomeApi.HomeResponse response) {
+//                final String homeid = response.id;
+//                XlinkCloudManager.getInstance().setHomeProperty(homeid, zone, sunrise, sunset, new XlinkRequestCallback<String>() {
+//                    @Override
+//                    public void onError(String error) {
+//                        Toast.makeText(getContext(), error, Toast.LENGTH_SHORT)
+//                             .show();
+//                        HomeManager.getInstance().refreshHomeList(null);
+//                        getActivity().getSupportFragmentManager().popBackStack();
+//                    }
+//
+//                    @Override
+//                    public void onSuccess(String s) {
+//                        HomeManager.getInstance().refreshHomeList(null);
+//                        getActivity().getSupportFragmentManager().popBackStack();
+//                    }
+//                });
+//                if (add_habitat_favourite.isChecked()) {
+//                    FavouriteUtil.addFavourite(getContext(), homeid);
+//                }
+//            }
+//        });
     }
 }

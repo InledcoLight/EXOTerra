@@ -11,8 +11,6 @@ import android.widget.TextView;
 
 import com.inledco.exoterra.R;
 import com.inledco.exoterra.common.SimpleAdapter;
-import com.inledco.exoterra.util.DeviceUtil;
-import com.inledco.exoterra.xlink.XlinkConstants;
 
 import java.util.List;
 
@@ -35,21 +33,21 @@ public abstract class APDeviceAdapter extends SimpleAdapter<ScanResult, APDevice
 
     @Override
     public void onBindViewHolder(@NonNull final APDeviceViewHolder holder, int i) {
-        ScanResult result = mData.get(i);
-        if (DeviceUtil.isEXOStrip(result)) {
-            holder.iv_icon.setImageResource(DeviceUtil.getProductIcon(XlinkConstants.PRODUCT_ID_LEDSTRIP));
-        } else if (DeviceUtil.isEXOSocket(result)) {
-            holder.iv_icon.setImageResource(DeviceUtil.getProductIcon(XlinkConstants.PRODUCT_ID_SOCKET));
-        } else if (DeviceUtil.isEXOMonsoon(result)) {
-            holder.iv_icon.setImageResource(DeviceUtil.getProductIcon(XlinkConstants.PRODUCT_ID_MONSOON));
-        }
-        holder.tv_ssid.setText(result.SSID);
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mItemClickListener.onItemClick(holder.getAdapterPosition());
-            }
-        });
+//        ScanResult result = mData.get(i);
+//        if (DeviceUtil.isEXOStrip(result)) {
+//            holder.iv_icon.setImageResource(DeviceUtil.getProductIcon(XlinkConstants.PRODUCT_ID_LEDSTRIP));
+//        } else if (DeviceUtil.isEXOSocket(result)) {
+//            holder.iv_icon.setImageResource(DeviceUtil.getProductIcon(XlinkConstants.PRODUCT_ID_SOCKET));
+//        } else if (DeviceUtil.isEXOMonsoon(result)) {
+//            holder.iv_icon.setImageResource(DeviceUtil.getProductIcon(XlinkConstants.PRODUCT_ID_MONSOON));
+//        }
+//        holder.tv_ssid.setText(result.SSID);
+//        holder.itemView.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                mItemClickListener.onItemClick(holder.getAdapterPosition());
+//            }
+//        });
     }
 
     class APDeviceViewHolder extends RecyclerView.ViewHolder {

@@ -2,11 +2,15 @@ package com.inledco.exoterra.manager;
 
 import android.content.Context;
 import android.text.TextUtils;
+import android.util.Base64;
+import android.util.Log;
 
 import com.inledco.exoterra.util.PrefUtil;
 import com.inledco.exoterra.util.RegexUtil;
 
 public class UserManager {
+    private static final String TAG = "UserManager";
+
     /**
      * 用户信息存储文件
      */
@@ -21,9 +25,7 @@ public class UserManager {
 
     private static final String PREF_KEY_USER_ID = "user_id";
 
-    private static final String PREF_KEY_USER_AUTHORIZE = "user_authorize";
-
-    private static final String PREF_KEY_USER_REFRESH_TOKEN = "user_refresh_token";
+    private static final String PREF_KEY_USER_TOKEN = "user_token";
 
     private static String mEmail;
     private static String mNickname;
@@ -57,51 +59,46 @@ public class UserManager {
     }
 
     public static void setPassword(Context context, String password) {
-        PrefUtil.put(context, PREF_FILE_USER, PREF_KEY_USER_PASSWORD, password);
+        String data = Base64.encodeToString(password.getBytes(), Base64.DEFAULT);
+        Log.e(TAG, "setPassword: " + data);
+        PrefUtil.put(context, PREF_FILE_USER, PREF_KEY_USER_PASSWORD, data);
     }
 
     public static String getPassword(Context context) {
-        return PrefUtil.getString(context, PREF_FILE_USER, PREF_KEY_USER_PASSWORD, "");
+        String data = PrefUtil.getString(context, PREF_FILE_USER, PREF_KEY_USER_PASSWORD, "");
+        String password = new String(Base64.decode(data, Base64.DEFAULT));
+        Log.e(TAG, "getPassword: " + password);
+        return password;
     }
 
     public static void removePassword(Context context) {
         PrefUtil.remove(context, PREF_FILE_USER, PREF_KEY_USER_PASSWORD);
     }
 
-    public static void setUserId(Context context, int userid) {
+    public static void setUserId(Context context, String userid) {
         PrefUtil.put(context, PREF_FILE_USER, PREF_KEY_USER_ID, userid);
     }
 
-    public static int getUserId(Context context) {
-        return PrefUtil.getInt(context, PREF_FILE_USER, PREF_KEY_USER_ID, 0);
+    public static String getUserId(Context context) {
+        return PrefUtil.getString(context, PREF_FILE_USER, PREF_KEY_USER_ID, "");
     }
 
     public static void removeUserId(Context context) {
         PrefUtil.remove(context, PREF_FILE_USER, PREF_KEY_USER_ID);
     }
 
-    public static void setAuthorize(Context context, String authorize) {
-        PrefUtil.put(context, PREF_FILE_USER, PREF_KEY_USER_AUTHORIZE, authorize);
+    public static void setToken(Context context, String token) {
+        String data = Base64.encodeToString(token.getBytes(), Base64.DEFAULT);
+        PrefUtil.put(context, PREF_FILE_USER, PREF_KEY_USER_TOKEN, data);
     }
 
-    public static String getAuthorize(Context context) {
-        return PrefUtil.getString(context, PREF_FILE_USER, PREF_KEY_USER_AUTHORIZE, "");
+    public static String getToken(Context context) {
+        String data = PrefUtil.getString(context, PREF_FILE_USER, PREF_KEY_USER_TOKEN, "");
+        return new String(Base64.decode(data, Base64.DEFAULT));
     }
 
-    public static void removeAuthorize(Context context) {
-        PrefUtil.remove(context, PREF_FILE_USER, PREF_KEY_USER_AUTHORIZE);
-    }
-
-    public static void setRefreshToken(Context context, String refresh_token) {
-        PrefUtil.put(context, PREF_FILE_USER, PREF_KEY_USER_REFRESH_TOKEN, refresh_token);
-    }
-
-    public static String getRefreshToken(Context context) {
-        return PrefUtil.getString(context, PREF_FILE_USER, PREF_KEY_USER_REFRESH_TOKEN, "");
-    }
-
-    public static void removeRefreshToken(Context context) {
-        PrefUtil.remove(context, PREF_FILE_USER, PREF_KEY_USER_REFRESH_TOKEN);
+    public static void removeToken(Context context) {
+        PrefUtil.remove(context, PREF_FILE_USER, PREF_KEY_USER_TOKEN);
     }
 
     public static void clear(Context context) {
@@ -110,8 +107,17 @@ public class UserManager {
         mNickname = null;
     }
 
-    public static boolean checkAuthorize(int userid, String authorize, String refresh_token) {
-        if (userid == 0 || TextUtils.isEmpty(authorize) || TextUtils.isEmpty(refresh_token)) {
+    public static boolean checkAuthorize(String userid, String token) {
+        if (TextUtils.isEmpty(userid) || TextUtils.isEmpty(token)) {
+            return false;
+        }
+        return true;
+    }
+
+    public static boolean checkAuthorize(Context context) {
+        String userid = getUserId(context);
+        String token = getToken(context);
+        if (TextUtils.isEmpty(userid) || TextUtils.isEmpty(token)) {
             return false;
         }
         return true;

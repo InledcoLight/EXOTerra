@@ -7,10 +7,15 @@ import android.support.design.widget.TextInputLayout;
 import android.text.TextUtils;
 import android.text.method.HideReturnsTransformationMethod;
 import android.text.method.PasswordTransformationMethod;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
+import com.alibaba.fastjson.JSON;
 import com.inledco.exoterra.R;
+import com.inledco.exoterra.aliot.AliotClient;
+import com.inledco.exoterra.aliot.ExoSocket;
+import com.inledco.exoterra.aliot.KeyValue;
 import com.inledco.exoterra.base.BaseActivity;
 import com.inledco.exoterra.foundback.FoundbackActivity;
 import com.inledco.exoterra.main.MainActivity;
@@ -18,13 +23,7 @@ import com.inledco.exoterra.manager.UserManager;
 import com.inledco.exoterra.register.RegisterActivity;
 import com.inledco.exoterra.util.RegexUtil;
 import com.inledco.exoterra.view.AdvancedTextInputEditText;
-import com.inledco.exoterra.view.MessageDialog;
-import com.inledco.exoterra.xlink.XlinkCloudManager;
-import com.inledco.exoterra.xlink.XlinkTaskCallback;
 import com.liruya.loaddialog.LoadDialog;
-
-import cn.xlink.restful.api.app.UserAuthApi;
-import cn.xlink.sdk.v5.module.main.XLinkSDK;
 
 public class LoginActivity extends BaseActivity {
 
@@ -86,12 +85,12 @@ public class LoginActivity extends BaseActivity {
         login_et_password.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_lock_white_24dp, 0, R.drawable.design_ic_visibility_off, 0);
         login_et_email.bindTextInputLayout(login_til_email);
         login_et_password.bindTextInputLayout(login_til_password);
+
+        AliotClient.getInstance().init(LoginActivity.this, "test001", "zoi45K3ZgWcNeZGjdAIoDQlAKMZ1z3ij");
     }
 
     @Override
     protected void initData() {
-        XLinkSDK.start();
-
         final String email = UserManager.getAccount(this);
         if (TextUtils.isEmpty(email)) {
             login_et_email.requestFocus();
@@ -123,6 +122,8 @@ public class LoginActivity extends BaseActivity {
         login_btn_signin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                gotoMainActivity();
+
                 final String email = getEmailText();
                 final String password = getPasswordText();
                 if (!RegexUtil.isEmail(email)) {
@@ -135,32 +136,31 @@ public class LoginActivity extends BaseActivity {
                     login_et_password.requestFocus();
                     return;
                 }
-                XlinkCloudManager.getInstance().login(email, password, 5000, new XlinkTaskCallback<UserAuthApi.UserAuthResponse>() {
-                    @Override
-                    public void onError(String error) {
-                        new MessageDialog(LoginActivity.this).setTitle(R.string.signin_failed)
-                                                             .setMessage(error)
-                                                             .setButton(getString(R.string.ok), null)
-                                                             .show();
-                        dismissLoading();
-                    }
-
-                    @Override
-                    public void onStart() {
-                        showLoading();
-                    }
-
-                    @Override
-                    public void onComplete(UserAuthApi.UserAuthResponse response) {
-                        dismissLoading();
-                        UserManager.setAccount(LoginActivity.this, email);
-                        UserManager.setPassword(LoginActivity.this, password);
-                        UserManager.setUserId(LoginActivity.this, response.userId);
-                        UserManager.setAuthorize(LoginActivity.this, response.authorize);
-                        UserManager.setRefreshToken(LoginActivity.this, response.refreshToken);
-                        gotoMainActivity();
-                    }
-                });
+//                XlinkCloudManager.getInstance().login(email, password, 5000, new XlinkTaskCallback<UserAuthApi.UserAuthResponse>() {
+//                    @Override
+//                    public void onError(String error) {
+//                        new MessageDialog(LoginActivity.this).setTitle(R.string.signin_failed)
+//                                                             .setMessage(error)
+//                                                             .setButton(getString(R.string.ok), null)
+//                                                             .show();
+//                        dismissLoading();
+//                    }
+//
+//                    @Override
+//                    public void onStart() {
+//                        showLoading();
+//                    }
+//
+//                    @Override
+//                    public void onComplete(UserAuthApi.UserAuthResponse response) {
+//                        dismissLoading();
+//                        UserManager.setAccount(LoginActivity.this, email);
+//                        UserManager.setPassword(LoginActivity.this, password);
+//                        UserManager.setUserId(LoginActivity.this, response.userId);
+//                        UserManager.setToken(LoginActivity.this, response.authorize);
+//                        gotoMainActivity();
+//                    }
+//                });
             }
         });
         login_btn_signup.setOnClickListener(new View.OnClickListener() {
@@ -178,9 +178,29 @@ public class LoginActivity extends BaseActivity {
         login_btn_skip.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                gotoMainActivity();
+//                gotoMainActivity();
+//                AliotServer.getInstance().test();
+//                UserApi.UserRegisterRequest request = new UserApi.UserRegisterRequest();
+//                request.email = "123";
+//                Log.e(TAG, "onClick: " + JSON.toJSONString(request));
+//                test();
+//                test();
             }
         });
+    }
+
+    private void test() {
+        ExoSocket.SensorConfig cfg = new ExoSocket.SensorConfig();
+        KeyValue attr1 = new KeyValue("attr1", cfg);
+        Log.e(TAG, "test: " + JSON.toJSONString(attr1));
+
+        ExoSocket.SensorConfig[] cfgs = new ExoSocket.SensorConfig[2];
+        cfgs[0] = new ExoSocket.SensorConfig();
+        cfgs[1] = new ExoSocket.SensorConfig();
+        KeyValue attrs = new KeyValue("attrs", cfgs);
+        Log.e(TAG, "test: " + JSON.toJSONString(attrs));
+
+        AliotClient.getInstance().setProperty("123", "12345", attr1, attrs);
     }
 
     private String getEmailText() {

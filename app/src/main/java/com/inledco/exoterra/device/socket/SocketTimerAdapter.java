@@ -9,15 +9,15 @@ import android.widget.CheckedTextView;
 import android.widget.TextView;
 
 import com.inledco.exoterra.R;
-import com.inledco.exoterra.bean.EXOSocketTimer;
+import com.inledco.exoterra.aliot.ExoSocket;
 import com.inledco.exoterra.common.SimpleAdapter;
 
 import java.text.DecimalFormat;
 import java.util.List;
 
-public abstract class SocketTimerAdapter extends SimpleAdapter<EXOSocketTimer, SocketTimerAdapter.SocketTimerViewHolder> {
+public abstract class SocketTimerAdapter extends SimpleAdapter<ExoSocket.Timer, SocketTimerAdapter.SocketTimerViewHolder> {
 
-    public SocketTimerAdapter(@NonNull Context context, List<EXOSocketTimer> data) {
+    public SocketTimerAdapter(@NonNull Context context, List<ExoSocket.Timer> data) {
         super(context, data);
     }
 
@@ -35,20 +35,20 @@ public abstract class SocketTimerAdapter extends SimpleAdapter<EXOSocketTimer, S
     @Override
     public void onBindViewHolder(@NonNull final SocketTimerViewHolder holder, final int pos) {
         final int position = holder.getAdapterPosition();
-        EXOSocketTimer tmr = mData.get(position);
+        ExoSocket.Timer tmr = mData.get(position);
         final int repeat = tmr.getRepeat()&0x7F;
         switch (tmr.getAction()) {
-            case EXOSocketTimer.ACTION_TURNOFF:
+            case ExoSocket.Timer.ACTION_TURNOFF:
                 holder.tv_ontime.setVisibility(View.INVISIBLE);
                 holder.tv_offtime.setVisibility(View.VISIBLE);
                 holder.tv_offtime.setText(getTimeText(tmr.getHour(), tmr.getMinute(), tmr.getSecond()));
                 break;
-            case EXOSocketTimer.ACTION_TURNON:
+            case ExoSocket.Timer.ACTION_TURNON:
                 holder.tv_ontime.setVisibility(View.VISIBLE);
                 holder.tv_offtime.setVisibility(View.INVISIBLE);
                 holder.tv_ontime.setText(getTimeText(tmr.getHour(), tmr.getMinute(), tmr.getSecond()));
                 break;
-            case EXOSocketTimer.ACTION_TURNON_PERIOD:
+            case ExoSocket.Timer.ACTION_TURNON_PERIOD:
                 holder.tv_ontime.setVisibility(View.VISIBLE);
                 holder.tv_offtime.setVisibility(View.VISIBLE);
                 holder.tv_ontime.setText(getTimeText(tmr.getHour(), tmr.getMinute(), tmr.getSecond()));

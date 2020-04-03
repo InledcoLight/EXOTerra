@@ -6,13 +6,14 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckedTextView;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.CheckedTextView;
 import android.widget.ToggleButton;
 
 import com.github.mikephil.charting.charts.BarChart;
@@ -21,8 +22,9 @@ import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.interfaces.datasets.IBarDataSet;
 import com.inledco.exoterra.R;
+import com.inledco.exoterra.aliot.ExoLed;
+import com.inledco.exoterra.aliot.LightViewModel;
 import com.inledco.exoterra.base.BaseFragment;
-import com.inledco.exoterra.bean.EXOLedstrip;
 import com.inledco.exoterra.bean.LightSpectrum;
 import com.inledco.exoterra.util.LightUtil;
 import com.inledco.exoterra.util.SpectrumUtil;
@@ -52,7 +54,7 @@ public class EditDayNightFragment extends BaseFragment {
     private GradientCornerButton daynight_save;
 
     private LightViewModel mLightViewModel;
-    private EXOLedstrip mLight;
+    private ExoLed mLight;
 
     private boolean mNight;
 
@@ -143,14 +145,14 @@ public class EditDayNightFragment extends BaseFragment {
 
         daynight_icon.setImageResource(mNight ? R.drawable.ic_moon : R.drawable.ic_sun);
         for (int i = 0; i < mLight.getChannelCount(); i++) {
-            byte brt = (mNight ? mLight.getNightBrights()[i] : mLight.getDayBrights()[i]);
+            int brt = (mNight ? mLight.getNightBrights()[i] : mLight.getDayBrights()[i]);
             mCircleSeekbars[i].setProgress(brt);
         }
 
         int count = mLight.getChannelCount();
         for (int i = 0; i < 4; i++) {
             mCustoms[i].setCircleCount(count);
-            byte[] array = mLight.getCustomBrights(i);
+            int[] array = mLight.getCustomBrights(i);
             if (array != null && array.length == count) {
                 for (int j = 0; j < count; j++) {
                     mCustoms[i].setProgress(j, array[j]);
@@ -162,6 +164,7 @@ public class EditDayNightFragment extends BaseFragment {
         }
 
         refreshData();
+        daynight_spectrum.animateXY(1000, 1000);
     }
 
     @Override
@@ -208,7 +211,7 @@ public class EditDayNightFragment extends BaseFragment {
                 @Override
                 public void onClick(View v) {
                     for (int j = 0; j < mLight.getChannelCount(); j++) {
-                        mCircleSeekbars[j].setProgress(mLight.getCustomBrights(pos)[j]);
+                        mCircleSeekbars[j].setProgress(mLight.getCustomBrights(pos)[j]/10);
                     }
                     for (int j = 0; j < 8; j++) {
                         mPresets[j].setChecked(false);
@@ -263,9 +266,9 @@ public class EditDayNightFragment extends BaseFragment {
         daynight_save.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                byte[] brts = new byte[mLight.getChannelCount()];
+                int[] brts = new int[mLight.getChannelCount()];
                 for (int i = 0; i < brts.length; i++) {
-                    brts[i] = (byte) mCircleSeekbars[i].getProgress();
+                    brts[i] = mCircleSeekbars[i].getProgress();
                 }
                 if (mNight) {
                     mLightViewModel.setNightBrights(brts);
@@ -300,14 +303,9 @@ public class EditDayNightFragment extends BaseFragment {
         if (mLightSpectrum == null) {
             return;
         }
-        if (mLight.getPower()) {
-            for (int i = 0; i < mLight.getChannelCount(); i++) {
-                mLightSpectrum.setGain(i, ((float) mCircleSeekbars[i].getProgress()) / 100);
-            }
-        } else {
-            for (int i = 0; i < mLight.getChannelCount(); i++) {
-                mLightSpectrum.setGain(i, 0);
-            }
+        Log.e(TAG, "refreshData: ");
+        for (int i = 0; i < mLight.getChannelCount(); i++) {
+            mLightSpectrum.setGain(i, ((float) mCircleSeekbars[i].getProgress()) / 100);
         }
 
         int min = getResources().getInteger(R.integer.spectrum_wavelength_min);

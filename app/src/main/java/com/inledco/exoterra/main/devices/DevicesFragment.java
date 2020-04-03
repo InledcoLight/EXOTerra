@@ -6,7 +6,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.RecyclerView;
-import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,24 +15,26 @@ import android.widget.TextView;
 
 import com.inledco.exoterra.R;
 import com.inledco.exoterra.adddevice.AddDeviceActivity;
+import com.inledco.exoterra.aliot.ADevice;
+import com.inledco.exoterra.aliot.AliotConsts;
+import com.inledco.exoterra.aliot.Device;
+import com.inledco.exoterra.aliot.ExoLed;
+import com.inledco.exoterra.aliot.ExoSocket;
+import com.inledco.exoterra.aliot.StatusReponse;
 import com.inledco.exoterra.base.BaseFragment;
-import com.inledco.exoterra.bean.Device;
 import com.inledco.exoterra.common.OnItemClickListener;
 import com.inledco.exoterra.device.DeviceActivity;
-import com.inledco.exoterra.event.DatapointChangedEvent;
-import com.inledco.exoterra.event.DevicePropertyChangedEvent;
-import com.inledco.exoterra.event.DeviceStateChangedEvent;
 import com.inledco.exoterra.event.DevicesRefreshedEvent;
 import com.inledco.exoterra.event.HomesRefreshedEvent;
 import com.inledco.exoterra.manager.DeviceManager;
 import com.inledco.exoterra.scan.ScanActivity;
 import com.inledco.exoterra.smartconfig.SmartconfigActivity;
-import com.inledco.exoterra.xlink.XlinkTaskCallback;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class DevicesFragment extends BaseFragment {
@@ -42,7 +44,7 @@ public class DevicesFragment extends BaseFragment {
     private RecyclerView devices_rv_show;
     private ImageButton devices_ib_add;
 
-    private final List<Device> mDevices = DeviceManager.getInstance().getAllDevices();
+    private final List<Device> mDevices = new ArrayList<>();
     private DevicesAdapter mAdapter;
 
 //    private AsyncTask<Void, Void, Void> mGetPropertyTask;
@@ -85,18 +87,20 @@ public class DevicesFragment extends BaseFragment {
 
     @Override
     protected void initData() {
+        initList();
         mAdapter = new DevicesAdapter(getContext(), mDevices);
         mAdapter.setOnItemClickListener(new OnItemClickListener() {
             @Override
             public void onItemClick(final int position) {
                 final Device device = mDevices.get(position);
-                gotoDeviceActivity(device.getDeviceTag());
+                Log.e(TAG, "onItemClick: " + device.getTag());
+                gotoDeviceActivity(device.getTag());
             }
         });
         devices_rv_show.setAdapter(mAdapter);
-
-        devices_swipe_refresh.setRefreshing(true);
-        refreshDevices();
+//
+//        devices_swipe_refresh.setRefreshing(true);
+//        refreshDevices();
     }
 
     @Override
@@ -117,16 +121,16 @@ public class DevicesFragment extends BaseFragment {
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onDevicePropertyChangedEvent(DevicePropertyChangedEvent event) {
-        if (event != null) {
-            for (int i = 0; i < mDevices.size(); i++) {
-                if (event.getDeviceId() == mDevices.get(i).getXDevice().getDeviceId()) {
-                    mDevices.get(i).getXDevice().setDeviceName(event.getDeviceName());
-                    mAdapter.notifyDataSetChanged();
-                    return;
-                }
-            }
-        }
+    public void onDevicePropertyChangedEvent(@NonNull ADevice event) {
+//        if (event != null) {
+//            for (int i = 0; i < mDevices.size(); i++) {
+//                if (event.getDeviceId() == mDevices.get(i).getXDevice().getDeviceId()) {
+//                    mDevices.get(i).getXDevice().setDeviceName(event.getDeviceName());
+//                    mAdapter.notifyDataSetChanged();
+//                    return;
+//                }
+//            }
+//        }
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -136,45 +140,34 @@ public class DevicesFragment extends BaseFragment {
 
     @Subscribe (threadMode = ThreadMode.MAIN)
     public void onDevicesRefreshedEvent(DevicesRefreshedEvent event) {
-        devices_swipe_refresh.setRefreshing(false);
-        devices_warning.setVisibility(mDevices.size() == 0 ? View.VISIBLE : View.GONE);
-        mAdapter.notifyDataSetChanged();
+//        devices_swipe_refresh.setRefreshing(false);
+//        devices_warning.setVisibility(mDevices.size() == 0 ? View.VISIBLE : View.GONE);
+//        mAdapter.notifyDataSetChanged();
     }
 
     @Subscribe (threadMode = ThreadMode.MAIN)
-    public void onDeviceStateChangedEvent(DeviceStateChangedEvent event) {
-        if (event != null) {
-            for (int i = 0; i < mDevices.size(); i++) {
-                if (TextUtils.equals(event.getDeviceTag(), mDevices.get(i).getDeviceTag())) {
-                    mAdapter.notifyItemChanged(i);
-                }
-            }
-        }
-    }
-
-    @Subscribe (threadMode = ThreadMode.MAIN)
-    public void onDatapointChangedEvent(DatapointChangedEvent event) {
-        if (event != null) {
-            for (int i = 0; i < mDevices.size(); i++) {
-                if (TextUtils.equals(event.getDeviceTag(), mDevices.get(i).getDeviceTag())) {
-                    mAdapter.notifyItemChanged(i);
-                }
-            }
-        }
+    public void onDeviceStateChangedEvent(@NonNull StatusReponse event) {
+//        if (event != null) {
+//            for (int i = 0; i < mDevices.size(); i++) {
+//                if (TextUtils.equals(event.getDeviceTag(), mDevices.get(i).getDeviceTag())) {
+//                    mAdapter.notifyItemChanged(i);
+//                }
+//            }
+//        }
     }
 
     private void refreshDevices() {
-        DeviceManager.getInstance().syncSubcribeDevices(new XlinkTaskCallback<List<Device>>() {
-            @Override
-            public void onError(String error) {
-                devices_swipe_refresh.setRefreshing(false);
-            }
-
-            @Override
-            public void onComplete(List<Device> devices) {
-
-            }
-        });
+//        DeviceManager.getInstance().syncSubcribeDevices(new XlinkTaskCallback<List<Device>>() {
+//            @Override
+//            public void onError(String error) {
+//                devices_swipe_refresh.setRefreshing(false);
+//            }
+//
+//            @Override
+//            public void onComplete(List<Device> devices) {
+//
+//            }
+//        });
     }
 
 //    private void getProperty() {
@@ -217,9 +210,9 @@ public class DevicesFragment extends BaseFragment {
 //        mGetPropertyTask.execute();
 //    }
 
-    private void gotoDeviceActivity(String deviceTag) {
+    private void gotoDeviceActivity(String tag) {
         Intent intent = new Intent(getContext(), DeviceActivity.class);
-        intent.putExtra("device_tag", deviceTag);
+        intent.putExtra("deviceTag", tag);
         startActivity(intent);
     }
 
@@ -236,5 +229,26 @@ public class DevicesFragment extends BaseFragment {
     private void startAdddeviceActivity() {
         Intent intent = new Intent(getContext(), AddDeviceActivity.class);
         startActivity(intent);
+    }
+
+    private void initList() {
+        mDevices.clear();
+        //  ExoLed
+        Device exoLed = new ExoLed();
+        exoLed.setProductKey(AliotConsts.PRODUCT_KEY_EXOLED);
+        exoLed.setDeviceName("2CF432121FC9");
+        exoLed.setMac("2CF432121FC9");
+        exoLed.setName("2CF432121FC9");
+
+        //  ExoSocket
+        Device exoSocket = new ExoSocket();
+        exoSocket.setProductKey(AliotConsts.PRODUCT_KEY_EXOSOCKET);
+        exoSocket.setDeviceName("2CF432121F42");
+        exoSocket.setMac("2CF432121F42");
+        exoSocket.setName("2CF432121F42");
+
+        DeviceManager.getInstance().addDevice(exoLed);
+        DeviceManager.getInstance().addDevice(exoSocket);
+        mDevices.addAll(DeviceManager.getInstance().getAllDevices());
     }
 }

@@ -21,8 +21,9 @@ import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.interfaces.datasets.IBarDataSet;
 import com.inledco.exoterra.R;
+import com.inledco.exoterra.aliot.ExoLed;
+import com.inledco.exoterra.aliot.LightViewModel;
 import com.inledco.exoterra.base.BaseFragment;
-import com.inledco.exoterra.bean.EXOLedstrip;
 import com.inledco.exoterra.bean.LightSpectrum;
 import com.inledco.exoterra.util.LightUtil;
 import com.inledco.exoterra.util.SpectrumUtil;
@@ -31,7 +32,6 @@ import com.inledco.exoterra.view.MultiCircleProgress;
 import com.inledco.exoterra.view.TurningWheel;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class LightManualFragment extends BaseFragment {
@@ -51,7 +51,7 @@ public class LightManualFragment extends BaseFragment {
     private TextView[] mColors;
 
     private LightViewModel mLightViewModel;
-    private EXOLedstrip mLight;
+    private ExoLed mLight;
 
     private int mSelected = -1;
 
@@ -118,15 +118,16 @@ public class LightManualFragment extends BaseFragment {
     protected void initData() {
         mLightViewModel = ViewModelProviders.of(getActivity()).get(LightViewModel.class);
         mLight = mLightViewModel.getData();
-        mLightViewModel.observe(this, new Observer<EXOLedstrip>() {
+        mLightViewModel.observe(this, new Observer<ExoLed>() {
             @Override
-            public void onChanged(@Nullable EXOLedstrip exoLedstrip) {
+            public void onChanged(@Nullable ExoLed exoLed) {
                 refreshData();
             }
         });
 
         mLightSpectrum = SpectrumUtil.loadDataFromAssets(getContext().getAssets(), "exoterrastrip_spectrum_450.txt");
         refreshData();
+        light_manual_spectrum.animateXY(1000, 1000);
     }
 
     @Override
@@ -151,12 +152,8 @@ public class LightManualFragment extends BaseFragment {
             mCustoms[i].setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    int[] prgs = mCustoms[pos].getProgress();
-                    int[] progress = Arrays.copyOf(prgs, prgs.length);
-                    for (int i = 0; i < progress.length; i++) {
-                        progress[i] *= 10;
-                    }
-                    mLightViewModel.setAllBrights(progress);
+                    int[] progress = mCustoms[pos].getProgress();
+                    mLightViewModel.setChannelBrights(progress);
                     for (int j = 0; j < 8; j++) {
                         mPresets[j].setChecked(false);
                     }
@@ -165,11 +162,7 @@ public class LightManualFragment extends BaseFragment {
             mCustoms[i].setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View v) {
-                    byte[] brights = new byte[mLight.getChannelCount()];
-                    for (int i = 0; i < mLight.getChannelCount(); i++) {
-                        brights[i] = (byte) (mLight.getBright(i) / 10);
-                    }
-                    mLightViewModel.setCustomBrights(pos, brights);
+                    mLightViewModel.setCustomBrights(pos, mLight.getChannelBrights());
                     return true;
                 }
             });
@@ -204,7 +197,7 @@ public class LightManualFragment extends BaseFragment {
                         String name = mLight.getChannelName(pos);
                         int color = LightUtil.getColorValue(name);
                         light_manual_csb.setProgressColor(color);
-                        light_manual_csb.setProgress(mLight.getBright(pos));
+                        light_manual_csb.setProgress(mLight.getChannelBright(pos));
                     }
                     for (int j = 0; j < 6; j++) {
                         if (mSelected == j) {
@@ -228,13 +221,13 @@ public class LightManualFragment extends BaseFragment {
             public void onSeekStop() {
                 int progress = light_manual_csb.getProgress();
                 if (mSelected >= 0 && mSelected < mLight.getChannelCount()) {
-                    mLightViewModel.setBright(mSelected, progress);
+                    mLightViewModel.setChannelBright(mSelected, progress);
                 } else {
                     int[] brights = new int[mLight.getChannelCount()];
                     for (int i = 0; i < brights.length; i++) {
                         brights[i] = progress;
                     }
-                    mLightViewModel.setAllBrights(brights);
+                    mLightViewModel.setChannelBrights(brights);
                 }
             }
         });
@@ -246,7 +239,7 @@ public class LightManualFragment extends BaseFragment {
         }
         for (int i = 0; i < mLight.getChannelCount(); i++) {
             includes[i].setVisibility(View.VISIBLE);
-            int brt = mLight.getBright(i);
+            int brt = mLight.getChannelBright(i);
             String color = mLight.getChannelName(i);
             mCircleSeekbars[i].setProgressColor(LightUtil.getColorValue(color));
             mCircleSeekbars[i].setProgress(brt);
@@ -268,7 +261,7 @@ public class LightManualFragment extends BaseFragment {
         int count = mLight.getChannelCount();
         for (int i = 0; i < 4; i++) {
             mCustoms[i].setCircleCount(count);
-            byte[] array = mLight.getCustomBrights(i);
+            int[] array = mLight.getCustomBrights(i);
             if (array != null && array.length == count) {
                 for (int j = 0; j < count; j++) {
                     mCustoms[i].setProgress(j, array[j]);
@@ -284,7 +277,7 @@ public class LightManualFragment extends BaseFragment {
         }
         if (mLight.getPower()) {
             for (int i = 0; i < mLight.getChannelCount(); i++) {
-                mLightSpectrum.setGain(i, ((float) mLight.getBright(i)) / 1000);
+                mLightSpectrum.setGain(i, ((float) mLight.getChannelBright(i)) / 1000);
             }
         } else {
             for (int i = 0; i < mLight.getChannelCount(); i++) {

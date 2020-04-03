@@ -11,10 +11,10 @@ import android.view.ViewGroup;
 import android.widget.CheckedTextView;
 import android.widget.ImageButton;
 
-import com.inledco.exoterra.AppConstants;
 import com.inledco.exoterra.R;
+import com.inledco.exoterra.aliot.ExoMonsoon;
+import com.inledco.exoterra.aliot.MonsoonViewModel;
 import com.inledco.exoterra.base.BaseFragment;
-import com.inledco.exoterra.bean.EXOMonsoon;
 import com.inledco.exoterra.view.CircleSeekbar;
 
 public class MonsoonFragment extends BaseFragment {
@@ -26,7 +26,7 @@ public class MonsoonFragment extends BaseFragment {
     private CheckedTextView monsoon_ctv_timer;
 
     private MonsoonViewModel mMonsoonViewModel;
-    private EXOMonsoon mMonsoon;
+    private ExoMonsoon mMonsoon;
 
     @Nullable
     @Override
@@ -56,9 +56,9 @@ public class MonsoonFragment extends BaseFragment {
     protected void initData() {
         mMonsoonViewModel = ViewModelProviders.of(getActivity()).get(MonsoonViewModel.class);
         mMonsoon = mMonsoonViewModel.getData();
-        mMonsoonViewModel.observe(this, new Observer<EXOMonsoon>() {
+        mMonsoonViewModel.observe(this, new Observer<ExoMonsoon>() {
             @Override
-            public void onChanged(@Nullable EXOMonsoon exoMonsoon) {
+            public void onChanged(@Nullable ExoMonsoon exoMonsoon) {
                 refreshData();
             }
         });
@@ -73,7 +73,7 @@ public class MonsoonFragment extends BaseFragment {
         monsoon_power.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                byte power = (monsoon_power.isChecked() ? AppConstants.MONSOON_POWEROFF : AppConstants.MONSOON_POWERON);      //128+120
+                int power = (monsoon_power.isChecked() ? ExoMonsoon.SPRAY_OFF : ExoMonsoon.SPRAY_MAX);
                 mMonsoonViewModel.setPower(power);
             }
         });
@@ -112,24 +112,18 @@ public class MonsoonFragment extends BaseFragment {
         if (mMonsoon == null) {
             return;
         }
-        byte power = mMonsoon.getPower();
-        if ((power&0x80) == 0) {
+        int power = mMonsoon.getPower();
+        if (power == 0) {
             monsoon_power.setChecked(false);
             monsoon_power.setText(R.string.off);
             monsoon_poweron_tmr.setProgress(0);
         } else {
             monsoon_power.setChecked(true);
-            int total = power&0x7F;
-            int tmr = mMonsoon.getPoweronTmr();
+            int total = power;
+            int tmr = mMonsoon.getCountdown();
             monsoon_poweron_tmr.setMax(total);
             monsoon_poweron_tmr.setProgress(tmr);
-            if (tmr <= 120) {
-                monsoon_power.setText("" + tmr + "s");
-            } else if (tmr <= 123) {
-                monsoon_power.setText("" + (tmr-118)*60 + "s");
-            } else {
-                monsoon_power.setText(null);
-            }
+            monsoon_power.setText("" + tmr + "s");
         }
     }
 }

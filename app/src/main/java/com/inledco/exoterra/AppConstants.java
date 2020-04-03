@@ -4,11 +4,6 @@ public class AppConstants {
     //云平台对应包名生成的appid
     public static final String  APPID                   = "2e0042bafe5fc600";
 
-    //阿里推送辅助FCM通道 对应google-services.json中project_number
-    public static final String  ALIPUSH_SENDID          = "604700660779";
-    //阿里推送辅助FCM通道 对应google-services.json中mobilesdk_app_id
-    public static final String  ALIPUSH_APPID           = "1:604700660779:android:d60434ef8e9a18f522c66e";
-
     public static final String  FILE_VERIFYCODE_REGISTER    = "verifycode_register";
     public static final String  FILE_VERIFYCODE_RESET       = "verifycode_reset";
 

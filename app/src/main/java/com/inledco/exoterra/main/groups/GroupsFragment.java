@@ -9,7 +9,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.RecyclerView;
-import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,16 +18,10 @@ import android.widget.TextView;
 import com.inledco.exoterra.R;
 import com.inledco.exoterra.base.BaseFragment;
 import com.inledco.exoterra.bean.Home;
-import com.inledco.exoterra.common.OnItemClickListener;
-import com.inledco.exoterra.event.DatapointChangedEvent;
 import com.inledco.exoterra.event.HomeChangedEvent;
 import com.inledco.exoterra.event.HomeDeviceChangedEvent;
 import com.inledco.exoterra.event.HomePropertyChangedEvent;
 import com.inledco.exoterra.event.HomesRefreshedEvent;
-import com.inledco.exoterra.group.GroupFragment;
-import com.inledco.exoterra.manager.HomeManager;
-import com.inledco.exoterra.util.FavouriteUtil;
-import com.inledco.exoterra.xlink.XlinkConstants;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -37,8 +30,6 @@ import org.greenrobot.eventbus.ThreadMode;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-
-import cn.xlink.restful.api.app.HomeApi;
 
 public class GroupsFragment extends BaseFragment {
     private TextView groups_title;
@@ -98,20 +89,20 @@ public class GroupsFragment extends BaseFragment {
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onHomesRefreshedEvent(HomesRefreshedEvent event) {
-        groups_refresh.setRefreshing(false);
-        if (showOnlyFavourite) {
-            mFavouriteHomes.clear();
-            for (int i = 0; i < mHomes.size(); i++) {
-                Home home = mHomes.get(i);
-                if (mFavourites.contains(home.getHome().id)) {
-                    mFavouriteHomes.add(home);
-                }
-            }
-            groups_warning.setVisibility(mFavouriteHomes.size() == 0 ? View.VISIBLE : View.GONE);
-        } else {
-            groups_warning.setVisibility(mHomes.size() == 0 ? View.VISIBLE : View.GONE);
-        }
-        mAdapter.notifyDataSetChanged();
+//        groups_refresh.setRefreshing(false);
+//        if (showOnlyFavourite) {
+//            mFavouriteHomes.clear();
+//            for (int i = 0; i < mHomes.size(); i++) {
+//                Home home = mHomes.get(i);
+//                if (mFavourites.contains(home.getHome().id)) {
+//                    mFavouriteHomes.add(home);
+//                }
+//            }
+//            groups_warning.setVisibility(mFavouriteHomes.size() == 0 ? View.VISIBLE : View.GONE);
+//        } else {
+//            groups_warning.setVisibility(mHomes.size() == 0 ? View.VISIBLE : View.GONE);
+//        }
+//        mAdapter.notifyDataSetChanged();
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -121,35 +112,20 @@ public class GroupsFragment extends BaseFragment {
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onHomePropertyChangedEvent(HomePropertyChangedEvent event) {
-        for (int i = 0; i < mHomes.size(); i++) {
-            if (TextUtils.equals(event.getHomeid(), mHomes.get(i).getHome().id)) {
-                mAdapter.updateData(i);
-            }
-        }
+//        for (int i = 0; i < mHomes.size(); i++) {
+//            if (TextUtils.equals(event.getHomeid(), mHomes.get(i).getHome().id)) {
+//                mAdapter.updateData(i);
+//            }
+//        }
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onHomeDeviceChangedEvent(HomeDeviceChangedEvent event) {
-        for (int i = 0; i < mHomes.size(); i++) {
-            if (TextUtils.equals(event.getHomeid(), mHomes.get(i).getHome().id)) {
-                mAdapter.updateData(i);
-            }
-        }
-    }
-
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onDatapointChangedEvent(DatapointChangedEvent event) {
-        for (int i = 0; i < mHomes.size(); i++) {
-            Home home = mHomes.get(i);
-            for (int j = 0; j < home.getDevices().size(); j++) {
-                HomeApi.HomeDevicesResponse.Device device = home.getDevices().get(j);
-                String tag = device.productId + "_" + device.mac;
-                if (TextUtils.equals(device.productId, XlinkConstants.PRODUCT_ID_SOCKET) && TextUtils.equals(tag, event.getDeviceTag())) {
-                    mAdapter.updateData(i);
-                    return;
-                }
-            }
-        }
+//        for (int i = 0; i < mHomes.size(); i++) {
+//            if (TextUtils.equals(event.getHomeid(), mHomes.get(i).getHome().id)) {
+//                mAdapter.updateData(i);
+//            }
+//        }
     }
 
     @Override
@@ -179,54 +155,54 @@ public class GroupsFragment extends BaseFragment {
         filter.addAction(Intent.ACTION_TIME_TICK);
         getActivity().registerReceiver(mTimeReceiver, filter);
 
-        mHomes = HomeManager.getInstance().getHomeList();
-        if (!showOnlyFavourite) {
-            mAdapter = new GroupsAdapter(getContext(), mHomes);
-        } else {
-            groups_title.setVisibility(View.VISIBLE);
-            mFavourites = FavouriteUtil.getFavourites(getContext());
-            for (int i = 0; i < mHomes.size(); i++) {
-                Home home = mHomes.get(i);
-                if (mFavourites.contains(home.getHome().id)) {
-                    mFavouriteHomes.add(home);
-                }
-            }
-            mAdapter = new GroupsAdapter(getContext(), mFavouriteHomes);
-        }
-
-        mAdapter.setOnItemClickListener(new OnItemClickListener() {
-            @Override
-            public void onItemClick(int position) {
-                HomeApi.HomesResponse.Home home;
-                if (showOnlyFavourite) {
-                    home = mFavouriteHomes.get(position).getHome();
-                } else {
-                    home = mHomes.get(position).getHome();
-                }
-                String homeid = home.id;
-                String homename = home.name;
-                addFragmentToStack(R.id.main_fl, GroupFragment.newInstance(homeid, homename));
-            }
-        });
-        groups_rv.setAdapter(mAdapter);
-        groups_refresh.setRefreshing(true);
-        HomeManager.getInstance().refreshHomeList(null);
+//        mHomes = HomeManager.getInstance().getHomeList();
+//        if (!showOnlyFavourite) {
+//            mAdapter = new GroupsAdapter(getContext(), mHomes);
+//        } else {
+//            groups_title.setVisibility(View.VISIBLE);
+//            mFavourites = FavouriteUtil.getFavourites(getContext());
+//            for (int i = 0; i < mHomes.size(); i++) {
+//                Home home = mHomes.get(i);
+//                if (mFavourites.contains(home.getHome().id)) {
+//                    mFavouriteHomes.add(home);
+//                }
+//            }
+//            mAdapter = new GroupsAdapter(getContext(), mFavouriteHomes);
+//        }
+//
+//        mAdapter.setOnItemClickListener(new OnItemClickListener() {
+//            @Override
+//            public void onItemClick(int position) {
+//                HomeApi.HomesResponse.Home home;
+//                if (showOnlyFavourite) {
+//                    home = mFavouriteHomes.get(position).getHome();
+//                } else {
+//                    home = mHomes.get(position).getHome();
+//                }
+//                String homeid = home.id;
+//                String homename = home.name;
+//                addFragmentToStack(R.id.main_fl, GroupFragment.newInstance(homeid, homename));
+//            }
+//        });
+//        groups_rv.setAdapter(mAdapter);
+//        groups_refresh.setRefreshing(true);
+//        HomeManager.getInstance().refreshHomeList(null);
     }
 
     @Override
     protected void initEvent() {
-        groups_refresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                HomeManager.getInstance().refreshHomeList(null);
-            }
-        });
-
-        groups_ib_add.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                addFragmentToStack(R.id.main_fl, AddHabitatFragment.newInstance(showOnlyFavourite));
-            }
-        });
+//        groups_refresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+//            @Override
+//            public void onRefresh() {
+//                HomeManager.getInstance().refreshHomeList(null);
+//            }
+//        });
+//
+//        groups_ib_add.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                addFragmentToStack(R.id.main_fl, AddHabitatFragment.newInstance(showOnlyFavourite));
+//            }
+//        });
     }
 }

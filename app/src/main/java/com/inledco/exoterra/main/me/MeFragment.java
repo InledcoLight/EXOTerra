@@ -10,7 +10,6 @@ import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
 import android.text.method.HideReturnsTransformationMethod;
 import android.text.method.PasswordTransformationMethod;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,19 +18,12 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.inledco.exoterra.R;
 import com.inledco.exoterra.base.BaseFragment;
 import com.inledco.exoterra.login.LoginActivity;
 import com.inledco.exoterra.manager.UserManager;
 import com.inledco.exoterra.view.AdvancedTextInputEditText;
-import com.inledco.exoterra.xlink.XlinkCloudManager;
-import com.inledco.exoterra.xlink.XlinkRequestCallback;
-
-import cn.xlink.restful.api.app.UserApi;
-import cn.xlink.sdk.v5.manager.XLinkUserManager;
-import cn.xlink.sdk.v5.module.main.XLinkSDK;
 
 public class MeFragment extends BaseFragment {
     private ImageView me_icon_usr;
@@ -72,7 +64,7 @@ public class MeFragment extends BaseFragment {
 
         me_tv_nickname.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_edit_white_24dp, 0);
 
-        boolean login = XLinkUserManager.getInstance().isUserAuthorized();
+        boolean login = false;
         me_tv_signin.setVisibility(login ? View.INVISIBLE : View.VISIBLE);
         me_usr_detail.setVisibility(login ? View.VISIBLE : View.INVISIBLE);
         if (login) {
@@ -84,71 +76,71 @@ public class MeFragment extends BaseFragment {
 
     @Override
     protected void initData() {
-        if (XLinkUserManager.getInstance().isUserAuthorized() && TextUtils.isEmpty(UserManager.getEmail())) {
-            XlinkCloudManager.getInstance()
-                             .getUserInfo(XLinkUserManager.getInstance()
-                                                          .getUid(), new XlinkRequestCallback<UserApi.UserInfoResponse>() {
-                                 @Override
-                                 public void onError(String error) {
-
-                                 }
-
-                                 @Override
-                                 public void onSuccess(UserApi.UserInfoResponse response) {
-                                     UserManager.setEmail(response.email);
-                                     UserManager.setNickname(response.nickname);
-                                     me_tv_nickname.setText(response.nickname);
-                                     me_tv_email.setText(response.email);
-                                     me_tv_nickname.setVisibility(TextUtils.isEmpty(response.nickname) ? View.GONE : View.VISIBLE);
-                                 }
-                             });
-        }
+//        if (XLinkUserManager.getInstance().isUserAuthorized() && TextUtils.isEmpty(UserManager.getEmail())) {
+//            XlinkCloudManager.getInstance()
+//                             .getUserInfo(XLinkUserManager.getInstance()
+//                                                          .getUid(), new XlinkRequestCallback<UserApi.UserInfoResponse>() {
+//                                 @Override
+//                                 public void onError(String error) {
+//
+//                                 }
+//
+//                                 @Override
+//                                 public void onSuccess(UserApi.UserInfoResponse response) {
+//                                     UserManager.setEmail(response.email);
+//                                     UserManager.setNickname(response.nickname);
+//                                     me_tv_nickname.setText(response.nickname);
+//                                     me_tv_email.setText(response.email);
+//                                     me_tv_nickname.setVisibility(TextUtils.isEmpty(response.nickname) ? View.GONE : View.VISIBLE);
+//                                 }
+//                             });
+//        }
     }
 
     @Override
     protected void initEvent() {
-        me_icon_usr.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (!XLinkUserManager.getInstance().isUserAuthorized()) {
-                    login();
-                    getActivity().finish();
-                } else {
-                    addFragmentToStack(R.id.main_fl, new MessagesFragment());
-                }
-            }
-        });
-        me_tv_nickname.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showModifyNicknameDialog();
-            }
-        });
-        me_mod_psw.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showModifyPasswordDialog();
-            }
-        });
-        me_btn_logout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                int usrid = UserManager.getUserId(getContext());
-                XlinkCloudManager.getInstance().unregisterFCMMessageService(usrid, new XlinkRequestCallback<String>() {
-                    @Override
-                    public void onError(String error) {
-                        Log.e(TAG, "onError: " + error);
-                    }
-
-                    @Override
-                    public void onSuccess(String s) {
-
-                    }
-                });
-                XLinkSDK.logoutAndStop();
-                logout();
-            }
-        });
+//        me_icon_usr.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                if (!XLinkUserManager.getInstance().isUserAuthorized()) {
+//                    login();
+//                    getActivity().finish();
+//                } else {
+//                    addFragmentToStack(R.id.main_fl, new MessagesFragment());
+//                }
+//            }
+//        });
+//        me_tv_nickname.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                showModifyNicknameDialog();
+//            }
+//        });
+//        me_mod_psw.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                showModifyPasswordDialog();
+//            }
+//        });
+//        me_btn_logout.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                int usrid = UserManager.getUserId(getContext());
+//                XlinkCloudManager.getInstance().unregisterFCMMessageService(usrid, new XlinkRequestCallback<String>() {
+//                    @Override
+//                    public void onError(String error) {
+//                        Log.e(TAG, "onError: " + error);
+//                    }
+//
+//                    @Override
+//                    public void onSuccess(String s) {
+//
+//                    }
+//                });
+//                XLinkSDK.logoutAndStop();
+//                logout();
+//            }
+//        });
     }
 
     private void showModifyNicknameDialog() {
@@ -174,20 +166,20 @@ public class MeFragment extends BaseFragment {
                     til.setError(getString(R.string.input_empty));
                     return;
                 }
-                XlinkCloudManager.getInstance().modifyNickname(name, new XlinkRequestCallback<String>() {
-                    @Override
-                    public void onError(String error) {
-                        Toast.makeText(getContext(), error, Toast.LENGTH_SHORT)
-                             .show();
-                    }
-
-                    @Override
-                    public void onSuccess(String s) {
-                        me_tv_nickname.setText(name);
-                        UserManager.setNickname(name);
-                        dialog.dismiss();
-                    }
-                });
+//                XlinkCloudManager.getInstance().modifyNickname(name, new XlinkRequestCallback<String>() {
+//                    @Override
+//                    public void onError(String error) {
+//                        Toast.makeText(getContext(), error, Toast.LENGTH_SHORT)
+//                             .show();
+//                    }
+//
+//                    @Override
+//                    public void onSuccess(String s) {
+//                        me_tv_nickname.setText(name);
+//                        UserManager.setNickname(name);
+//                        dialog.dismiss();
+//                    }
+//                });
             }
         });
     }
@@ -252,18 +244,18 @@ public class MeFragment extends BaseFragment {
                     et_new.requestFocus();
                     return;
                 }
-                XlinkCloudManager.getInstance().modifyPassword(oldpsw, newpsw, new XlinkRequestCallback<String>() {
-                    @Override
-                    public void onError(String error) {
-                        Toast.makeText(getContext(), error, Toast.LENGTH_SHORT)
-                             .show();
-                    }
-
-                    @Override
-                    public void onSuccess(String s) {
-                        dialog.dismiss();
-                    }
-                });
+//                XlinkCloudManager.getInstance().modifyPassword(oldpsw, newpsw, new XlinkRequestCallback<String>() {
+//                    @Override
+//                    public void onError(String error) {
+//                        Toast.makeText(getContext(), error, Toast.LENGTH_SHORT)
+//                             .show();
+//                    }
+//
+//                    @Override
+//                    public void onSuccess(String s) {
+//                        dialog.dismiss();
+//                    }
+//                });
             }
         });
     }

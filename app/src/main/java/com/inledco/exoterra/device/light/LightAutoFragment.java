@@ -7,26 +7,16 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Color;
-import android.graphics.drawable.GradientDrawable;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.design.widget.BottomSheetDialog;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
-import android.widget.Button;
-import android.widget.CompoundButton;
 import android.widget.ImageButton;
-import android.widget.ListView;
-import android.widget.NumberPicker;
 import android.widget.SeekBar;
-import android.widget.Switch;
 import android.widget.TextView;
-import android.widget.TimePicker;
 
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.charts.LineChart;
@@ -41,8 +31,9 @@ import com.github.mikephil.charting.interfaces.datasets.IBarDataSet;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import com.inledco.exoterra.GlobalSettings;
 import com.inledco.exoterra.R;
+import com.inledco.exoterra.aliot.ExoLed;
+import com.inledco.exoterra.aliot.LightViewModel;
 import com.inledco.exoterra.base.BaseFragment;
-import com.inledco.exoterra.bean.EXOLedstrip;
 import com.inledco.exoterra.bean.LightSpectrum;
 import com.inledco.exoterra.util.LightUtil;
 import com.inledco.exoterra.util.SpectrumUtil;
@@ -73,7 +64,7 @@ public class LightAutoFragment extends BaseFragment {
     private TextView[] nightlight_tv;
 
     private LightViewModel mLightViewModel;
-    private EXOLedstrip mLight;
+    private ExoLed mLight;
     private LightSpectrum mLightSpectrum;
 
     private int chnCount;
@@ -83,8 +74,8 @@ public class LightAutoFragment extends BaseFragment {
     private int sunsetRamp;
     private boolean turnoffEnable;
     private int turnoffTime;
-    private byte[] dayBrights;
-    private byte[] nightBrights;
+    private int[] dayBrights;
+    private int[] nightBrights;
 
     private DateFormat mTimeFormat;
     private boolean mEditing;
@@ -158,12 +149,11 @@ public class LightAutoFragment extends BaseFragment {
     @Override
     protected void initData() {
         mTimeFormat = GlobalSettings.getTimeFormat();
-        mLightViewModel = ViewModelProviders.of(getActivity())
-                                            .get(LightViewModel.class);
+        mLightViewModel = ViewModelProviders.of(getActivity()).get(LightViewModel.class);
         mLight = mLightViewModel.getData();
-        mLightViewModel.observe(this, new Observer<EXOLedstrip>() {
+        mLightViewModel.observe(this, new Observer<ExoLed>() {
             @Override
-            public void onChanged(@Nullable EXOLedstrip exoLedstrip) {
+            public void onChanged(@Nullable ExoLed exoLed) {
                 if (!mEditing) {
                     initParam();
                     refreshData();
@@ -177,6 +167,8 @@ public class LightAutoFragment extends BaseFragment {
         getActivity().registerReceiver(mTimeTickReceiver, filter);
 
         refreshData();
+        auto_line_chart.animateXY(1000, 1000);
+        auto_spectrum.animateXY(1000, 1000);
         showTimeLine();
     }
 
@@ -221,13 +213,13 @@ public class LightAutoFragment extends BaseFragment {
 
     private void initParam() {
         chnCount = mLight.getChannelCount();
-        sunriseStart = mLight.getDaytimeStart();
+        sunriseStart = mLight.getSunrise();
         sunriseRamp = mLight.getSunriseRamp();
-        sunsetEnd = mLight.getDaytimeEnd();
+        sunsetEnd = mLight.getSunset();
         sunsetRamp = mLight.getSunsetRamp();
         turnoffEnable = mLight.getTurnoffEnable();
         turnoffTime = mLight.getTurnoffTime();
-        byte[] brights = mLight.getDayBrights();
+        int[] brights = mLight.getDayBrights();
         dayBrights = Arrays.copyOf(brights, brights.length);
         brights = mLight.getNightBrights();
         nightBrights = Arrays.copyOf(brights, brights.length);
@@ -235,7 +227,6 @@ public class LightAutoFragment extends BaseFragment {
 
     private void showTimeLine() {
         int zone = mLight.getZone();
-        zone = (zone/100)*60 + (zone%100);
         long tm = System.currentTimeMillis()/60000 + zone;
         int minutes = (int) (tm%1440);
         LimitLine line = new LimitLine(minutes);
@@ -249,21 +240,18 @@ public class LightAutoFragment extends BaseFragment {
 
     private void refresSpectrum() {
         int zone = mLight.getZone();
-        zone = (zone/100)*60 + (zone%100);
         long tm = System.currentTimeMillis()/60000 + zone;
         int minutes = (int) (tm%1440);
 
         int cnt = mLight.getChannelCount();
-        int t1 = mLight.getDaytimeStart();
+        int t1 = mLight.getSunrise();
         int d1 = mLight.getSunriseRamp();
-        int t2 = mLight.getDaytimeEnd();
+        int t2 = mLight.getSunset();
         int d2 = mLight.getSunsetRamp();
         boolean enable = mLight.getTurnoffEnable();
         int t3 = mLight.getTurnoffTime();
-        byte[] brts = mLight.getDayBrights();
-        byte[] dbrts = Arrays.copyOf(brts, brts.length);
-        brts = mLight.getNightBrights();
-        byte[] nbrts = Arrays.copyOf(brts, brts.length);
+        int[] dbrts = mLight.getDayBrights();
+        int[] nbrts = mLight.getNightBrights();
         int sunriseEnd = (t1 + d1) % 1440;
         int sunsetStart = (1440 + t2 - d2) % 1440;
         int[] time;
@@ -495,294 +483,294 @@ public class LightAutoFragment extends BaseFragment {
         refresSpectrum();
     }
 
-    private void showEditSunriseDialog(final boolean sunset) {
-        if (mLight == null) {
-            return;
-        }
-        mEditing = true;
-        View view = LayoutInflater.from(getContext())
-                                  .inflate(R.layout.dialog_edit_sunrise_sunset, null, false);
-        int height = (int) (auto_line_chart.getHeight() * 1.2f);
-        view.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, height));
-        final BottomSheetDialog dialog = new BottomSheetDialog(getContext());
-        dialog.setContentView(view);
-        dialog.setCanceledOnTouchOutside(false);
-        dialog.setCancelable(false);
-        TextView tv_text = view.findViewById(R.id.dialog_sunrs_text);
-        final TimePicker tp_time = view.findViewById(R.id.dialog_sunrs_time);
-        final NumberPicker np_ramp = view.findViewById(R.id.dialog_sunrs_ramp);
-        Button btn_cancel = view.findViewById(R.id.btn_cancel);
-        Button btn_save = view.findViewById(R.id.btn_save);
-        String[] displayValues = new String[25];
-        for (int i = 0; i < 25; i++) {
-            displayValues[i] = "" + i * 10 + " min";
-        }
-        np_ramp.setMaxValue(24);
-        np_ramp.setMinValue(0);
-        np_ramp.setDisplayedValues(displayValues);
-        int time;
-        if (sunset) {
-            tv_text.setText(R.string.sunset);
-            time = sunsetEnd;
-            np_ramp.setValue(sunsetRamp / 10);
-        }
-        else {
-            time = sunriseStart;
-            np_ramp.setValue(sunriseRamp / 10);
-        }
-        tp_time.setIs24HourView(GlobalSettings.is24HourFormat());
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            tp_time.setHour(time / 60);
-            tp_time.setMinute(time % 60);
-        }
-        else {
-            tp_time.setCurrentHour(time / 60);
-            tp_time.setCurrentMinute(time % 60);
-        }
-        btn_cancel.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                initParam();
-                refreshData();
-                dialog.dismiss();
-                mEditing = false;
-            }
-        });
-        btn_save.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                int t;
-                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
-                    t = tp_time.getHour() * 60 + tp_time.getMinute();
-                }
-                else {
-                    t = tp_time.getCurrentHour() * 60 + tp_time.getCurrentMinute();
-                }
-                int ramp = np_ramp.getValue() * 10;
-                if (sunset) {
-                    mLightViewModel.setSunsetAndRamp(t, ramp);
-                }
-                else {
-                    mLightViewModel.setSunriseAndRamp(t, ramp);
-                }
-                dialog.dismiss();
-                mEditing = false;
-            }
-        });
-        tp_time.setOnTimeChangedListener(new TimePicker.OnTimeChangedListener() {
-            @Override
-            public void onTimeChanged(TimePicker view, int hourOfDay, int minute) {
-                int t = hourOfDay * 60 + minute;
-                if (sunset) {
-                    sunsetEnd = t;
-                }
-                else {
-                    sunriseStart = t;
-                }
-                refreshData();
-            }
-        });
-        np_ramp.setOnValueChangedListener(new NumberPicker.OnValueChangeListener() {
-            @Override
-            public void onValueChange(NumberPicker picker, int oldVal, int newVal) {
-                if (sunset) {
-                    sunsetRamp = newVal * 10;
-                }
-                else {
-                    sunriseRamp = newVal * 10;
-                }
-                refreshData();
-            }
-        });
-        dialog.show();
-    }
+//    private void showEditSunriseDialog(final boolean sunset) {
+//        if (mLight == null) {
+//            return;
+//        }
+//        mEditing = true;
+//        View view = LayoutInflater.from(getContext())
+//                                  .inflate(R.layout.dialog_edit_sunrise_sunset, null, false);
+//        int height = (int) (auto_line_chart.getHeight() * 1.2f);
+//        view.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, height));
+//        final BottomSheetDialog dialog = new BottomSheetDialog(getContext());
+//        dialog.setContentView(view);
+//        dialog.setCanceledOnTouchOutside(false);
+//        dialog.setCancelable(false);
+//        TextView tv_text = view.findViewById(R.id.dialog_sunrs_text);
+//        final TimePicker tp_time = view.findViewById(R.id.dialog_sunrs_time);
+//        final NumberPicker np_ramp = view.findViewById(R.id.dialog_sunrs_ramp);
+//        Button btn_cancel = view.findViewById(R.id.btn_cancel);
+//        Button btn_save = view.findViewById(R.id.btn_save);
+//        String[] displayValues = new String[25];
+//        for (int i = 0; i < 25; i++) {
+//            displayValues[i] = "" + i * 10 + " min";
+//        }
+//        np_ramp.setMaxValue(24);
+//        np_ramp.setMinValue(0);
+//        np_ramp.setDisplayedValues(displayValues);
+//        int time;
+//        if (sunset) {
+//            tv_text.setText(R.string.sunset);
+//            time = sunsetEnd;
+//            np_ramp.setValue(sunsetRamp / 10);
+//        }
+//        else {
+//            time = sunriseStart;
+//            np_ramp.setValue(sunriseRamp / 10);
+//        }
+//        tp_time.setIs24HourView(GlobalSettings.is24HourFormat());
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+//            tp_time.setHour(time / 60);
+//            tp_time.setMinute(time % 60);
+//        }
+//        else {
+//            tp_time.setCurrentHour(time / 60);
+//            tp_time.setCurrentMinute(time % 60);
+//        }
+//        btn_cancel.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                initParam();
+//                refreshData();
+//                dialog.dismiss();
+//                mEditing = false;
+//            }
+//        });
+//        btn_save.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                int t;
+//                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+//                    t = tp_time.getHour() * 60 + tp_time.getMinute();
+//                }
+//                else {
+//                    t = tp_time.getCurrentHour() * 60 + tp_time.getCurrentMinute();
+//                }
+//                int ramp = np_ramp.getValue() * 10;
+//                if (sunset) {
+//                    mLightViewModel.setSunsetAndRamp(t, ramp);
+//                }
+//                else {
+//                    mLightViewModel.setSunriseAndRamp(t, ramp);
+//                }
+//                dialog.dismiss();
+//                mEditing = false;
+//            }
+//        });
+//        tp_time.setOnTimeChangedListener(new TimePicker.OnTimeChangedListener() {
+//            @Override
+//            public void onTimeChanged(TimePicker view, int hourOfDay, int minute) {
+//                int t = hourOfDay * 60 + minute;
+//                if (sunset) {
+//                    sunsetEnd = t;
+//                }
+//                else {
+//                    sunriseStart = t;
+//                }
+//                refreshData();
+//            }
+//        });
+//        np_ramp.setOnValueChangedListener(new NumberPicker.OnValueChangeListener() {
+//            @Override
+//            public void onValueChange(NumberPicker picker, int oldVal, int newVal) {
+//                if (sunset) {
+//                    sunsetRamp = newVal * 10;
+//                }
+//                else {
+//                    sunriseRamp = newVal * 10;
+//                }
+//                refreshData();
+//            }
+//        });
+//        dialog.show();
+//    }
 
-    private void showEditTurnoffDialog() {
-        if (mLight == null) {
-            return;
-        }
-        mEditing = true;
-        View view = LayoutInflater.from(getContext()).inflate(R.layout.dialog_edit_turnoff, null, false);
-        int height = (int) (auto_line_chart.getHeight() * 1.2f);
-        view.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, height));
-        final Switch sw_enable = view.findViewById(R.id.dialog_turnoff_enable);
-        final TimePicker tp_turnoff = view.findViewById(R.id.dialog_turnoff_time);
-        Button btn_cancel = view.findViewById(R.id.btn_cancel);
-        Button btn_save = view.findViewById(R.id.btn_save);
-        sw_enable.setChecked(turnoffEnable);
-        tp_turnoff.setIs24HourView(GlobalSettings.is24HourFormat());
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            tp_turnoff.setHour(turnoffTime / 60);
-            tp_turnoff.setMinute(turnoffTime % 60);
-        }
-        else {
-            tp_turnoff.setCurrentHour(turnoffTime / 60);
-            tp_turnoff.setCurrentMinute(turnoffTime % 60);
-        }
-        final BottomSheetDialog dialog = new BottomSheetDialog(getContext());
-        dialog.setContentView(view);
-        dialog.setCanceledOnTouchOutside(false);
-        dialog.setCancelable(false);
-        sw_enable.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                turnoffEnable = isChecked;
-                refreshData();
-            }
-        });
-        tp_turnoff.setOnTimeChangedListener(new TimePicker.OnTimeChangedListener() {
-            @Override
-            public void onTimeChanged(TimePicker view, int hourOfDay, int minute) {
-                turnoffTime = hourOfDay * 60 + minute;
-                refreshData();
-            }
-        });
-        btn_cancel.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                initParam();
-                refreshData();
-                dialog.dismiss();
-                mEditing = false;
-            }
-        });
-        btn_save.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                boolean enable = sw_enable.isChecked();
-                int time;
-                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
-                    time = tp_turnoff.getHour() * 60 + tp_turnoff.getMinute();
-                }
-                else {
-                    time = tp_turnoff.getCurrentHour() * 60 + tp_turnoff.getCurrentMinute();
-                }
-                mLightViewModel.setTurnoff(enable, time);
-                dialog.dismiss();
-                mEditing = false;
-            }
-        });
-        dialog.show();
-    }
+//    private void showEditTurnoffDialog() {
+//        if (mLight == null) {
+//            return;
+//        }
+//        mEditing = true;
+//        View view = LayoutInflater.from(getContext()).inflate(R.layout.dialog_edit_turnoff, null, false);
+//        int height = (int) (auto_line_chart.getHeight() * 1.2f);
+//        view.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, height));
+//        final Switch sw_enable = view.findViewById(R.id.dialog_turnoff_enable);
+//        final TimePicker tp_turnoff = view.findViewById(R.id.dialog_turnoff_time);
+//        Button btn_cancel = view.findViewById(R.id.btn_cancel);
+//        Button btn_save = view.findViewById(R.id.btn_save);
+//        sw_enable.setChecked(turnoffEnable);
+//        tp_turnoff.setIs24HourView(GlobalSettings.is24HourFormat());
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+//            tp_turnoff.setHour(turnoffTime / 60);
+//            tp_turnoff.setMinute(turnoffTime % 60);
+//        }
+//        else {
+//            tp_turnoff.setCurrentHour(turnoffTime / 60);
+//            tp_turnoff.setCurrentMinute(turnoffTime % 60);
+//        }
+//        final BottomSheetDialog dialog = new BottomSheetDialog(getContext());
+//        dialog.setContentView(view);
+//        dialog.setCanceledOnTouchOutside(false);
+//        dialog.setCancelable(false);
+//        sw_enable.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+//            @Override
+//            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+//                turnoffEnable = isChecked;
+//                refreshData();
+//            }
+//        });
+//        tp_turnoff.setOnTimeChangedListener(new TimePicker.OnTimeChangedListener() {
+//            @Override
+//            public void onTimeChanged(TimePicker view, int hourOfDay, int minute) {
+//                turnoffTime = hourOfDay * 60 + minute;
+//                refreshData();
+//            }
+//        });
+//        btn_cancel.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                initParam();
+//                refreshData();
+//                dialog.dismiss();
+//                mEditing = false;
+//            }
+//        });
+//        btn_save.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                boolean enable = sw_enable.isChecked();
+//                int time;
+//                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+//                    time = tp_turnoff.getHour() * 60 + tp_turnoff.getMinute();
+//                }
+//                else {
+//                    time = tp_turnoff.getCurrentHour() * 60 + tp_turnoff.getCurrentMinute();
+//                }
+//                mLightViewModel.setTurnoff(enable, time);
+//                dialog.dismiss();
+//                mEditing = false;
+//            }
+//        });
+//        dialog.show();
+//    }
 
-    private void showEditDayNightDialog(final boolean night) {
-        if (mLight == null) {
-            return;
-        }
-        mEditing = true;
-        View view = LayoutInflater.from(getContext()).inflate(R.layout.dialog_edit_day_night, null, false);
-        int height = (int) (auto_line_chart.getHeight() * 1.2f);
-        view.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, height));
-        TextView title = view.findViewById(R.id.dialog_daynight_title);
-        ListView listView = view.findViewById(R.id.dialog_daynight_lv);
-        Button btn_cancel = view.findViewById(R.id.dialog_daynight_cancel);
-        Button btn_save = view.findViewById(R.id.dialog_daynight_save);
-        title.setText(night ? R.string.night_light : R.string.day_light);
-        final BottomSheetDialog dialog = new BottomSheetDialog(getContext());
-        dialog.setContentView(view);
-        dialog.setCanceledOnTouchOutside(false);
-        dialog.setCancelable(false);
-        DialogSliderAdeapter adapter = new DialogSliderAdeapter(night ? nightBrights : dayBrights);
-        listView.setAdapter(adapter);
-        btn_cancel.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                initParam();
-                refreshData();
-                dialog.dismiss();
-                mEditing = false;
-            }
-        });
-        btn_save.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (night) {
-                    mLightViewModel.setNightBrights(nightBrights);
-                }
-                else {
-                    mLightViewModel.setDayBrights(dayBrights);
-                }
-                dialog.dismiss();
-                mEditing = false;
-            }
-        });
-        dialog.show();
-    }
+//    private void showEditDayNightDialog(final boolean night) {
+//        if (mLight == null) {
+//            return;
+//        }
+//        mEditing = true;
+//        View view = LayoutInflater.from(getContext()).inflate(R.layout.dialog_edit_day_night, null, false);
+//        int height = (int) (auto_line_chart.getHeight() * 1.2f);
+//        view.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, height));
+//        TextView title = view.findViewById(R.id.dialog_daynight_title);
+//        ListView listView = view.findViewById(R.id.dialog_daynight_lv);
+//        Button btn_cancel = view.findViewById(R.id.dialog_daynight_cancel);
+//        Button btn_save = view.findViewById(R.id.dialog_daynight_save);
+//        title.setText(night ? R.string.night_light : R.string.day_light);
+//        final BottomSheetDialog dialog = new BottomSheetDialog(getContext());
+//        dialog.setContentView(view);
+//        dialog.setCanceledOnTouchOutside(false);
+//        dialog.setCancelable(false);
+//        DialogSliderAdeapter adapter = new DialogSliderAdeapter(night ? nightBrights : dayBrights);
+//        listView.setAdapter(adapter);
+//        btn_cancel.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                initParam();
+//                refreshData();
+//                dialog.dismiss();
+//                mEditing = false;
+//            }
+//        });
+//        btn_save.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                if (night) {
+//                    mLightViewModel.setNightBrights(nightBrights);
+//                }
+//                else {
+//                    mLightViewModel.setDayBrights(dayBrights);
+//                }
+//                dialog.dismiss();
+//                mEditing = false;
+//            }
+//        });
+//        dialog.show();
+//    }
 
-    class DialogSliderAdeapter extends BaseAdapter {
-        private byte[] mBrights;
-
-        public DialogSliderAdeapter(byte[] brights) {
-            mBrights = brights;
-        }
-
-        @Override
-        public int getCount() {
-            return mBrights == null ? 0 : mBrights.length;
-        }
-
-        @Override
-        public Object getItem(int i) {
-            return mBrights[i];
-        }
-
-        @Override
-        public long getItemId(int i) {
-            return i;
-        }
-
-        @Override
-        public View getView(final int postion, View view, ViewGroup viewGroup) {
-            ViewHolder holder;
-            if (view == null) {
-                view = LayoutInflater.from(getContext())
-                                     .inflate(R.layout.dialog_item_slider, viewGroup, false);
-                holder = new ViewHolder();
-//                holder.iv_icon = view.findViewById(R.id.dialog_item_slider_color);
-                holder.sb_progress = view.findViewById(R.id.dialog_item_slider_progress);
-                holder.tv_percent = view.findViewById(R.id.dialog_item_slider_percent);
-                view.setTag(holder);
-            }
-            else {
-                holder = (ViewHolder) view.getTag();
-            }
-            String name = mLight.getChannelName(postion);
-            int color = LightUtil.getColorValue(name);
-
-//            GradientDrawable icon = (GradientDrawable) holder.iv_icon.getDrawable();
-//            icon.setColor(color);
-            //动态设置SeekBar progressDrawable
-            holder.sb_progress.setProgressDrawable(LightUtil.getProgressDrawable(getContext(), name));
-            //动态设置SeekBar thumb
-            GradientDrawable thumb = (GradientDrawable) holder.sb_progress.getThumb();
-            thumb.setColor(color);
-
-            holder.sb_progress.setProgress(mBrights[postion]);
-            holder.tv_percent.setText("" + mBrights[postion] + "%");
-            final ViewHolder finalHolder = holder;
-            holder.sb_progress.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-                @Override
-                public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-                    if (b) {
-                        mBrights[postion] = (byte) i;
-                        finalHolder.tv_percent.setText("" + i + "%");
-                        refreshData();
-                    }
-                }
-
-                @Override
-                public void onStartTrackingTouch(SeekBar seekBar) {
-
-                }
-
-                @Override
-                public void onStopTrackingTouch(SeekBar seekBar) {
-
-                }
-            });
-            return view;
-        }
-    }
+//    class DialogSliderAdeapter extends BaseAdapter {
+//        private byte[] mBrights;
+//
+//        public DialogSliderAdeapter(byte[] brights) {
+//            mBrights = brights;
+//        }
+//
+//        @Override
+//        public int getCount() {
+//            return mBrights == null ? 0 : mBrights.length;
+//        }
+//
+//        @Override
+//        public Object getItem(int i) {
+//            return mBrights[i];
+//        }
+//
+//        @Override
+//        public long getItemId(int i) {
+//            return i;
+//        }
+//
+//        @Override
+//        public View getView(final int postion, View view, ViewGroup viewGroup) {
+//            ViewHolder holder;
+//            if (view == null) {
+//                view = LayoutInflater.from(getContext())
+//                                     .inflate(R.layout.dialog_item_slider, viewGroup, false);
+//                holder = new ViewHolder();
+////                holder.iv_icon = view.findViewById(R.id.dialog_item_slider_color);
+//                holder.sb_progress = view.findViewById(R.id.dialog_item_slider_progress);
+//                holder.tv_percent = view.findViewById(R.id.dialog_item_slider_percent);
+//                view.setTag(holder);
+//            }
+//            else {
+//                holder = (ViewHolder) view.getTag();
+//            }
+//            String name = mLight.getChannelName(postion);
+//            int color = LightUtil.getColorValue(name);
+//
+////            GradientDrawable icon = (GradientDrawable) holder.iv_icon.getDrawable();
+////            icon.setColor(color);
+//            //动态设置SeekBar progressDrawable
+//            holder.sb_progress.setProgressDrawable(LightUtil.getProgressDrawable(getContext(), name));
+//            //动态设置SeekBar thumb
+//            GradientDrawable thumb = (GradientDrawable) holder.sb_progress.getThumb();
+//            thumb.setColor(color);
+//
+//            holder.sb_progress.setProgress(mBrights[postion]);
+//            holder.tv_percent.setText("" + mBrights[postion] + "%");
+//            final ViewHolder finalHolder = holder;
+//            holder.sb_progress.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+//                @Override
+//                public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+//                    if (b) {
+//                        mBrights[postion] = (byte) i;
+//                        finalHolder.tv_percent.setText("" + i + "%");
+//                        refreshData();
+//                    }
+//                }
+//
+//                @Override
+//                public void onStartTrackingTouch(SeekBar seekBar) {
+//
+//                }
+//
+//                @Override
+//                public void onStopTrackingTouch(SeekBar seekBar) {
+//
+//                }
+//            });
+//            return view;
+//        }
+//    }
 
     class ViewHolder {
 //        private ImageView iv_icon;

@@ -11,10 +11,10 @@ import android.view.ViewGroup;
 import android.widget.CheckedTextView;
 import android.widget.TextView;
 
-import com.inledco.exoterra.AppConstants;
 import com.inledco.exoterra.R;
+import com.inledco.exoterra.aliot.ExoMonsoon;
+import com.inledco.exoterra.aliot.MonsoonViewModel;
 import com.inledco.exoterra.base.BaseFragment;
-import com.inledco.exoterra.bean.EXOMonsoon;
 
 public class MonsoonPowerFragment extends BaseFragment {
 
@@ -22,7 +22,7 @@ public class MonsoonPowerFragment extends BaseFragment {
     private TextView power_status;
 
     private MonsoonViewModel mMonsoonViewModel;
-    private EXOMonsoon mMonsoon;
+    private ExoMonsoon mMonsoon;
 
     @Nullable
     @Override
@@ -49,9 +49,9 @@ public class MonsoonPowerFragment extends BaseFragment {
     protected void initData() {
         mMonsoonViewModel = ViewModelProviders.of(getActivity()).get(MonsoonViewModel.class);
         mMonsoon = mMonsoonViewModel.getData();
-        mMonsoonViewModel.observe(this, new Observer<EXOMonsoon>() {
+        mMonsoonViewModel.observe(this, new Observer<ExoMonsoon>() {
             @Override
-            public void onChanged(@Nullable EXOMonsoon exoMonsoon) {
+            public void onChanged(@Nullable ExoMonsoon exoMonsoon) {
                 refreshData();
             }
         });
@@ -67,26 +67,20 @@ public class MonsoonPowerFragment extends BaseFragment {
         power_ctv.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mMonsoonViewModel.setPower(power_ctv.isChecked() ? 0 : AppConstants.MONSOON_POWERON);
+                mMonsoonViewModel.setPower(power_ctv.isChecked() ? ExoMonsoon.SPRAY_OFF : ExoMonsoon.SPRAY_MAX);
             }
         });
     }
 
     private void refreshData() {
-        byte power = mMonsoon.getPower();
-        if ((power&0x80) == 0) {
+        int power = mMonsoon.getPower();
+        if (power == 0) {
             power_ctv.setChecked(false);
             power_status.setText(null);
         } else {
             power_ctv.setChecked(true);
-            int tmr = mMonsoon.getPoweronTmr();
-            if (tmr <= 120) {
-                power_status.setText("" + tmr + "s");
-            } else if (tmr <= 123) {
-                power_status.setText("" + (tmr-118)*60 + "s");
-            } else {
-                power_status.setText(null);
-            }
+            int tmr = mMonsoon.getCountdown();
+            power_status.setText("" + tmr + "s");
         }
     }
 }

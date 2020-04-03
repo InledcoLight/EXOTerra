@@ -27,9 +27,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.inledco.exoterra.R;
+import com.inledco.exoterra.aliot.ExoSocket;
+import com.inledco.exoterra.aliot.SocketViewModel;
 import com.inledco.exoterra.base.BaseFragment;
-import com.inledco.exoterra.bean.EXOSocket;
-import com.inledco.exoterra.bean.EXOSocketTimer;
 import com.inledco.exoterra.common.OnItemClickListener;
 import com.inledco.exoterra.common.OnItemLongClickListener;
 
@@ -44,8 +44,8 @@ public class SocketTimersFragment extends BaseFragment {
     private ImageButton socket_timers_add;
 
     private SocketViewModel mSocketViewModel;
-    private EXOSocket mSocket;
-    private final List<EXOSocketTimer> mTimers = new ArrayList<>();
+    private ExoSocket mSocket;
+    private final List<ExoSocket.Timer> mTimers = new ArrayList<>();
     private SocketTimerAdapter mAdapter;
 
     @Nullable
@@ -73,9 +73,9 @@ public class SocketTimersFragment extends BaseFragment {
     protected void initData() {
         mSocketViewModel = ViewModelProviders.of(getActivity()).get(SocketViewModel.class);
         mSocket = mSocketViewModel.getData();
-        mSocketViewModel.observe(this, new Observer<EXOSocket>() {
+        mSocketViewModel.observe(this, new Observer<ExoSocket>() {
             @Override
-            public void onChanged(@Nullable EXOSocket exoSocket) {
+            public void onChanged(@Nullable ExoSocket exoSocket) {
                 refreshData();
             }
         });
@@ -84,7 +84,7 @@ public class SocketTimersFragment extends BaseFragment {
             @Override
             protected void onEnableTimer(int position) {
                 if (position >= 0 && position < mTimers.size()) {
-                    EXOSocketTimer tmr = mTimers.get(position);
+                    ExoSocket.Timer tmr = mTimers.get(position);
                     tmr.setEnable(true);
                     mSocketViewModel.setTimer(position, tmr);
                 }
@@ -93,7 +93,7 @@ public class SocketTimersFragment extends BaseFragment {
             @Override
             protected void onDisableTimer(int position) {
                 if (position >= 0 && position < mTimers.size()) {
-                    EXOSocketTimer tmr = mTimers.get(position);
+                    ExoSocket.Timer tmr = mTimers.get(position);
                     tmr.setEnable(false);
                     mSocketViewModel.setTimer(position, tmr);
                 }
@@ -132,7 +132,7 @@ public class SocketTimersFragment extends BaseFragment {
             return;
         }
         mTimers.clear();
-        mTimers.addAll(mSocket.getAllTimers());
+        mTimers.addAll(mSocket.getTimers());
         mAdapter.notifyDataSetChanged();
     }
 
@@ -143,7 +143,8 @@ public class SocketTimersFragment extends BaseFragment {
         builder.setPositiveButton(R.string.remove, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                mSocketViewModel.removeTimer(position);
+                mTimers.remove(position);
+                mSocketViewModel.setTimers(mTimers);
             }
         });
         builder.show();
@@ -151,7 +152,7 @@ public class SocketTimersFragment extends BaseFragment {
 
     private void showEditTimerDialog(final int idx) {
         if (idx >= 0 && idx < mTimers.size()) {
-            final EXOSocketTimer timer = mTimers.get(idx);
+            final ExoSocket.Timer timer = mTimers.get(idx);
             final SocketTimerView view = new SocketTimerView(getContext());
             view.init(timer);
             AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
@@ -161,7 +162,7 @@ public class SocketTimersFragment extends BaseFragment {
             builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-                    EXOSocketTimer timer = view.getSocketTimer();
+                    ExoSocket.Timer timer = view.getSocketTimer();
                     mSocketViewModel.setTimer(idx, timer);
                 }
             });
@@ -171,7 +172,7 @@ public class SocketTimersFragment extends BaseFragment {
     }
 
     private void showAddTimerDialog() {
-        if (mTimers.size() >= EXOSocket.TIMER_COUNT_MAX) {
+        if (mTimers.size() >= ExoSocket.TIMER_COUNT_MAX) {
             Toast.makeText(getContext(), R.string.timer_count_over, Toast.LENGTH_SHORT)
                  .show();
             return;
@@ -185,8 +186,8 @@ public class SocketTimersFragment extends BaseFragment {
         builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                EXOSocketTimer timer = view.getSocketTimer();
-                mSocketViewModel.addTimer(timer);
+                ExoSocket.Timer timer = view.getSocketTimer();
+                mSocketViewModel.setTimer(mTimers.size(), timer);
             }
         });
         builder.setCancelable(false);
@@ -204,14 +205,14 @@ public class SocketTimersFragment extends BaseFragment {
         final NumberPicker np_second;
         final CheckBox[] cb_week;
 
-        private byte action;
-        private byte repeat;
-        private byte hour;
-        private byte minute;
-        private byte second;
-        private byte end_hour;
-        private byte end_minute;
-        private byte end_second;
+        private int action;
+        private int repeat;
+        private int hour;
+        private int minute;
+        private int second;
+        private int end_hour;
+        private int end_minute;
+        private int end_second;
 
         private final DecimalFormat df = new DecimalFormat("00");
         private final String[] values1 = new String[24];
@@ -266,7 +267,7 @@ public class SocketTimersFragment extends BaseFragment {
             initEvent();
         }
 
-        private void init(EXOSocketTimer timer) {
+        private void init(ExoSocket.Timer timer) {
             if (timer != null) {
                 action = timer.getAction();
                 repeat = timer.getRepeat();
@@ -450,8 +451,8 @@ public class SocketTimersFragment extends BaseFragment {
             exec.setText(text);
         }
 
-        private EXOSocketTimer getSocketTimer() {
-            EXOSocketTimer timer = new EXOSocketTimer();
+        private ExoSocket.Timer getSocketTimer() {
+            ExoSocket.Timer timer = new ExoSocket.Timer();
             timer.setEnable(true);
             timer.setAction(action);
             timer.setHour(hour);

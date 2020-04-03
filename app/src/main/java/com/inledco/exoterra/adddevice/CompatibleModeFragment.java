@@ -20,7 +20,6 @@ import com.inledco.exoterra.util.DeviceUtil;
 import com.inledco.exoterra.util.RouterUtil;
 import com.inledco.exoterra.view.CircleSeekbar;
 
-import cn.xlink.sdk.v5.manager.XLinkUserManager;
 
 public class CompatibleModeFragment extends BaseFragment {
     private ImageView netconfig_prdt;
@@ -80,7 +79,8 @@ public class CompatibleModeFragment extends BaseFragment {
 
         mConnectNetBean.setRunning(true);
         mConnectNetViewModel.postValue();
-        boolean subscribe = XLinkUserManager.getInstance().isUserAuthorized();
+//        boolean subscribe = UserManager.checkAuthorize(this);
+        boolean subscribe = false;
         mAPConfigLinker = new APConfigLinker(subscribe, mConnectNetBean.getProductId(), mConnectNetBean.getSsid(), mConnectNetBean.getBssid(),
                                              mConnectNetBean.getPassword(), (AppCompatActivity) getActivity());
         mListener = new APConfigLinker.APConfigListener() {

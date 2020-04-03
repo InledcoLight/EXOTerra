@@ -21,8 +21,6 @@ import com.inledco.exoterra.util.DeviceUtil;
 import com.inledco.exoterra.util.RouterUtil;
 import com.inledco.exoterra.view.CircleSeekbar;
 
-import cn.xlink.sdk.v5.manager.XLinkUserManager;
-
 public class SmartConfigFragment extends BaseFragment {
 
     private ImageView netconfig_prdt;
@@ -119,7 +117,7 @@ public class SmartConfigFragment extends BaseFragment {
         netconfig_prdt.setImageResource(DeviceUtil.getProductIcon(bean.getProductId()));
         netconfig_title.setText(R.string.smartconfig);
 
-        boolean subscribe = XLinkUserManager.getInstance().isUserAuthorized();
+        boolean subscribe = true;
         String pid = bean.getProductId();
         String ssid = bean.getSsid();
         String gateway = bean.getBssid();

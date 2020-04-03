@@ -5,12 +5,7 @@ import android.os.CountDownTimer;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 
-import com.inledco.exoterra.R;
-import com.inledco.exoterra.bean.ImportDeviceResponse;
-import com.inledco.exoterra.bean.QueryDeviceResponse;
 import com.inledco.exoterra.bean.Result;
-import com.inledco.exoterra.xlink.XlinkCloudManager;
-import com.inledco.exoterra.xlink.XlinkResult;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -18,8 +13,6 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.TimeZone;
-
-import cn.xlink.restful.api.app.DeviceApi;
 
 public class APConfigLinker{
     private final String TAG = "APConfigLinker";
@@ -142,35 +135,36 @@ public class APConfigLinker{
     }
 
     private boolean checkDeviceRegistered() {
-        QueryDeviceResponse response = XlinkCloudManager.getInstance().queryDeviceBlock(mProductId, mAddress);
-        if (response == null || !response.isValid()) {
-            return false;
-        }
+//        QueryDeviceResponse response = XlinkCloudManager.getInstance().queryDeviceBlock(mProductId, mAddress);
+//        if (response == null || !response.isValid()) {
+//            return false;
+//        }
         return true;
     }
 
     private Result registerDevice() {
         Result result = new Result();
-        ImportDeviceResponse response = XlinkCloudManager.getInstance()
-                                                         .registerDeviceBlock(mProductId, null, mAddress, mSN);
-        if (response != null && response.isValid()) {
-            if (response.getResp().getErrcode() == 0) {
-                result.setSuccess(true);
-            } else {
-                result.setError(response.getResp().getErrmsg());
-            }
-        } else {
-            result.setError(mActivity.get().getString(R.string.error_regdev_failed));
-        }
+//        ImportDeviceResponse response = XlinkCloudManager.getInstance()
+//                                                         .registerDeviceBlock(mProductId, null, mAddress, mSN);
+//        if (response != null && response.isValid()) {
+//            if (response.getResp().getErrcode() == 0) {
+//                result.setSuccess(true);
+//            } else {
+//                result.setError(response.getResp().getErrmsg());
+//            }
+//        } else {
+//            result.setError(mActivity.get().getString(R.string.error_regdev_failed));
+//        }
         return result;
     }
 
     private Result subscribeBySn() {
-        XlinkResult<DeviceApi.SnSubscribeResponse> result = XlinkCloudManager.getInstance().subscribeDeviceBySn(mProductId, mSN);
-        if (result.isSuccess()) {
-            mDeviceId = result.getResult().id;
-        }
-        return new Result(result.isSuccess(), result.getError());
+//        XlinkResult<DeviceApi.SnSubscribeResponse> result = XlinkCloudManager.getInstance().subscribeDeviceBySn(mProductId, mSN);
+//        if (result.isSuccess()) {
+//            mDeviceId = result.getResult().id;
+//        }
+//        return new Result(result.isSuccess(), result.getError());
+        return new Result(false, "error");
     }
 
     private void delay(long ms) {

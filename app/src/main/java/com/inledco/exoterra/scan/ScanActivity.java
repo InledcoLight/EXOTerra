@@ -1,36 +1,15 @@
 package com.inledco.exoterra.scan;
 
 import android.app.ProgressDialog;
-import android.content.Intent;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.text.TextUtils;
 import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
-import android.widget.CompoundButton;
-import android.widget.ProgressBar;
-import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import com.inledco.exoterra.R;
 import com.inledco.exoterra.base.BaseActivity;
-import com.inledco.exoterra.device.DeviceActivity;
-import com.inledco.exoterra.manager.DeviceManager;
-import com.inledco.exoterra.xlink.XlinkCloudManager;
-import com.inledco.exoterra.xlink.XlinkConstants;
-import com.inledco.exoterra.xlink.XlinkTaskCallback;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-
-import cn.xlink.sdk.core.XLinkCoreException;
-import cn.xlink.sdk.v5.listener.XLinkScanDeviceListener;
-import cn.xlink.sdk.v5.model.XDevice;
-import cn.xlink.sdk.v5.module.connection.XLinkScanDeviceTask;
-import cn.xlink.sdk.v5.module.main.XLinkSDK;
 
 public class ScanActivity extends BaseActivity {
     private final int SCAN_DEVICE_TIMEOUT = 10000;
@@ -40,12 +19,12 @@ public class ScanActivity extends BaseActivity {
     private ToggleButton scan_tb_scan;
     private RecyclerView scan_rv_show;
 
-    private Set<String> mSubscribedDevices;
-    private List<XDevice> mScannedDevices;
-    private ScanAdapter mAdapter;
-    private XLinkScanDeviceTask mScanTask;
-    private XLinkScanDeviceListener mScanDeviceListener;
-    private boolean mScanning;
+//    private Set<String> mSubscribedDevices;
+//    private List<XDevice> mScannedDevices;
+//    private ScanAdapter mAdapter;
+//    private XLinkScanDeviceTask mScanTask;
+//    private XLinkScanDeviceListener mScanDeviceListener;
+//    private boolean mScanning;
 
     private ProgressDialog mProgressDialog;
 
@@ -60,29 +39,29 @@ public class ScanActivity extends BaseActivity {
     @Override
     protected void onStop() {
         super.onStop();
-        stopScan();
+//        stopScan();
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_scan, menu);
-        MenuItem menuItem = menu.findItem(R.id.menu_scan_scan);
-        scan_tb_scan = menuItem.getActionView()
-                               .findViewById(R.id.scan_tb_scan);
-        final ProgressBar scan_progress = menuItem.getActionView()
-                                                  .findViewById(R.id.scan_progress);
-        scan_tb_scan.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                scan_progress.setVisibility(isChecked ? View.VISIBLE : View.GONE);
-                if (isChecked) {
-                    startScan();
-                } else {
-                    stopScan();
-                }
-            }
-        });
-        scan_tb_scan.setChecked(true);
+//        getMenuInflater().inflate(R.menu.menu_scan, menu);
+//        MenuItem menuItem = menu.findItem(R.id.menu_scan_scan);
+//        scan_tb_scan = menuItem.getActionView()
+//                               .findViewById(R.id.scan_tb_scan);
+//        final ProgressBar scan_progress = menuItem.getActionView()
+//                                                  .findViewById(R.id.scan_progress);
+//        scan_tb_scan.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+//            @Override
+//            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+//                scan_progress.setVisibility(isChecked ? View.VISIBLE : View.GONE);
+//                if (isChecked) {
+//                    startScan();
+//                } else {
+//                    stopScan();
+//                }
+//            }
+//        });
+//        scan_tb_scan.setChecked(true);
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -104,66 +83,66 @@ public class ScanActivity extends BaseActivity {
 
     @Override
     protected void initData() {
-        mSubscribedDevices = DeviceManager.getInstance().getAllDeviceAddress();
-        mScannedDevices = new ArrayList<>();
-        mAdapter = new ScanAdapter(ScanActivity.this, mScannedDevices, mSubscribedDevices) {
-            @Override
-            public void onItemClick(final XDevice device) {
-                XlinkCloudManager.getInstance().addDevice(device, 10000, new XlinkTaskCallback<XDevice>() {
-                    @Override
-                    public void onError(String error) {
-                        mProgressDialog.dismiss();
-                        Toast.makeText(ScanActivity.this, error, Toast.LENGTH_SHORT)
-                             .show();
-                    }
-
-                    @Override
-                    public void onStart() {
-                        mProgressDialog.show();
-                    }
-
-                    @Override
-                    public void onComplete(XDevice xDevice) {
-                        mProgressDialog.dismiss();
-                        Intent intent = new Intent(ScanActivity.this, DeviceActivity.class);
-                        intent.putExtra("device_tag", DeviceManager.getInstance().getDeviceTag(device));
-                        startActivity(intent);
-                        finish();
-                    }
-                });
-            }
-        };
-        scan_rv_show.setAdapter(mAdapter);
-        mScanDeviceListener = new XLinkScanDeviceListener() {
-            @Override
-            public void onScanResult(XDevice xDevice) {
-                if (xDevice != null) {
-                    if (!containsDevice(xDevice)) {
-                        mScannedDevices.add(xDevice);
-                        mAdapter.notifyItemInserted(mScannedDevices.size()-1);
-                    }
-                }
-            }
-
-            @Override
-            public void onError(XLinkCoreException e) {
-                mScanning = false;
-                scan_tb_scan.setChecked(false);
-                stopScan();
-            }
-
-            @Override
-            public void onStart() {
-                mScanning = true;
-            }
-
-            @Override
-            public void onComplete(Void aVoid) {
-                mScanning = false;
-                scan_tb_scan.setChecked(false);
-                stopScan();
-            }
-        };
+//        mSubscribedDevices = DeviceManager.getInstance().getAllDeviceAddress();
+//        mScannedDevices = new ArrayList<>();
+//        mAdapter = new ScanAdapter(ScanActivity.this, mScannedDevices, mSubscribedDevices) {
+//            @Override
+//            public void onItemClick(final XDevice device) {
+//                XlinkCloudManager.getInstance().addDevice(device, 10000, new XlinkTaskCallback<XDevice>() {
+//                    @Override
+//                    public void onError(String error) {
+//                        mProgressDialog.dismiss();
+//                        Toast.makeText(ScanActivity.this, error, Toast.LENGTH_SHORT)
+//                             .show();
+//                    }
+//
+//                    @Override
+//                    public void onStart() {
+//                        mProgressDialog.show();
+//                    }
+//
+//                    @Override
+//                    public void onComplete(XDevice xDevice) {
+//                        mProgressDialog.dismiss();
+//                        Intent intent = new Intent(ScanActivity.this, DeviceActivity.class);
+//                        intent.putExtra("device_tag", DeviceManager.getInstance().getDeviceTag(device));
+//                        startActivity(intent);
+//                        finish();
+//                    }
+//                });
+//            }
+//        };
+//        scan_rv_show.setAdapter(mAdapter);
+//        mScanDeviceListener = new XLinkScanDeviceListener() {
+//            @Override
+//            public void onScanResult(XDevice xDevice) {
+//                if (xDevice != null) {
+//                    if (!containsDevice(xDevice)) {
+//                        mScannedDevices.add(xDevice);
+//                        mAdapter.notifyItemInserted(mScannedDevices.size()-1);
+//                    }
+//                }
+//            }
+//
+//            @Override
+//            public void onError(XLinkCoreException e) {
+//                mScanning = false;
+//                scan_tb_scan.setChecked(false);
+//                stopScan();
+//            }
+//
+//            @Override
+//            public void onStart() {
+//                mScanning = true;
+//            }
+//
+//            @Override
+//            public void onComplete(Void aVoid) {
+//                mScanning = false;
+//                scan_tb_scan.setChecked(false);
+//                stopScan();
+//            }
+//        };
     }
 
     @Override
@@ -176,29 +155,28 @@ public class ScanActivity extends BaseActivity {
         });
     }
 
-    private boolean containsDevice(XDevice xDevice) {
-        for (XDevice xd : mScannedDevices) {
-            if (TextUtils.equals(xDevice.getDeviceTag(), xd.getMacAddress())) {
-                return true;
-            }
-        }
-        return false;
-    }
+//    private boolean containsDevice(XDevice xDevice) {
+//        for (XDevice xd : mScannedDevices) {
+//            if (TextUtils.equals(xDevice.getDeviceTag(), xd.getMacAddress())) {
+//                return true;
+//            }
+//        }
+//        return false;
+//    }
 
-    private void startScan() {
-        if (mScanning) {
-            return;
-        }
-        mScannedDevices.clear();
-        mAdapter.notifyDataSetChanged();
-        mScanTask = XlinkCloudManager.getInstance().createScanDeviceTask(XlinkConstants.XLINK_PRODUCTS, SCAN_DEVICE_TIMEOUT, SCAN_RETRY_INTERVAL, mScanDeviceListener);
-        XLinkSDK.startTask(mScanTask);
-//        XlinkCloudManager.getInstance().scanDevice(pids, SCAN_DEVICE_TIMEOUT, SCAN_RETRY_INTERVAL, mScanDeviceListener);
-    }
-
-    private void stopScan() {
-        XLinkSDK.stopTask(mScanTask);
-        mScanTask = null;
-        mScanning = false;
-    }
+//    private void startScan() {
+//        if (mScanning) {
+//            return;
+//        }
+//        mScannedDevices.clear();
+//        mAdapter.notifyDataSetChanged();
+//        mScanTask = XlinkCloudManager.getInstance().createScanDeviceTask(XlinkConstants.XLINK_PRODUCTS, SCAN_DEVICE_TIMEOUT, SCAN_RETRY_INTERVAL, mScanDeviceListener);
+//        XLinkSDK.startTask(mScanTask);
+//    }
+//
+//    private void stopScan() {
+//        XLinkSDK.stopTask(mScanTask);
+//        mScanTask = null;
+//        mScanning = false;
+//    }
 }

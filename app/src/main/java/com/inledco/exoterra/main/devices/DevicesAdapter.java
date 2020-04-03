@@ -7,11 +7,9 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.inledco.exoterra.R;
-import com.inledco.exoterra.bean.Device;
-import com.inledco.exoterra.bean.Home;
+import com.inledco.exoterra.aliot.Device;
 import com.inledco.exoterra.common.DeviceViewHolder;
 import com.inledco.exoterra.common.SimpleAdapter;
-import com.inledco.exoterra.manager.HomeManager;
 import com.inledco.exoterra.util.DeviceUtil;
 
 import java.util.List;
@@ -37,24 +35,25 @@ public class DevicesAdapter extends SimpleAdapter<Device, DeviceViewHolder> {
     @Override
     public void onBindViewHolder(@NonNull final DeviceViewHolder holder, int i) {
         Device device = mData.get(i);
-        String pid = device.getXDevice().getProductId();
-        String name = device.getXDevice().getDeviceName();
+        String pkey = device.getProductKey();
+        String dname = device.getDeviceName();
+        String name = device.getName();
         if (TextUtils.isEmpty(name)) {
-            name = DeviceUtil.getDefaultName(pid);
+            name = DeviceUtil.getDefaultName(pkey);
         }
-        String mac = device.getXDevice().getMacAddress();
-        holder.iv_icon.setImageResource(DeviceUtil.getProductIcon(pid));
+        String mac = device.getMac();
+        holder.iv_icon.setImageResource(DeviceUtil.getProductIcon(pkey));
         holder.tv_name.setText(name);
-        Home home = HomeManager.getInstance().getDeviceHome(device);
-        if (home != null) {
-            holder.ctv_habitat.setChecked(true);
-            holder.ctv_habitat.setText(home.getHome().name);
-        } else {
-            holder.ctv_habitat.setChecked(false);
-            holder.ctv_habitat.setText(null);
-        }
-        holder.ctv_habitat.setVisibility(View.VISIBLE);
-        boolean state = device.getXDevice().isOnline();
+//        Home home = HomeManager.getInstance().getDeviceHome(device);
+//        if (home != null) {
+//            holder.ctv_habitat.setChecked(true);
+//            holder.ctv_habitat.setText(home.getHome().name);
+//        } else {
+//            holder.ctv_habitat.setChecked(false);
+//            holder.ctv_habitat.setText(null);
+//        }
+//        holder.ctv_habitat.setVisibility(View.VISIBLE);
+        boolean state = device.isOnline();
         holder.ctv_state.setChecked(state);
         holder.ctv_state.setText(state ? R.string.cloud_online : R.string.cloud_offline);
         holder.itemView.setOnClickListener(new View.OnClickListener() {
@@ -75,20 +74,4 @@ public class DevicesAdapter extends SimpleAdapter<Device, DeviceViewHolder> {
             }
         });
     }
-
-//    public class DeviceViewHolder extends RecyclerView.ViewHolder {
-//        private ImageView iv_icon;
-//        private TextView tv_name;
-//        private CheckedTextView ctv_state;
-//        private CheckedTextView ctv_habitat;
-//
-//        public DeviceViewHolder(@NonNull View itemView) {
-//            super(itemView);
-//
-//            iv_icon = itemView.findViewById(R.id.item_device_icon);
-//            tv_name = itemView.findViewById(R.id.item_device_name);
-//            ctv_state = itemView.findViewById(R.id.item_device_state);
-//            ctv_habitat = itemView.findViewById(R.id.item_device_habitat);
-//        }
-//    }
 }

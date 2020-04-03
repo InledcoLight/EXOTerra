@@ -16,12 +16,7 @@ import com.inledco.exoterra.base.BaseActivity;
 import com.inledco.exoterra.manager.VerifycodeManager;
 import com.inledco.exoterra.util.RegexUtil;
 import com.inledco.exoterra.view.AdvancedTextInputEditText;
-import com.inledco.exoterra.view.MessageDialog;
-import com.inledco.exoterra.xlink.XlinkCloudManager;
-import com.inledco.exoterra.xlink.XlinkRequestCallback;
 import com.liruya.loaddialog.LoadDialog;
-
-import cn.xlink.restful.api.app.UserAuthApi;
 
 public class RegisterActivity extends BaseActivity {
     private Toolbar register_toolbar;
@@ -35,8 +30,7 @@ public class RegisterActivity extends BaseActivity {
     private LoadDialog mLoadDialog;
     private ProgressDialog mProgressDialog;
 
-    private XlinkRequestCallback<String> mVerifycodeCallback;
-    private XlinkRequestCallback<UserAuthApi.EmailVerifyCodeRegisterResponse> mRegisterCallback;
+//    private XlinkRequestCallback<String> mVerifycodeCallback;
 
     private boolean showPassword;
 
@@ -81,45 +75,45 @@ public class RegisterActivity extends BaseActivity {
         mProgressDialog = new ProgressDialog(this);
         mProgressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
 
-        mVerifycodeCallback = new XlinkRequestCallback<String>() {
-            @Override
-            public void onError(String error) {
-                Toast.makeText(RegisterActivity.this, error, Toast.LENGTH_SHORT)
-                     .show();
-                getMessageDialog().setTitle(R.string.title_verifycode_sent_failed)
-                                  .setMessage(error)
-                                  .show();
-            }
+//        mVerifycodeCallback = new XlinkRequestCallback<String>() {
+//            @Override
+//            public void onError(String error) {
+//                Toast.makeText(RegisterActivity.this, error, Toast.LENGTH_SHORT)
+//                     .show();
+//                getMessageDialog().setTitle(R.string.title_verifycode_sent_failed)
+//                                  .setMessage(error)
+//                                  .show();
+//            }
+//
+//            @Override
+//            public void onSuccess(String s) {
+//                getMessageDialog().setTitle(R.string.title_verifycode_sent)
+//                                  .setMessage(R.string.msg_get_verifycode)
+//                                  .show();
+//            }
+//        };
 
-            @Override
-            public void onSuccess(String s) {
-                getMessageDialog().setTitle(R.string.title_verifycode_sent)
-                                  .setMessage(R.string.msg_get_verifycode)
-                                  .show();
-            }
-        };
-
-        mRegisterCallback = new XlinkRequestCallback<UserAuthApi.EmailVerifyCodeRegisterResponse>() {
-            @Override
-            public void onStart() {
-                showLoading();
-            }
-
-            @Override
-            public void onError(String error) {
-                dismissLoading();
-                new MessageDialog(RegisterActivity.this).setTitle(R.string.signup_failed)
-                                                     .setMessage(error)
-                                                     .setButton(getString(R.string.ok), null)
-                                                     .show();
-            }
-
-            @Override
-            public void onSuccess(UserAuthApi.EmailVerifyCodeRegisterResponse response) {
-                dismissLoading();
-                backtoLoginActivity(true);
-            }
-        };
+//        mRegisterCallback = new XlinkRequestCallback<UserAuthApi.EmailVerifyCodeRegisterResponse>() {
+//            @Override
+//            public void onStart() {
+//                showLoading();
+//            }
+//
+//            @Override
+//            public void onError(String error) {
+//                dismissLoading();
+//                new MessageDialog(RegisterActivity.this).setTitle(R.string.signup_failed)
+//                                                     .setMessage(error)
+//                                                     .setButton(getString(R.string.ok), null)
+//                                                     .show();
+//            }
+//
+//            @Override
+//            public void onSuccess(UserAuthApi.EmailVerifyCodeRegisterResponse response) {
+//                dismissLoading();
+//                backtoLoginActivity(true);
+//            }
+//        };
     }
 
     @Override
@@ -149,7 +143,7 @@ public class RegisterActivity extends BaseActivity {
                          .show();
                     return;
                 }
-                XlinkCloudManager.getInstance().requestRegisterEmailVerifycode(email, mVerifycodeCallback);
+//                XlinkCloudManager.getInstance().requestRegisterEmailVerifycode(email, mVerifycodeCallback);
                 mVerifycodeManager.addRegisterVerifycode(email);
             }
         });
@@ -189,7 +183,7 @@ public class RegisterActivity extends BaseActivity {
                     register_et_password.requestFocus();
                     return;
                 }
-                XlinkCloudManager.getInstance().registerEmailByVerifycode(email, password, verifycode, mRegisterCallback);
+//                XlinkCloudManager.getInstance().registerEmailByVerifycode(email, password, verifycode, mRegisterCallback);
             }
         });
     }

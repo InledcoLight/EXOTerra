@@ -14,8 +14,9 @@ import android.widget.TimePicker;
 
 import com.inledco.exoterra.GlobalSettings;
 import com.inledco.exoterra.R;
+import com.inledco.exoterra.aliot.ExoLed;
+import com.inledco.exoterra.aliot.LightViewModel;
 import com.inledco.exoterra.base.BaseFragment;
-import com.inledco.exoterra.bean.EXOLedstrip;
 import com.inledco.exoterra.view.GradientCornerButton;
 
 public class EditSunriseSusetFragment extends BaseFragment {
@@ -27,7 +28,7 @@ public class EditSunriseSusetFragment extends BaseFragment {
     private GradientCornerButton sunrs_save;
 
     private LightViewModel mLightViewModel;
-    private EXOLedstrip mLight;
+    private ExoLed mLight;
 
     private boolean mSunset;
 
@@ -84,11 +85,11 @@ public class EditSunriseSusetFragment extends BaseFragment {
         int time;
         if (mSunset) {
             sunrs_title.setText(R.string.sunset);
-            time = mLight.getDaytimeEnd();
+            time = mLight.getSunset();
             sunrs_ramp.setValue(mLight.getSunsetRamp() / 10);
         }
         else {
-            time = mLight.getDaytimeStart();
+            time = mLight.getSunrise();
             sunrs_ramp.setValue(mLight.getSunriseRamp() / 10);
         }
         sunrs_time.setIs24HourView(GlobalSettings.is24HourFormat());

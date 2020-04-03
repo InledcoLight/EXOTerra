@@ -3,29 +3,14 @@ package com.inledco.exoterra.adddevice;
 import android.os.AsyncTask;
 import android.os.CountDownTimer;
 import android.support.v7.app.AppCompatActivity;
-import android.text.TextUtils;
 import android.util.Log;
 
 import com.espressif.iot.esptouch.EsptouchTask;
 import com.espressif.iot.esptouch.IEsptouchResult;
 import com.espressif.iot.esptouch.IEsptouchTask;
-import com.inledco.exoterra.R;
-import com.inledco.exoterra.bean.ImportDeviceResponse;
-import com.inledco.exoterra.bean.QueryDeviceResponse;
 import com.inledco.exoterra.bean.Result;
-import com.inledco.exoterra.xlink.XlinkCloudManager;
-import com.inledco.exoterra.xlink.XlinkTaskHandler;
 
 import java.lang.ref.WeakReference;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.TimeZone;
-
-import cn.xlink.sdk.core.XLinkCoreException;
-import cn.xlink.sdk.core.model.DataPointValueType;
-import cn.xlink.sdk.core.model.XLinkDataPoint;
-import cn.xlink.sdk.v5.listener.XLinkScanDeviceListener;
-import cn.xlink.sdk.v5.model.XDevice;
 
 public class SmartConfigLinker {
     private final String TAG = "SmartConfigLinker";
@@ -55,7 +40,7 @@ public class SmartConfigLinker {
     private final String mSsid;
     private final String mBssid;
     private final String mPassword;
-    private XDevice mXDevice;
+//    private XDevice mXDevice;
 
     private WeakReference<AppCompatActivity> mActivity;
 
@@ -116,116 +101,102 @@ public class SmartConfigLinker {
 
     private Result scan() {
         final TaskResult result = new TaskResult();
-        XLinkScanDeviceListener listener = new XLinkScanDeviceListener() {
-            @Override
-            public void onScanResult(XDevice xDevice) {
-                if (xDevice != null && TextUtils.equals(mAddress, xDevice.getMacAddress().toUpperCase())) {
-                    mXDevice = xDevice;
-                    result.setSuccess(true);
-                    result.setOver(true);
-                }
-            }
-
-            @Override
-            public void onError(XLinkCoreException e) {
-                result.setError("error code: " + e.getErrorCode() + "\n" + e.getErrorName());
-                result.setSuccess(false);
-                result.setOver(true);
-            }
-
-            @Override
-            public void onStart() {
-                Log.e(TAG, "Scan - onStart: ");
-            }
-
-            @Override
-            public void onComplete(Void aVoid) {
-                Log.e(TAG, "onComplete: ");
-                result.setError("Scan timeout");
-                result.setSuccess(false);
-                result.setOver(true);
-            }
-        };
-        XlinkCloudManager.getInstance().scanDevice(mProductId, SCAN_DEVICE_TIMEOUT, SCAN_RETRY_INTERVAL, listener);
-        while(!result.isOver());
+//        XLinkScanDeviceListener listener = new XLinkScanDeviceListener() {
+//            @Override
+//            public void onScanResult(XDevice xDevice) {
+//                if (xDevice != null && TextUtils.equals(mAddress, xDevice.getMacAddress().toUpperCase())) {
+//                    mXDevice = xDevice;
+//                    result.setSuccess(true);
+//                    result.setOver(true);
+//                }
+//            }
+//
+//            @Override
+//            public void onError(XLinkCoreException e) {
+//                result.setError("error code: " + e.getErrorCode() + "\n" + e.getErrorName());
+//                result.setSuccess(false);
+//                result.setOver(true);
+//            }
+//
+//            @Override
+//            public void onStart() {
+//                Log.e(TAG, "Scan - onStart: ");
+//            }
+//
+//            @Override
+//            public void onComplete(Void aVoid) {
+//                Log.e(TAG, "onComplete: ");
+//                result.setError("Scan timeout");
+//                result.setSuccess(false);
+//                result.setOver(true);
+//            }
+//        };
+//        XlinkCloudManager.getInstance().scanDevice(mProductId, SCAN_DEVICE_TIMEOUT, SCAN_RETRY_INTERVAL, listener);
+//        while(!result.isOver());
         Result res = new Result(result.isSuccess(), result.getError());
         return res;
     }
 
     private boolean checkDeviceRegistered() {
-        QueryDeviceResponse response = XlinkCloudManager.getInstance().queryDeviceBlock(mProductId, mAddress);
-        if (response == null || !response.isValid()) {
-            return false;
-        }
+//        QueryDeviceResponse response = XlinkCloudManager.getInstance().queryDeviceBlock(mProductId, mAddress);
+//        if (response == null || !response.isValid()) {
+//            return false;
+//        }
         return true;
     }
 
     private Result registerDevice() {
         Result result = new Result();
-        ImportDeviceResponse response = XlinkCloudManager.getInstance()
-                                                         .registerDeviceBlock(mProductId, null, mAddress, mAddress.toLowerCase());
-        if (response != null && response.isValid()) {
-            if (response.getResp().getErrcode() == 0) {
-                result.setSuccess(true);
-            } else {
-                result.setError(response.getResp().getErrmsg());
-            }
-        } else {
-            result.setError(mActivity.get().getString(R.string.error_regdev_failed));
-        }
+//        ImportDeviceResponse response = XlinkCloudManager.getInstance()
+//                                                         .registerDeviceBlock(mProductId, null, mAddress, mAddress.toLowerCase());
+//        if (response != null && response.isValid()) {
+//            if (response.getResp().getErrcode() == 0) {
+//                result.setSuccess(true);
+//            } else {
+//                result.setError(response.getResp().getErrmsg());
+//            }
+//        } else {
+//            result.setError(mActivity.get().getString(R.string.error_regdev_failed));
+//        }
         return result;
     }
 
     private Result addDevice() {
-        XlinkTaskHandler<XDevice> listener = new XlinkTaskHandler<>();
-        XlinkCloudManager.getInstance().addDevice(mXDevice, ADD_DEVICE_TIMEOUT, listener);
-        while (!listener.isOver());
-        Result res = new Result(listener.isSuccess(), listener.getError());
-        return res;
+//        XlinkTaskHandler<XDevice> listener = new XlinkTaskHandler<>();
+//        XlinkCloudManager.getInstance().addDevice(mXDevice, ADD_DEVICE_TIMEOUT, listener);
+//        while (!listener.isOver());
+//        Result res = new Result(listener.isSuccess(), listener.getError());
+//        return res;
+        return new Result();
     }
 
     private Result syncDevice() {
-        XlinkTaskHandler<XDevice> listener = new XlinkTaskHandler<>();
-        final int rawZone = TimeZone.getDefault().getRawOffset()/60000;
-        final int zone = (rawZone/60)*100 + (rawZone%60);
-        final List<XLinkDataPoint> dps = new ArrayList<>();
-        final XLinkDataPoint dp1 = new XLinkDataPoint(INDEX_ZONE, DataPointValueType.SHORT, (short) zone);
-        dps.add(dp1);
-//        if (mSubscribe) {
-//            final byte[] array = new byte[10];
-//            Calendar calendar = Calendar.getInstance();
-//            int year = calendar.get(Calendar.YEAR);
-//            array[0] = (byte) (year & 0xFF);
-//            array[1] = (byte) ((year >> 8) & 0xFF);
-//            array[2] = (byte) calendar.get(Calendar.MONTH);
-//            array[3] = (byte) calendar.get(Calendar.DATE);
-//            array[4] = (byte) calendar.get(Calendar.DAY_OF_WEEK);
-//            array[5] = (byte) calendar.get(Calendar.HOUR_OF_DAY);
-//            array[6] = (byte) calendar.get(Calendar.MINUTE);
-//            array[7] = (byte) calendar.get(Calendar.SECOND);
-//            array[8] = (byte) (zone & 0xFF);
-//            array[9] = (byte) ((zone>>8) & 0xFF);
-//            final XLinkDataPoint dp2 = new XLinkDataPoint(INDEX_SYNC_DATETIME, DataPointValueType.BYTE_ARRAY, array);
-//            dps.add(dp2);
-//        }
-        XlinkCloudManager.getInstance().setDeviceDatapoints(mXDevice, dps, SET_ZONE_TIMEOUT, listener);
-        while (!listener.isOver());
-        Result res = new Result(listener.isSuccess(), listener.getError());
-        return res;
+//        XlinkTaskHandler<XDevice> listener = new XlinkTaskHandler<>();
+//        final int rawZone = TimeZone.getDefault().getRawOffset()/60000;
+//        final int zone = (rawZone/60)*100 + (rawZone%60);
+//        final List<XLinkDataPoint> dps = new ArrayList<>();
+//        final XLinkDataPoint dp1 = new XLinkDataPoint(INDEX_ZONE, DataPointValueType.SHORT, (short) zone);
+//        dps.add(dp1);
+//        XlinkCloudManager.getInstance().setDeviceDatapoints(mXDevice, dps, SET_ZONE_TIMEOUT, listener);
+//        while (!listener.isOver());
+//        Result res = new Result(listener.isSuccess(), listener.getError());
+//        return res;
+        return new Result();
     }
 
     private Result subscribe() {
-        XlinkTaskHandler<XDevice> listener = new XlinkTaskHandler<XDevice>() {
-            @Override
-            public void onComplete(XDevice device) {
-                super.onComplete(device);
-                mXDevice = device;
-            }
-        };
-        XlinkCloudManager.getInstance().subscribeDevice(mXDevice, null, SUBSCRIBE_DEVICE_TIMEOUT, listener);
-        while (!listener.isOver());
-        Result res = new Result(listener.isSuccess(), listener.getError());
-        return res;
+//        XlinkTaskHandler<XDevice> listener = new XlinkTaskHandler<XDevice>() {
+//            @Override
+//            public void onComplete(XDevice device) {
+//                super.onComplete(device);
+//                mXDevice = device;
+//            }
+//        };
+//        XlinkCloudManager.getInstance().subscribeDevice(mXDevice, null, SUBSCRIBE_DEVICE_TIMEOUT, listener);
+//        while (!listener.isOver());
+//        Result res = new Result(listener.isSuccess(), listener.getError());
+//        return res;
+        return new Result();
     }
 
     private void delay(long ms) {
@@ -240,7 +211,7 @@ public class SmartConfigLinker {
     }
 
     public void startTask() {
-        mXDevice = null;
+//        mXDevice = null;
         mProgress = 0;
         mTask = new AsyncTask<Void, Integer, Result>() {
             @Override
@@ -304,7 +275,7 @@ public class SmartConfigLinker {
                     if (result.isSuccess()) {
                         mProgress = PROGRESS_SUCCESS;
                         mListener.onProgressUpdate(mProgress);
-                        mListener.onSuccess(mXDevice.getDeviceId(), mAddress);
+//                        mListener.onSuccess(mXDevice.getDeviceId(), mAddress);
                     } else {
                         mListener.onError(result.getError());
                     }

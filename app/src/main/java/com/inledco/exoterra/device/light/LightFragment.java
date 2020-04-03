@@ -1,6 +1,5 @@
 package com.inledco.exoterra.device.light;
 
-import android.annotation.SuppressLint;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
@@ -13,8 +12,9 @@ import android.widget.CheckedTextView;
 import android.widget.ImageButton;
 
 import com.inledco.exoterra.R;
+import com.inledco.exoterra.aliot.ExoLed;
+import com.inledco.exoterra.aliot.LightViewModel;
 import com.inledco.exoterra.base.BaseFragment;
-import com.inledco.exoterra.bean.EXOLedstrip;
 
 public class LightFragment extends BaseFragment {
 
@@ -24,7 +24,7 @@ public class LightFragment extends BaseFragment {
     private CheckedTextView light_ctv_pro;
 
     private LightViewModel mLightViewModel;
-    private EXOLedstrip mLight;
+    private ExoLed mLight;
 
     @Nullable
     @Override
@@ -53,9 +53,9 @@ public class LightFragment extends BaseFragment {
     protected void initData() {
         mLightViewModel = ViewModelProviders.of(getActivity()).get(LightViewModel.class);
         mLight = mLightViewModel.getData();
-        mLightViewModel.observe(this, new Observer<EXOLedstrip>() {
+        mLightViewModel.observe(this, new Observer<ExoLed>() {
             @Override
-            public void onChanged(@Nullable EXOLedstrip exoLedstrip) {
+            public void onChanged(@Nullable ExoLed exoLed) {
                 refreshData();
             }
         });
@@ -71,21 +71,19 @@ public class LightFragment extends BaseFragment {
             }
         });
         light_ctv_manual.setOnClickListener(new View.OnClickListener() {
-            @SuppressLint ("RestrictedApi")
             @Override
             public void onClick(View v) {
                 if (!light_ctv_manual.isChecked()) {
-                    mLightViewModel.setMode(EXOLedstrip.MODE_MANUAL);
+                    mLightViewModel.setMode(ExoLed.MODE_MANUAL);
                 }
             }
         });
 
         light_ctv_auto.setOnClickListener(new View.OnClickListener() {
-            @SuppressLint ("RestrictedApi")
             @Override
             public void onClick(View v) {
                 if (!light_ctv_auto.isChecked()) {
-                    mLightViewModel.setMode(EXOLedstrip.MODE_AUTO);
+                    mLightViewModel.setMode(ExoLed.MODE_AUTO);
                 }
             }
         });
@@ -94,7 +92,7 @@ public class LightFragment extends BaseFragment {
             @Override
             public void onClick(View v) {
                 if (!light_ctv_pro.isChecked()) {
-                    mLightViewModel.setMode(EXOLedstrip.MODE_PRO);
+                    mLightViewModel.setMode(ExoLed.MODE_PRO);
                 }
             }
         });
@@ -104,17 +102,17 @@ public class LightFragment extends BaseFragment {
         if (mLight == null) {
             return;
         }
-        if (!light_ctv_auto.isChecked() && mLight.getMode() == EXOLedstrip.MODE_AUTO) {
+        if (!light_ctv_auto.isChecked() && mLight.getMode() == ExoLed.MODE_AUTO) {
             light_ctv_manual.setChecked(false);
             light_ctv_auto.setChecked(true);
             light_ctv_pro.setChecked(false);
             replaceFragment(R.id.light_fl_show, new LightAutoFragment());
-        } else if (!light_ctv_pro.isChecked() && mLight.getMode() == EXOLedstrip.MODE_PRO) {
+        } else if (!light_ctv_pro.isChecked() && mLight.getMode() == ExoLed.MODE_PRO) {
             light_ctv_manual.setChecked(false);
             light_ctv_auto.setChecked(false);
             light_ctv_pro.setChecked(true);
             replaceFragment(R.id.light_fl_show, new LightProFragment());
-        } else if (!light_ctv_manual.isChecked() && mLight.getMode() == EXOLedstrip.MODE_MANUAL){
+        } else if (!light_ctv_manual.isChecked() && mLight.getMode() == ExoLed.MODE_MANUAL){
             light_ctv_manual.setChecked(true);
             light_ctv_auto.setChecked(false);
             light_ctv_pro.setChecked(false);

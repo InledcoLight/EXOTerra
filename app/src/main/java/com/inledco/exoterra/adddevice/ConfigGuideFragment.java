@@ -1,6 +1,5 @@
 package com.inledco.exoterra.adddevice;
 
-import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
@@ -18,12 +17,7 @@ import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.text.Spannable;
-import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
-import android.text.method.LinkMovementMethod;
-import android.text.style.ClickableSpan;
-import android.text.style.ForegroundColorSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,8 +27,6 @@ import android.widget.TextView;
 
 import com.inledco.exoterra.R;
 import com.inledco.exoterra.base.BaseFragment;
-import com.inledco.exoterra.util.DeviceUtil;
-import com.inledco.exoterra.xlink.XlinkConstants;
 
 public class ConfigGuideFragment extends BaseFragment {
     private TextView config_guide_title;
@@ -196,71 +188,71 @@ public class ConfigGuideFragment extends BaseFragment {
     }
 
     private void refreshData() {
-        unregisterWifiReceiver();
-        config_guide_prdt.setImageResource(DeviceUtil.getProductIcon(mConnectNetBean.getProductId()));
-        config_guide_next.setEnabled(!mConnectNetBean.isCompatibleMode());
-        if (mAnimator != null) {
-            mAnimator.cancel();
-            mAnimator = null;
-        }
-        int duration = 500;
-        if (mConnectNetBean.isCompatibleMode()) {
-            config_guide_title.setText(R.string.set_device_compatiblemode );
-            duration = 1500;
-            SpannableStringBuilder ssb = new SpannableStringBuilder();
-            String ssid;
-            if (TextUtils.equals(XlinkConstants.PRODUCT_ID_LEDSTRIP, mConnectNetBean.getProductId())) {
-                ssid = XlinkConstants.STRIP_AP_SSID;
-                ssb.append(getString(R.string.apconfig_guide_strip, ssid));
-            } else if (TextUtils.equals(XlinkConstants.PRODUCT_ID_SOCKET, mConnectNetBean.getProductId())) {
-                ssid = XlinkConstants.SOCKET_AP_SSID;
-                ssb.append(getString(R.string.apconfig_guide_default, ssid));
-            } else if (TextUtils.equals(XlinkConstants.PRODUCT_ID_MONSOON, mConnectNetBean.getProductId())) {
-                ssid = XlinkConstants.MONSOON_AP_SSID;
-                ssb.append(getString(R.string.apconfig_guide_default, ssid));
-            } else {
-                return;
-            }
-            ClickableSpan clickableText = new ClickableSpan() {
-                @Override
-                public void onClick(@NonNull View widget) {
-                    gotoSystemWifiSettings();
-                }
-            };
-            int start = ssb.length() - ssid.length() - 1;
-            int end = ssb.length() - 1;
-            ssb.setSpan(clickableText, start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-            ForegroundColorSpan fcs = new ForegroundColorSpan(getContext().getResources().getColor(R.color.colorAccent));
-            ssb.setSpan(fcs, start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-            config_guide_step.setMovementMethod(LinkMovementMethod.getInstance());
-            config_guide_step.setText(ssb);
-
-            registerWifiReceiver();
-        } else {
-            config_guide_title.setText(R.string.set_device_smartconfig_mode);
-            if (TextUtils.equals(XlinkConstants.PRODUCT_ID_LEDSTRIP, mConnectNetBean.getProductId())) {
-                config_guide_step.setText(R.string.smartconfig_guide_strip);
-            } else {
-                config_guide_step.setText(R.string.smartconfig_guide_default);
-            }
-        }
-
-        mAnimator = ObjectAnimator.ofInt(0-duration/2, duration/2);
-        mAnimator.setDuration(duration);
-        mAnimator.setRepeatCount(ValueAnimator.INFINITE);
-        mAnimator.setRepeatMode(ValueAnimator.REVERSE);
-        mAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-            @Override
-            public void onAnimationUpdate(ValueAnimator animation) {
-                int value = (int) animation.getAnimatedValue();
-                if (value > 0) {
-                    config_guide_icon.setImageResource(DeviceUtil.getProductLedonIcon(mConnectNetBean.getProductId()));
-                } else {
-                    config_guide_icon.setImageResource(DeviceUtil.getProductLedoffIcon(mConnectNetBean.getProductId()));
-                }
-            }
-        });
-        mAnimator.start();
+//        unregisterWifiReceiver();
+//        config_guide_prdt.setImageResource(DeviceUtil.getProductIcon(mConnectNetBean.getProductId()));
+//        config_guide_next.setEnabled(!mConnectNetBean.isCompatibleMode());
+//        if (mAnimator != null) {
+//            mAnimator.cancel();
+//            mAnimator = null;
+//        }
+//        int duration = 500;
+//        if (mConnectNetBean.isCompatibleMode()) {
+//            config_guide_title.setText(R.string.set_device_compatiblemode );
+//            duration = 1500;
+//            SpannableStringBuilder ssb = new SpannableStringBuilder();
+//            String ssid;
+//            if (TextUtils.equals(XlinkConstants.PRODUCT_ID_LEDSTRIP, mConnectNetBean.getProductId())) {
+//                ssid = XlinkConstants.STRIP_AP_SSID;
+//                ssb.append(getString(R.string.apconfig_guide_strip, ssid));
+//            } else if (TextUtils.equals(XlinkConstants.PRODUCT_ID_SOCKET, mConnectNetBean.getProductId())) {
+//                ssid = XlinkConstants.SOCKET_AP_SSID;
+//                ssb.append(getString(R.string.apconfig_guide_default, ssid));
+//            } else if (TextUtils.equals(XlinkConstants.PRODUCT_ID_MONSOON, mConnectNetBean.getProductId())) {
+//                ssid = XlinkConstants.MONSOON_AP_SSID;
+//                ssb.append(getString(R.string.apconfig_guide_default, ssid));
+//            } else {
+//                return;
+//            }
+//            ClickableSpan clickableText = new ClickableSpan() {
+//                @Override
+//                public void onClick(@NonNull View widget) {
+//                    gotoSystemWifiSettings();
+//                }
+//            };
+//            int start = ssb.length() - ssid.length() - 1;
+//            int end = ssb.length() - 1;
+//            ssb.setSpan(clickableText, start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+//            ForegroundColorSpan fcs = new ForegroundColorSpan(getContext().getResources().getColor(R.color.colorAccent));
+//            ssb.setSpan(fcs, start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+//            config_guide_step.setMovementMethod(LinkMovementMethod.getInstance());
+//            config_guide_step.setText(ssb);
+//
+//            registerWifiReceiver();
+//        } else {
+//            config_guide_title.setText(R.string.set_device_smartconfig_mode);
+//            if (TextUtils.equals(XlinkConstants.PRODUCT_ID_LEDSTRIP, mConnectNetBean.getProductId())) {
+//                config_guide_step.setText(R.string.smartconfig_guide_strip);
+//            } else {
+//                config_guide_step.setText(R.string.smartconfig_guide_default);
+//            }
+//        }
+//
+//        mAnimator = ObjectAnimator.ofInt(0-duration/2, duration/2);
+//        mAnimator.setDuration(duration);
+//        mAnimator.setRepeatCount(ValueAnimator.INFINITE);
+//        mAnimator.setRepeatMode(ValueAnimator.REVERSE);
+//        mAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+//            @Override
+//            public void onAnimationUpdate(ValueAnimator animation) {
+//                int value = (int) animation.getAnimatedValue();
+//                if (value > 0) {
+//                    config_guide_icon.setImageResource(DeviceUtil.getProductLedonIcon(mConnectNetBean.getProductId()));
+//                } else {
+//                    config_guide_icon.setImageResource(DeviceUtil.getProductLedoffIcon(mConnectNetBean.getProductId()));
+//                }
+//            }
+//        });
+//        mAnimator.start();
     }
 
     private void gotoSystemWifiSettings() {
@@ -270,29 +262,29 @@ public class ConfigGuideFragment extends BaseFragment {
     }
 
     private void onWiFiChanged(WifiInfo wifiInfo, DhcpInfo dhcpInfo) {
-        if (wifiInfo == null || dhcpInfo == null) {
-            return;
-        }
-        if (dhcpInfo.gateway == DeviceUtil.ESP8266_GATEWAY) {
-            String ssid = wifiInfo.getSSID();
-            if (ssid.startsWith("\"") && ssid.endsWith("\"")) {
-                ssid = ssid.substring(1, ssid.length()-1);
-            }
-            if (TextUtils.equals(mConnectNetBean.getProductId(), XlinkConstants.PRODUCT_ID_LEDSTRIP) &&
-                ssid.matches(DeviceUtil.EXO_STRIP_REGEX)) {
-                config_guide_next.setEnabled(true);
-                return;
-            } else if (TextUtils.equals(mConnectNetBean.getProductId(), XlinkConstants.PRODUCT_ID_SOCKET) &&
-                       ssid.matches(DeviceUtil.EXO_SOCKET_REGEX)) {
-                config_guide_next.setEnabled(true);
-                return;
-            } else if (TextUtils.equals(mConnectNetBean.getProductId(), XlinkConstants.PRODUCT_ID_MONSOON) &&
-                       ssid.matches(DeviceUtil.EXO_MONSOON_REGEX)) {
-                config_guide_next.setEnabled(true);
-                return;
-            }
-        }
-        config_guide_next.setEnabled(false);
+//        if (wifiInfo == null || dhcpInfo == null) {
+//            return;
+//        }
+//        if (dhcpInfo.gateway == DeviceUtil.ESP8266_GATEWAY) {
+//            String ssid = wifiInfo.getSSID();
+//            if (ssid.startsWith("\"") && ssid.endsWith("\"")) {
+//                ssid = ssid.substring(1, ssid.length()-1);
+//            }
+//            if (TextUtils.equals(mConnectNetBean.getProductId(), XlinkConstants.PRODUCT_ID_LEDSTRIP) &&
+//                ssid.matches(DeviceUtil.EXO_STRIP_REGEX)) {
+//                config_guide_next.setEnabled(true);
+//                return;
+//            } else if (TextUtils.equals(mConnectNetBean.getProductId(), XlinkConstants.PRODUCT_ID_SOCKET) &&
+//                       ssid.matches(DeviceUtil.EXO_SOCKET_REGEX)) {
+//                config_guide_next.setEnabled(true);
+//                return;
+//            } else if (TextUtils.equals(mConnectNetBean.getProductId(), XlinkConstants.PRODUCT_ID_MONSOON) &&
+//                       ssid.matches(DeviceUtil.EXO_MONSOON_REGEX)) {
+//                config_guide_next.setEnabled(true);
+//                return;
+//            }
+//        }
+//        config_guide_next.setEnabled(false);
     }
 
     private void registerWifiReceiver() {

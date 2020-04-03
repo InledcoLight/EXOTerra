@@ -6,7 +6,7 @@ import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
 import com.inledco.exoterra.R;
-import com.inledco.exoterra.xlink.XlinkConstants;
+import com.inledco.exoterra.aliot.AliotConsts;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,113 +26,126 @@ public class DeviceUtil {
 
     public static final int ESP8266_GATEWAY = 0x0104A8C0;
 
-    public static String getDefaultName(String pid) {
-        if (TextUtils.isEmpty(pid)) {
-            return "";
+    public static String getProductName(String pkey) {
+        if (TextUtils.equals(pkey, AliotConsts.PRODUCT_KEY_EXOLED)) {
+            return AliotConsts.PRODUCT_EXOLED;
         }
-        if (XlinkConstants.PRODUCT_ID_LEDSTRIP.equals(pid)) {
-            return "EXOTerraStrip";
+        if (TextUtils.equals(pkey, AliotConsts.PRODUCT_KEY_EXOSOCKET)) {
+            return AliotConsts.PRODUCT_EXOSOCKET;
         }
-        if (XlinkConstants.PRODUCT_ID_MONSOON.equals(pid)) {
-            return "EXOTerraMonsoon";
-        }
-        if (XlinkConstants.PRODUCT_ID_SOCKET.equals(pid)) {
-            return "EXOTerraSocket";
+        if (TextUtils.equals(pkey, AliotConsts.PRODUCT_KEY_EXOMONSOON)) {
+            return AliotConsts.PRODUCT_EXOMONSOON;
         }
         return "";
     }
 
-    public static @DrawableRes int getProductIcon(String pid) {
-        if (XlinkConstants.PRODUCT_ID_LEDSTRIP.equals(pid)) {
-            return R.drawable.ic_strip;
-        }
-        if (XlinkConstants.PRODUCT_ID_MONSOON.equals(pid)) {
-            return R.drawable.ic_monsoon;
-        }
-        if (XlinkConstants.PRODUCT_ID_SOCKET.equals(pid)) {
-            return R.drawable.ic_socket;
-        }
+    public static String getDefaultName(String pkey) {
+//        if (TextUtils.isEmpty(pkey)) {
+//            return "";
+//        }
+//        if (XlinkConstants.PRODUCT_ID_LEDSTRIP.equals(pkey)) {
+//            return "EXOTerraStrip";
+//        }
+//        if (XlinkConstants.PRODUCT_ID_MONSOON.equals(pkey)) {
+//            return "EXOTerraMonsoon";
+//        }
+//        if (XlinkConstants.PRODUCT_ID_SOCKET.equals(pkey)) {
+//            return "EXOTerraSocket";
+//        }
+        return "";
+    }
+
+    public static @DrawableRes int getProductIcon(String pkey) {
+//        if (XlinkConstants.PRODUCT_ID_LEDSTRIP.equals(pkey)) {
+//            return R.drawable.ic_strip;
+//        }
+//        if (XlinkConstants.PRODUCT_ID_MONSOON.equals(pkey)) {
+//            return R.drawable.ic_monsoon;
+//        }
+//        if (XlinkConstants.PRODUCT_ID_SOCKET.equals(pkey)) {
+//            return R.drawable.ic_socket;
+//        }
         return R.drawable.ic_device_default_white_64dp;
     }
 
-    public static @DrawableRes int getProductIconSmall(String pid) {
-        if (XlinkConstants.PRODUCT_ID_LEDSTRIP.equals(pid)) {
-            return R.drawable.ic_strip_48dp;
-        }
-        if (XlinkConstants.PRODUCT_ID_MONSOON.equals(pid)) {
-            return R.drawable.ic_monsoon_48dp;
-        }
-        if (XlinkConstants.PRODUCT_ID_SOCKET.equals(pid)) {
-            return R.drawable.ic_socket_48dp;
-        }
+    public static @DrawableRes int getProductIconSmall(String pkey) {
+//        if (XlinkConstants.PRODUCT_ID_LEDSTRIP.equals(pkey)) {
+//            return R.drawable.ic_strip_48dp;
+//        }
+//        if (XlinkConstants.PRODUCT_ID_MONSOON.equals(pkey)) {
+//            return R.drawable.ic_monsoon_48dp;
+//        }
+//        if (XlinkConstants.PRODUCT_ID_SOCKET.equals(pkey)) {
+//            return R.drawable.ic_socket_48dp;
+//        }
         return R.drawable.ic_device_default_white_24dp;
     }
 
-    public static @DrawableRes int getProductLedoffIcon(String pid) {
-//        if (XlinkConstants.PRODUCT_ID_LEDSTRIP.equals(pid)) {
+    public static @DrawableRes int getProductLedoffIcon(String pkey) {
+//        if (XlinkConstants.PRODUCT_ID_LEDSTRIP.equals(pkey)) {
 //            return R.mipmap.ic_strip_off_256;
 //        }
-//        if (XlinkConstants.PRODUCT_ID_MONSOON.equals(pid)) {
+//        if (XlinkConstants.PRODUCT_ID_MONSOON.equals(pkey)) {
 //            return R.mipmap.ic_monsoon_off_256;
 //        }
-//        if (XlinkConstants.PRODUCT_ID_SOCKET.equals(pid)) {
+//        if (XlinkConstants.PRODUCT_ID_SOCKET.equals(pkey)) {
 //            return R.mipmap.ic_socket_off_256;
 //        }
 //        return 0;
         return R.drawable.ic_power_gray;
     }
 
-    public static @DrawableRes int getProductLedonIcon(String pid) {
-//        if (XlinkConstants.PRODUCT_ID_LEDSTRIP.equals(pid)) {
+    public static @DrawableRes int getProductLedonIcon(String pkey) {
+//        if (XlinkConstants.PRODUCT_ID_LEDSTRIP.equals(pkey)) {
 //            return R.mipmap.ic_strip_on_256;
 //        }
-//        if (XlinkConstants.PRODUCT_ID_MONSOON.equals(pid)) {
+//        if (XlinkConstants.PRODUCT_ID_MONSOON.equals(pkey)) {
 //            return R.mipmap.ic_monsoon_on_256;
 //        }
-//        if (XlinkConstants.PRODUCT_ID_SOCKET.equals(pid)) {
+//        if (XlinkConstants.PRODUCT_ID_SOCKET.equals(pkey)) {
 //            return R.mipmap.ic_socket_on_256;
 //        }
 //        return 0;
         return R.drawable.ic_power_green;
     }
 
-    public static String getProductType(String pid) {
-        if (TextUtils.isEmpty(pid)) {
-            return "";
-        }
-        if (XlinkConstants.PRODUCT_ID_LEDSTRIP.equals(pid)) {
-            return "Microtope Led Strip";
-        }
-        if (XlinkConstants.PRODUCT_ID_MONSOON.equals(pid)) {
-            return "Microtope Monsoon";
-        }
-        if (XlinkConstants.PRODUCT_ID_SOCKET.equals(pid)) {
-            return "Microtope Socket";
-        }
-        return pid;
+    public static String getProductType(String pkey) {
+//        if (TextUtils.isEmpty(pkey)) {
+//            return "";
+//        }
+//        if (XlinkConstants.PRODUCT_ID_LEDSTRIP.equals(pkey)) {
+//            return "Microtope Led Strip";
+//        }
+//        if (XlinkConstants.PRODUCT_ID_MONSOON.equals(pkey)) {
+//            return "Microtope Monsoon";
+//        }
+//        if (XlinkConstants.PRODUCT_ID_SOCKET.equals(pkey)) {
+//            return "Microtope Socket";
+//        }
+        return pkey;
     }
 
     public static List<String> getAllProducts() {
         final List<String> products = new ArrayList<>();
-        products.add(XlinkConstants.PRODUCT_ID_LEDSTRIP);
-        products.add(XlinkConstants.PRODUCT_ID_SOCKET);
-        products.add(XlinkConstants.PRODUCT_ID_MONSOON);
+//        products.add(XlinkConstants.PRODUCT_ID_LEDSTRIP);
+//        products.add(XlinkConstants.PRODUCT_ID_SOCKET);
+//        products.add(XlinkConstants.PRODUCT_ID_MONSOON);
         return products;
     }
 
     public static boolean containsProduct(String prdt) {
-        if (TextUtils.isEmpty(prdt)) {
-            return false;
-        }
-        if (TextUtils.equals(XlinkConstants.PRODUCT_ID_LEDSTRIP, prdt)) {
-            return true;
-        }
-        if (TextUtils.equals(XlinkConstants.PRODUCT_ID_SOCKET, prdt)) {
-            return true;
-        }
-        if (TextUtils.equals(XlinkConstants.PRODUCT_ID_MONSOON, prdt)) {
-            return true;
-        }
+//        if (TextUtils.isEmpty(prdt)) {
+//            return false;
+//        }
+//        if (TextUtils.equals(XlinkConstants.PRODUCT_ID_LEDSTRIP, prdt)) {
+//            return true;
+//        }
+//        if (TextUtils.equals(XlinkConstants.PRODUCT_ID_SOCKET, prdt)) {
+//            return true;
+//        }
+//        if (TextUtils.equals(XlinkConstants.PRODUCT_ID_MONSOON, prdt)) {
+//            return true;
+//        }
         return false;
     }
 
@@ -157,7 +170,7 @@ public class DeviceUtil {
         return true;
     }
 
-    public static boolean isEXODevice(@NonNull final ScanResult result, @NonNull final String pid) {
+    public static boolean isEXODevice(@NonNull final ScanResult result, @NonNull final String pkey) {
         if (result.frequency < 2400 || result.frequency > 2500) {
             return false;
         }
@@ -170,15 +183,15 @@ public class DeviceUtil {
         if (ssid.startsWith("\"") && ssid.startsWith("\"")) {
             ssid = ssid.substring(1, ssid.length()-1);
         }
-        if (ssid.matches(EXO_STRIP_REGEX) && XlinkConstants.PRODUCT_ID_LEDSTRIP.equals(pid)) {
-            return true;
-        }
-        if (ssid.matches(EXO_SOCKET_REGEX) && XlinkConstants.PRODUCT_ID_SOCKET.equals(pid)) {
-            return true;
-        }
-        if (ssid.matches(EXO_MONSOON_REGEX) && XlinkConstants.PRODUCT_ID_MONSOON.equals(pid)) {
-            return true;
-        }
+//        if (ssid.matches(EXO_STRIP_REGEX) && XlinkConstants.PRODUCT_ID_LEDSTRIP.equals(pkey)) {
+//            return true;
+//        }
+//        if (ssid.matches(EXO_SOCKET_REGEX) && XlinkConstants.PRODUCT_ID_SOCKET.equals(pkey)) {
+//            return true;
+//        }
+//        if (ssid.matches(EXO_MONSOON_REGEX) && XlinkConstants.PRODUCT_ID_MONSOON.equals(pkey)) {
+//            return true;
+//        }
         return false;
     }
 

@@ -47,20 +47,13 @@ public class GlobalSettings {
     }
 
     public static String getTemperatureText(int value) {
-        if (isCelsius()) {
-            return (value/10) + "." + (value%10) + "\n℃";
-        } else {
+        if (!mIsCelsius) {
             value = 9 * value / 5 + 320;
-            return (value/10) + "." + (value%10) + "\n℉";
         }
-    }
-
-    public static String getHumidityText(int value) {
-        return (value/10) + "." + (value%10) + "\n%";
+        return (value/10) + "." + (value%10);
     }
 
     public static String getTemperatureUnit() {
-//        return "℉";
-        return "℃";
+        return mIsCelsius ? "℃" : "℉";
     }
 }

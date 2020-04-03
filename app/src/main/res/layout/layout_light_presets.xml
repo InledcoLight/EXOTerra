@@ -28,7 +28,7 @@
                 app:centerTextSize="14sp"
                 app:circleWidth="2dp"
                 app:dividerWidth="0dp"
-                app:max="100"
+                app:max="1000"
                 app:progress="0"
                 app:startAngle="-225"
                 app:sweepAngle="270" />
@@ -48,7 +48,7 @@
                 app:centerTextSize="14sp"
                 app:circleWidth="2dp"
                 app:dividerWidth="0dp"
-                app:max="100"
+                app:max="1000"
                 app:progress="0"
                 app:startAngle="-225"
                 app:sweepAngle="270" />
@@ -68,7 +68,7 @@
                 app:centerTextSize="14sp"
                 app:circleWidth="2dp"
                 app:dividerWidth="0dp"
-                app:max="100"
+                app:max="1000"
                 app:progress="0"
                 app:startAngle="-225"
                 app:sweepAngle="270" />
@@ -88,7 +88,7 @@
                 app:centerTextSize="14sp"
                 app:circleWidth="2dp"
                 app:dividerWidth="0dp"
-                app:max="100"
+                app:max="1000"
                 app:progress="0"
                 app:startAngle="-225"
                 app:sweepAngle="270" />

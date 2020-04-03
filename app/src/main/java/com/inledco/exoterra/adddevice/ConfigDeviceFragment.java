@@ -10,18 +10,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.Toast;
 
 import com.inledco.exoterra.R;
 import com.inledco.exoterra.base.BaseFragment;
 import com.inledco.exoterra.util.DeviceUtil;
 import com.inledco.exoterra.util.LocalDevicePrefUtil;
 import com.inledco.exoterra.view.GradientCornerButton;
-import com.inledco.exoterra.xlink.XlinkCloudManager;
-import com.inledco.exoterra.xlink.XlinkRequestCallback;
-
-import cn.xlink.restful.api.app.DeviceApi;
-import cn.xlink.sdk.v5.manager.XLinkUserManager;
 
 public class ConfigDeviceFragment extends BaseFragment {
 
@@ -77,36 +71,37 @@ public class ConfigDeviceFragment extends BaseFragment {
                 if (TextUtils.isEmpty(name)) {
                     name = DeviceUtil.getDefaultName(pid);
                 }
-                if (XLinkUserManager.getInstance().isUserAuthorized()) {
+                boolean authorized = true;
+                if (authorized) {
                     final int devid = mConnectNetBean.getResultDevid();
-                    XlinkCloudManager.getInstance().renameDevice(pid, devid, name, new XlinkRequestCallback<DeviceApi.DeviceResponse>() {
-                        @Override
-                        public void onError(String error) {
-                            Toast.makeText(getContext(), error, Toast.LENGTH_SHORT)
-                                 .show();
-                        }
-
-                        @Override
-                        public void onSuccess(DeviceApi.DeviceResponse response) {
-                            final String homeid = mConnectNetBean.getHomeid();
-                            if (TextUtils.isEmpty(homeid)) {
-                                replaceFragment(R.id.adddevice_fl, new AssignHabitatFragment());
-                            } else {
-                                XlinkCloudManager.getInstance().addDeviceToHome(homeid, devid, new XlinkRequestCallback<String>() {
-                                    @Override
-                                    public void onError(String error) {
-                                        Toast.makeText(getContext(), error, Toast.LENGTH_SHORT)
-                                             .show();
-                                    }
-
-                                    @Override
-                                    public void onSuccess(String s) {
-                                        getActivity().finish();
-                                    }
-                                });
-                            }
-                        }
-                    });
+//                    XlinkCloudManager.getInstance().renameDevice(pid, devid, name, new XlinkRequestCallback<DeviceApi.DeviceResponse>() {
+//                        @Override
+//                        public void onError(String error) {
+//                            Toast.makeText(getContext(), error, Toast.LENGTH_SHORT)
+//                                 .show();
+//                        }
+//
+//                        @Override
+//                        public void onSuccess(DeviceApi.DeviceResponse response) {
+//                            final String homeid = mConnectNetBean.getHomeid();
+//                            if (TextUtils.isEmpty(homeid)) {
+//                                replaceFragment(R.id.adddevice_fl, new AssignHabitatFragment());
+//                            } else {
+//                                XlinkCloudManager.getInstance().addDeviceToHome(homeid, devid, new XlinkRequestCallback<String>() {
+//                                    @Override
+//                                    public void onError(String error) {
+//                                        Toast.makeText(getContext(), error, Toast.LENGTH_SHORT)
+//                                             .show();
+//                                    }
+//
+//                                    @Override
+//                                    public void onSuccess(String s) {
+//                                        getActivity().finish();
+//                                    }
+//                                });
+//                            }
+//                        }
+//                    });
                 } else {
                     final String mac = mConnectNetBean.getResultAddress();
                     LocalDevicePrefUtil.putLocalDevice(getContext(), pid, mac, name);

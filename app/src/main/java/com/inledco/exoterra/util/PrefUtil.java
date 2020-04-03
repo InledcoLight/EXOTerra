@@ -65,6 +65,7 @@ public class PrefUtil {
         catch (IOException e) {
             e.printStackTrace();
         }
+
     }
 
     public synchronized static void put(@NonNull Context context, @NonNull String file, @NonNull String key, boolean value) {

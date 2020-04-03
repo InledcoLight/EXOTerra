@@ -11,23 +11,13 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.inledco.exoterra.R;
+import com.inledco.exoterra.aliot.Device;
 import com.inledco.exoterra.base.BaseFragment;
-import com.inledco.exoterra.bean.Device;
-import com.inledco.exoterra.bean.Home;
-import com.inledco.exoterra.manager.DeviceManager;
-import com.inledco.exoterra.manager.HomeManager;
-import com.inledco.exoterra.xlink.XlinkCloudManager;
-import com.inledco.exoterra.xlink.XlinkResult;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-
-import cn.xlink.restful.api.app.HomeApi;
 
 public class AddGroupDeviceFragment extends BaseFragment {
     private Toolbar add_home_device_toolbar;
@@ -39,32 +29,6 @@ public class AddGroupDeviceFragment extends BaseFragment {
 
     private boolean mProcessing;
     private AsyncTask<Void, Void, Integer> mAddDeviceTask;
-
-//    private final XlinkRequestCallback<String> mCallback = new XlinkRequestCallback<String>() {
-//        @Override
-//        public void onError(final String error) {
-//            getActivity().runOnUiThread(new Runnable() {
-//                @Override
-//                public void run() {
-//                    Toast.makeText(getContext(), error, Toast.LENGTH_SHORT)
-//                         .show();
-//                }
-//            });
-//        }
-//
-//        @Override
-//        public void onSuccess(String s) {
-//            getActivity().runOnUiThread(new Runnable() {
-//                @Override
-//                public void run() {
-//                    Toast.makeText(getContext(), "Add device to habitat success.", Toast.LENGTH_SHORT)
-//                         .show();
-//                    HomeManager.getInstance().refreshHomeDevices(mHomeId);
-//                }
-//            });
-//            getActivity().onBackPressed();
-//        }
-//    };
 
     public static AddGroupDeviceFragment newInstance(@NonNull final String homeid) {
         Bundle args = new Bundle();
@@ -109,18 +73,18 @@ public class AddGroupDeviceFragment extends BaseFragment {
 
     @Override
     protected void initData() {
-        Set<String> devtags = new HashSet<>();
-        for (Home home : HomeManager.getInstance().getHomeList()) {
-            for (HomeApi.HomeDevicesResponse.Device device : home.getDevices()) {
-                devtags.add(device.productId + "_" + device.mac);
-            }
-        }
-        for (Device device : DeviceManager.getInstance().getAllDevices()) {
-            if (devtags.contains(device.getDeviceTag())) {
-                continue;
-            }
-            mDevices.add(device);
-        }
+//        Set<String> devtags = new HashSet<>();
+//        for (Home home : HomeManager.getInstance().getHomeList()) {
+//            for (HomeApi.HomeDevicesResponse.Device device : home.getDevices()) {
+//                devtags.add(device.productId + "_" + device.mac);
+//            }
+//        }
+//        for (Device device : DeviceManager.getInstance().getAllDevices()) {
+//            if (devtags.contains(device.getDeviceTag())) {
+//                continue;
+//            }
+//            mDevices.add(device);
+//        }
 
         mAdapter = new AddGroupDeviceAdapter(getContext(), mDevices);
 //        mAdapter.setOnItemClickListener(new OnItemClickListener() {
@@ -167,33 +131,33 @@ public class AddGroupDeviceFragment extends BaseFragment {
     }
 
     private void addDevicesToHabitat() {
-        final Set<Integer> devids = mAdapter.getAddDeviceIds();
-        mAddDeviceTask = new AsyncTask<Void, Void, Integer>() {
-            @Override
-            protected Integer doInBackground(Void... voids) {
-                int cnt = 0;
-                for (Integer id : devids) {
-                    XlinkResult<String> res = XlinkCloudManager.getInstance().addDeviceToHome(mHomeId, id);
-                    if (res.isSuccess()) {
-                        cnt++;
-                    }
-                }
-                return cnt;
-            }
-
-            @Override
-            protected void onPostExecute(Integer result) {
-                super.onPostExecute(result);
-                mProcessing = false;
-                HomeManager.getInstance().refreshHomeDevices(mHomeId);
-                if (result < devids.size()) {
-                    Toast.makeText(getContext(), "Success: " + result + ", Failed: " + (devids.size()-result), Toast.LENGTH_SHORT)
-                         .show();
-                }
-                getActivity().getSupportFragmentManager().popBackStack();
-            }
-        };
-        mProcessing = true;
-        mAddDeviceTask.execute();
+//        final Set<Integer> devids = mAdapter.getAddDeviceIds();
+//        mAddDeviceTask = new AsyncTask<Void, Void, Integer>() {
+//            @Override
+//            protected Integer doInBackground(Void... voids) {
+//                int cnt = 0;
+//                for (Integer id : devids) {
+//                    XlinkResult<String> res = XlinkCloudManager.getInstance().addDeviceToHome(mHomeId, id);
+//                    if (res.isSuccess()) {
+//                        cnt++;
+//                    }
+//                }
+//                return cnt;
+//            }
+//
+//            @Override
+//            protected void onPostExecute(Integer result) {
+//                super.onPostExecute(result);
+//                mProcessing = false;
+//                HomeManager.getInstance().refreshHomeDevices(mHomeId);
+//                if (result < devids.size()) {
+//                    Toast.makeText(getContext(), "Success: " + result + ", Failed: " + (devids.size()-result), Toast.LENGTH_SHORT)
+//                         .show();
+//                }
+//                getActivity().getSupportFragmentManager().popBackStack();
+//            }
+//        };
+//        mProcessing = true;
+//        mAddDeviceTask.execute();
     }
 }

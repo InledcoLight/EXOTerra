@@ -14,8 +14,9 @@ import android.widget.TimePicker;
 
 import com.inledco.exoterra.GlobalSettings;
 import com.inledco.exoterra.R;
+import com.inledco.exoterra.aliot.ExoLed;
+import com.inledco.exoterra.aliot.LightViewModel;
 import com.inledco.exoterra.base.BaseFragment;
-import com.inledco.exoterra.bean.EXOLedstrip;
 
 public class EditTurnoffFragment extends BaseFragment {
 
@@ -25,7 +26,7 @@ public class EditTurnoffFragment extends BaseFragment {
     private Button turnoff_save;
 
     private LightViewModel mLightViewModel;
-    private EXOLedstrip mLight;
+    private ExoLed mLight;
 
     @Nullable
     @Override
