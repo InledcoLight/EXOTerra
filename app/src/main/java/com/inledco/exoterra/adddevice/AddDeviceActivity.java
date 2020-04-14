@@ -65,7 +65,7 @@ public class AddDeviceActivity extends BaseActivity {
     public void onBackPressed() {
         if (mConnectNetViewModel.getData().isRunning()) {
             AlertDialog.Builder builder = new AlertDialog.Builder(AddDeviceActivity.this);
-            builder.setTitle("Stop Add Device")
+            builder.setTitle("Stop Add XDevice")
                    .setMessage("This will stop add device, confirm to exit?")
                    .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                        @Override

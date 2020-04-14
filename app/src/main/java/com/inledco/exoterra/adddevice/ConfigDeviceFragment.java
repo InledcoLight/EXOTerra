@@ -13,6 +13,7 @@ import android.widget.ImageView;
 
 import com.inledco.exoterra.R;
 import com.inledco.exoterra.base.BaseFragment;
+import com.inledco.exoterra.manager.UserManager;
 import com.inledco.exoterra.util.DeviceUtil;
 import com.inledco.exoterra.util.LocalDevicePrefUtil;
 import com.inledco.exoterra.view.GradientCornerButton;
@@ -55,9 +56,9 @@ public class ConfigDeviceFragment extends BaseFragment {
         if (mConnectNetBean == null) {
             return;
         }
-        final String pid = mConnectNetBean.getProductId();
-        config_device_prdt.setImageResource(DeviceUtil.getProductIcon(pid));
-        config_device_name.setText(DeviceUtil.getDefaultName(pid));
+        final String pkey = mConnectNetBean.getProductKey();
+        config_device_prdt.setImageResource(DeviceUtil.getProductIcon(pkey));
+        config_device_name.setText(DeviceUtil.getDefaultName(pkey));
         config_device_name.requestFocus();
     }
 
@@ -66,14 +67,16 @@ public class ConfigDeviceFragment extends BaseFragment {
         config_device_save.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                final String pid = mConnectNetBean.getProductId();
+                final String pkey = mConnectNetBean.getProductKey();
+                final String dname = mConnectNetBean.getDeviceName();
                 String name = config_device_name.getText().toString();
                 if (TextUtils.isEmpty(name)) {
-                    name = DeviceUtil.getDefaultName(pid);
+                    name = DeviceUtil.getDefaultName(pkey);
                 }
                 boolean authorized = true;
                 if (authorized) {
-                    final int devid = mConnectNetBean.getResultDevid();
+                    String token = UserManager.getInstance().getToken();
+//                    AliotServer.getInstance().modifyDeviceName(token, pkey, dname);
 //                    XlinkCloudManager.getInstance().renameDevice(pid, devid, name, new XlinkRequestCallback<DeviceApi.DeviceResponse>() {
 //                        @Override
 //                        public void onError(String error) {
@@ -103,8 +106,8 @@ public class ConfigDeviceFragment extends BaseFragment {
 //                        }
 //                    });
                 } else {
-                    final String mac = mConnectNetBean.getResultAddress();
-                    LocalDevicePrefUtil.putLocalDevice(getContext(), pid, mac, name);
+                    final String mac = mConnectNetBean.getAddress();
+                    LocalDevicePrefUtil.putLocalDevice(getContext(), pkey, mac, name);
                     getActivity().finish();
                 }
             }

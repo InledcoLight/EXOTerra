@@ -2,36 +2,41 @@ package com.inledco.exoterra.adddevice;
 
 import android.support.annotation.NonNull;
 
+import com.inledco.exoterra.util.RegexUtil;
+
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public abstract class BaseClient {
-    protected int mRemoteIp;
+    protected String mRemoteAddress;
     protected int mRemotePort;
     protected boolean mListening;
     protected final ExecutorService mExecutorService;
 
-    protected BaseClientListener mListener;
+    protected Listener mListener;
 
     protected final Object mLock;
 
-    public BaseClient(int remoteIp, int remotePort) {
+    public BaseClient(String remoteAddress, int remotePort) {
+        if (!RegexUtil.isIP(remoteAddress)) {
+            throw new RuntimeException("Invalid ip address.");
+        }
         if (remotePort < 0 || remotePort > 65535) {
             throw new RuntimeException("Invalid remote port.");
         }
-        mRemoteIp = remoteIp;
+        mRemoteAddress = remoteAddress;
         mRemotePort = remotePort;
         mExecutorService = Executors.newCachedThreadPool();
         mLock = new Object();
     }
 
-    public int getRemoteIp() {
-        return mRemoteIp;
+    public String getRemoteAddress() {
+        return mRemoteAddress;
     }
 
-    public void setRemoteIp(int remoteIp) {
-        if (!mListening) {
-            mRemoteIp = remoteIp;
+    public void setRemoteIp(String remoteAddress) {
+        if (!mListening && RegexUtil.isIP(remoteAddress)) {
+            mRemoteAddress = remoteAddress;
         }
     }
 
@@ -49,21 +54,7 @@ public abstract class BaseClient {
         return mListening;
     }
 
-    protected final String ipstr(int ip) {
-        int[] addr = new int[4];
-        addr[0] = ip&0xFF;
-        addr[1] = (ip>>8)&0xFF;
-        addr[2] = (ip>>16)&0xFF;
-        addr[3] = (ip>>24)&0xFF;
-        StringBuilder sb = new StringBuilder();
-        sb.append(addr[0]).append(".")
-          .append(addr[1]).append(".")
-          .append(addr[2]).append(".")
-          .append(addr[3]);
-        return new String(sb);
-    }
-
-    public void setListener(BaseClientListener listener) {
+    public void setListener(Listener listener) {
         mListener = listener;
     }
 
@@ -76,7 +67,7 @@ public abstract class BaseClient {
     protected abstract void send(@NonNull byte[] bytes);
     protected abstract void receive();
 
-    public interface BaseClientListener {
+    public interface Listener {
         void onError(String error);
         void onReceive(byte[] bytes);
     }

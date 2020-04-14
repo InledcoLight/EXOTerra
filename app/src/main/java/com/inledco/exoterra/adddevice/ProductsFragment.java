@@ -57,7 +57,7 @@ public class ProductsFragment extends BaseFragment {
             if (Manifest.permission.ACCESS_COARSE_LOCATION.equals(permissions[0])) {
                 if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     mConnectNetViewModel.getData()
-                                        .setProductId(mProductId);
+                                        .setProductKey(mProductId);
                     addFragmentToStack(R.id.adddevice_fl, new ConnectNetFragment());
                 } else if (mLocationHelper.shouldShowRequestPermissionRationale()) {
                     Toast.makeText(getContext(), R.string.msg_location_permission, Toast.LENGTH_LONG)
@@ -95,7 +95,7 @@ public class ProductsFragment extends BaseFragment {
                     mLocationHelper.requestLocationPermission(REQUEST_LOCATION_CODE);
                 } else {
                     mConnectNetViewModel.getData()
-                                        .setProductId(mProductId);
+                                        .setProductKey(mProductId);
                     addFragmentToStack(R.id.adddevice_fl, new ConnectNetFragment());
                 }
             }

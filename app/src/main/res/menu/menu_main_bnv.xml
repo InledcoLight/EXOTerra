@@ -4,7 +4,7 @@
         android:id="@+id/main_bnv_home"
         android:icon="@drawable/ic_home_white"
         android:visible="false"
-        android:title="@string/home"/>
+        android:title="@string/group"/>
     <item
         android:id="@+id/main_bnv_habitat"
         android:icon="@drawable/ic_habitats_white"

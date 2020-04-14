@@ -210,26 +210,6 @@ public class EXOTerraApplication extends MultiDexApplication {
 //        });
 //    }
 
-//    private void handleHomeMessageNotify(@NonNull final EventNotifyHelper.HomeMessageNotify notify) {
-//        Log.e(TAG, "handleHomeMessageNotify: " + notify.toString());
-//        if (notify.type.equalsIgnoreCase(EventNotifyHelper.HomeMessageNotify.TYPE_DELETE)) {
-//            showDeleteHomeMessage(notify);
-//            HomeManager.getInstance().refreshHomeList(null);
-//        }
-//    }
-//
-//    private void handleHomeMemberChangedNotify(@NonNull final EventNotifyHelper.HomeMemberChangedNotify notify) {
-//        Log.e(TAG, "handleHomeMemberChangedNotify: " + notify.toString());
-//        if (notify.type.equalsIgnoreCase(EventNotifyHelper.HomeMemberChangedNotify.TYPE_ADD)) {
-//            showJoinHomeMessage(notify);
-//            EventBus.getDefault().post(new HomeMemberChangedEvent(notify.home_id));
-//            HomeManager.getInstance().refreshHomeList(null);
-//        } else if (notify.type.equalsIgnoreCase(EventNotifyHelper.HomeMemberChangedNotify.TYPE_REMOVE)) {
-//            showLeaveHomeMessage(notify);
-//            EventBus.getDefault().post(new HomeMemberChangedEvent(notify.home_id));
-//            HomeManager.getInstance().refreshHomeList(null);
-//        }
-//    }
 
     @RequiresApi (api = Build.VERSION_CODES.O)
     private void createNotificationChannel(String channelId, String channelName, int importance) {
@@ -317,7 +297,7 @@ public class EXOTerraApplication extends MultiDexApplication {
 //
 //    private void showOnlineStateAlarmNotification(EventNotifyHelper.OnlineStateAlertNotify notify) {
 //        if (getNotificationManager() != null) {
-//            Device device = DeviceManager.getInstance().getDeviceByDevid(notify.device_id);
+//            XDevice device = DeviceManager.getInstance().getDeviceByDevid(notify.device_id);
 //            int icon = R.drawable.ic_device_default_white_64dp;
 //            if (device != null) {
 //                icon = DeviceUtil.getProductIcon(device.getXDevice().getProductId());
@@ -339,7 +319,7 @@ public class EXOTerraApplication extends MultiDexApplication {
 
 //    private void showAlarmNotification(final int devid, XlinkDataPointAlertNotify notify) {
 //        if (getNotificationManager() != null) {
-//            Device device = DeviceManager.getInstance().getDeviceByDevid(devid);
+//            XDevice device = DeviceManager.getInstance().getDeviceByDevid(devid);
 //            int icon = R.drawable.ic_device_default_white_64dp;
 //            if (device != null) {
 //                icon = DeviceUtil.getProductIcon(device.getXDevice().getProductId());

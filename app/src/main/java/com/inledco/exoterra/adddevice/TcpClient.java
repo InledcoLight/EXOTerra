@@ -24,13 +24,13 @@ public class TcpClient extends BaseClient {
     private BufferedInputStream mInputStream;
     private BufferedOutputStream mOutputStream;
 
-    public TcpClient(int remoteIp, int remotePort, int connectTimeout) {
-        super(remoteIp, remotePort);
+    public TcpClient(String remoteAddress, int remotePort, int connectTimeout) {
+        super(remoteAddress, remotePort);
         mConnectTimeout = connectTimeout;
     }
 
-    public TcpClient(int remoteIp, int remotePort) {
-        this(remoteIp, remotePort, 2000);
+    public TcpClient(String remoteAddress, int remotePort) {
+        this(remoteAddress, remotePort, 2000);
     }
 
     public int getConnectTimeout() {
@@ -58,8 +58,7 @@ public class TcpClient extends BaseClient {
                         mSocket.setKeepAlive(true);
                         mSocket.setReceiveBufferSize(TCP_RECEIVE_BUFFER_SIZE);
                         mSocket.setSendBufferSize(TCP_SEND_BUFFER_SIZE);
-                        String remoteIp = ipstr(mRemoteIp);
-                        mSocket.connect(new InetSocketAddress(remoteIp, mRemotePort), mConnectTimeout);
+                        mSocket.connect(new InetSocketAddress(mRemoteAddress, mRemotePort), mConnectTimeout);
                         mInputStream = new BufferedInputStream(mSocket.getInputStream());
                         mOutputStream = new BufferedOutputStream(mSocket.getOutputStream());
 

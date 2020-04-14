@@ -1,17 +1,22 @@
 package com.inledco.exoterra.aliot;
 
 import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONException;
+import com.alibaba.fastjson.JSONObject;
+import com.inledco.exoterra.aliot.bean.XDevice;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class Device extends ADevice{
-    private final String TAG = "Device";
+    private final String TAG = "XDevice";
 
-    private final String KEY_ZONE = "Zone";
-    private final String KEY_DEVICETIME = "DeviceTime";
-    private final String KEY_SUNRISE = "Sunrise";
-    private final String KEY_SUNSET = "Sunset";
+    private final String KEY_FIRMWARE_VERSION   = "FirmwareVersion";
+    private final String KEY_DEVICE_INFO        = "DeviceInfo";
+    private final String KEY_ZONE               = "Zone";
+    private final String KEY_DEVICETIME         = "DeviceTime";
+    private final String KEY_SUNRISE            = "Sunrise";
+    private final String KEY_SUNSET             = "Sunset";
 
     private String name;
     private String mac;
@@ -19,9 +24,20 @@ public class Device extends ADevice{
     private String remark2;
     private String remark3;
 
-    private int firmwareVersion;
     private boolean isOnline;
     private long statusUpdateTime;
+
+    public Device(XDevice xDevice) {
+        if (xDevice != null) {
+            setProductKey(xDevice.product_key);
+            setDeviceName(xDevice.device_name);
+            setName(xDevice.name);
+            setMac(xDevice.mac);
+            setRemark1(xDevice.remark1);
+            setRemark2(xDevice.remark2);
+            setRemark3(xDevice.remark3);
+        }
+    }
 
     public String getName() {
         return name;
@@ -118,8 +134,13 @@ public class Device extends ADevice{
 
     public <T> T getPropertyObject(String key, Class<T> clazz) {
         Object obj = getPropertyValue(key);
-        if (obj != null && obj.getClass().equals(clazz)) {
-            return (T) obj;
+        if (obj != null && obj instanceof JSONObject) {
+            JSONObject jo = (JSONObject) obj;
+            try {
+                return jo.toJavaObject(clazz);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
         }
         return null;
     }
@@ -130,7 +151,7 @@ public class Device extends ADevice{
             JSONArray ja = (JSONArray) obj;
             List<T> result = new ArrayList<>();
             for (int i = 0; i < ja.size(); i++) {
-                if (ja.get(i) != null && ja.get(i).getClass().equals(clazz)) {
+                if (ja.get(i) != null) {
                     result.add(ja.getObject(i, clazz));
                 } else {
                     return null;
@@ -139,6 +160,14 @@ public class Device extends ADevice{
             return result;
         }
         return null;
+    }
+
+    public DeviceInfo getDeviceInfo() {
+        return getPropertyObject(KEY_DEVICE_INFO, DeviceInfo.class);
+    }
+
+    public int getFirmwareVersion() {
+        return getPropertyInt(KEY_FIRMWARE_VERSION);
     }
 
     public int getZone() {
@@ -178,21 +207,7 @@ public class Device extends ADevice{
         return new KeyValue(KEY_SUNSET, sunset);
     }
 
-//    public class KeyValue {
-//        private final String attrKey;
-//        private Object attrValue;
-//
-//        public KeyValue(String attrKey, Object attrValue) {
-//            this.attrKey = attrKey;
-//            this.attrValue = attrValue;
-//        }
-//
-//        public String getAttrKey() {
-//            return attrKey;
-//        }
-//
-//        public Object getAttrValue() {
-//            return attrValue;
-//        }
-//    }
+    protected String getProductName() {
+        return null;
+    }
 }

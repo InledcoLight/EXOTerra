@@ -209,7 +209,7 @@ public class LocalDevicesFragment extends BaseFragment {
 //            @Override
 //            protected Void doInBackground(Void... voids) {
 //                for (int i = 0; i < mLocalDevices.size(); i++) {
-//                    Device device = mLocalDevices.get(i);
+//                    XDevice device = mLocalDevices.get(i);
 //                    String result = XlinkCloudManager.getInstance().getDeviceProperty(device.getXDevice());
 //                    Log.e(TAG, "doInBackground: " + result);
 //                    if (!TextUtils.isEmpty(result)) {

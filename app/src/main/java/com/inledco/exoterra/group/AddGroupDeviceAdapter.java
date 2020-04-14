@@ -35,7 +35,7 @@ public class AddGroupDeviceAdapter extends SimpleAdapter<Device, DeviceViewHolde
     @Override
     public void onBindViewHolder(@NonNull DeviceViewHolder holder, int i) {
 //        final int position = holder.getAdapterPosition();
-//        final Device device = mData.get(position);
+//        final XDevice device = mData.get(position);
 //        String pid = device.getXDevice().getProductId();
 //        String dev_name = device.getXDevice().getDeviceName();
 //        String name = TextUtils.isEmpty(dev_name) ? DeviceUtil.getDefaultName(pid) : dev_name;

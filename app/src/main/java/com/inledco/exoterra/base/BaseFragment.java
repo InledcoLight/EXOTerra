@@ -1,6 +1,7 @@
 package com.inledco.exoterra.base;
 
 import android.os.Bundle;
+import android.os.Looper;
 import android.support.annotation.IdRes;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
@@ -12,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.Toast;
 
 import com.inledco.exoterra.R;
 
@@ -68,6 +70,25 @@ public abstract class BaseFragment extends Fragment {
                      .add(layout, fragment, name)
                      .addToBackStack(name)
                      .commitAllowingStateLoss();
+    }
+
+    protected void showToast(final String msg) {
+        boolean isMainThread = Looper.getMainLooper().getThread().getId() == Thread.currentThread().getId();
+        if (isMainThread) {
+            Toast.makeText(getContext(), msg, Toast.LENGTH_SHORT)
+                 .show();
+        } else {
+            if (getActivity() == null) {
+                return;
+            }
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(getContext(), msg, Toast.LENGTH_SHORT)
+                         .show();
+                }
+            });
+        }
     }
 
     protected abstract @LayoutRes int getLayoutRes();

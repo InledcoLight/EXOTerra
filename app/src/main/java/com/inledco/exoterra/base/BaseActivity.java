@@ -1,6 +1,7 @@
 package com.inledco.exoterra.base;
 
 import android.os.Bundle;
+import android.os.Looper;
 import android.support.annotation.IdRes;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
@@ -9,6 +10,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.AppCompatDelegate;
+import android.widget.Toast;
 
 import com.inledco.exoterra.R;
 import com.inledco.exoterra.view.MessageDialog;
@@ -80,6 +82,21 @@ public abstract class BaseActivity extends AppCompatActivity {
 //            mDialog.dismiss();
 //        }
 //    }
+
+    protected void showToast(final String msg) {
+        boolean isMainThread = Looper.getMainLooper().getThread().getId() == Thread.currentThread().getId();
+        if (isMainThread) {
+            Toast.makeText(this, msg, Toast.LENGTH_SHORT)
+                 .show();
+        } else {runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(BaseActivity.this, msg, Toast.LENGTH_SHORT)
+                         .show();
+                }
+            });
+        }
+    }
 
     protected abstract @LayoutRes int getLayoutRes();
 

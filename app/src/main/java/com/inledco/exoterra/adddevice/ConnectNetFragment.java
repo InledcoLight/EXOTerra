@@ -119,7 +119,7 @@ public class ConnectNetFragment extends BaseFragment {
     protected void initData() {
         mWifiHelper = new WifiHelper(getContext());
         mConnectNetViewModel = ViewModelProviders.of(getActivity()).get(ConnectNetViewModel.class);
-        connect_net_prdt.setImageResource(DeviceUtil.getProductIcon(mConnectNetViewModel.getData().getProductId()));
+        connect_net_prdt.setImageResource(DeviceUtil.getProductIcon(mConnectNetViewModel.getData().getProductKey()));
     }
 
     @Override

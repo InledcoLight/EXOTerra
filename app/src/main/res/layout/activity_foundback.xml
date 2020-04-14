@@ -103,7 +103,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/foundback_til_verifycode">
 
-        <com.inledco.exoterra.view.AdvancedTextInputEditText
+        <com.inledco.exoterra.view.PasswordEditText
             android:id="@+id/foundback_et_password"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

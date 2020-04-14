@@ -1,52 +1,95 @@
 package com.inledco.exoterra.aliot;
 
+import com.inledco.exoterra.aliot.bean.Triad;
+import com.inledco.exoterra.aliot.bean.User;
+import com.inledco.exoterra.aliot.bean.XDevice;
+import com.inledco.exoterra.aliot.bean.XGroup;
+
 import java.util.List;
 
 public class UserApi {
-    public static class TestResponse {
-        public int user_id;
-        public String access_token;
-        public String refresh_token;
-        public int expire_in;
-        public String authorize;
+//    public static class AResponse {
+//        public int code;
+//        public String msg;
+//    }
+
+//    public static class User {
+//        public String userid;
+//        public String email;
+//        public String nickname;
+//        public String create_date;
+//        public String corpid;
+//        public String avatar;
+//        public String remark1;
+//        public String remark2;
+//        public String remark3;
+//    }
+//
+//    public static class XDevice {
+//        public String product_key;
+//        public String device_name;
+//        public String mac;
+//        public String name;
+//        public String remark1;
+//        public String remark2;
+//        public String remark3;
+//        public int role;
+//        public int firmware_version;
+//        public boolean is_online;
+//    }
+//
+//    public static class Triad {
+//        public String product_key;
+//        public String device_name;
+//        public String device_secret;
+//    }
+//
+//    public static class Group {
+//        public String groupid;
+//        public String name;
+//        public String remark1;
+//        public String remark2;
+//        public String remark3;
+//        public List<User> users;
+//        public String creator;
+//        public String create_time;
+//        public String update_time;
+//    }
+
+    public static class Response extends ApiResponse<Object> {
+
     }
 
     public static class UserRegisterRequest {
         public String corpid;
+        public String productKey;
         public String email;
         public String password;
         public String verifycode;
         public String nickname;
     }
 
-    public static class UserRegisterResponse {
-
-    }
-
     public static class UserLoginRequest {
-        public String corpid;
-        public String email;
-        public String password;
+        public String principal;
+        public String credentials;
     }
 
-    public static class UserLoginResponse {
-        public String userid;
-        public String token;
+    public static class UserLoginResponse extends ApiResponse {
+        public String userId;
+        public String access_token;
+        public String token_type;
+        public String refresh_token;
+        public String secret;
+        public int expires_in;
+        public String nickeName;
+        public String pic;
     }
 
-    public static class UserInfoResponse {
-        public String userid;
-        public String email;
-        public String nickname;
-        public String create_date;
-        public String corpid;
-        public String avatar;
-        public String remark1;
-        public String remark2;
-        public String remark3;
+    public static class GetUserInfoResponse extends ApiResponse<User> {
+
     }
 
-    public static class UserInfoRequest {
+    public static class SetUserInfoRequest {
         public String nickname;
         public String avatar;
         public String remark1;
@@ -66,21 +109,8 @@ public class UserApi {
         public String new_password;
     }
 
-    public static class UserSubscribedDevicesResponse {
-        public List<Device> devices;
+    public static class UserSubscribedDevicesResponse extends ApiResponse<List<XDevice>> {
 
-        public static class Device {
-            public String product_key;
-            public String device_name;
-            public String mac;
-            public String name;
-            public String remark1;
-            public String remark2;
-            public String remark3;
-            public int role;
-            public int firmware_version;
-            public boolean is_online;
-        }
     }
 
     public static class SubscribeDeviceRequest {
@@ -89,10 +119,8 @@ public class UserApi {
         public String mac;
     }
 
-    public static class SubscribeDeviceResponse {
-        public String product_key;
-        public String device_name;
-        public String device_secret;
+    public static class SubscribeDeviceResponse extends ApiResponse<Triad> {
+
     }
 
     public static class UnsubscribeDeviceRequest {
@@ -100,24 +128,15 @@ public class UserApi {
         public String device_name;
     }
 
-    public static class DeviceInfoRequest {
+    public static class ModifyDeviceInfoRequest {
         public String name;
         public String remark1;
         public String remark2;
         public String remark3;
     }
 
-    public static class DeviceInfoResponse {
-        public String product_key;
-        public String device_name;
-        public String mac;
-        public String name;
-        public String remark1;
-        public String remark2;
-        public String remark3;
-        public int role;
-        public int firmware_version;
-        public boolean is_online;
+    public static class DeviceInfoResponse extends ApiResponse<XDevice> {
+
     }
 
     public static class GroupRequest {
@@ -127,43 +146,12 @@ public class UserApi {
         public String remark3;
     }
 
-    public static class GroupResponse {
-        public String groupid;
-        public String name;
-        public String remark1;
-        public String remark2;
-        public String remark3;
-        public List<User> users;
-        public String creator;
-        public String create_time;
-        public String update_time;
+    public static class GroupResponse extends ApiResponse<XGroup> {
 
-        public static class User {
-            public String userid;
-            public String email;
-            public String nickname;
-            public String avatar;
-            public String remark1;
-            public String remark2;
-            public String remark3;
-            public int role;
-        }
     }
 
-    public static class GroupsResponse {
+    public static class GroupsResponse extends ApiResponse<List<XGroup>> {
 
-        public List<Group> groups;
-
-        public static class Group {
-            public String groupid;
-            public String name;
-            public String remark1;
-            public String remark2;
-            public String remark3;
-            public String creator;
-            public String create_time;
-            public String update_time;
-        }
     }
 
     public static class GroupAddDeviceRequest {
@@ -176,22 +164,8 @@ public class UserApi {
         public String device_name;
     }
 
-    public static class GroupDevicesResponse {
+    public static class GroupDevicesResponse extends ApiResponse<List<XDevice>>{
 
-        public List<Device> devices;
-
-        public static class Device {
-            public String product_key;
-            public String device_name;
-            public String mac;
-            public String name;
-            public String remark1;
-            public String remark2;
-            public String remark3;
-            public int role;
-            public int firmware_version;
-            public boolean is_online;
-        }
     }
 
     public static class GroupInviteRequest {
@@ -199,15 +173,18 @@ public class UserApi {
         public long expire_time;
     }
 
-    public static class GroupInviteResponse {
-        public String invite_id;
+    public static class GroupInviteResponse extends ApiResponse<GroupInviteResponse.InviteId> {
+
+        public static class InviteId {
+            public String invite_id;
+        }
     }
 
     public static class InviteActionRequest {
         public String invite_id;
     }
 
-    public static class InviteListResponse {
+    public static class InviteRecord {
         public String invite_id;
         public String groupid;
         public String group_name;
@@ -219,14 +196,22 @@ public class UserApi {
         public String invitee_email;
     }
 
-    public static class FirmwaresResponse {
+    public static class InviteListResponse extends ApiResponse<List<InviteRecord>> {
+
+    }
+
+    public static class Firmware {
+        public int version;
+        public int size;
+        public String url;
+    }
+
+    public static class FirmwareList {
         public String product_key;
         public List<Firmware> firmware_list;
+    }
 
-        public static class Firmware {
-            public int version;
-            public int size;
-            public String url;
-        }
+    public static class FirmwaresResponse extends ApiResponse<FirmwareList> {
+
     }
 }

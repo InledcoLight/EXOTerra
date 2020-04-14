@@ -32,12 +32,12 @@ public class ProductAdapter extends SimpleAdapter<String, ProductAdapter.Product
 
     @Override
     public void onBindViewHolder(@NonNull ProductViewHolder holder, final int position) {
-        final String prdt = mData.get(position);
-        if (DeviceUtil.containsProduct(prdt) == false) {
+        final String pkey = mData.get(position);
+        if (DeviceUtil.containsProduct(pkey) == false) {
             return;
         }
-        holder.iv_icon.setImageResource(DeviceUtil.getProductIcon(prdt));
-        holder.tv_type.setText(DeviceUtil.getProductType(prdt));
+        holder.iv_icon.setImageResource(DeviceUtil.getProductIcon(pkey));
+        holder.tv_type.setText(DeviceUtil.getProductName(pkey));
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

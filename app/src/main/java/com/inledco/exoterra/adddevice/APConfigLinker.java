@@ -4,24 +4,38 @@ import android.os.AsyncTask;
 import android.os.CountDownTimer;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
+import android.text.TextUtils;
+import android.util.Log;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONException;
+import com.alibaba.fastjson.JSONObject;
+import com.inledco.exoterra.aliot.AliotServer;
+import com.inledco.exoterra.aliot.DeviceParam;
+import com.inledco.exoterra.aliot.UserApi;
 import com.inledco.exoterra.bean.Result;
-
-import org.json.JSONException;
-import org.json.JSONObject;
+import com.inledco.exoterra.manager.UserPref;
 
 import java.io.IOException;
 import java.lang.ref.WeakReference;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.TimeZone;
 
-public class APConfigLinker{
+public class APConfigLinker {
     private final String TAG = "APConfigLinker";
+
+    private final String KEY_SSID       = "ssid";
+    private final String KEY_PASSWORD   = "password";
+    private final String KEY_ZONE       = "zone";
+    private final String KEY_TIME       = "time";
 
     private final int TIMEOUT = 50000;
     private final int SUBSCRIBE_TIMEOUT = 10000;
 
     private final boolean USE_TCP = false;
     //192.168.4.1
+    private final String REMOTE_ADDRESS = "192.168.4.1";
     private final int REMOTE_IP = 0x0104A8C0;
     private final int REMOTE_PORT = 8266;
     //for udp
@@ -31,50 +45,68 @@ public class APConfigLinker{
 
     private WeakReference<AppCompatActivity> mActivity;
 
-    private final String mProductId;
+    private final String mProductKey;
     private final String mSsid;
     private final String mBssid;
     private final String mPassword;
     private String mAddress;
-    private String mSN;
-    private int mDeviceId;
+    private String mDeviceName;
+    private String mDeviceSecret;
 
     private final boolean mSubscribe;
 
     private int mProgress;
     private APConfigListener mListener;
 
-    private final CountDownTimer mAckTimer;
+    private CountDownTimer mGetTimer;
+    private boolean mGetTimeout;
+    private CountDownTimer mSetTimer;
+    private boolean mSetTimeout;
+
     private final CountDownTimer mTimer;
 
     private final BaseClient mClient;
+    private BaseClient.Listener mClientListener;
     private String mReceive;
     private AsyncTask<Void, Integer, Result> mTask;
 
-    public APConfigLinker(boolean subscribe, @NonNull String pid, @NonNull String ssid, String bssid, String password, AppCompatActivity activity) {
+    public APConfigLinker(boolean subscribe, @NonNull String pkey, @NonNull String ssid, String bssid, String password, AppCompatActivity activity) {
         mActivity = new WeakReference<>(activity);
         mSubscribe = subscribe;
-        mProductId = pid;
+        mProductKey = pkey;
         mSsid = ssid;
         mBssid = bssid;
         mPassword = password;
         if (USE_TCP) {
-            mClient = new TcpClient(REMOTE_IP, REMOTE_PORT);
+            mClient = new TcpClient(REMOTE_ADDRESS, REMOTE_PORT);
         } else {
-            mClient = new UdpClient(REMOTE_IP, REMOTE_PORT, LOCAL_PORT);
+            mClient = new UdpClient(REMOTE_ADDRESS, REMOTE_PORT, LOCAL_PORT);
         }
-        mAckTimer = new CountDownTimer(2000, 100) {
+
+        mGetTimer = new CountDownTimer(10000, 2000) {
             @Override
             public void onTick(long millisUntilFinished) {
-
+                getDeviceParam();
             }
 
             @Override
             public void onFinish() {
-                sendRouterInfo();
-                start();
+                mGetTimeout = true;
             }
         };
+
+        mSetTimer = new CountDownTimer(10000, 2000) {
+            @Override
+            public void onTick(long millisUntilFinished) {
+                setDeviceParam();
+            }
+
+            @Override
+            public void onFinish() {
+                mSetTimeout = true;
+            }
+        };
+
         mTimer = new CountDownTimer(TIMEOUT, 500) {
             @Override
             public void onTick(long millisUntilFinished) {
@@ -94,77 +126,81 @@ public class APConfigLinker{
                 }
             }
         };
+
+        mClientListener = new BaseClient.Listener() {
+            @Override
+            public void onError(String error) {
+                Log.e(TAG, "onError: " + error);
+            }
+
+            @Override
+            public void onReceive(byte[] bytes) {
+                mReceive = new String(bytes);
+                Log.e(TAG, "onReceive: " + mReceive);
+            }
+        };
+        mClient.setListener(mClientListener);
     }
 
-    private void sendRouterInfo() {
-        JSONObject jsonObject = new JSONObject();
+    private void getDeviceParam() {
+        String[] array = new String[]{"region", "productKey", "productSecret", "deviceName", "deviceSecret", "mac"};
+        Map<String, Object> map = new HashMap<>();
+        map.put("get", array);
+        String paylod = JSON.toJSONString(map);
+        Log.e(TAG, "getDeviceParam: " + paylod);
+        mClient.send(paylod);
+    }
+
+    private DeviceParam parseGetParamResponse(String result) {
         try {
-            jsonObject.put("ssid", mSsid);
-            jsonObject.put("psw", mPassword);
-            jsonObject.put("bssid", mBssid.replace(":", ""));
-            final int rawZone = TimeZone.getDefault().getRawOffset() / 60000;
-            final int zone = (rawZone/60)*100 + (rawZone%60);
-            jsonObject.put("zone", zone);
-            mClient.send(jsonObject.toString());
-        }
-        catch (JSONException e) {
+            JSONObject object = JSON.parseObject(result);
+            if (object.containsKey("get_resp")) {
+                return object.getObject("get_resp", DeviceParam.class);
+            }
+        } catch (JSONException e) {
             e.printStackTrace();
         }
+        return null;
     }
 
-    private void sendOK() {
-        mClient.send("OK!\n");
+
+    private void setDeviceParam() {
+        JSONObject object = new JSONObject();
+        final int zone = TimeZone.getDefault().getRawOffset() / 60000;
+        final long time = System.currentTimeMillis();
+        object.put(KEY_SSID, mSsid);
+        object.put(KEY_PASSWORD, mPassword);
+        object.put(KEY_ZONE, zone);
+        object.put(KEY_TIME, time);
+        Map<String, Object> map = new HashMap<>();
+        map.put("set", object);
+        mClient.send(JSON.toJSONString(map));
     }
 
-    private boolean decode(@NonNull String rcv) {
+    public boolean parseSetParamResponse(String result) {
         try {
-            JSONObject jsonObject = new JSONObject(rcv);
-            if (jsonObject != null && jsonObject.has("mac") && jsonObject.has("sn")) {
-                String mac = jsonObject.getString("mac");
-                if (mac != null && mac.matches("^[0-9A-Fa-f]{12}$")) {
-                    mAddress = jsonObject.getString("mac");
-                    mSN = jsonObject.getString("sn");
-                    return true;
+            JSONObject object = JSON.parseObject(result);
+            if (object.containsKey("set_resp")) {
+                JSONObject res = object.getJSONObject("set_resp");
+                if (res.containsKey("result")) {
+                    String suc = res.getString("result");
+                    if (TextUtils.equals(suc, "success")) {
+                        return true;
+                    }
                 }
             }
-        }
-        catch (JSONException e) {
+        } catch (JSONException e) {
             e.printStackTrace();
         }
         return false;
     }
 
-    private boolean checkDeviceRegistered() {
-//        QueryDeviceResponse response = XlinkCloudManager.getInstance().queryDeviceBlock(mProductId, mAddress);
-//        if (response == null || !response.isValid()) {
-//            return false;
-//        }
-        return true;
-    }
-
-    private Result registerDevice() {
-        Result result = new Result();
-//        ImportDeviceResponse response = XlinkCloudManager.getInstance()
-//                                                         .registerDeviceBlock(mProductId, null, mAddress, mSN);
-//        if (response != null && response.isValid()) {
-//            if (response.getResp().getErrcode() == 0) {
-//                result.setSuccess(true);
-//            } else {
-//                result.setError(response.getResp().getErrmsg());
-//            }
-//        } else {
-//            result.setError(mActivity.get().getString(R.string.error_regdev_failed));
-//        }
-        return result;
-    }
-
-    private Result subscribeBySn() {
-//        XlinkResult<DeviceApi.SnSubscribeResponse> result = XlinkCloudManager.getInstance().subscribeDeviceBySn(mProductId, mSN);
-//        if (result.isSuccess()) {
-//            mDeviceId = result.getResult().id;
-//        }
-//        return new Result(result.isSuccess(), result.getError());
-        return new Result(false, "error");
+    private UserApi.SubscribeDeviceResponse subscribeDevice(String deviceName) {
+        String userid = UserPref.readUserId(mActivity.get());
+        String token = UserPref.readAccessToken(mActivity.get());
+        UserApi.SubscribeDeviceResponse response = AliotServer.getInstance()
+                                                              .subscribeDevice(userid, token, mProductKey, deviceName, mAddress);
+        return response;
     }
 
     private void delay(long ms) {
@@ -179,40 +215,55 @@ public class APConfigLinker{
     }
 
     public void startTask() {
+        mReceive = null;
+        mGetTimeout = false;
+        mSetTimeout = false;
         mProgress = 0;
-        final BaseClient.BaseClientListener listener = new BaseClient.BaseClientListener() {
-            @Override
-            public void onError(String error) {
-
-            }
-
-            @Override
-            public void onReceive(byte[] bytes) {
-                mReceive = new String(bytes);
-            }
-        };
-        mClient.setListener(listener);
         mTask = new AsyncTask<Void, Integer, Result>() {
             @Override
             protected Result doInBackground(Void... voids) {
                 //开启客户端
                 mClient.start();
                 while (!mClient.isListening());
-                //发送配网信息,如果超时时间内未收到返回信息则重复发送
-                sendRouterInfo();
-                mAckTimer.start();
-                //等待设备返回信息并解析
-                while (true) {
+
+                //  获取设备信息
+                mGetTimer.start();
+                DeviceParam deviceParam = null;
+                while (!mGetTimeout) {
                     if (mReceive != null) {
-                        if (decode(mReceive)) {
-                            mAckTimer.cancel();
+                        deviceParam = parseGetParamResponse(mReceive);
+                        if (deviceParam != null) {
+                            mGetTimer.cancel();
+                            if (TextUtils.equals(mProductKey, deviceParam.getProductKey()) == false) {
+                                return new Result(false, "Invalid product.");
+                            } else {
+                                break;
+                            }
+                        }
+                        mReceive = null;
+                    }
+                }
+                if (mGetTimeout) {
+                    return new Result(false, "Get Param Timeout.");
+                }
+
+                mAddress = deviceParam.getMac();
+                mDeviceName = deviceParam.getDeviceName();
+                mReceive = null;
+                mSetTimer.start();
+                while (!mSetTimeout) {
+                    if (mReceive != null) {
+                        if (parseSetParamResponse(mReceive)) {
+                            mSetTimer.cancel();
                             break;
                         }
                         mReceive = null;
                     }
                 }
-                //发送配置完成信息，设备开始连接路由
-                sendOK();
+                if (mSetTimeout) {
+                    return new Result(false, "Set Param Timeout.");
+                }
+
                 if (!mSubscribe) {
                     delay(5000);
                     return new Result(true, null);
@@ -231,22 +282,13 @@ public class APConfigLinker{
                         e.printStackTrace();
                     }
                 }
-                if (!checkDeviceRegistered()) {
-                    Result result = registerDevice();
-                    if (!result.isSuccess()) {
-                        return result;
-                    }
-                    delay(3000);
-                }
-                //通过设备SN订阅设备
-                return subscribeBySn();
 
-//                Result result = subscribeBySn();
-//                if (!result.isSuccess()) {
-//                    return result;
-//                }
-//                delay(1000);
-//                return addDeviceToHomeAndRoom();
+                //订阅设备
+                UserApi.SubscribeDeviceResponse response = subscribeDevice(deviceParam.getDeviceName());
+                if (response == null) {
+                    return new Result(false, "Suscribe failed");
+                }
+                return new Result(true, null);
             }
 
             @Override
@@ -257,9 +299,9 @@ public class APConfigLinker{
                     if (result.isSuccess()) {
                         mProgress = PROGRESS_SUCCESS;
                         mListener.onProgressUpdate(mProgress);
-                        mListener.onAPConfigSuccess(mDeviceId, mAddress);
+                        mListener.onAPConfigSuccess(mDeviceName, mAddress);
                     } else {
-                        mListener.onAPConfigFailed(result.getError());
+                        mListener.onAPConfigFailed(result.getMessage());
                     }
                 }
             }
@@ -281,7 +323,8 @@ public class APConfigLinker{
     }
 
     public void stopTask() {
-        mAckTimer.cancel();
+        mGetTimer.cancel();
+        mSetTimer.cancel();
         mTimer.cancel();
         mClient.stop();
         if (mTask != null) {
@@ -316,7 +359,7 @@ public class APConfigLinker{
 
         void onTimeout();
 
-        void onAPConfigSuccess(int devid, String mac);
+        void onAPConfigSuccess(String deviceName, String mac);
 
         void onAPConfigFailed(String error);
     }

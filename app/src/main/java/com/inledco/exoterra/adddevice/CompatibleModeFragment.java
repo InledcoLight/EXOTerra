@@ -74,14 +74,14 @@ public class CompatibleModeFragment extends BaseFragment {
         if (mConnectNetBean == null) {
             return;
         }
-        netconfig_prdt.setImageResource(DeviceUtil.getProductIcon(mConnectNetBean.getProductId()));
+        netconfig_prdt.setImageResource(DeviceUtil.getProductIcon(mConnectNetBean.getProductKey()));
         netconfig_title.setText(R.string.compatible_mode);
 
         mConnectNetBean.setRunning(true);
         mConnectNetViewModel.postValue();
-//        boolean subscribe = UserManager.checkAuthorize(this);
+//        boolean subscribe = UserPref.checkAuthorize(this);
         boolean subscribe = false;
-        mAPConfigLinker = new APConfigLinker(subscribe, mConnectNetBean.getProductId(), mConnectNetBean.getSsid(), mConnectNetBean.getBssid(),
+        mAPConfigLinker = new APConfigLinker(subscribe, mConnectNetBean.getProductKey(), mConnectNetBean.getSsid(), mConnectNetBean.getBssid(),
                                              mConnectNetBean.getPassword(), (AppCompatActivity) getActivity());
         mListener = new APConfigLinker.APConfigListener() {
             @Override
@@ -98,10 +98,10 @@ public class CompatibleModeFragment extends BaseFragment {
             }
 
             @Override
-            public void onAPConfigSuccess(int devid, String mac) {
+            public void onAPConfigSuccess(String dname, String mac) {
                 mConnectNetBean.setRunning(false);
-                mConnectNetBean.setResultDevid(devid);
-                mConnectNetBean.setResultAddress(mac);
+                mConnectNetBean.setDeviceName(dname);
+                mConnectNetBean.setAddress(mac);
                 mConnectNetViewModel.postValue();
                 RouterUtil.putRouterPassword(getContext(), mConnectNetViewModel.getData().getSsid(), mConnectNetViewModel.getData().getPassword());
                 getActivity().getSupportFragmentManager().popBackStack(null, 1);

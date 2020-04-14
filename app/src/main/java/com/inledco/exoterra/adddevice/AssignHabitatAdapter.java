@@ -8,16 +8,16 @@ import android.view.ViewGroup;
 import android.widget.CheckedTextView;
 
 import com.inledco.exoterra.R;
-import com.inledco.exoterra.bean.Home;
+import com.inledco.exoterra.bean.Group;
 import com.inledco.exoterra.common.SimpleAdapter;
 
 import java.util.List;
 
-public class AssignHabitatAdapter extends SimpleAdapter<Home, AssignHabitatAdapter.ChooseHabitatViewHolder> {
+public class AssignHabitatAdapter extends SimpleAdapter<Group, AssignHabitatAdapter.ChooseHabitatViewHolder> {
     private String mSelectedHomeid;
     private ChooseHabitatViewHolder mSelectedHolder;
 
-    public AssignHabitatAdapter(@NonNull Context context, List<Home> data) {
+    public AssignHabitatAdapter(@NonNull Context context, List<Group> data) {
         super(context, data);
     }
 
@@ -35,7 +35,7 @@ public class AssignHabitatAdapter extends SimpleAdapter<Home, AssignHabitatAdapt
     @Override
     public void onBindViewHolder(@NonNull final ChooseHabitatViewHolder holder, int i) {
 //        final int position = holder.getAdapterPosition();
-//        final HomeApi.HomesResponse.Home home = mData.get(position).getHome();
+//        final HomeApi.HomesResponse.Group home = mData.get(position).getHome();
 //        boolean selected = TextUtils.equals(mSelectedHomeid, home.id);
 //        holder.name.setText(home.name);
 //        holder.name.setChecked(selected);

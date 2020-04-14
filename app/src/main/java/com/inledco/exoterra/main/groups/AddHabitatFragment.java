@@ -10,6 +10,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputLayout;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,13 +19,21 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.TimePicker;
 
+import com.alibaba.fastjson.JSON;
 import com.inledco.exoterra.GlobalSettings;
 import com.inledco.exoterra.R;
+import com.inledco.exoterra.aliot.AliotServer;
+import com.inledco.exoterra.aliot.HttpCallback;
+import com.inledco.exoterra.aliot.UserApi;
 import com.inledco.exoterra.base.BaseFragment;
+import com.inledco.exoterra.manager.GroupManager;
+import com.inledco.exoterra.manager.UserManager;
 import com.inledco.exoterra.util.TimeFormatUtil;
 import com.inledco.exoterra.view.AdvancedTextInputEditText;
 
 import java.text.DateFormat;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.TimeZone;
 
 public class AddHabitatFragment extends BaseFragment {
@@ -53,7 +62,7 @@ public class AddHabitatFragment extends BaseFragment {
     private DateFormat mDateFormat;
     private DateFormat mTimeFormat;
 
-    private int mZone;
+    private int mZone = TimeZone.getDefault().getRawOffset()/60000;
     private int mSunrise = 360;
     private int mSunset = 1080;
 
@@ -115,7 +124,6 @@ public class AddHabitatFragment extends BaseFragment {
         }
         mDateFormat = GlobalSettings.getDateTimeFormat();
         mTimeFormat = GlobalSettings.getTimeFormat();
-        mZone = TimeZone.getDefault().getRawOffset()/60000;
         add_habitat_sunrise.setText(TimeFormatUtil.formatMinutesTime(mTimeFormat, mSunrise));
         add_habitat_sunset.setText(TimeFormatUtil.formatMinutesTime(mTimeFormat, mSunset));
         refreshTime();
@@ -211,6 +219,27 @@ public class AddHabitatFragment extends BaseFragment {
     }
 
     private void createHome(final String name, final int zone, final int sunrise, final int sunset) {
+        String token = UserManager.getInstance().getToken();
+        Map<String, Integer> map = new HashMap<>();
+        map.put("zone", zone);
+        map.put("sunrise", sunrise);
+        map.put("sunset", sunset);
+        final UserApi.GroupRequest request = new UserApi.GroupRequest();
+        request.name = name;
+        request.remark1 = JSON.toJSONString(map);
+        AliotServer.getInstance().createGroup(token, request, new HttpCallback<UserApi.GroupResponse>() {
+            @Override
+            public void onError(String error) {
+                Log.e(TAG, "onError: " + error);
+            }
+
+            @Override
+            public void onSuccess(UserApi.GroupResponse result) {
+                GroupManager.getInstance().addGroup(result.data);
+                Log.e(TAG, "onSuccess: " + JSON.toJSONString(result));
+            }
+        });
+
 //        XlinkCloudManager.getInstance().createHome(name, new XlinkRequestCallback<HomeApi.HomeResponse>() {
 //            @Override
 //            public void onError(String error) {

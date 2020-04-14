@@ -108,7 +108,7 @@ public class DeviceDetailFragment extends BaseFragment {
 //        if (mDevice == null) {
 //            return;
 //        }
-//        Home home = HomeManager.getInstance().getDeviceHome(mDevice);
+//        Group home = HomeManager.getInstance().getDeviceHome(mDevice);
 //        if (home != null) {
 //            device_detail_habitat.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
 //            device_detail_habitat.setText(home.getHome().name);
@@ -147,9 +147,9 @@ public class DeviceDetailFragment extends BaseFragment {
     protected void initData() {
         mDeviceViewModel = ViewModelProviders.of(getActivity()).get(DeviceBaseViewModel.class);
         mDevice = mDeviceViewModel.getData();
-//        mDeviceViewModel.observe(this, new Observer<Device>() {
+//        mDeviceViewModel.observe(this, new Observer<XDevice>() {
 //            @Override
-//            public void onChanged(@Nullable Device device) {
+//            public void onChanged(@Nullable XDevice device) {
 //                if (device == null) {
 //                    return;
 //                }
@@ -178,7 +178,7 @@ public class DeviceDetailFragment extends BaseFragment {
 
         if (mDevice != null) {
             device_detail_icon.setImageResource(DeviceUtil.getProductIconSmall(mDevice.getProductKey()));
-//            Home home = HomeManager.getInstance().getDeviceHome(mDevice);
+//            Group home = HomeManager.getInstance().getDeviceHome(mDevice);
 //            if (home != null) {
 //                device_detail_habitat.setText(home.getHome().name);
 //            } else {
@@ -243,7 +243,7 @@ public class DeviceDetailFragment extends BaseFragment {
         device_detail_habitat.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                Home home = HomeManager.getInstance().getDeviceHome(mDevice);
+//                Group home = HomeManager.getInstance().getDeviceHome(mDevice);
 //                if (home == null) {
 //                    int devid = mDevice.getXDevice().getDeviceId();
 //                    addFragmentToStack(R.id.device_root, SetHabitatFragment.newInstance(devid));
@@ -303,7 +303,7 @@ public class DeviceDetailFragment extends BaseFragment {
     }
 
     private void deleteDevice() {
-//        Home home = HomeManager.getInstance().getDeviceHome(mDevice);
+//        Group home = HomeManager.getInstance().getDeviceHome(mDevice);
 //        if (home != null) {
 //            int devid = mDevice.getXDevice().getDeviceId();
 //            String homeid = home.getHome().id;

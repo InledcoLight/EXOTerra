@@ -38,35 +38,61 @@ public class AliotClient {
 
     private final String TAG = "AliotClient";
 
-    private final String APP_PRODUCT_KEY = "a1yk0nvw5UI";
+    /**
+     * {region}
+     */
+    private final String IOTAUTH_DOMAIN_FMT = "iot-auth.%1$s.aliyuncs.com";
+    private final String IOTAUTH_DOMAIN;
 
     /**
-     * publish {userid(deviceName), product}
+     * {region}
      */
-    private final String topicPropertySet = "/a1yk0nvw5UI/%1$s/user/%2$s/property/set";
+    private final String IOT_DOMAIN_FMT = "iot.%1$s.aliyuncs.com";
+    private final String IOT_DOMAIN;
 
     /**
-     * publish {userid(deviceName), product}
+     * {productKey}  {region}
      */
-    private final String topicPropertyGet = "/a1yk0nvw5UI/%1$s/user/%2$s/property/get";
+    private final String MQTT_DOMAIN_FMT = "%1$s.iot-as-mqtt.%2$s.aliyuncs.com:1883";
+    private final String MQTT_DOMAIN;
+
+    private final String REGION = "us-west-1";
+
+    private final String APP_PRODUCT_KEY = "a3jdKlLMaEn";
+    private final String APP_PRODUCT_SECRET = "AAWBJNSJkaxi3nvh";
+
+    private final String CODE_SUCCESS = "200";
+    private final String KEY_DEVICE_SECRET = "deviceSecret";
 
     /**
-     * subscribe {userid(deviceName)}
+     * publish {appkey, userid(deviceName), product}
      */
-    private final String topicPropertyResponse = "/a1yk0nvw5UI/%1$s/user/property/response";
+    private final String propertySetFormat = "/%1$s/%2$s/user/%3$s/property/set";
+    private String topicPropertySet;
 
     /**
-     * subscribe {userid(deviceName)}
+     * publish {appkey, userid(deviceName), product}
      */
-    private final String topicPropertyStatus = "/a1yk0nvw5UI/%1$s/user/status";
+    private final String propertyGetFormat = "/%1$s/%2$s/user/%3$s/property/get";
+    private String topicPropertyGet;
+
+    /**
+     * subscribe {appkey, userid(deviceName)}
+     */
+    private final String propertyResponseFormat = "/%1$s/%2$s/user/property/response";
+    private String topicPropertyResponse;
+
+    /**
+     * subscribe {appkey, userid(deviceName)}
+     */
+    private final String deviceStatusFormat = "/%1$s/%2$s/user/status";
+    private String topicDeviceStatus;
 
     private String mUserid;
 
-    private String mToken;
+    private String mSecret;
 
     private boolean initialized;
-
-    private final Map<String, String> productMap = new HashMap<>();
 
     private Set<String> subTopics = new HashSet<>();
 
@@ -75,7 +101,7 @@ public class AliotClient {
         public void onNotify(String s, String s1, AMessage aMessage) {
             String payload = new String((byte[]) aMessage.getData());
             Log.e(TAG, "onNotify: " + s + " " + s1 + " " + payload);
-            if (TextUtils.equals(s1, String.format(topicPropertyResponse, mUserid))) {          // 设备属性上报
+            if (TextUtils.equals(s1, String.format(propertyResponseFormat, APP_PRODUCT_KEY, mUserid))) {          // 设备属性上报
                 try {
                     ADevice adev = JSON.parseObject(payload, ADevice.class);
                     if (adev != null) {
@@ -88,7 +114,7 @@ public class AliotClient {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-            } else if (TextUtils.equals(s1, String.format(topicPropertyStatus, mUserid))) {     // 设备状态变化
+            } else if (TextUtils.equals(s1, String.format(deviceStatusFormat, APP_PRODUCT_KEY, mUserid))) {     // 设备状态变化
                 try {
                     StatusReponse status = JSON.parseObject(payload, StatusReponse.class);
                     if (status != null) {
@@ -113,23 +139,68 @@ public class AliotClient {
     };
 
     private AliotClient() {
-        productMap.put("Test", "a1layga4ANI");
-        productMap.put("ExoTerraSocket", "a1MUlQSvB8a");
-        productMap.put("ExoTerraMonsoon", "a1iLPCJMw7s");
+        IOTAUTH_DOMAIN = String.format(IOTAUTH_DOMAIN_FMT, REGION);
+        IOT_DOMAIN = String.format(IOT_DOMAIN_FMT, REGION);
+        MQTT_DOMAIN = String.format(MQTT_DOMAIN_FMT, APP_PRODUCT_KEY, REGION);
     }
 
     public static AliotClient getInstance() {
         return LazyHolder.INSTANCE;
     }
 
-    public void init(Context context, final String userid, final String token) {
+//    public void dynamicRegister(final Context context, final String userid) {
+//        final DeviceInfo devInfo = new DeviceInfo();
+//        devInfo.productKey = APP_PRODUCT_KEY;
+//        devInfo.productSecret = APP_PRODUCT_SECRET;
+//        devInfo.deviceName = userid;
+//
+//        LinkKitInitParams params = new LinkKitInitParams();
+//        params.deviceInfo = devInfo;
+//        HubApiRequest request = new HubApiRequest();
+//        request.domain = IOTAUTH_DOMAIN;
+//        request.path = "/auth/register/device";
+//
+//        LinkKit.getInstance().deviceRegister(context, params, request, new IConnectSendListener() {
+//            @Override
+//            public void onResponse(ARequest aRequest, AResponse aResponse) {
+//                Log.e(TAG, "onResponse: " + JSON.toJSONString(aResponse));
+//                if (aResponse == null || aResponse.data == null) {
+//                    return;
+//                }
+//                String payload = aResponse.data.toString();
+//                Type type = new TypeReference<ResponseModel<Map<String, String>>>(){}.getType();
+//                try {
+//                    ResponseModel<Map<String, String>> response = JSONObject.parseObject(payload, type);
+//                    if (CODE_SUCCESS.equals(response.code) && response.data != null && response.data.containsKey(KEY_DEVICE_SECRET)) {
+//                        String deviceSecret = response.data.get(KEY_DEVICE_SECRET);
+//                        if (!TextUtils.isEmpty(deviceSecret)) {
+//                            devInfo.deviceSecret = deviceSecret;
+//                            UserPref.setSecret(context, deviceSecret);
+//                        }
+//                    }
+//                } catch (JSONException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//
+//            @Override
+//            public void onFailure(ARequest aRequest, AError aError) {
+//                Log.e(TAG, "onFailure: " + JSON.toJSONString(aError));
+//            }
+//        });
+//    }
+
+    public void init(Context context, final String userid, final String secret) {
         DeviceInfo devInfo = new DeviceInfo();
         devInfo.productKey = APP_PRODUCT_KEY;
         devInfo.deviceName = userid;
-        devInfo.deviceSecret = token;
+        devInfo.deviceSecret = secret;
 
-        IoTMqttClientConfig clientConfig = new IoTMqttClientConfig(APP_PRODUCT_KEY, userid, token);
+        IoTMqttClientConfig clientConfig = new IoTMqttClientConfig(APP_PRODUCT_KEY, userid, secret);
+        // 慎用 设置 mqtt 请求域名, 默认 productKey+".iot-as-mqtt.cn-shanghai.aliyuncs.com:1883", 如果无具体的业务需求, 请不要设置
+        clientConfig.channelHost = MQTT_DOMAIN;
         IoTApiClientConfig connectConfig = new IoTApiClientConfig();
+        connectConfig.domain = IOT_DOMAIN;
 
         Map<String, ValueWrapper> propertyValues = new HashMap<>();
 
@@ -137,6 +208,7 @@ public class AliotClient {
         params.deviceInfo = devInfo;
         params.propertyValues = propertyValues;
         params.mqttClientConfig = clientConfig;
+        params.connectConfig = connectConfig;
 
         LinkKit.getInstance().init(context, params, new ILinkKitConnectListener() {
             @Override
@@ -150,11 +222,11 @@ public class AliotClient {
 
                 LinkKit.getInstance().registerOnPushListener(mNotifyListener);
 
-                subscribeTopic(String.format(topicPropertyResponse, userid));
-                subscribeTopic(String.format(topicPropertyStatus, userid));
+                subscribeTopic(String.format(propertyResponseFormat, APP_PRODUCT_KEY, userid));
+                subscribeTopic(String.format(deviceStatusFormat, APP_PRODUCT_KEY, userid));
 
                 mUserid = userid;
-                mToken = token;
+                mSecret = secret;
                 initialized = true;
             }
         });
@@ -166,7 +238,11 @@ public class AliotClient {
         LinkKit.getInstance().deinit();
         initialized = false;
         mUserid = null;
-        mToken = null;
+        mSecret = null;
+    }
+
+    public boolean isInitialized() {
+        return initialized;
     }
 
     private void subscribeTopic(String topic) {
@@ -204,14 +280,15 @@ public class AliotClient {
     }
 
     private void unsubscribeAllTopics() {
-        for (String topic : subTopics) {
+        Set<String> topics = new HashSet<>(subTopics);
+        for (final String topic : topics) {
             MqttSubscribeRequest request = new MqttSubscribeRequest();
             request.topic = topic;
             request.isSubscribe = false;
             LinkKit.getInstance().unsubscribe(request, new IConnectUnscribeListener() {
                 @Override
                 public void onSuccess() {
-
+                    subTopics.remove(topic);
                 }
 
                 @Override
@@ -220,7 +297,6 @@ public class AliotClient {
                 }
             });
         }
-        subTopics.clear();
     }
 
     /**
@@ -247,7 +323,7 @@ public class AliotClient {
         payload.put("deviceName", dname);
         payload.put("params", params);
         MqttPublishRequest request = new MqttPublishRequest();
-        request.topic = String.format(topicPropertySet, mUserid, product);
+        request.topic = String.format(propertySetFormat, APP_PRODUCT_KEY, mUserid, product);
         request.payloadObj = JSON.toJSONString(payload);
         request.qos = 0;
         request.isRPC = false;
@@ -284,7 +360,7 @@ public class AliotClient {
         payload.put("deviceName", dname);
         payload.put("params", params);
         MqttPublishRequest request = new MqttPublishRequest();
-        request.topic = String.format(topicPropertySet, mUserid, product);
+        request.topic = String.format(propertySetFormat, APP_PRODUCT_KEY, mUserid, product);
         request.payloadObj = JSON.toJSONString(payload);
         request.qos = 0;
         request.isRPC = false;
@@ -317,7 +393,7 @@ public class AliotClient {
         payload.put("deviceName", dname);
         payload.put("params", attrKeys);
         MqttPublishRequest request = new MqttPublishRequest();
-        request.topic = String.format(topicPropertyGet, mUserid, product);
+        request.topic = String.format(propertyGetFormat, APP_PRODUCT_KEY, mUserid, product);
         request.payloadObj = JSON.toJSONString(payload);
         request.qos = 0;
         request.isRPC = false;

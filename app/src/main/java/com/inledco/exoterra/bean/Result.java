@@ -2,15 +2,15 @@ package com.inledco.exoterra.bean;
 
 public class Result {
     private boolean mSuccess;
-    private String mError;
+    private String mMessage;
 
     public Result() {
         mSuccess = false;
     }
 
-    public Result(boolean success, String error) {
+    public Result(boolean success, String message) {
         mSuccess = success;
-        mError = error;
+        mMessage = message;
     }
 
     public boolean isSuccess() {
@@ -21,11 +21,11 @@ public class Result {
         mSuccess = success;
     }
 
-    public String getError() {
-        return mError;
+    public String getMessage() {
+        return mMessage;
     }
 
-    public void setError(String error) {
-        mError = error;
+    public void setMessage(String message) {
+        mMessage = message;
     }
 }

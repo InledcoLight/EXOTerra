@@ -119,7 +119,7 @@ public class OKHttpManager {
      * @param callback
      */
     public boolean post(String url, Headers headers, String json, Callback callback) {
-        if (TextUtils.isEmpty(url) || TextUtils.isEmpty(json)) {
+        if (TextUtils.isEmpty(url)) {
             return false;
         }
         RequestBody body = RequestBody.create(CONTENT_TYPE_JSON, json);
@@ -163,7 +163,7 @@ public class OKHttpManager {
                 return JSON.parseObject(response.body().string(), clazz);
             }
         }
-        catch (IOException e) {
+        catch (Exception e) {
             e.printStackTrace();
         }
         return null;

@@ -4,7 +4,7 @@
     <integer name="password_text_length_min">6</integer>
     <integer name="password_text_length_max">16</integer>
     <integer name="nickname_text_length_max">32</integer>
-    <integer name="verifycode_text_length_max">6</integer>
+    <integer name="verifycode_text_length_max">4</integer>
 
     <integer name="spectrum_wavelength_min">360</integer>
     <integer name="spectrum_wavelength_max">800</integer>

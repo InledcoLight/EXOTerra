@@ -3,8 +3,8 @@ package com.inledco.exoterra.manager;
 public class HomeManager {
 //    private final String TAG = "HomeManager";
 //
-//    private final Map<String, Home> mHomeMap;
-//    private final List<Home> mHomeList;
+//    private final Map<String, Group> mHomeMap;
+//    private final List<Group> mHomeList;
 //
 //    private AsyncTask<Void, Void, Void> mAsyncTask;
 //
@@ -36,10 +36,10 @@ public class HomeManager {
 //        mHomeMap.remove(homeid);
 //    }
 //
-//    private void updateHomes(@NonNull final List<HomeApi.HomesResponse.Home> homes) {
+//    private void updateHomes(@NonNull final List<HomeApi.HomesResponse.Group> homes) {
 //        final Set<String> oldsets = new HashSet<>(mHomeMap.keySet());
 //        final Set<String> newsets = new HashSet<>();
-//        for (HomeApi.HomesResponse.Home home : homes) {
+//        for (HomeApi.HomesResponse.Group home : homes) {
 //            newsets.add(home.id);
 //        }
 //        for (String key : oldsets) {
@@ -47,28 +47,28 @@ public class HomeManager {
 //                mHomeMap.remove(key);
 //            }
 //        }
-//        for (HomeApi.HomesResponse.Home home : homes) {
+//        for (HomeApi.HomesResponse.Group home : homes) {
 //            final String homeid = home.id;
 //            if (mHomeMap.containsKey(homeid)) {
 //                mHomeMap.get(homeid).setHome(home);
 //            } else {
-//                mHomeMap.put(homeid, new Home(home));
+//                mHomeMap.put(homeid, new Group(home));
 //            }
 //        }
 //        mHomeList.clear();
 //        mHomeList.addAll(mHomeMap.values());
 //    }
 //
-//    public Home getHome(final String homeid) {
+//    public Group getHome(final String homeid) {
 //        if (!TextUtils.isEmpty(homeid) && mHomeMap.containsKey(homeid)) {
 //            return mHomeMap.get(homeid);
 //        }
 //        return null;
 //    }
 //
-//    public Home getDeviceHome(final String pid, final String mac) {
-//        for (Home home : mHomeList) {
-//            for (HomeApi.HomeDevicesResponse.Device dev : home.getDevices()) {
+//    public Group getDeviceHome(final String pid, final String mac) {
+//        for (Group home : mHomeList) {
+//            for (HomeApi.HomeDevicesResponse.XDevice dev : home.getDevices()) {
 //                if (TextUtils.equals(pid, dev.productId) && TextUtils.equals(mac, dev.mac)) {
 //                    return home;
 //                }
@@ -77,7 +77,7 @@ public class HomeManager {
 //        return null;
 //    }
 //
-//    public Home getDeviceHome(final Device device) {
+//    public Group getDeviceHome(final XDevice device) {
 //        if (device != null) {
 //            final String pid = device.getXDevice().getProductId();
 //            final String mac = device.getXDevice().getMacAddress();
@@ -86,11 +86,11 @@ public class HomeManager {
 //        return null;
 //    }
 //
-//    public List<Home> getHomeList() {
+//    public List<Group> getHomeList() {
 //        return mHomeList;
 //    }
 //
-//    public void refreshHomeList(final XlinkRequestCallback<List<Home>> callback) {
+//    public void refreshHomeList(final XlinkRequestCallback<List<Group>> callback) {
 //        if (mAsyncTask != null) {
 //            mAsyncTask.cancel(true);
 //        }
@@ -106,13 +106,13 @@ public class HomeManager {
 //            public void onSuccess(HomeApi.HomesResponse response) {
 ////                mHomeMap.clear();
 ////                mHomeList.clear();
-////                for (HomeApi.HomesResponse.Home home : response.list) {
-////                    mHomeMap.put(home.id, new Home(home));
+////                for (HomeApi.HomesResponse.Group home : response.list) {
+////                    mHomeMap.put(home.id, new Group(home));
 ////                }
 ////                mHomeList.addAll(mHomeMap.values());
 //
 //                updateHomes(response.list);
-//                EventBus.getDefault().post(new HomesRefreshedEvent());
+//                EventBus.getDefault().post(new GroupsRefreshedEvent());
 //                if (callback != null) {
 //                    callback.onSuccess(mHomeList);
 //                }
@@ -131,7 +131,7 @@ public class HomeManager {
 //        mAsyncTask = new AsyncTask<Void, Void, Void>() {
 //            @Override
 //            protected Void doInBackground(Void... voids) {
-//                for (Home home : mHomeList) {
+//                for (Group home : mHomeList) {
 //                    String homeid = home.getHome().id;
 //                    if (!home.isPropertySynchronized()) {
 //                        XlinkResult<HomeProperty> result1 = XlinkCloudManager.getInstance().getHomeProperty(homeid);
@@ -154,7 +154,7 @@ public class HomeManager {
 //        mAsyncTask.execute();
 //    }
 //
-//    public void refreshHome(@NonNull final Home home) {
+//    public void refreshHome(@NonNull final Group home) {
 //        final String homeid = home.getHome().id;
 //        XlinkCloudManager.getInstance().getHomeProperty(homeid, new XlinkRequestCallback<HomeProperty>() {
 //            @Override
@@ -182,7 +182,7 @@ public class HomeManager {
 //        });
 //    }
 //
-//    public void refreshHomeDevices(final Home home) {
+//    public void refreshHomeDevices(final Group home) {
 //        if (home == null) {
 //            return;
 //        }
@@ -203,7 +203,7 @@ public class HomeManager {
 //    }
 //
 //    public void refreshHomeDevices(final String homeid) {
-//        final Home home = getHome(homeid);
+//        final Group home = getHome(homeid);
 //        refreshHomeDevices(home);
 //    }
 //

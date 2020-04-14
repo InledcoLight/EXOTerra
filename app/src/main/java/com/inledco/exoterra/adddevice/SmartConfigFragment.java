@@ -1,6 +1,5 @@
 package com.inledco.exoterra.adddevice;
 
-import android.annotation.SuppressLint;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.DialogInterface;
 import android.os.Bundle;
@@ -44,33 +43,19 @@ public class SmartConfigFragment extends BaseFragment {
             showSmartConfigFailedDialog(error);
         }
 
-        @SuppressLint ("RestrictedApi")
         @Override
-        public void onSuccess(int devid, String mac) {
+        public void onSuccess(String dname, String mac) {
             mConnectNetViewModel.getData().setRunning(false);
-            mConnectNetViewModel.getData().setResultDevid(devid);
-            mConnectNetViewModel.getData().setResultAddress(mac);
+            mConnectNetViewModel.getData().setDeviceName(dname);
+            mConnectNetViewModel.getData().setAddress(mac);
             mConnectNetViewModel.postValue();
             getActivity().getSupportFragmentManager().popBackStack(null, 1);
             replaceFragment(R.id.adddevice_fl, new ConfigDeviceFragment());
         }
 
-        @SuppressLint ("RestrictedApi")
         @Override
         public void onEsptouchSuccess() {
             RouterUtil.putRouterPassword(getContext(), mConnectNetViewModel.getData().getSsid(), mConnectNetViewModel.getData().getPassword());
-        }
-
-        @SuppressLint ("RestrictedApi")
-        @Override
-        public void onDeviceScanned() {
-
-        }
-
-        @SuppressLint ("RestrictedApi")
-        @Override
-        public void onDeviceInitialized() {
-
         }
     };
 
@@ -114,11 +99,11 @@ public class SmartConfigFragment extends BaseFragment {
         mConnectNetViewModel = ViewModelProviders.of(getActivity()).get(ConnectNetViewModel.class);
         ConnectNetBean bean = mConnectNetViewModel.getData();
 
-        netconfig_prdt.setImageResource(DeviceUtil.getProductIcon(bean.getProductId()));
+        netconfig_prdt.setImageResource(DeviceUtil.getProductIcon(bean.getProductKey()));
         netconfig_title.setText(R.string.smartconfig);
 
         boolean subscribe = true;
-        String pid = bean.getProductId();
+        String pid = bean.getProductKey();
         String ssid = bean.getSsid();
         String gateway = bean.getBssid();
         String psw = bean.getPassword();

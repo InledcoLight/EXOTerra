@@ -60,4 +60,14 @@ public class ADevice {
         }
         return null;
     }
+
+    public long getPropertyTime(String key) {
+        if (items.containsKey(key)) {
+            BaseProperty prop = items.get(key);
+            if (prop != null) {
+                return prop.getTime();
+            }
+        }
+        return 0;
+    }
 }

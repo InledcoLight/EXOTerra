@@ -44,7 +44,7 @@ public class DevicesAdapter extends SimpleAdapter<Device, DeviceViewHolder> {
         String mac = device.getMac();
         holder.iv_icon.setImageResource(DeviceUtil.getProductIcon(pkey));
         holder.tv_name.setText(name);
-//        Home home = HomeManager.getInstance().getDeviceHome(device);
+//        Group home = HomeManager.getInstance().getDeviceHome(device);
 //        if (home != null) {
 //            holder.ctv_habitat.setChecked(true);
 //            holder.ctv_habitat.setText(home.getHome().name);

@@ -109,7 +109,7 @@ public class DeviceActivity extends BaseActivity {
         }
         device_icon.setImageResource(DeviceUtil.getProductIconSmall(pkey));
         device_name.setText(name);
-//        final Home home = HomeManager.getInstance().getDeviceHome(mDevice);
+//        final Group home = HomeManager.getInstance().getDeviceHome(mDevice);
 //        if (home != null) {
 //            device_habitat_name.setText(home.getHome().name);
 //        }

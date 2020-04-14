@@ -9,40 +9,38 @@ import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
-import android.text.method.HideReturnsTransformationMethod;
-import android.text.method.PasswordTransformationMethod;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.alibaba.fastjson.JSON;
 import com.inledco.exoterra.R;
+import com.inledco.exoterra.aliot.AliotServer;
+import com.inledco.exoterra.aliot.HttpCallback;
+import com.inledco.exoterra.aliot.UserApi;
 import com.inledco.exoterra.base.BaseActivity;
 import com.inledco.exoterra.manager.VerifycodeManager;
 import com.inledco.exoterra.util.RegexUtil;
 import com.inledco.exoterra.view.AdvancedTextInputEditText;
+import com.inledco.exoterra.view.PasswordEditText;
 import com.liruya.loaddialog.LoadDialog;
 
 public class FoundbackActivity extends BaseActivity {
-
-    private final int VERIFY_CODE_SEND_INTERVAL = 120000;
 
     private Toolbar foundback_toolbar;
     private TextInputLayout foundback_til_email;
     private AdvancedTextInputEditText foundback_et_email;
     private TextInputLayout foundback_til_password;
-    private AdvancedTextInputEditText foundback_et_password;
+    private PasswordEditText foundback_et_password;
     private TextInputLayout foundback_til_verifycode;
     private AdvancedTextInputEditText foundback_et_verifycode;
-//    private Button foundback_btn_send;
     private Button foundback_btn_found;
     private LoadDialog mLoadDialog;
     private ProgressDialog mProgressDialog;
 
-//    private CountDownTimer mSendVerifycodeTimer;
-//    private XlinkRequestCallback<String> mRequestVerifycodeCallback;
-//    private XlinkRequestCallback<String> mFoundbackPasswordCallback;
-
-    private boolean showPassword;
+    private HttpCallback<UserApi.Response> mVerifycodeCallback;
+    private HttpCallback<UserApi.Response> mFoundbackPasswordCallback;
 
     private VerifycodeManager mVerifycodeManager;
 
@@ -68,13 +66,12 @@ public class FoundbackActivity extends BaseActivity {
         foundback_et_password = findViewById(R.id.foundback_et_password);
         foundback_til_verifycode = findViewById(R.id.foundback_til_verifycode);
         foundback_et_verifycode = findViewById(R.id.foundback_et_verifycode);
-//        foundback_btn_send = findViewById(R.id.foundback_btn_send);
         foundback_btn_found = findViewById(R.id.foundback_btn_found);
 
         setSupportActionBar(foundback_toolbar);
         foundback_et_email.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_email_white_24dp, 0, 0, 0);
         foundback_et_verifycode.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_verify_white_24dp, 0, R.drawable.ic_send_white_24dp, 0);
-        foundback_et_password.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_lock_white_24dp, 0, R.drawable.design_ic_visibility_off, 0);
+        foundback_et_password.setIcon(R.drawable.ic_lock_white_24dp, R.drawable.design_ic_visibility, R.drawable.design_ic_visibility_off);
         foundback_et_email.bindTextInputLayout(foundback_til_email);
         foundback_et_verifycode.bindTextInputLayout(foundback_til_verifycode);
         foundback_et_password.bindTextInputLayout(foundback_til_password);
@@ -94,61 +91,61 @@ public class FoundbackActivity extends BaseActivity {
                 foundback_et_password.requestFocus();
             }
         }
-//        mSendVerifycodeTimer = new CountDownTimer(VERIFY_CODE_SEND_INTERVAL, 1000) {
-//            @Override
-//            public void onTick(long millisUntilFinished) {
-//                foundback_btn_send.setText("" + millisUntilFinished/1000);
-//            }
-//
-//            @Override
-//            public void onFinish() {
-//                foundback_btn_send.setText(R.string.send_verifycode);
-//                foundback_btn_send.setEnabled(true);
-//            }
-//        };
-//        mRequestVerifycodeCallback = new XlinkRequestCallback<String>() {
-//            @Override
-//            public void onStart() {
-//                showLoading();
-//            }
-//
-//            @Override
-//            public void onError(String error) {
-//                dismissLoading();
-//                Toast.makeText(FoundbackActivity.this, error, Toast.LENGTH_SHORT)
-//                     .show();
-//            }
-//
-//            @Override
-//            public void onSuccess(String s) {
-//                dismissLoading();
-////                foundback_btn_send.setEnabled(false);
-////                mSendVerifycodeTimer.start();
-//                getMessageDialog().setTitle(R.string.title_verifycode_sent)
-//                                  .setMessage(R.string.msg_get_verifycode)
-//                                  .show();
-//            }
-//        };
-//        mFoundbackPasswordCallback = new XlinkRequestCallback<String>() {
-//            @Override
-//            public void onStart() {
-//                showLoading();
-//            }
-//
-//            @Override
-//            public void onError(String error) {
-//                dismissLoading();
-//                getMessageDialog().setTitle(R.string.foundback_failed)
-//                                  .setMessage(error)
-//                                  .show();
-//            }
-//
-//            @Override
-//            public void onSuccess(String s) {
-//                dismissLoading();
-//                showFoundbackSuccessDialog();
-//            }
-//        };
+        mVerifycodeCallback = new HttpCallback<UserApi.Response>() {
+            @Override
+            public void onError(final String error) {
+                Log.e(TAG, "onError: " + error);
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        dismissLoading();
+                        Toast.makeText(FoundbackActivity.this, error, Toast.LENGTH_SHORT)
+                             .show();
+                    }
+                });
+            }
+
+            @Override
+            public void onSuccess(UserApi.Response result) {
+                Log.e(TAG, "onSuccess: " + JSON.toJSONString(result));
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        dismissLoading();
+                        getMessageDialog().setTitle(R.string.title_verifycode_sent)
+                                          .setMessage(R.string.msg_get_verifycode)
+                                          .show();
+                    }
+                });
+            }
+        };
+        mFoundbackPasswordCallback = new HttpCallback<UserApi.Response>() {
+            @Override
+            public void onError(final String error) {
+                Log.e(TAG, "onError: " + error);
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        dismissLoading();
+                        getMessageDialog().setTitle(R.string.foundback_failed)
+                                          .setMessage(error)
+                                          .show();
+                    }
+                });
+            }
+
+            @Override
+            public void onSuccess(UserApi.Response result) {
+                Log.e(TAG, "onSuccess: " + JSON.toJSONString(result));
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        dismissLoading();
+                        showFoundbackSuccessDialog();
+                    }
+                });
+            }
+        };
     }
 
     @Override
@@ -178,37 +175,11 @@ public class FoundbackActivity extends BaseActivity {
                          .show();
                     return;
                 }
-//                XlinkCloudManager.getInstance().requestEmailFoundbackPasswordVerifyCode(email, mRequestVerifycodeCallback);
+                AliotServer.getInstance().getEmailVerifycode(email, mVerifycodeCallback);
                 mVerifycodeManager.addResetVerifycode(email);
             }
         });
 
-        foundback_et_password.setDrawableRightClickListener(new AdvancedTextInputEditText.DrawableRightClickListener() {
-            @Override
-            public void onDrawableRightClick() {
-                showPassword = !showPassword;
-                if (showPassword) {
-                    foundback_et_password.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_lock_white_24dp, 0, R.drawable.design_ic_visibility, 0);
-                    foundback_et_password.setTransformationMethod(HideReturnsTransformationMethod.getInstance());
-                } else {
-                    foundback_et_password.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_lock_white_24dp, 0, R.drawable.design_ic_visibility_off, 0);
-                    foundback_et_password.setTransformationMethod(PasswordTransformationMethod.getInstance());
-                }
-            }
-        });
-
-//        foundback_btn_send.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                String email = getEmailText();
-//                if (RegexUtil.isEmail(email)) {
-//                    XlinkCloudManager.getInstance()
-//                                     .requestEmailFoundbackPasswordVerifyCode(email, mRequestVerifycodeCallback);
-//                } else {
-//                    foundback_til_email.setError(getString(R.string.error_email));
-//                }
-//            }
-//        });
         foundback_btn_found.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -220,17 +191,17 @@ public class FoundbackActivity extends BaseActivity {
                     foundback_et_email.requestFocus();
                     return;
                 }
-                if (TextUtils.isEmpty(password) || password.length() < 6) {
+                if (TextUtils.isEmpty(password) || password.length() < getResources().getInteger(R.integer.password_text_length_min)) {
                     foundback_til_password.setError(getString(R.string.error_password));
                     foundback_et_password.requestFocus();
                     return;
                 }
-                if (TextUtils.isEmpty(verifycode) || verifycode.length() != 6) {
+                if (TextUtils.isEmpty(verifycode) || verifycode.length() != getResources().getInteger(R.integer.verifycode_text_length_max)) {
                     foundback_til_verifycode.setError(getString(R.string.error_verifycode));
                     foundback_et_verifycode.requestFocus();
                     return;
                 }
-//                XlinkCloudManager.getInstance().foundbackPassword(email, password, verifycode, mFoundbackPasswordCallback);
+                AliotServer.getInstance().resetPassword(email, verifycode, password, mFoundbackPasswordCallback);
             }
         });
     }

@@ -1,5 +1,7 @@
 package com.inledco.exoterra.aliot;
 
+import com.inledco.exoterra.aliot.bean.XDevice;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -66,8 +68,8 @@ public class ExoLed extends Device {
     private final String KEY_TURNOFF_ENABLE     = "TurnoffEnable";
     private final String KEY_TURNOFF_TIME       = "TurnoffTime";
 
-    public ExoLed() {
-
+    public ExoLed(XDevice xDevice) {
+        super(xDevice);
     }
 
     public int getChannelCountMax() {
@@ -402,5 +404,10 @@ public class ExoLed extends Device {
             return null;
         }
         return new KeyValue(KEY_TURNOFF_TIME, time);
+    }
+
+    @Override
+    protected String getProductName() {
+        return "exoled";
     }
 }

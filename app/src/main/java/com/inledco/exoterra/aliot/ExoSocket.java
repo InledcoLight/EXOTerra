@@ -1,6 +1,7 @@
 package com.inledco.exoterra.aliot;
 
 import com.alibaba.fastjson.JSONArray;
+import com.inledco.exoterra.aliot.bean.XDevice;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -9,7 +10,7 @@ import java.util.List;
 public class ExoSocket extends Device {
     private final String TAG = "ExoSocket";
 
-    public static final int TIMER_COUNT_MAX           = 24;
+    public static final int TIMER_COUNT_MAX     = 24;
     public static final int MODE_TIMER          = 0;
     public static final int MODE_SENSOR1        = 1;
     public static final int MODE_SENSOR2        = 2;
@@ -78,6 +79,10 @@ public class ExoSocket extends Device {
     private final String KEY_SENSOR_AVAILABLE   = "SensorAvailable";
     private final String KEY_SENSOR             = "Sensor";
     private final String KEY_SENSOR_CONFIG      = "SensorConfig";
+
+    public ExoSocket(XDevice xDevice) {
+        super(xDevice);
+    }
 
     public int getSwitchCountMax() {
         return getPropertyInt(KEY_SWITCH_COUNT_MAX);
@@ -253,6 +258,11 @@ public class ExoSocket extends Device {
         timer.setEndMinute(array[7]);
         timer.setEndSecond(array[8]);
         return timer;
+    }
+
+    @Override
+    protected String getProductName() {
+        return "exosocket";
     }
 
     public static class Timer {

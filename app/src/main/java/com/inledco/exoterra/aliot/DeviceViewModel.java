@@ -9,28 +9,28 @@ public class DeviceViewModel<T extends Device> extends BaseViewModel<T> {
     public void setProperty(KeyValue... attrs) {
         String pkey = getData().getProductKey();
         String dname = getData().getDeviceName();
-        String pname = DeviceUtil.getProductName(pkey);
+        String pname = DeviceUtil.getProductName(pkey).toLowerCase();
         AliotClient.getInstance().setProperty(pname, dname, attrs);
     }
 
     public void setProperty(List<KeyValue> attrs) {
         String pkey = getData().getProductKey();
         String dname = getData().getDeviceName();
-        String pname = DeviceUtil.getProductName(pkey);
+        String pname = DeviceUtil.getProductName(pkey).toLowerCase();
         AliotClient.getInstance().setProperty(pname, dname, attrs);
     }
 
     public void getProperty(String... keys) {
         String pkey = getData().getProductKey();
         String dname = getData().getDeviceName();
-        String pname = DeviceUtil.getProductName(pkey);
+        String pname = DeviceUtil.getProductName(pkey).toLowerCase();
         AliotClient.getInstance().getProperty(pname, dname, keys);
     }
 
     public void getAllProperties() {
         String pkey = getData().getProductKey();
         String dname = getData().getDeviceName();
-        String pname = DeviceUtil.getProductName(pkey);
+        String pname = DeviceUtil.getProductName(pkey).toLowerCase();
         AliotClient.getInstance().getAllProperties(pname, dname);
     }
 

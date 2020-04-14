@@ -20,8 +20,8 @@ public class UdpClient extends BaseClient {
 
     private DatagramSocket mSocket;
 
-    public UdpClient(int remoteIp, int remotePort, int localPort) {
-        super(remoteIp, remotePort);
+    public UdpClient(String remoteAddress, int remotePort, int localPort) {
+        super(remoteAddress, remotePort);
         if (localPort < 0 || localPort > 65535) {
             throw new RuntimeException("Invalid local port.");
         }
@@ -33,7 +33,7 @@ public class UdpClient extends BaseClient {
     }
 
     public void setLocalPort(int localPort) {
-        if (!mListening) {
+        if (!mListening && localPort >= 0 && localPort <= 65535) {
             mLocalPort = localPort;
         }
     }
@@ -65,6 +65,9 @@ public class UdpClient extends BaseClient {
                 }
                 catch (InterruptedException e) {
                     e.printStackTrace();
+                    if (mListener != null) {
+                        mListener.onError(e.getMessage());
+                    }
                 }
             }
         });
@@ -99,7 +102,7 @@ public class UdpClient extends BaseClient {
             public void run() {
                 try {
                     synchronized (mLock) {
-                        InetAddress address = InetAddress.getByName(ipstr(mRemoteIp));
+                        InetAddress address = InetAddress.getByName(mRemoteAddress);
                         DatagramPacket packet = new DatagramPacket(bytes, bytes.length, address, mRemotePort);
                         mSocket.send(packet);
                     }
@@ -118,7 +121,7 @@ public class UdpClient extends BaseClient {
     protected void receive() {
         byte[] rxBuffer = new byte[UDP_RECEIVE_BUFFER_SIZE];
         try {
-            InetAddress address = InetAddress.getByName( ipstr(mRemoteIp) );
+            InetAddress address = InetAddress.getByName(mRemoteAddress);
             DatagramPacket rcvPacket = new DatagramPacket( rxBuffer, rxBuffer.length );
             while (mListening) {
                 if (mSocket == null) {
@@ -126,8 +129,7 @@ public class UdpClient extends BaseClient {
                 }
                 mSocket.receive(rcvPacket);
                 int len = rcvPacket.getLength();
-                if (rcvPacket.getAddress().equals(address) && len > 0)
-                {
+                if (rcvPacket.getAddress().equals(address) && len > 0) {
                     if (mListener != null) {
                         byte[] bytes = Arrays.copyOf(rxBuffer, len);
                         mListener.onReceive(bytes);

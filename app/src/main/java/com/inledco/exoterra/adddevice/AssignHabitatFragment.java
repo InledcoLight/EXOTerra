@@ -13,7 +13,7 @@ import android.widget.TextView;
 
 import com.inledco.exoterra.R;
 import com.inledco.exoterra.base.BaseFragment;
-import com.inledco.exoterra.event.HomesRefreshedEvent;
+import com.inledco.exoterra.event.GroupsRefreshedEvent;
 import com.inledco.exoterra.main.groups.AddHabitatFragment;
 import com.inledco.exoterra.view.GradientCornerButton;
 
@@ -32,7 +32,7 @@ public class AssignHabitatFragment extends BaseFragment {
     private ConnectNetViewModel mConnectNetViewModel;
     private ConnectNetBean mConnectNetBean;
 
-//    private List<Home> mHomes = HomeManager.getInstance().getHomeList();
+//    private List<Group> mHomes = HomeManager.getInstance().getHomeList();
     private AssignHabitatAdapter mAdapter;
 
     @Nullable
@@ -118,7 +118,7 @@ public class AssignHabitatFragment extends BaseFragment {
     }
 
     @Subscribe (threadMode = ThreadMode.MAIN)
-    public void onHomesRefreshedEvent(HomesRefreshedEvent event) {
+    public void onHomesRefreshedEvent(GroupsRefreshedEvent event) {
 //        assign_habitat_warning.setVisibility(mHomes.size() == 0 ? View.VISIBLE : View.GONE);
 //        mAdapter.notifyDataSetChanged();
     }

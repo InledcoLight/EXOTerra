@@ -3,6 +3,7 @@ package com.inledco.exoterra.device.Monsoon;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
@@ -23,6 +24,8 @@ public class MonsoonPowerFragment extends BaseFragment {
 
     private MonsoonViewModel mMonsoonViewModel;
     private ExoMonsoon mMonsoon;
+
+    private CountDownTimer mTimer;
 
     @Nullable
     @Override
@@ -77,10 +80,34 @@ public class MonsoonPowerFragment extends BaseFragment {
         if (power == 0) {
             power_ctv.setChecked(false);
             power_status.setText(null);
+            if (mTimer != null) {
+                mTimer.cancel();
+                mTimer = null;
+            }
         } else {
             power_ctv.setChecked(true);
-            int tmr = mMonsoon.getCountdown();
-            power_status.setText("" + tmr + "s");
+            if (mTimer == null) {
+                long currTime = System.currentTimeMillis();
+                long time = mMonsoon.getPowerTime();
+                if (time > currTime) {
+                    time = currTime;
+                }
+                long total = power*1000 + time - currTime;
+                power_status.setText("" + total/1000 + "s");
+                mTimer = new CountDownTimer(total+100, 1000) {
+                    @Override
+                    public void onTick(long millisUntilFinished) {
+                        power_status.setText("" + millisUntilFinished/1000 + "s");
+                    }
+
+                    @Override
+                    public void onFinish() {
+                        power_status.setText(null);
+                        mTimer = null;
+                    }
+                };
+                mTimer.start();
+            }
         }
     }
 }

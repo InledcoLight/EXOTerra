@@ -27,6 +27,7 @@ import com.inledco.exoterra.main.devices.LocalDevicesFragment;
 import com.inledco.exoterra.main.groups.GroupsFragment;
 import com.inledco.exoterra.main.me.MeFragment;
 import com.inledco.exoterra.main.pref.PrefFragment;
+import com.inledco.exoterra.manager.UserManager;
 import com.inledco.exoterra.scan.ScanActivity;
 import com.inledco.exoterra.smartconfig.SmartconfigActivity;
 
@@ -82,10 +83,15 @@ public class MainActivity extends BaseActivity {
     @Override
     protected void initData() {
         GlobalSettings.init(this);
-//        HomeManager.getInstance().refreshHomeList(null);
+        authorized = UserManager.getInstance().isAuthorized();
         if (authorized) {
             main_bnv.setSelectedItemId(R.id.main_bnv_home);
             replaceFragment(R.id.main_fl_show, GroupsFragment.newInstance(true));
+            String userid = UserManager.getInstance().getUserid();
+            String secret = UserManager.getInstance().getSecret();
+            Log.e(TAG, "initData: " + userid + " " + secret);
+            AliotClient.getInstance().init(MainActivity.this, userid, secret);
+//            AliotClient.getInstance().init(MainActivity.this, UserManager.getInstance().getUserid());
         } else {
             main_bnv.setSelectedItemId(R.id.main_bnv_devices);
             replaceFragment(R.id.main_fl_show, new LocalDevicesFragment());

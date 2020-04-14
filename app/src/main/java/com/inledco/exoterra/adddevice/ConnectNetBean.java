@@ -1,13 +1,15 @@
 package com.inledco.exoterra.adddevice;
 
 public class ConnectNetBean {
-    private String mHomeid;
-    private String mProductId;
+    private String mGroupid;
+    private String mProductKey;
     private String mSsid;
     private String mBssid;
     private String mPassword;
-    private int mResultDevid;
-    private String mResultAddress;
+
+    private String mDeviceName;
+    private String mAddress;
+
     private boolean mConflict;
     private boolean mCompatibleMode;
     private boolean mRunning;
@@ -16,20 +18,20 @@ public class ConnectNetBean {
 
     }
 
-    public ConnectNetBean(String homeid) {
-        mHomeid = homeid;
+    public ConnectNetBean(String groupid) {
+        mGroupid = groupid;
     }
 
-    public String getHomeid() {
-        return mHomeid;
+    public String getGroupid() {
+        return mGroupid;
     }
 
-    public String getProductId() {
-        return mProductId;
+    public String getProductKey() {
+        return mProductKey;
     }
 
-    public void setProductId(String productId) {
-        mProductId = productId;
+    public void setProductKey(String productKey) {
+        mProductKey = productKey;
     }
 
     public String getSsid() {
@@ -56,20 +58,20 @@ public class ConnectNetBean {
         mPassword = password;
     }
 
-    public int getResultDevid() {
-        return mResultDevid;
+    public String getDeviceName() {
+        return mDeviceName;
     }
 
-    public void setResultDevid(int resultDevid) {
-        mResultDevid = resultDevid;
+    public void setDeviceName(String deviceName) {
+        mDeviceName = deviceName;
     }
 
-    public String getResultAddress() {
-        return mResultAddress;
+    public String getAddress() {
+        return mAddress;
     }
 
-    public void setResultAddress(String resultAddress) {
-        mResultAddress = resultAddress;
+    public void setAddress(String address) {
+        mAddress = address;
     }
 
     public boolean isConflict() {

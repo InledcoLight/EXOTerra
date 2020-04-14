@@ -36,6 +36,7 @@ public class AdvancedTextInputEditText extends TextInputEditText {
             }
         }
     };
+
     public AdvancedTextInputEditText(Context context) {
         super(context);
         addTextChangedListener(mTextWatcher);

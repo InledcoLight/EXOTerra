@@ -148,7 +148,7 @@ public class SocketSensorFragment extends BaseFragment {
     }
 
     private void showDaytimeDialog() {
-//        final Home home = HomeManager.getInstance().getDeviceHome(mSocket);
+//        final Group home = HomeManager.getInstance().getDeviceHome(mSocket);
 //        mSunrise = mSocket.getSunrise();
 //        mSunsrt = mSocket.getSunset();
 //        View view = LayoutInflater.from(getContext()).inflate(R.layout.dialog_daytime, null, false);

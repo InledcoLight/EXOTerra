@@ -14,7 +14,7 @@ import com.inledco.exoterra.AppConstants;
 import com.inledco.exoterra.R;
 import com.inledco.exoterra.adddevice.AssignHabitatAdapter;
 import com.inledco.exoterra.base.BaseFragment;
-import com.inledco.exoterra.event.HomesRefreshedEvent;
+import com.inledco.exoterra.event.GroupsRefreshedEvent;
 import com.inledco.exoterra.view.GradientCornerButton;
 
 import org.greenrobot.eventbus.EventBus;
@@ -30,7 +30,7 @@ public class SetHabitatFragment extends BaseFragment {
     private GradientCornerButton set_habitat_back;
     private GradientCornerButton set_habitat_save;
 
-//    private List<Home> mHomes = HomeManager.getInstance().getHomeList();
+//    private List<Group> mHomes = HomeManager.getInstance().getHomeList();
     private AssignHabitatAdapter mAdapter;
 
     private int mDeviceId;
@@ -130,7 +130,7 @@ public class SetHabitatFragment extends BaseFragment {
     }
 
     @Subscribe (threadMode = ThreadMode.MAIN)
-    public void onHomesRefreshedEvent(HomesRefreshedEvent event) {
+    public void onHomesRefreshedEvent(GroupsRefreshedEvent event) {
 //        set_habitat_warning.setVisibility(mHomes.size() == 0 ? View.VISIBLE : View.GONE);
 //        mAdapter.notifyDataSetChanged();
     }

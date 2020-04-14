@@ -13,19 +13,19 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
+import com.alibaba.fastjson.JSON;
 import com.inledco.exoterra.R;
 import com.inledco.exoterra.adddevice.AddDeviceActivity;
 import com.inledco.exoterra.aliot.ADevice;
-import com.inledco.exoterra.aliot.AliotConsts;
 import com.inledco.exoterra.aliot.Device;
-import com.inledco.exoterra.aliot.ExoLed;
-import com.inledco.exoterra.aliot.ExoSocket;
+import com.inledco.exoterra.aliot.HttpCallback;
 import com.inledco.exoterra.aliot.StatusReponse;
+import com.inledco.exoterra.aliot.UserApi;
 import com.inledco.exoterra.base.BaseFragment;
 import com.inledco.exoterra.common.OnItemClickListener;
 import com.inledco.exoterra.device.DeviceActivity;
 import com.inledco.exoterra.event.DevicesRefreshedEvent;
-import com.inledco.exoterra.event.HomesRefreshedEvent;
+import com.inledco.exoterra.event.GroupsRefreshedEvent;
 import com.inledco.exoterra.manager.DeviceManager;
 import com.inledco.exoterra.scan.ScanActivity;
 import com.inledco.exoterra.smartconfig.SmartconfigActivity;
@@ -87,7 +87,7 @@ public class DevicesFragment extends BaseFragment {
 
     @Override
     protected void initData() {
-        initList();
+        mDevices.addAll(DeviceManager.getInstance().getAllDevices());
         mAdapter = new DevicesAdapter(getContext(), mDevices);
         mAdapter.setOnItemClickListener(new OnItemClickListener() {
             @Override
@@ -98,9 +98,11 @@ public class DevicesFragment extends BaseFragment {
             }
         });
         devices_rv_show.setAdapter(mAdapter);
-//
-//        devices_swipe_refresh.setRefreshing(true);
-//        refreshDevices();
+
+        if (DeviceManager.getInstance().isSynchronized() == false) {
+            devices_swipe_refresh.setRefreshing(true);
+            refreshDevices();
+        }
     }
 
     @Override
@@ -134,15 +136,16 @@ public class DevicesFragment extends BaseFragment {
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onHomesRefreshedEvent(HomesRefreshedEvent event) {
+    public void onHomesRefreshedEvent(GroupsRefreshedEvent event) {
         mAdapter.notifyDataSetChanged();
     }
 
     @Subscribe (threadMode = ThreadMode.MAIN)
     public void onDevicesRefreshedEvent(DevicesRefreshedEvent event) {
-//        devices_swipe_refresh.setRefreshing(false);
-//        devices_warning.setVisibility(mDevices.size() == 0 ? View.VISIBLE : View.GONE);
-//        mAdapter.notifyDataSetChanged();
+        Log.e(TAG, "onDevicesRefreshedEvent: ");
+        devices_swipe_refresh.setRefreshing(false);
+        devices_warning.setVisibility(mDevices.size() == 0 ? View.VISIBLE : View.GONE);
+        mAdapter.notifyDataSetChanged();
     }
 
     @Subscribe (threadMode = ThreadMode.MAIN)
@@ -157,58 +160,22 @@ public class DevicesFragment extends BaseFragment {
     }
 
     private void refreshDevices() {
-//        DeviceManager.getInstance().syncSubcribeDevices(new XlinkTaskCallback<List<Device>>() {
-//            @Override
-//            public void onError(String error) {
-//                devices_swipe_refresh.setRefreshing(false);
-//            }
-//
-//            @Override
-//            public void onComplete(List<Device> devices) {
-//
-//            }
-//        });
-    }
+        DeviceManager.getInstance().getSubscribedDevices(new HttpCallback<UserApi.UserSubscribedDevicesResponse>() {
+            @Override
+            public void onError(String error) {
+                Log.e(TAG, "onError: " + error);
+                stopRefresh();
+            }
 
-//    private void getProperty() {
-//        if (mGetPropertyTask != null) {
-//            mGetPropertyTask.cancel(true);
-//            mGetPropertyTask = null;
-//        }
-//        mGetPropertyTask = new AsyncTask<Void, Void, Void>() {
-//            @Override
-//            protected Void doInBackground(Void... voids) {
-//                for (int i = 0; i < mDevices.size(); i++) {
-//                    Device device = mDevices.get(i);
-//                    String result = XlinkCloudManager.getInstance().getDeviceProperty(device.getXDevice());
-//                    Log.e(TAG, "doInBackground: " + result);
-//                    if (!TextUtils.isEmpty(result)) {
-//                        try {
-//                            JSONObject jsonObject = new JSONObject(result);
-//                            if (jsonObject.has(AppConstants.SPECIFICATION)) {
-//                                String spec = jsonObject.getString(AppConstants.SPECIFICATION);
-//                                device.setProperty(spec);
-//                                DeviceManager.getInstance().getDevice(device.getDeviceTag()).setProperty(spec);
-//                                continue;
-//                            }
-//                        } catch (JSONException e) {
-//                            e.printStackTrace();
-//                        }
-//                    }
-//                    device.setProperty(null);
-//                }
-//                return null;
-//            }
-//
-//            @Override
-//            protected void onPostExecute(Void aVoid) {
-//                super.onPostExecute(aVoid);
-//                devices_swipe_refresh.setRefreshing(false);
-//                mAdapter.notifyDataSetChanged();
-//            }
-//        };
-//        mGetPropertyTask.execute();
-//    }
+            @Override
+            public void onSuccess(UserApi.UserSubscribedDevicesResponse result) {
+                Log.e(TAG, "onSuccess: " + JSON.toJSONString(result));
+                mDevices.clear();
+                mDevices.addAll(DeviceManager.getInstance().getAllDevices());
+                EventBus.getDefault().post(new DevicesRefreshedEvent());
+            }
+        });
+    }
 
     private void gotoDeviceActivity(String tag) {
         Intent intent = new Intent(getContext(), DeviceActivity.class);
@@ -231,24 +198,44 @@ public class DevicesFragment extends BaseFragment {
         startActivity(intent);
     }
 
-    private void initList() {
-        mDevices.clear();
-        //  ExoLed
-        Device exoLed = new ExoLed();
-        exoLed.setProductKey(AliotConsts.PRODUCT_KEY_EXOLED);
-        exoLed.setDeviceName("2CF432121FC9");
-        exoLed.setMac("2CF432121FC9");
-        exoLed.setName("2CF432121FC9");
-
-        //  ExoSocket
-        Device exoSocket = new ExoSocket();
-        exoSocket.setProductKey(AliotConsts.PRODUCT_KEY_EXOSOCKET);
-        exoSocket.setDeviceName("2CF432121F42");
-        exoSocket.setMac("2CF432121F42");
-        exoSocket.setName("2CF432121F42");
-
-        DeviceManager.getInstance().addDevice(exoLed);
-        DeviceManager.getInstance().addDevice(exoSocket);
-        mDevices.addAll(DeviceManager.getInstance().getAllDevices());
+    private void stopRefresh() {
+        if (getActivity() == null) {
+            return;
+        }
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                devices_swipe_refresh.setRefreshing(false);
+            }
+        });
     }
+
+//    private void initList() {
+//        mDevices.clear();
+//        //  ExoLed
+//        Device exoLed = new ExoLed();
+//        exoLed.setProductKey(AliotConsts.PRODUCT_KEY_EXOLED);
+//        exoLed.setDeviceName("2CF432121FC9");
+//        exoLed.setMac("2CF432121FC9");
+//        exoLed.setName("2CF432121FC9");
+//
+//        //  ExoSocket
+//        Device exoSocket = new ExoSocket();
+//        exoSocket.setProductKey(AliotConsts.PRODUCT_KEY_EXOSOCKET);
+//        exoSocket.setDeviceName("2CF432121F42");
+//        exoSocket.setMac("2CF432121F42");
+//        exoSocket.setName("2CF432121F42");
+//
+//        //ExoMonsoon
+//        Device exoMonsoon = new ExoMonsoon();
+//        exoMonsoon.setProductKey(AliotConsts.PRODUCT_KEY_EXOMONSOON);
+//        exoMonsoon.setDeviceName("2CF4322CF664");
+//        exoMonsoon.setMac("2CF4322CF664");
+//        exoMonsoon.setName("2CF4322CF664");
+//
+//        DeviceManager.getInstance().addDevice(exoLed);
+//        DeviceManager.getInstance().addDevice(exoSocket);
+//        DeviceManager.getInstance().addDevice(exoMonsoon);
+//        mDevices.addAll(DeviceManager.getInstance().getAllDevices());
+//    }
 }

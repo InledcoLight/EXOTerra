@@ -204,7 +204,7 @@
     <!--        android:layout_width="wrap_content"-->
     <!--        android:layout_height="wrap_content"-->
     <!--        android:layout_marginStart="16dp"-->
-    <!--        android:text="Device connected to router"-->
+    <!--        android:text="XDevice connected to router"-->
     <!--        app:layout_constraintBottom_toBottomOf="@+id/smart_config_cib_step1"-->
     <!--        app:layout_constraintStart_toEndOf="@+id/smart_config_cib_step1"-->
     <!--        app:layout_constraintTop_toTopOf="@+id/smart_config_cib_step1"/>-->
@@ -214,7 +214,7 @@
     <!--        android:layout_width="wrap_content"-->
     <!--        android:layout_height="wrap_content"-->
     <!--        android:layout_marginStart="16dp"-->
-    <!--        android:text="Device scanned"-->
+    <!--        android:text="XDevice scanned"-->
     <!--        app:layout_constraintBottom_toBottomOf="@+id/smart_config_cib_step2"-->
     <!--        app:layout_constraintStart_toEndOf="@+id/smart_config_cib_step2"-->
     <!--        app:layout_constraintTop_toTopOf="@+id/smart_config_cib_step2"/>-->
@@ -224,7 +224,7 @@
     <!--        android:layout_width="wrap_content"-->
     <!--        android:layout_height="wrap_content"-->
     <!--        android:layout_marginStart="16dp"-->
-    <!--        android:text="Device Initialized"-->
+    <!--        android:text="XDevice Initialized"-->
     <!--        app:layout_constraintBottom_toBottomOf="@+id/smart_config_cib_step3"-->
     <!--        app:layout_constraintStart_toEndOf="@+id/smart_config_cib_step3"-->
     <!--        app:layout_constraintTop_toTopOf="@+id/smart_config_cib_step3"/>-->
@@ -234,7 +234,7 @@
     <!--        android:layout_width="wrap_content"-->
     <!--        android:layout_height="wrap_content"-->
     <!--        android:layout_marginStart="16dp"-->
-    <!--        android:text="Device subscribed"-->
+    <!--        android:text="XDevice subscribed"-->
     <!--        app:layout_constraintBottom_toBottomOf="@+id/smart_config_cib_step4"-->
     <!--        app:layout_constraintStart_toEndOf="@+id/smart_config_cib_step4"-->
     <!--        app:layout_constraintTop_toTopOf="@+id/smart_config_cib_step4"/>-->
@@ -334,7 +334,7 @@
 <!--        android:layout_width="wrap_content"-->
 <!--        android:layout_height="wrap_content"-->
 <!--        android:layout_marginStart="16dp"-->
-<!--        android:text="Device connected to router"-->
+<!--        android:text="XDevice connected to router"-->
 <!--        app:layout_constraintBottom_toBottomOf="@+id/smart_config_cib_step1"-->
 <!--        app:layout_constraintStart_toEndOf="@+id/smart_config_cib_step1"-->
 <!--        app:layout_constraintTop_toTopOf="@+id/smart_config_cib_step1"/>-->
@@ -344,7 +344,7 @@
 <!--        android:layout_width="wrap_content"-->
 <!--        android:layout_height="wrap_content"-->
 <!--        android:layout_marginStart="16dp"-->
-<!--        android:text="Device scanned"-->
+<!--        android:text="XDevice scanned"-->
 <!--        app:layout_constraintBottom_toBottomOf="@+id/smart_config_cib_step2"-->
 <!--        app:layout_constraintStart_toEndOf="@+id/smart_config_cib_step2"-->
 <!--        app:layout_constraintTop_toTopOf="@+id/smart_config_cib_step2"/>-->
@@ -354,7 +354,7 @@
 <!--        android:layout_width="wrap_content"-->
 <!--        android:layout_height="wrap_content"-->
 <!--        android:layout_marginStart="16dp"-->
-<!--        android:text="Device Initialized"-->
+<!--        android:text="XDevice Initialized"-->
 <!--        app:layout_constraintBottom_toBottomOf="@+id/smart_config_cib_step3"-->
 <!--        app:layout_constraintStart_toEndOf="@+id/smart_config_cib_step3"-->
 <!--        app:layout_constraintTop_toTopOf="@+id/smart_config_cib_step3"/>-->
@@ -364,7 +364,7 @@
 <!--        android:layout_width="wrap_content"-->
 <!--        android:layout_height="wrap_content"-->
 <!--        android:layout_marginStart="16dp"-->
-<!--        android:text="Device subscribed"-->
+<!--        android:text="XDevice subscribed"-->
 <!--        app:layout_constraintBottom_toBottomOf="@+id/smart_config_cib_step4"-->
 <!--        app:layout_constraintStart_toEndOf="@+id/smart_config_cib_step4"-->
 <!--        app:layout_constraintTop_toTopOf="@+id/smart_config_cib_step4"/>-->

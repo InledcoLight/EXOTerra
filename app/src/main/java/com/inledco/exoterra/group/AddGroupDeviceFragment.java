@@ -74,12 +74,12 @@ public class AddGroupDeviceFragment extends BaseFragment {
     @Override
     protected void initData() {
 //        Set<String> devtags = new HashSet<>();
-//        for (Home home : HomeManager.getInstance().getHomeList()) {
-//            for (HomeApi.HomeDevicesResponse.Device device : home.getDevices()) {
+//        for (Group home : HomeManager.getInstance().getHomeList()) {
+//            for (HomeApi.HomeDevicesResponse.XDevice device : home.getDevices()) {
 //                devtags.add(device.productId + "_" + device.mac);
 //            }
 //        }
-//        for (Device device : DeviceManager.getInstance().getAllDevices()) {
+//        for (XDevice device : DeviceManager.getInstance().getAllDevices()) {
 //            if (devtags.contains(device.getDeviceTag())) {
 //                continue;
 //            }
@@ -90,7 +90,7 @@ public class AddGroupDeviceFragment extends BaseFragment {
 //        mAdapter.setOnItemClickListener(new OnItemClickListener() {
 //            @Override
 //            public void onItemClick(int position) {
-//                Device device = mDevices.get(position);
+//                XDevice device = mDevices.get(position);
 //                if (TextUtils.isEmpty(mHomeId)) {
 //                    return;
 //                }

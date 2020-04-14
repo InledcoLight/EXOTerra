@@ -1,5 +1,7 @@
 package com.inledco.exoterra.aliot;
 
+import com.inledco.exoterra.aliot.bean.XDevice;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,12 +21,20 @@ public class ExoMonsoon extends Device {
     private final String KEY_CUSTOM_ACTIONS = "CustomActions";
     private final String KEY_TIMERS         = "Timers";
 
+    public ExoMonsoon(XDevice xDevice) {
+        super(xDevice);
+    }
+
     public int getKeyAction() {
         return getPropertyInt(KEY_BUTTON_ACTION);
     }
 
     public int getPower() {
         return getPropertyInt(KEY_POWER);
+    }
+
+    public long getPowerTime() {
+        return getPropertyTime(KEY_POWER);
     }
 
     public int getCountdown() {
@@ -121,6 +131,11 @@ public class ExoMonsoon extends Device {
         timer.setRepeat(repeat);
         timer.setTimer(tmr);
         return timer;
+    }
+
+    @Override
+    protected String getProductName() {
+        return "exomonsoon";
     }
 
     public static class Timer {

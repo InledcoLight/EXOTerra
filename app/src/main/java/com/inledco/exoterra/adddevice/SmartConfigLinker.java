@@ -2,45 +2,53 @@ package com.inledco.exoterra.adddevice;
 
 import android.os.AsyncTask;
 import android.os.CountDownTimer;
+import android.support.annotation.StringRes;
 import android.support.v7.app.AppCompatActivity;
+import android.text.TextUtils;
 import android.util.Log;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONException;
+import com.alibaba.fastjson.JSONObject;
 import com.espressif.iot.esptouch.EsptouchTask;
 import com.espressif.iot.esptouch.IEsptouchResult;
 import com.espressif.iot.esptouch.IEsptouchTask;
+import com.inledco.exoterra.aliot.AliotServer;
+import com.inledco.exoterra.aliot.DeviceParam;
+import com.inledco.exoterra.aliot.UserApi;
 import com.inledco.exoterra.bean.Result;
+import com.inledco.exoterra.manager.UserManager;
 
 import java.lang.ref.WeakReference;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.TimeZone;
 
 public class SmartConfigLinker {
     private final String TAG = "SmartConfigLinker";
 
-    private final int SCAN_DEVICE_TIMEOUT       = 8000;
-    private final int SCAN_RETRY_INTERVAL       = 1000;
-    private final int ADD_DEVICE_TIMEOUT        = 10000;
-    private final int SET_ZONE_TIMEOUT          = 5000;
-    private final int SUBSCRIBE_DEVICE_TIMEOUT  = 15000;
-
-    private final int INDEX_ZONE                = 1;
-    private final int INDEX_SYNC_DATETIME       = 5;
+    private final int SUBSCRIBE_TIMEOUT         = 15000;
 
     private final int PROGRESS_ESPTOUCH         = 60;
-    private final int PROGRESS_SCAN             = 68;
-    private final int PROGRESS_ADDDEVICE        = 78;
-    private final int PROGRESS_SYNC_DEVICE = 85;
+    private final int PROGRESS_GETPARAM         = 70;
+    private final int PROGRESS_SUBSCRIBE        = 80;
     private final int PROGRESS_SUCCESS          = 100;
+
+    private final int REMOTE_PORT               = 8899;
+    private final int LOCAL_PORT                = 5000;
 
     private final boolean mSubscribe;
 
     private int mProgress;
     private final CountDownTimer mTimer;
 
-    private final String mProductId;
-    private String mAddress;
+    private final String mProductKey;
     private final String mSsid;
     private final String mBssid;
     private final String mPassword;
-//    private XDevice mXDevice;
+    private String mAddress;
+    private String mDeviceName;
+    private String mDeviceSecret;
 
     private WeakReference<AppCompatActivity> mActivity;
 
@@ -50,16 +58,62 @@ public class SmartConfigLinker {
 
     private SmartConfigListener mListener;
 
+    private UdpClient mClient;
+    private BaseClient.Listener mClientListener;
+    private String mReceive;
+    private CountDownTimer mGetTimer;
+    private boolean mGetTimeout;
+    private CountDownTimer mSetTimer;
+    private boolean mSetTimeout;
+
     private AsyncTask<Void, Integer, Result> mTask;
 
-    public SmartConfigLinker(AppCompatActivity activity, boolean subscribe, String pid, String ssid, String bssid, String psw) {
+    public SmartConfigLinker(AppCompatActivity activity, boolean subscribe, String pkey, String ssid, String bssid, String psw) {
         mSubscribe = subscribe;
-        mProductId = pid;
+        mProductKey = pkey;
         mSsid = ssid;
         mBssid = bssid;
         mPassword = psw;
         mActivity = new WeakReference<>(activity);
         mLock = new Object();
+
+        mGetTimer = new CountDownTimer(10000, 2000) {
+            @Override
+            public void onTick(long millisUntilFinished) {
+                getDeviceParam();
+            }
+
+            @Override
+            public void onFinish() {
+                mGetTimeout = true;
+            }
+        };
+
+        mSetTimer = new CountDownTimer(10000, 2000) {
+            @Override
+            public void onTick(long millisUntilFinished) {
+                setDeviceParam(mDeviceSecret);
+            }
+
+            @Override
+            public void onFinish() {
+                mSetTimeout = true;
+            }
+        };
+
+        mClientListener = new BaseClient.Listener() {
+            @Override
+            public void onError(String error) {
+                Log.e(TAG, "onError: " + error);
+            }
+
+            @Override
+            public void onReceive(byte[] bytes) {
+                mReceive = new String(bytes);
+                Log.e(TAG, "onReceive: " + mReceive);
+            }
+        };
+
         mTimer = new CountDownTimer(100000, 1000) {
             @Override
             public void onTick(long millisUntilFinished) {
@@ -92,111 +146,97 @@ public class SmartConfigLinker {
         }
         IEsptouchResult esptouchResult = mEsptouchTask.executeForResult();
         if (esptouchResult == null || esptouchResult.isCancelled() || !esptouchResult.isSuc()) {
-            return new Result(false, "Esptouch failed.");
+            return new Result(false, "Smartconfig failed.");
         }
         mAddress = esptouchResult.getBssid().toUpperCase();
-        Log.e(TAG, "esptouch: " + mAddress);
-        return new Result(true, null);
+        byte[] addr = esptouchResult.getInetAddress().getAddress();
+        String remoteAddress = String.format("%1$d.%2$d.%3$d.%4$d", addr[0]&0xFF, addr[1]&0xFF, addr[2]&0xFF, addr[3]&0xFF);
+        Log.e(TAG, "esptouch: " + remoteAddress);
+        mClient = new UdpClient(remoteAddress, REMOTE_PORT, LOCAL_PORT);
+        mClient.setListener(mClientListener);
+        mClient.start();
+        while (!mClient.isListening());
+        return new Result(true, remoteAddress);
     }
 
-    private Result scan() {
-        final TaskResult result = new TaskResult();
-//        XLinkScanDeviceListener listener = new XLinkScanDeviceListener() {
-//            @Override
-//            public void onScanResult(XDevice xDevice) {
-//                if (xDevice != null && TextUtils.equals(mAddress, xDevice.getMacAddress().toUpperCase())) {
-//                    mXDevice = xDevice;
-//                    result.setSuccess(true);
-//                    result.setOver(true);
-//                }
-//            }
-//
-//            @Override
-//            public void onError(XLinkCoreException e) {
-//                result.setError("error code: " + e.getErrorCode() + "\n" + e.getErrorName());
-//                result.setSuccess(false);
-//                result.setOver(true);
-//            }
-//
-//            @Override
-//            public void onStart() {
-//                Log.e(TAG, "Scan - onStart: ");
-//            }
-//
-//            @Override
-//            public void onComplete(Void aVoid) {
-//                Log.e(TAG, "onComplete: ");
-//                result.setError("Scan timeout");
-//                result.setSuccess(false);
-//                result.setOver(true);
-//            }
-//        };
-//        XlinkCloudManager.getInstance().scanDevice(mProductId, SCAN_DEVICE_TIMEOUT, SCAN_RETRY_INTERVAL, listener);
-//        while(!result.isOver());
-        Result res = new Result(result.isSuccess(), result.getError());
-        return res;
+    private void getDeviceParam() {
+        String[] array = new String[]{"region", "productKey", "productSecret", "deviceName", "deviceSecret"};
+        Map<String, Object> map = new HashMap<>();
+        map.put("get", array);
+        String paylod = JSON.toJSONString(map);
+        Log.e(TAG, "getDeviceParam: " + paylod);
+        mClient.send(paylod);
     }
 
-    private boolean checkDeviceRegistered() {
-//        QueryDeviceResponse response = XlinkCloudManager.getInstance().queryDeviceBlock(mProductId, mAddress);
-//        if (response == null || !response.isValid()) {
-//            return false;
-//        }
-        return true;
+    private DeviceParam parseGetParamResponse(String result) {
+        try {
+            JSONObject object = JSON.parseObject(result);
+            if (object.containsKey("get_resp")) {
+                return object.getObject("get_resp", DeviceParam.class);
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
-    private Result registerDevice() {
-        Result result = new Result();
-//        ImportDeviceResponse response = XlinkCloudManager.getInstance()
-//                                                         .registerDeviceBlock(mProductId, null, mAddress, mAddress.toLowerCase());
-//        if (response != null && response.isValid()) {
-//            if (response.getResp().getErrcode() == 0) {
-//                result.setSuccess(true);
-//            } else {
-//                result.setError(response.getResp().getErrmsg());
-//            }
-//        } else {
-//            result.setError(mActivity.get().getString(R.string.error_regdev_failed));
-//        }
-        return result;
+    public void setDeviceParam(String region, String pkey, String psecret, String dsecret) {
+        final int zone = TimeZone.getDefault().getRawOffset() / 60000;
+        final long time = System.currentTimeMillis();
+        DeviceParam devParam = new DeviceParam(region, pkey, psecret, dsecret, zone, time);
+        Map<String, Object> setAction = new HashMap<>();
+        setAction.put("set", devParam);
+        String payload = JSON.toJSONString(setAction);
+        Log.e(TAG, "setDeviceParam: " + payload);
+        mClient.send(payload);
     }
 
-    private Result addDevice() {
-//        XlinkTaskHandler<XDevice> listener = new XlinkTaskHandler<>();
-//        XlinkCloudManager.getInstance().addDevice(mXDevice, ADD_DEVICE_TIMEOUT, listener);
-//        while (!listener.isOver());
-//        Result res = new Result(listener.isSuccess(), listener.getError());
-//        return res;
-        return new Result();
+    public void setDeviceParam(String dsecret) {
+        final int zone = TimeZone.getDefault().getRawOffset() / 60000;
+        final long time = System.currentTimeMillis();
+        DeviceParam devParam = new DeviceParam(dsecret, zone, time);
+        Map<String, Object> setAction = new HashMap<>();
+        setAction.put("set", devParam);
+        String payload = JSON.toJSONString(setAction);
+        Log.e(TAG, "setDeviceParam: " + payload);
+        mClient.send(payload);
     }
 
-    private Result syncDevice() {
-//        XlinkTaskHandler<XDevice> listener = new XlinkTaskHandler<>();
-//        final int rawZone = TimeZone.getDefault().getRawOffset()/60000;
-//        final int zone = (rawZone/60)*100 + (rawZone%60);
-//        final List<XLinkDataPoint> dps = new ArrayList<>();
-//        final XLinkDataPoint dp1 = new XLinkDataPoint(INDEX_ZONE, DataPointValueType.SHORT, (short) zone);
-//        dps.add(dp1);
-//        XlinkCloudManager.getInstance().setDeviceDatapoints(mXDevice, dps, SET_ZONE_TIMEOUT, listener);
-//        while (!listener.isOver());
-//        Result res = new Result(listener.isSuccess(), listener.getError());
-//        return res;
-        return new Result();
+    public void setDeviceParam() {
+        final int zone = TimeZone.getDefault().getRawOffset() / 60000;
+        final long time = System.currentTimeMillis();
+        DeviceParam devParam = new DeviceParam(zone, time);
+        Map<String, Object> setAction = new HashMap<>();
+        setAction.put("set", devParam);
+        String payload = JSON.toJSONString(setAction);
+        Log.e(TAG, "setDeviceParam: " + payload);
+        mClient.send(payload);
     }
 
-    private Result subscribe() {
-//        XlinkTaskHandler<XDevice> listener = new XlinkTaskHandler<XDevice>() {
-//            @Override
-//            public void onComplete(XDevice device) {
-//                super.onComplete(device);
-//                mXDevice = device;
-//            }
-//        };
-//        XlinkCloudManager.getInstance().subscribeDevice(mXDevice, null, SUBSCRIBE_DEVICE_TIMEOUT, listener);
-//        while (!listener.isOver());
-//        Result res = new Result(listener.isSuccess(), listener.getError());
-//        return res;
-        return new Result();
+    public boolean parseSetParamResponse(String result) {
+        try {
+            JSONObject object = JSON.parseObject(result);
+            if (object.containsKey("set_resp")) {
+                JSONObject res = object.getJSONObject("set_resp");
+                if (res.containsKey("result")) {
+                    String suc = res.getString("result");
+                    if (TextUtils.equals(suc, "success")) {
+                        return true;
+                    }
+                }
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    private UserApi.SubscribeDeviceResponse subscribeDevice(String deviceName) {
+        String userid = UserManager.getInstance().getUserid();
+        String token = UserManager.getInstance().getToken();
+        UserApi.SubscribeDeviceResponse response = AliotServer.getInstance()
+                                                              .subscribeDevice(userid, token, mProductKey, deviceName, mAddress);
+        return response;
     }
 
     private void delay(long ms) {
@@ -211,7 +251,10 @@ public class SmartConfigLinker {
     }
 
     public void startTask() {
-//        mXDevice = null;
+        mReceive = null;
+        mGetTimeout = false;
+        mSetTimeout = false;
+        mDeviceSecret = null;
         mProgress = 0;
         mTask = new AsyncTask<Void, Integer, Result>() {
             @Override
@@ -222,47 +265,59 @@ public class SmartConfigLinker {
                 }
                 publishProgress(PROGRESS_ESPTOUCH);
 
-                result = scan();
-                if (!result.isSuccess()) {
-                    return result;
-                }
-                publishProgress(PROGRESS_SCAN);
-
-                delay(1000);
-                result = addDevice();
-                if (!result.isSuccess()) {
-                    return result;
-                }
-                publishProgress(PROGRESS_ADDDEVICE);
-
-                delay(2000);
-
-                result = syncDevice();
-                if (!mSubscribe) {
-                    return result;
-                }
-                if (!result.isSuccess()) {
-                    return result;
-                }
-                while (mProgress < PROGRESS_SYNC_DEVICE);
-                publishProgress(PROGRESS_SYNC_DEVICE);
-
-                if (!checkDeviceRegistered()) {
-                    result = registerDevice();
-                    if (!result.isSuccess()) {
-                        return result;
+                mGetTimer.start();
+                DeviceParam deviceParam = null;
+                while (!mGetTimeout) {
+                    if (mReceive != null) {
+                        deviceParam = parseGetParamResponse(mReceive);
+                        if (deviceParam != null) {
+                            mGetTimer.cancel();
+                            if (TextUtils.equals(mProductKey, deviceParam.getProductKey()) == false) {
+                                return new Result(false, "Invalid product.");
+                            } else {
+                                break;
+                            }
+                        }
+                        mReceive = null;
                     }
                 }
+                if (mGetTimeout) {
+                    return new Result(false, "Get Param Timeout.");
+                }
+                publishProgress(PROGRESS_GETPARAM);
 
-                delay(2000);
-                return subscribe();
+                UserApi.SubscribeDeviceResponse response = subscribeDevice(deviceParam.getDeviceName());
+                if (response == null) {
+                    result.setSuccess(false);
+                    result.setMessage("Suscribe failed");
+                    return result;
+                }
+                if (response.code != 0) {
+                    result.setSuccess(false);
+                    result.setMessage(response.msg);
+                    return result;
+                }
+                if(TextUtils.equals(deviceParam.getDeviceSecret(), response.data.device_secret) == false) {
+                    mDeviceSecret = response.data.device_secret;
+                }
 
-//                result = subscribe();
-//                if (!result.isSuccess()) {
-//                    return result;
-//                }
-//                delay(1000);
-//                return addDeviceToHomeAndRoom();
+                mReceive = null;
+                mSetTimer.start();
+                while (!mSetTimeout) {
+                    if (mReceive != null) {
+                        if (parseSetParamResponse(mReceive)) {
+                            mSetTimer.cancel();
+                            break;
+                        }
+                        mReceive = null;
+                    }
+                }
+                if (mSetTimeout) {
+                    return new Result(false, "Set Param Timeout.");
+                }
+
+                mDeviceName = deviceParam.getDeviceName();
+                return new Result(true, null);
             }
 
             @Override
@@ -275,9 +330,9 @@ public class SmartConfigLinker {
                     if (result.isSuccess()) {
                         mProgress = PROGRESS_SUCCESS;
                         mListener.onProgressUpdate(mProgress);
-//                        mListener.onSuccess(mXDevice.getDeviceId(), mAddress);
+                        mListener.onSuccess(mDeviceName, mAddress);
                     } else {
-                        mListener.onError(result.getError());
+                        mListener.onError(result.getMessage());
                     }
                 }
             }
@@ -294,10 +349,6 @@ public class SmartConfigLinker {
                 if (mListener != null) {
                     if (values[0] == PROGRESS_ESPTOUCH) {
                         mListener.onEsptouchSuccess();
-                    } else if (values[0] == PROGRESS_SCAN) {
-                        mListener.onDeviceScanned();
-                    } else if (values[0] == PROGRESS_SYNC_DEVICE) {
-                        mListener.onDeviceInitialized();
                     }
                     mListener.onProgressUpdate(mProgress);
                 }
@@ -308,15 +359,25 @@ public class SmartConfigLinker {
     }
 
     public void stopTask() {
+        mGetTimer.cancel();
+        mSetTimer.cancel();
         mTimer.cancel();
         if (mEsptouchTask != null) {
             mEsptouchTask.interrupt();
             mEsptouchTask = null;
         }
+        if (mClient != null) {
+            mClient.stop();
+            mClient = null;
+        }
         if (mTask != null) {
             mTask.cancel(true);
             mTask = null;
         }
+    }
+
+    private String getString(@StringRes int resid) {
+        return mActivity.get().getString(resid);
     }
 
     class TaskResult {

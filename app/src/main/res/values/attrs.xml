@@ -104,4 +104,5 @@
         <attr name="seekable"/>
         <attr name="scrollOnce"/>
     </declare-styleable>
+
 </resources>
