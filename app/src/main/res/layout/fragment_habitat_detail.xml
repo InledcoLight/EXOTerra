@@ -32,9 +32,17 @@
             android:orientation="horizontal"
             android:gravity="center_vertical">
 
+            <ImageButton
+                android:id="@+id/habitat_detail_icon"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="?attr/selectableItemBackground"
+                android:scaleType="fitCenter"/>
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="top"
+                android:layout_marginLeft="8dp"
                 android:textColor="@color/textColorPrimary"
                 android:textSize="@dimen/textSizeSubTitle"
                 android:text="@string/habitat_name"/>
@@ -47,8 +55,7 @@
                 android:id="@+id/habitat_detail_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:paddingTop="4dp"
-                android:paddingBottom="4dp"
+                android:layout_gravity="bottom"
                 android:gravity="center_vertical"
                 android:drawablePadding="8dp"
                 android:background="?attr/selectableItemBackground"

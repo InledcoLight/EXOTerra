@@ -1,8 +1,10 @@
 package com.inledco.exoterra.manager;
 
+import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
+import com.inledco.exoterra.aliot.AliotClient;
 import com.inledco.exoterra.aliot.AliotConsts;
 import com.inledco.exoterra.aliot.AliotServer;
 import com.inledco.exoterra.aliot.Device;
@@ -12,6 +14,10 @@ import com.inledco.exoterra.aliot.ExoSocket;
 import com.inledco.exoterra.aliot.HttpCallback;
 import com.inledco.exoterra.aliot.UserApi;
 import com.inledco.exoterra.aliot.bean.XDevice;
+import com.inledco.exoterra.event.DevicesRefreshedEvent;
+import com.inledco.exoterra.util.DeviceUtil;
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -28,10 +34,11 @@ public class DeviceManager {
     private final Map<String, Device> mSubcribedDevices;
     private final List<Device> mDevices;
 
+    private boolean mSynchronizing;
     private boolean mSynchronized;
-//    private boolean mSyncing;
-//    private AsyncTask<Void, Void, Void> mAsyncTask;
-//
+
+    private AsyncTask<Void, Void, Void> mAsyncTask;
+
     private DeviceManager() {
         mSubcribedDevices = new ConcurrentHashMap<>();
         mDevices = new ArrayList<>();
@@ -58,6 +65,8 @@ public class DeviceManager {
                 device.setRemark1(xdevice.remark1);
                 device.setRemark2(xdevice.remark2);
                 device.setRemark3(xdevice.remark3);
+                device.setOnline(TextUtils.equals(xdevice.is_online, "online"));
+                device.setRole(xdevice.role);
             } else {
                 if (TextUtils.equals(xdevice.product_key, AliotConsts.PRODUCT_KEY_EXOLED)) {
                     mSubcribedDevices.put(key, new ExoLed(xdevice));
@@ -85,6 +94,7 @@ public class DeviceManager {
     public void clear() {
         mSubcribedDevices.clear();
         mDevices.clear();
+        mSynchronized = false;
     }
 
     public boolean contains(String key) {
@@ -125,8 +135,8 @@ public class DeviceManager {
         return list;
     }
 
-    public boolean isSynchronized() {
-        return mSynchronized;
+    public boolean needSynchronize() {
+        return !mSynchronized && !mSynchronizing;
     }
 
     private void updateDevices(@NonNull final List<XDevice> xdevices) {
@@ -145,21 +155,17 @@ public class DeviceManager {
         }
         mDevices.clear();
         mDevices.addAll(mSubcribedDevices.values());
-
-//        mDevices.clear();
-//        mSubcribedDevices.clear();
-//        for (Device device : xdevices) {
-//            addDevice(device);
-//        }
-//        mDevices.addAll(mSubcribedDevices.values());
     }
 
-    public void getSubscribedDevices(final HttpCallback<UserApi.UserSubscribedDevicesResponse> callback) {
-        final String userid = UserManager.getInstance().getUserid();
-        final String token = UserManager.getInstance().getToken();
-        AliotServer.getInstance().getSubscribeDevices(userid, token, new HttpCallback<UserApi.UserSubscribedDevicesResponse>() {
+    public void getSubscribedDevices(final OnErrorCallback callback) {
+        if (mSynchronizing) {
+            return;
+        }
+        mSynchronizing = true;
+        AliotServer.getInstance().getSubscribeDevices(new HttpCallback<UserApi.UserSubscribedDevicesResponse>() {
             @Override
             public void onError(String error) {
+                mSynchronizing = false;
                 if (callback != null) {
                     callback.onError(error);
                 }
@@ -169,144 +175,48 @@ public class DeviceManager {
             public void onSuccess(UserApi.UserSubscribedDevicesResponse result) {
                 updateDevices(result.data);
                 mSynchronized = true;
-                if (callback != null) {
-                    callback.onSuccess(result);
-                }
+                mSynchronizing = false;
+                EventBus.getDefault().post(new DevicesRefreshedEvent());
+
+                getExoSocketSensors();
             }
         });
     }
 
-//    public void refreshDevice(@NonNull final XDevice device) {
-//        if (contains(device) && device.getXDevice() != null && device.getXDevice().isOnline()) {
-//            XlinkCloudManager.getInstance().getDeviceDatapoints(device.getXDevice(), new XlinkTaskCallback<List<XLinkDataPoint>>() {
-//                @Override
-//                public void onError(String error) {
-//
-//                }
-//
-//                @Override
-//                public void onComplete(List<XLinkDataPoint> dataPoints) {
-//                    Collections.sort(dataPoints, new Comparator<XLinkDataPoint>() {
-//                        @Override
-//                        public int compare(XLinkDataPoint o1, XLinkDataPoint o2) {
-//                            return o1.getIndex() - o2.getIndex();
-//                        }
-//                    });
-//                    device.setDataPointList(dataPoints);
-//                    EventBus.getDefault().post(new DatapointChangedEvent(device.getDeviceTag()));
-//                }
-//            });
-//        }
-//    }
-//
-//    public void refreshSubcribeDevices(final XlinkTaskCallback<List<XDevice>> listener) {
-//        XlinkCloudManager.getInstance().syncSubscribedDevices(new XlinkTaskCallback<List<XDevice>>() {
-//            @Override
-//            public void onError(String error) {
-//                if (listener != null) {
-//                    listener.onError(error);
-//                }
-//            }
-//
-//            @Override
-//            public void onStart() {
-//                if (listener != null) {
-//                    listener.onStart();
-//                }
-//            }
-//
-//            @Override
-//            public void onComplete(List<XDevice> xDevices) {
-//                mSubcribedDevices.clear();
-//                mDevices.clear();
-//                if (xDevices != null) {
-//                    for (XDevice xDevice : xDevices) {
-//                        if (xDevice != null) {
-//                            updateDevice(xDevice);
-//                        }
-//                    }
-//                }
-//                mDevices.addAll(mSubcribedDevices.values());
-//                if (listener != null) {
-//                    listener.onComplete(mDevices);
-//                }
-//            }
-//        });
-//    }
-//
-//    public void syncSubcribeDevices(final XlinkTaskCallback<List<XDevice>> listener) {
-//        if (mAsyncTask != null) {
-//            mAsyncTask.cancel(true);
-//        }
-//        XlinkCloudManager.getInstance().syncSubscribedDevices(new XlinkTaskCallback<List<XDevice>>() {
-//            @Override
-//            public void onError(String error) {
-//                if (listener != null) {
-//                    listener.onError(error);
-//                }
-//            }
-//
-//            @Override
-//            public void onStart() {
-//                if (listener != null) {
-//                    listener.onStart();
-//                }
-//            }
-//
-//            @Override
-//            public void onComplete(List<XDevice> xDevices) {
-//                updateDevices(xDevices);
-//                EventBus.getDefault().post(new DevicesRefreshedEvent());
-//                if (listener != null) {
-//                    listener.onComplete(mDevices);
-//                }
-//                getAllDeviceDatapoints();
-//
-////                mSubcribedDevices.clear();
-////                mDevices.clear();
-////                if (xDevices != null) {
-////                    for (final XDevice xDevice : xDevices) {
-////                        if (xDevice != null) {
-////                            updateDevice(xDevice);
-////                        }
-////                    }
-////                }
-////                mDevices.addAll(mSubcribedDevices.values());
-////                if (listener != null) {
-////                    listener.onComplete(mDevices);
-////                }
-////
-////                getAllDeviceDatapoints();
-//            }
-//        });
-//    }
-//
-//    public void getAllDeviceDatapoints() {
-//        if (mSubcribedDevices.size() == 0) {
-//            return;
-//        }
-//        if (mAsyncTask != null) {
-//            mAsyncTask.cancel(true);
-//        }
-//        mAsyncTask = new AsyncTask<Void, Void, Void>() {
-//            @Override
-//            protected Void doInBackground(Void... voids) {
-//                for (XDevice dev : mDevices) {
-//                    if (dev.getXDevice().isOnline() && !dev.isSynchronized()) {
-//                        XlinkTaskHandler<List<XLinkDataPoint>> callback = new XlinkTaskHandler<>();
-//                        XlinkCloudManager.getInstance().getDeviceDatapoints(dev.getXDevice(), callback);
-//                        while (!callback.isOver());
-//                        if (callback.isSuccess()) {
-//                            dev.setDataPointList(callback.getResult());
-//                            EventBus.getDefault().post(new DatapointChangedEvent(dev.getDeviceTag()));
-//                        }
-//                    }
-//                }
-//                return null;
-//            }
-//        };
-//        mAsyncTask.execute();
-//    }
+    public void getSubscribedDevices() {
+        getSubscribedDevices(null);
+    }
+
+    public void getExoSocketSensors() {
+        final Set<String> deviceNames = new HashSet<>();
+        for (Device device : mDevices) {
+            if (TextUtils.equals(device.getProductKey(), AliotConsts.PRODUCT_KEY_EXOSOCKET)) {
+                deviceNames.add(device.getDeviceName());
+            }
+        }
+        if (deviceNames.size() == 0) {
+            return;
+        }
+        if (mAsyncTask != null) {
+            mAsyncTask.cancel(true);
+        }
+        mAsyncTask = new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... voids) {
+                final String prodcut = DeviceUtil.getProductName(AliotConsts.PRODUCT_KEY_EXOSOCKET).toLowerCase();
+                for (String dname : deviceNames) {
+                    AliotClient.getInstance().getProperty(prodcut, dname, "SensorAvailable", "Sensor");
+                    try {
+                        Thread.sleep(20);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+                return null;
+            }
+        };
+        mAsyncTask.execute();
+    }
 
     private static class LazyHolder {
         private static final DeviceManager INSTANCE = new DeviceManager();

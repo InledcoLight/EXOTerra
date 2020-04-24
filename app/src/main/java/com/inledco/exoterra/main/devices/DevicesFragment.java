@@ -6,6 +6,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,15 +19,18 @@ import com.inledco.exoterra.R;
 import com.inledco.exoterra.adddevice.AddDeviceActivity;
 import com.inledco.exoterra.aliot.ADevice;
 import com.inledco.exoterra.aliot.Device;
-import com.inledco.exoterra.aliot.HttpCallback;
-import com.inledco.exoterra.aliot.StatusReponse;
-import com.inledco.exoterra.aliot.UserApi;
+import com.inledco.exoterra.aliot.bean.Group;
 import com.inledco.exoterra.base.BaseFragment;
 import com.inledco.exoterra.common.OnItemClickListener;
 import com.inledco.exoterra.device.DeviceActivity;
+import com.inledco.exoterra.event.DeviceChangedEvent;
+import com.inledco.exoterra.event.DeviceStatusChangedEvent;
 import com.inledco.exoterra.event.DevicesRefreshedEvent;
+import com.inledco.exoterra.event.GroupDeviceChangedEvent;
 import com.inledco.exoterra.event.GroupsRefreshedEvent;
 import com.inledco.exoterra.manager.DeviceManager;
+import com.inledco.exoterra.manager.GroupManager;
+import com.inledco.exoterra.manager.OnErrorCallback;
 import com.inledco.exoterra.scan.ScanActivity;
 import com.inledco.exoterra.smartconfig.SmartconfigActivity;
 
@@ -99,7 +103,7 @@ public class DevicesFragment extends BaseFragment {
         });
         devices_rv_show.setAdapter(mAdapter);
 
-        if (DeviceManager.getInstance().isSynchronized() == false) {
+        if (DeviceManager.getInstance().needSynchronize()) {
             devices_swipe_refresh.setRefreshing(true);
             refreshDevices();
         }
@@ -124,55 +128,78 @@ public class DevicesFragment extends BaseFragment {
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onDevicePropertyChangedEvent(@NonNull ADevice event) {
-//        if (event != null) {
-//            for (int i = 0; i < mDevices.size(); i++) {
-//                if (event.getDeviceId() == mDevices.get(i).getXDevice().getDeviceId()) {
-//                    mDevices.get(i).getXDevice().setDeviceName(event.getDeviceName());
-//                    mAdapter.notifyDataSetChanged();
-//                    return;
-//                }
+//        if (event == null) {
+//            return;
+//        }
+//        for (int i = 0; i < mDevices.size(); i++) {
+//            Device device = mDevices.get(i);
+//            if (TextUtils.equals(device.getTag(), event.getTag())) {
+//                mAdapter.notifyItemChanged(i);
 //            }
 //        }
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onHomesRefreshedEvent(GroupsRefreshedEvent event) {
+    public void onGroupsRefreshedEvent(GroupsRefreshedEvent event) {
+        mAdapter.notifyDataSetChanged();
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onGroupDeviceChangedEvent(GroupDeviceChangedEvent event) {
+        if (event == null) {
+            return;
+        }
+        for (int i = 0; i < mDevices.size(); i++) {
+            Device device = mDevices.get(i);
+            Group group = GroupManager.getInstance().getDeviceGroup(device.getProductKey(), device.getDeviceName());
+            if (group != null && TextUtils.equals(event.getGroupid(), group.groupid)) {
+                mAdapter.notifyItemChanged(i);
+            }
+        }
         mAdapter.notifyDataSetChanged();
     }
 
     @Subscribe (threadMode = ThreadMode.MAIN)
     public void onDevicesRefreshedEvent(DevicesRefreshedEvent event) {
         Log.e(TAG, "onDevicesRefreshedEvent: ");
+        mDevices.clear();
+        mDevices.addAll(DeviceManager.getInstance().getAllDevices());
         devices_swipe_refresh.setRefreshing(false);
         devices_warning.setVisibility(mDevices.size() == 0 ? View.VISIBLE : View.GONE);
         mAdapter.notifyDataSetChanged();
     }
 
     @Subscribe (threadMode = ThreadMode.MAIN)
-    public void onDeviceStateChangedEvent(@NonNull StatusReponse event) {
-//        if (event != null) {
-//            for (int i = 0; i < mDevices.size(); i++) {
-//                if (TextUtils.equals(event.getDeviceTag(), mDevices.get(i).getDeviceTag())) {
-//                    mAdapter.notifyItemChanged(i);
-//                }
-//            }
-//        }
+    public void onDeviceStatusChangedEvent(DeviceStatusChangedEvent event) {
+        Log.e(TAG, "onDeviceStatusChangedEvent: " + JSON.toJSONString(event));
+        if (event != null) {
+            for (int i = 0; i < mDevices.size(); i++) {
+                Device device = mDevices.get(i);
+                if (TextUtils.equals(event.getTag(), device.getTag())){
+                    mAdapter.notifyItemChanged(i);
+                }
+            }
+        }
+    }
+
+    @Subscribe (threadMode = ThreadMode.MAIN)
+    public void onDeviceChangedEvent(DeviceChangedEvent event) {
+        if (event != null) {
+            for (int i = 0; i < mDevices.size(); i++) {
+                Device device = mDevices.get(i);
+                if (TextUtils.equals(device.getTag(), event.getTag())) {
+                    mAdapter.notifyItemChanged(i);
+                    return;
+                }
+            }
+        }
     }
 
     private void refreshDevices() {
-        DeviceManager.getInstance().getSubscribedDevices(new HttpCallback<UserApi.UserSubscribedDevicesResponse>() {
+        DeviceManager.getInstance().getSubscribedDevices(new OnErrorCallback() {
             @Override
             public void onError(String error) {
-                Log.e(TAG, "onError: " + error);
                 stopRefresh();
-            }
-
-            @Override
-            public void onSuccess(UserApi.UserSubscribedDevicesResponse result) {
-                Log.e(TAG, "onSuccess: " + JSON.toJSONString(result));
-                mDevices.clear();
-                mDevices.addAll(DeviceManager.getInstance().getAllDevices());
-                EventBus.getDefault().post(new DevicesRefreshedEvent());
             }
         });
     }

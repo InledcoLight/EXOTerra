@@ -45,10 +45,11 @@
             android:orientation="horizontal">
 
             <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:id="@+id/group_icon"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
                 android:layout_marginLeft="8dp"
-                app:srcCompat="@drawable/ic_habitats_white_48dp" />
+                android:scaleType="fitCenter" />
 
             <TextView
                 android:id="@+id/group_title"

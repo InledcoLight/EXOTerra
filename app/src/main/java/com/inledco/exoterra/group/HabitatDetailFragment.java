@@ -15,6 +15,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,22 +25,24 @@ import android.widget.ImageButton;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.TimePicker;
-import android.widget.Toast;
 
+import com.alibaba.fastjson.JSON;
 import com.inledco.exoterra.GlobalSettings;
 import com.inledco.exoterra.R;
+import com.inledco.exoterra.aliot.AliotClient;
 import com.inledco.exoterra.aliot.AliotServer;
 import com.inledco.exoterra.aliot.HttpCallback;
 import com.inledco.exoterra.aliot.UserApi;
 import com.inledco.exoterra.aliot.bean.Group;
-import com.inledco.exoterra.aliot.bean.XGroup;
 import com.inledco.exoterra.base.BaseFragment;
 import com.inledco.exoterra.common.OnItemClickListener;
 import com.inledco.exoterra.event.GroupChangedEvent;
 import com.inledco.exoterra.event.GroupsRefreshedEvent;
+import com.inledco.exoterra.main.groups.GroupIconDialog;
 import com.inledco.exoterra.manager.GroupManager;
 import com.inledco.exoterra.manager.UserManager;
 import com.inledco.exoterra.util.FavouriteUtil;
+import com.inledco.exoterra.util.GroupUtil;
 import com.inledco.exoterra.util.RegexUtil;
 import com.inledco.exoterra.util.TimeFormatUtil;
 import com.inledco.exoterra.view.GradientCornerButton;
@@ -55,6 +58,7 @@ import java.util.Set;
 import java.util.TimeZone;
 
 public class HabitatDetailFragment extends BaseFragment {
+    private ImageButton habitat_detail_icon;
     private TextView habitat_detail_name;
     private TextView habitat_detail_localdatetime;
     private TextView habitat_detail_datetime;
@@ -77,10 +81,19 @@ public class HabitatDetailFragment extends BaseFragment {
 
     private DateFormat mDateFormat;
     private DateFormat mTimeFormat;
-    private BroadcastReceiver mTimeReceiver;
+    private final BroadcastReceiver mTimeReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            switch (intent.getAction()) {
+                case Intent.ACTION_TIME_TICK:
+                    refreshTime();
+                    break;
+            }
+        }
+    };
 
     private boolean mGroupAdmin;
-    private final List<XGroup.User> mUsers = new ArrayList<>();
+    private final List<Group.User> mUsers = new ArrayList<>();
     private HabitatMembersAdapter mAdapter;
 
     public static HabitatDetailFragment newInstance(@NonNull final String groupid) {
@@ -120,6 +133,7 @@ public class HabitatDetailFragment extends BaseFragment {
 
     @Override
     protected void initView(View view) {
+        habitat_detail_icon = view.findViewById(R.id.habitat_detail_icon);
         habitat_detail_name = view.findViewById(R.id.habitat_detail_name);
         habitat_detail_localdatetime = view.findViewById(R.id.habitat_detail_localdatetime);
         habitat_detail_datetime = view.findViewById(R.id.habitat_detail_datetime);
@@ -146,16 +160,7 @@ public class HabitatDetailFragment extends BaseFragment {
                 mZone = mGroup.getZone();
                 mSunrise = mGroup.getSunrise();
                 mSunset = mGroup.getSunset();
-                mTimeReceiver = new BroadcastReceiver() {
-                    @Override
-                    public void onReceive(Context context, Intent intent) {
-                        switch (intent.getAction()) {
-                            case Intent.ACTION_TIME_TICK:
-                                refreshTime();
-                                break;
-                        }
-                    }
-                };
+
                 IntentFilter filter = new IntentFilter(Intent.ACTION_TIME_TICK);
                 getActivity().registerReceiver(mTimeReceiver, filter);
 
@@ -183,7 +188,7 @@ public class HabitatDetailFragment extends BaseFragment {
                 mAdapter.setOnItemClickListener(new OnItemClickListener() {
                     @Override
                     public void onItemClick(int position) {
-                        XGroup.User user = mUsers.get(position);
+                        Group.User user = mUsers.get(position);
                         addFragmentToStack(R.id.main_fl, HabitatMemberFragment.newInstance(mGroupid, user.userid));
                     }
                 });
@@ -205,6 +210,12 @@ public class HabitatDetailFragment extends BaseFragment {
         if (mGroup == null) {
             return;
         }
+        habitat_detail_icon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showGroupIconDialog();
+            }
+        });
         habitat_detail_name.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -304,37 +315,12 @@ public class HabitatDetailFragment extends BaseFragment {
         GroupManager.getInstance().setRemark1(mGroupid, zone, sunrise, sunset, new HttpCallback<UserApi.GroupResponse>() {
             @Override
             public void onError(final String error) {
-                if (getActivity() == null) {
-                    return;
-                }
-                getActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        Toast.makeText(getContext(), error, Toast.LENGTH_SHORT)
-                             .show();
-                    }
-                });
+                showToast(error);
             }
 
             @Override
             public void onSuccess(UserApi.GroupResponse result) {
-                GroupManager.getInstance().addGroup(result.data);
                 EventBus.getDefault().post(new GroupChangedEvent(mGroupid));
-//                mZone = zone;
-//                mSunrise = sunrise;
-//                mSunset = sunset;
-//                if (getActivity() == null) {
-//                    return;
-//                }
-//                getActivity().runOnUiThread(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        refreshTime();
-//                        habitat_detail_sunrise.setText(getTimeText(mSunrise));
-//                        habitat_detail_sunset.setText(getTimeText(mSunset));
-//                        EventBus.getDefault().post(new GroupChangedEvent(mGroupid));
-//                    }
-//                });
             }
         });
     }
@@ -344,8 +330,8 @@ public class HabitatDetailFragment extends BaseFragment {
     }
 
     private void refreshData() {
-        String name = mGroup.name;
-        habitat_detail_name.setText(name);
+        habitat_detail_icon.setImageResource(GroupUtil.getGroupIcon(mGroup.remark2));
+        habitat_detail_name.setText(mGroup.name);
         refreshTime();
         habitat_detail_sunrise.setText(getTimeText(mSunrise));
         habitat_detail_sunset.setText(getTimeText(mSunset));
@@ -357,6 +343,30 @@ public class HabitatDetailFragment extends BaseFragment {
 
         long habitatTime = time + (mZone-defaultZone)*60000;
         habitat_detail_datetime.setText(mDateFormat.format(habitatTime));
+    }
+
+    private void showGroupIconDialog() {
+        GroupIconDialog dialog = new GroupIconDialog(getContext()) {
+            @Override
+            public void onChoose(final String name, final int res) {
+                UserApi.GroupRequest request = new UserApi.GroupRequest();
+                request.remark2 = name;
+                AliotServer.getInstance().modifyGroupInfo(mGroupid, request, new HttpCallback<UserApi.GroupResponse>() {
+                    @Override
+                    public void onError(String error) {
+                        showToast(error);
+                    }
+
+                    @Override
+                    public void onSuccess(UserApi.GroupResponse result) {
+                        mGroup.remark2 = name;
+                        EventBus.getDefault().post(new GroupChangedEvent(mGroupid));
+                    }
+                });
+            }
+        };
+        dialog.init(mGroup.remark2);
+        dialog.show();
     }
 
     private void showTimePickerDialog(int time, final TimePickerDialog.OnTimeSetListener listener) {
@@ -371,7 +381,7 @@ public class HabitatDetailFragment extends BaseFragment {
         til.setHint(getString(R.string.habitat_name));
         et_name.setText(mGroup.name);
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-        final AlertDialog dialog = builder.setTitle(R.string.rename_device)
+        final AlertDialog dialog = builder.setTitle(R.string.rename_habitat)
                                           .setNegativeButton(R.string.cancel, null)
                                           .setPositiveButton(R.string.ok, null)
                                           .setView(view)
@@ -387,8 +397,7 @@ public class HabitatDetailFragment extends BaseFragment {
                     et_name.setError(getString(R.string.input_empty));
                     return;
                 }
-                String token = UserManager.getInstance().getToken();
-                AliotServer.getInstance().modifyGroupName(token, mGroupid, name, new HttpCallback<UserApi.GroupResponse>() {
+                AliotServer.getInstance().modifyGroupName(mGroupid, name, new HttpCallback<UserApi.GroupResponse>() {
                     @Override
                     public void onError(final String error) {
                         showToast(error);
@@ -396,16 +405,12 @@ public class HabitatDetailFragment extends BaseFragment {
 
                     @Override
                     public void onSuccess(UserApi.GroupResponse result) {
+                        mGroup.name = name;
                         EventBus.getDefault().post(new GroupChangedEvent(mGroupid));
-                        if (getActivity() == null) {
-                            return;
-                        }
-                        getActivity().runOnUiThread(new Runnable() {
+                        runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
                                 dialog.dismiss();
-//                                mGroup.name = name;
-//                                habitat_detail_name.setText(name);
                             }
                         });
                     }
@@ -432,7 +437,7 @@ public class HabitatDetailFragment extends BaseFragment {
             public void onClick(View v) {
                 String email = et_email.getText().toString();
                 if (RegexUtil.isEmail(email)) {
-                    shareHome(email);
+                    inviteUser(email);
                     dialog.dismiss();
                 } else {
                     til.setError(getString(R.string.error_email));
@@ -441,62 +446,51 @@ public class HabitatDetailFragment extends BaseFragment {
         });
     }
 
-    private void shareHome(@NonNull final String email) {
-//        XlinkCloudManager.getInstance().inviteHomeMember(mGroup.getHome().id, email, new XlinkRequestCallback<HomeApi.UserInviteResponse>() {
-//            @Override
-//            public void onError(String error) {
-//                Toast.makeText(getContext(), error, Toast.LENGTH_SHORT)
-//                     .show();
-//            }
-//
-//            @Override
-//            public void onSuccess(HomeApi.UserInviteResponse response) {
-//                Toast.makeText(getContext(), "Share Habitat Success.", Toast.LENGTH_SHORT)
-//                     .show();
-//            }
-//        });
+    private void inviteUser(@NonNull final String email) {
+        AliotServer.getInstance().inviteUserToGroup(mGroupid, email, new HttpCallback<UserApi.GroupInviteResponse>() {
+            @Override
+            public void onError(String error) {
+                showToast(error);
+            }
+
+            @Override
+            public void onSuccess(UserApi.GroupInviteResponse result) {
+                Log.e(TAG, "onSuccess: " + JSON.toJSONString(result));
+                showToast("Invite user success");
+                AliotClient.getInstance().invite(result.data.invitee, result.data.invite_id, mGroupid, mGroup.name);
+            }
+        });
     }
 
     private void showDeleteHabitatDialog() {
-//        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-//        builder.setTitle(R.string.delete_habitat)
-//               .setMessage(getString(R.string.msg_delete, mGroup.getHome().name))
-//               .setNegativeButton(R.string.cancel, null)
-//               .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-//                   @Override
-//                   public void onClick(DialogInterface dialog, int which) {
-//                       final XlinkRequestCallback<String> callback = new XlinkRequestCallback<String>() {
-//                           @Override
-//                           public void onError(String error) {
-//                               Toast.makeText(getContext(), error, Toast.LENGTH_SHORT)
-//                                    .show();
-//                           }
-//
-//                           @Override
-//                           public void onSuccess(String s) {
-//                               Log.e(TAG, "onSuccess: " + mGroupid);
-//                               HomeManager.getInstance().remove(mGroupid);
-//                               EventBus.getDefault().post(new GroupsRefreshedEvent());
-//                               getActivity().getSupportFragmentManager().popBackStack(null, 1);
-//                           }
-//                       };
-//                       if (mGroupAdmin) {
-//                           XlinkCloudManager.getInstance().deleteHome(mGroupid, callback);
-//                       } else {
-//                           XlinkCloudManager.getInstance().deleteHomeUser(mGroupid, XLinkUserManager.getInstance().getUid(), callback);
-//                       }
-//                   }
-//               })
-//               .setCancelable(false)
-//               .show();
-    }
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        builder.setTitle(R.string.delete_habitat)
+               .setMessage(getString(R.string.msg_delete, mGroup.name))
+               .setNegativeButton(R.string.cancel, null)
+               .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                   @Override
+                   public void onClick(DialogInterface dialog, int which) {
+                       final HttpCallback<UserApi.Response> callback = new HttpCallback<UserApi.Response>() {
+                           @Override
+                           public void onError(String error) {
+                               showToast(error);
+                           }
 
-    @Subscribe (threadMode = ThreadMode.MAIN)
-    public void onHomesRefreshedEvent(GroupsRefreshedEvent event) {
-//        if (event != null) {
-//            mUsers.clear();
-//            mUsers.addAll(mGroup.getHome().userList);
-//            mAdapter.notifyDataSetChanged();
-//        }
+                           @Override
+                           public void onSuccess(UserApi.Response result) {
+                                GroupManager.getInstance().removeGroup(mGroupid);
+                                EventBus.getDefault().post(new GroupsRefreshedEvent());
+                                getActivity().getSupportFragmentManager().popBackStack(null, 1);
+                           }
+                       };
+                       if (mGroupAdmin) {
+                           AliotServer.getInstance().deleteGroup(mGroupid, callback);
+                       } else {
+                           AliotServer.getInstance().exitGroup(mGroupid, callback);
+                       }
+                   }
+               })
+               .setCancelable(false)
+               .show();
     }
 }

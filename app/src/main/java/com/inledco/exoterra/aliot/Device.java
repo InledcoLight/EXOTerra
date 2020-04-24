@@ -1,5 +1,7 @@
 package com.inledco.exoterra.aliot;
 
+import android.text.TextUtils;
+
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
@@ -23,6 +25,7 @@ public class Device extends ADevice{
     private String remark1;
     private String remark2;
     private String remark3;
+    private String role;
 
     private boolean isOnline;
     private long statusUpdateTime;
@@ -36,6 +39,8 @@ public class Device extends ADevice{
             setRemark1(xDevice.remark1);
             setRemark2(xDevice.remark2);
             setRemark3(xDevice.remark3);
+            setOnline(TextUtils.equals(xDevice.is_online, "online"));
+            setRole(xDevice.role);
         }
     }
 
@@ -79,15 +84,33 @@ public class Device extends ADevice{
         this.remark3 = remark3;
     }
 
-    public void updateOnlineStatus(StatusReponse status) {
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
+    }
+
+    public boolean updateOnlineStatus(StatusReponse status) {
         if (status == null || status.getStatusUpdateTime() < statusUpdateTime) {
-            return;
+            return false;
         }
+//        if (TextUtils.equals(productKey, status.getProductKey()) == false
+//            || TextUtils.equals(deviceName, status.getDeviceName()) == false) {
+//            return;
+//        }
         isOnline = status.isOnline();
+        statusUpdateTime = status.getStatusUpdateTime();
+        return true;
     }
 
     public boolean isOnline() {
         return isOnline;
+    }
+
+    public void setOnline(boolean online) {
+        isOnline = online;
     }
 
     public int getPropertyInt(String key) {

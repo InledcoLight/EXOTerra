@@ -28,6 +28,13 @@ public class UserManager {
         return (!TextUtils.isEmpty(mUserid)) && (!TextUtils.isEmpty(mToken));
     }
 
+    public void deinit() {
+        mUserid = null;
+        mToken = null;
+        mSecret = null;
+        mUser = null;
+    }
+
     public User getUser() {
         return mUser;
     }
@@ -100,10 +107,9 @@ public class UserManager {
             mUserid = response.userId;
             mToken = response.access_token;
             mSecret = response.secret;
-            final String userid = response.userId;
-            UserPref.saveEmailPassword(context, email, password);
-            UserPref.saveAuthorization(context, userid, mToken, mSecret);
-            getUserInfo(response.userId, mToken, null);
+            UserPref.saveAccount(context, email, password);
+            UserPref.saveAuthorization(context, mUserid, mToken, mSecret);
+            getUserInfo(mUserid, mToken, null);
             return null;
         }
         return (response == null ? "Login failed" : response.msg);
@@ -115,7 +121,7 @@ public class UserManager {
             mUserid = userid;
             mToken = token;
             mUser = response.data;
-//            mSecret = response.data.secret;
+            mSecret = response.data.secret;
             return true;
         }
         return false;
@@ -135,7 +141,7 @@ public class UserManager {
                 mUserid = userid;
                 mToken = token;
                 mUser = result.data;
-//                mSecret = result.data.secret;
+                mSecret = result.data.secret;
                 if (callback != null) {
                     callback.onSuccess();
                 }

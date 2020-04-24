@@ -1,6 +1,5 @@
 package com.inledco.exoterra.device;
 
-import android.annotation.SuppressLint;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
@@ -8,7 +7,6 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -24,7 +22,7 @@ import com.inledco.exoterra.aliot.ExoSocket;
 import com.inledco.exoterra.aliot.LightViewModel;
 import com.inledco.exoterra.aliot.MonsoonViewModel;
 import com.inledco.exoterra.aliot.SocketViewModel;
-import com.inledco.exoterra.aliot.StatusReponse;
+import com.inledco.exoterra.aliot.bean.Group;
 import com.inledco.exoterra.base.BaseActivity;
 import com.inledco.exoterra.device.Monsoon.MonsoonFragment;
 import com.inledco.exoterra.device.Monsoon.MonsoonPowerFragment;
@@ -33,7 +31,11 @@ import com.inledco.exoterra.device.light.LightFragment;
 import com.inledco.exoterra.device.light.LightPowerFragment;
 import com.inledco.exoterra.device.socket.SocketFragment;
 import com.inledco.exoterra.device.socket.SocketPowerFragment;
+import com.inledco.exoterra.event.DeviceChangedEvent;
+import com.inledco.exoterra.event.DeviceStatusChangedEvent;
+import com.inledco.exoterra.event.GroupDeviceChangedEvent;
 import com.inledco.exoterra.manager.DeviceManager;
+import com.inledco.exoterra.manager.GroupManager;
 import com.inledco.exoterra.util.DeviceUtil;
 
 import org.greenrobot.eventbus.EventBus;
@@ -109,11 +111,11 @@ public class DeviceActivity extends BaseActivity {
         }
         device_icon.setImageResource(DeviceUtil.getProductIconSmall(pkey));
         device_name.setText(name);
-//        final Group home = HomeManager.getInstance().getDeviceHome(mDevice);
-//        if (home != null) {
-//            device_habitat_name.setText(home.getHome().name);
-//        }
-        device_status_local.setImageResource(mDevice.isOnline() ? R.drawable.ic_wifi_on : R.drawable.ic_wifi);
+        final Group group = GroupManager.getInstance().getDeviceGroup(pkey, mDevice.getDeviceName());
+        if (group != null) {
+            device_habitat_name.setText(group.name);
+        }
+//        device_status_local.setImageResource(mDevice.isOnline() ? R.drawable.ic_wifi_on : R.drawable.ic_wifi);
         device_status_cloud.setImageResource(mDevice.isOnline() ? R.drawable.ic_cloud_green_16dp : R.drawable.ic_cloud_grey_16dp);
 
         mDeviceBaseViewModel = ViewModelProviders.of(this).get(DeviceBaseViewModel.class);
@@ -163,13 +165,11 @@ public class DeviceActivity extends BaseActivity {
         });
     }
 
-    @SuppressLint ("RestrictedApi")
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onDeviceStateChangedEvent(StatusReponse status) {
-        Log.e(TAG, "onDeviceStateChangedEvent: ");
-        if (status != null && mDevice != null
-            && TextUtils.equals(status.getProductKey() + "_" + status.getDeviceName(), mDevice.getTag())) {
-            device_status_cloud.setImageResource(status.isOnline() ? R.drawable.ic_cloud_green_16dp : R.drawable.ic_cloud_grey_16dp);
+    public void onDeviceStatusChangedEvent(DeviceStatusChangedEvent event) {
+        if (event != null && mDevice != null
+            && TextUtils.equals(event.getTag(), mDevice.getTag())) {
+            device_status_cloud.setImageResource(mDevice.isOnline() ? R.drawable.ic_cloud_green_16dp : R.drawable.ic_cloud_grey_16dp);
         }
     }
 
@@ -177,6 +177,28 @@ public class DeviceActivity extends BaseActivity {
     public void onDevicePropertyChangedEvent(ADevice aDevice) {
         if (mDevice != null && TextUtils.equals(mDevice.getTag(), aDevice.getTag())) {
             mDeviceViewModel.postValue();
+        }
+    }
+
+    @Subscribe (threadMode = ThreadMode.MAIN)
+    public void onDeviceChangedEvent(DeviceChangedEvent event) {
+        if (event != null && mDevice != null
+            && TextUtils.equals(event.getTag(), mDevice.getTag())) {
+            String name = mDevice.getName();
+            if (TextUtils.isEmpty(name)) {
+                name = DeviceUtil.getDefaultName(mDevice.getProductKey());
+            }
+            device_name.setText(name);
+        }
+    }
+
+    @Subscribe (threadMode = ThreadMode.MAIN)
+    public void onGroupDeviceChangedEvent(GroupDeviceChangedEvent event) {
+        if (event != null && mDevice != null) {
+            Group group = GroupManager.getInstance().getDeviceGroup(mDevice.getProductKey(), mDevice.getDeviceName());
+            if (group != null && TextUtils.equals(group.groupid, event.getGroupid())) {
+                device_habitat_name.setText(group.name);
+            }
         }
     }
 }

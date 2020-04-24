@@ -10,16 +10,16 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.inledco.exoterra.R;
-import com.inledco.exoterra.aliot.bean.XGroup;
+import com.inledco.exoterra.aliot.bean.Group;
 import com.inledco.exoterra.common.SimpleAdapter;
 
 import java.util.List;
 
-public class HabitatMembersAdapter extends SimpleAdapter<XGroup.User, HabitatMembersAdapter.HomeMemberViewHolder> {
+public class HabitatMembersAdapter extends SimpleAdapter<Group.User, HabitatMembersAdapter.HomeMemberViewHolder> {
 
     private final String creator;
 
-    public HabitatMembersAdapter(@NonNull Context context, final String creator, List<XGroup.User> data) {
+    public HabitatMembersAdapter(@NonNull Context context, final String creator, List<Group.User> data) {
         super(context, data);
         this.creator = creator;
     }
@@ -37,7 +37,7 @@ public class HabitatMembersAdapter extends SimpleAdapter<XGroup.User, HabitatMem
 
     @Override
     public void onBindViewHolder(@NonNull HomeMemberViewHolder holder, final int position) {
-        XGroup.User user = mData.get(position);
+        Group.User user = mData.get(position);
         String nickname = user.nickname;
         if (TextUtils.isEmpty(nickname)) {
             nickname = "" + user.userid;

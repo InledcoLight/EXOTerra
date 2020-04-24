@@ -99,6 +99,7 @@ public class TcpClient extends BaseClient {
                 try {
                     synchronized (mLock) {
                         mListening = false;
+                        mListener = null;
                         if (mInputStream != null) {
                             mInputStream.close();
                             mInputStream = null;

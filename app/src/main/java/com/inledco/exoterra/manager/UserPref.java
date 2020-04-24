@@ -29,7 +29,7 @@ public class UserPref {
 
     private static final String PREF_KEY_USER_SECRET = "user_secret";
 
-    public static void saveEmailPassword(Context context, String email, String password) {
+    public static void saveAccount(Context context, String email, String password) {
         if (TextUtils.isEmpty(email) || TextUtils.isEmpty(password)) {
             return;
         }
@@ -42,6 +42,14 @@ public class UserPref {
         SharedPreferences.Editor editor = sp.edit()
                                             .putString(PREF_KEY_USER_EMAIL, email)
                                             .putString(PREF_KEY_USER_PASSWORD, data);
+        editor.apply();
+    }
+
+    public static void clearAccount(Context context) {
+        SharedPreferences sp = context.getSharedPreferences(PREF_FILE_USER, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sp.edit()
+                                            .remove(PREF_KEY_USER_EMAIL)
+                                            .remove(PREF_KEY_USER_PASSWORD);
         editor.apply();
     }
 
@@ -88,6 +96,15 @@ public class UserPref {
                                             .putString(PREF_KEY_USER_ID, userid)
                                             .putString(PREF_KEY_USER_TOKEN, data1)
                                             .putString(PREF_KEY_USER_SECRET, data2);
+        editor.apply();
+    }
+
+    public static void clearAuthorization(Context context) {
+        SharedPreferences sp = context.getSharedPreferences(PREF_FILE_USER, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sp.edit()
+                                            .remove(PREF_KEY_USER_ID)
+                                            .remove(PREF_KEY_USER_TOKEN)
+                                            .remove(PREF_KEY_USER_SECRET);
         editor.apply();
     }
 

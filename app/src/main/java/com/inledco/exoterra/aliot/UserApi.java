@@ -1,5 +1,6 @@
 package com.inledco.exoterra.aliot;
 
+import com.inledco.exoterra.aliot.bean.Group;
 import com.inledco.exoterra.aliot.bean.Triad;
 import com.inledco.exoterra.aliot.bean.User;
 import com.inledco.exoterra.aliot.bean.XDevice;
@@ -150,7 +151,7 @@ public class UserApi {
 
     }
 
-    public static class GroupsResponse extends ApiResponse<List<XGroup>> {
+    public static class GroupsResponse extends ApiResponse<List<Group>> {
 
     }
 
@@ -173,10 +174,11 @@ public class UserApi {
         public long expire_time;
     }
 
-    public static class GroupInviteResponse extends ApiResponse<GroupInviteResponse.InviteId> {
+    public static class GroupInviteResponse extends ApiResponse<GroupInviteResponse.InviteResult> {
 
-        public static class InviteId {
+        public static class InviteResult {
             public String invite_id;
+            public String invitee;
         }
     }
 
@@ -212,6 +214,28 @@ public class UserApi {
     }
 
     public static class FirmwaresResponse extends ApiResponse<FirmwareList> {
+
+    }
+
+    public static class DeviceHistoryPropertiesRequest {
+        public long startTime;
+        public long endTime;
+        public int asc;                     // 0倒序 1正序
+        public int pageSize;                // 最大100
+        public String[] identifiers;         // 属性标识
+    }
+
+    public static class KeyValue {
+        public long Time;
+        public Object Value;
+    }
+
+    public static class PropertyDataInfo {
+        public String identifier;
+        public List<KeyValue> list;
+    }
+
+    public static class DeviceHistoryPropertiesResponse extends ApiResponse<List<PropertyDataInfo>> {
 
     }
 }

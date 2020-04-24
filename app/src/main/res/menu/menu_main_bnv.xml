@@ -2,12 +2,12 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/main_bnv_home"
-        android:icon="@drawable/ic_home_white"
+        android:icon="@drawable/ic_reptile"
         android:visible="false"
-        android:title="@string/group"/>
+        android:title="@string/home"/>
     <item
         android:id="@+id/main_bnv_habitat"
-        android:icon="@drawable/ic_habitats_white"
+        android:icon="@drawable/ic_dashboard"
         android:visible="false"
         android:title="@string/habitats"/>
     <item

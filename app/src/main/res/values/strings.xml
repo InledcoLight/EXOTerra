@@ -246,7 +246,7 @@
     <string name="rename_habitat">Rename habitat</string>
     <string name="delete_device">Delete device</string>
     <string name="msg_delete">Confirm delete %1$s?</string>
-    <string name="home2s">Homes</string>
+    <string name="home">Home</string>
     <string name="add_home">Add group</string>
     <string name="members">Members</string>
     <string name="admin">Administrator</string>
@@ -337,4 +337,9 @@
     <string name="habitat_invite_member">Habitat invite member</string>
     <string name="creator">Creator</string>
     <string name="change_role">Change role</string>
+    <string name="microtope">Microtope</string>
+    <string name="uvb_buddy">UVB Buddy</string>
+    <string name="restore_rays">Restore The Rays</string>
+    <string name="habitat_icon">Habitat icon</string>
+    <string name="habitat_name_icon"><![CDATA[Habitat name & icon]]></string>
 </resources>

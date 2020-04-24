@@ -9,6 +9,7 @@ public class ConnectNetBean {
 
     private String mDeviceName;
     private String mAddress;
+    private String mName;
 
     private boolean mConflict;
     private boolean mCompatibleMode;
@@ -64,6 +65,14 @@ public class ConnectNetBean {
 
     public void setDeviceName(String deviceName) {
         mDeviceName = deviceName;
+    }
+
+    public String getName() {
+        return mName;
+    }
+
+    public void setName(String name) {
+        mName = name;
     }
 
     public String getAddress() {

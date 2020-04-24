@@ -102,8 +102,9 @@
             android:id="@+id/add_habitat_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/habitat_name"
+            android:hint="@string/habitat_name_icon"
             android:imeOptions="actionDone"
+            android:drawablePadding="8dp"
             android:lines="1"
             android:maxLength="32"
             android:maxLines="1" />

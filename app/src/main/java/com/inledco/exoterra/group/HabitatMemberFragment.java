@@ -14,7 +14,6 @@ import android.widget.TextView;
 
 import com.inledco.exoterra.R;
 import com.inledco.exoterra.aliot.bean.Group;
-import com.inledco.exoterra.aliot.bean.XGroup;
 import com.inledco.exoterra.base.BaseFragment;
 import com.inledco.exoterra.manager.GroupManager;
 import com.inledco.exoterra.manager.UserManager;
@@ -83,13 +82,13 @@ public class HabitatMemberFragment extends BaseFragment {
             group_member_usrid.setText("" + mUserId);
             final Group group = GroupManager.getInstance().getGroup(mGroupid);
             if (group != null) {
-                for (XGroup.User usr : group.users) {
+                for (Group.User usr : group.users) {
                     if (usr.userid == UserManager.getInstance().getUserid()) {
 //                        mHomeRole = usr.role;
                     }
                 }
 
-                for (XGroup.User usr : group.users) {
+                for (Group.User usr : group.users) {
                     if (usr.userid == mUserId) {
 //                        mUserRole = usr.role;
                         refreshData();

@@ -7,6 +7,7 @@ import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.BottomSheetDialog;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -14,20 +15,32 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.inledco.exoterra.AppConstants;
 import com.inledco.exoterra.GlobalSettings;
 import com.inledco.exoterra.R;
 import com.inledco.exoterra.adddevice.AddDeviceActivity;
+import com.inledco.exoterra.aliot.ADevice;
+import com.inledco.exoterra.aliot.AliotConsts;
+import com.inledco.exoterra.aliot.AliotServer;
+import com.inledco.exoterra.aliot.Device;
+import com.inledco.exoterra.aliot.ExoSocket;
+import com.inledco.exoterra.aliot.HttpCallback;
+import com.inledco.exoterra.aliot.UserApi;
 import com.inledco.exoterra.aliot.bean.Group;
-import com.inledco.exoterra.aliot.bean.XDevice;
 import com.inledco.exoterra.base.BaseFragment;
 import com.inledco.exoterra.common.OnItemClickListener;
+import com.inledco.exoterra.common.OnItemLongClickListener;
 import com.inledco.exoterra.device.DeviceActivity;
 import com.inledco.exoterra.event.GroupChangedEvent;
-import com.inledco.exoterra.event.HomeDeviceChangedEvent;
+import com.inledco.exoterra.event.GroupDeviceChangedEvent;
+import com.inledco.exoterra.manager.DeviceManager;
 import com.inledco.exoterra.manager.GroupManager;
+import com.inledco.exoterra.manager.UserManager;
+import com.inledco.exoterra.util.GroupUtil;
+import com.inledco.exoterra.util.SensorUtil;
 import com.inledco.exoterra.util.TimeFormatUtil;
 
 import org.greenrobot.eventbus.EventBus;
@@ -35,10 +48,10 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
 import java.text.DateFormat;
-import java.util.List;
 import java.util.TimeZone;
 
 public class GroupFragment extends BaseFragment {
+    private ImageView group_icon;
     private TextView group_title;
     private ImageButton group_detail;
     private TextView group_time;
@@ -54,8 +67,9 @@ public class GroupFragment extends BaseFragment {
 
     private String mGroupid;
     private Group mGroup;
-    private List<XDevice> mDevices;
     private GroupDevicesAdapter mAdapter;
+
+    private boolean mGroupAdmin;
 
     private DateFormat mDateFormat;
     private DateFormat mTimeFormat;
@@ -71,26 +85,6 @@ public class GroupFragment extends BaseFragment {
             }
         }
     };
-
-//    private final XlinkRequestCallback<HomeApi.HomeDevicesResponse> mHomeDevicesCallback = new XlinkRequestCallback<HomeApi.HomeDevicesResponse>() {
-//        @Override
-//        public void onError(final String error) {
-//            getActivity().runOnUiThread(new Runnable() {
-//                @Override
-//                public void run() {
-//                    Toast.makeText(getContext(), error, Toast.LENGTH_SHORT)
-//                         .show();
-//                }
-//            });
-//        }
-//
-//        @Override
-//        public void onSuccess(HomeApi.HomeDevicesResponse response) {
-//            mDevices.clear();
-//            mDevices.addAll(response.list);
-//            mAdapter.notifyDataSetChanged();
-//        }
-//    };
 
     public static GroupFragment newInstance(@NonNull final String groupid, @NonNull final String name) {
         Bundle args = new Bundle();
@@ -118,15 +112,7 @@ public class GroupFragment extends BaseFragment {
         if (EventBus.getDefault().isRegistered(this)) {
             EventBus.getDefault().unregister(this);
         }
-        getActivity().unregisterReceiver(mTimeChangeReceiver);
-    }
-
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onHomeChangedEvent(GroupChangedEvent event) {
-//        Log.e(TAG, "onHomeChangedEvent: " + mHomeId + " " + event.getHomeid());
-//        if (TextUtils.equals(mHomeId, event.getHomeid())) {
-//            group_title.setText(mGroup.getHome().name);
-//        }
+        getContext().unregisterReceiver(mTimeChangeReceiver);
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -137,11 +123,22 @@ public class GroupFragment extends BaseFragment {
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onHomeDeviceChangedEvent(HomeDeviceChangedEvent event) {
-//        if (TextUtils.equals(mHomeId, event.getHomeid())) {
-//            group_connected_devices.setText(getString(R.string.habitat_devcnt, mGroup.getDeviceCount()));
-//            mAdapter.notifyDataSetChanged();
-//        }
+    public void onGroupDeviceChangedEvent(GroupDeviceChangedEvent event) {
+        if (event == null) {
+            return;
+        }
+        if (TextUtils.equals(mGroupid, event.getGroupid())) {
+            group_connected_devices.setText(getString(R.string.habitat_devcnt, mGroup.getDeviceCount()));
+            mAdapter.notifyDataSetChanged();
+        }
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onDevicePropertyChangedEvent(ADevice adev) {
+        if (adev == null || TextUtils.equals(adev.getProductKey(), AliotConsts.PRODUCT_KEY_EXOSOCKET) == false) {
+            return;
+        }
+        refreshSensor();
     }
 
     @Override
@@ -151,6 +148,7 @@ public class GroupFragment extends BaseFragment {
 
     @Override
     protected void initView(View view) {
+        group_icon = view.findViewById(R.id.group_icon);
         group_title = view.findViewById(R.id.group_title);
         group_detail = view.findViewById(R.id.group_detail);
         group_time = view.findViewById(R.id.group_time);
@@ -174,14 +172,25 @@ public class GroupFragment extends BaseFragment {
             String name = args.getString("name");
             mGroup = GroupManager.getInstance().getGroup(mGroupid);
             if (mGroup != null) {
-                mDevices = mGroup.devices;
-                mAdapter = new GroupDevicesAdapter(getContext(), mDevices);
+                mGroupAdmin = TextUtils.equals(UserManager.getInstance().getUserid(), mGroup.creator);
+                mAdapter = new GroupDevicesAdapter(getContext(), mGroup.devices);
                 mAdapter.setOnItemClickListener(new OnItemClickListener() {
                     @Override
                     public void onItemClick(int position) {
-                        XDevice device = mDevices.get(position);
+                        Group.Device device = mGroup.devices.get(position);
                         String deviceTag = device.product_key + "_" + device.device_name;
                         gotoDeviceActivity(deviceTag);
+                    }
+                });
+                mAdapter.setOnItemLongClickListener(new OnItemLongClickListener() {
+                    @Override
+                    public boolean onItemLongClick(int position) {
+                        if (mGroupAdmin) {
+                            Group.Device device = mGroup.devices.get(position);
+                            showItemActionDialog(mGroupid, device);
+                            return true;
+                        }
+                        return false;
                     }
                 });
                 group_rv.setAdapter(mAdapter);
@@ -189,12 +198,11 @@ public class GroupFragment extends BaseFragment {
                 group_title.setText(name);
                 refreshData();
                 group_connected_devices.setText(getString(R.string.habitat_devcnt, mGroup.getDeviceCount()));
-//                GroupManager.getInstance().refreshHome(mGroup);
             }
         }
 
         IntentFilter filter = new IntentFilter(Intent.ACTION_TIME_TICK);
-        getActivity().registerReceiver(mTimeChangeReceiver, filter);
+        getContext().registerReceiver(mTimeChangeReceiver, filter);
     }
 
     @Override
@@ -228,34 +236,47 @@ public class GroupFragment extends BaseFragment {
     }
 
     private void refreshSensor() {
-//        for (HomeApi.HomeDevicesResponse.XDevice dev : mGroup.getDevices()) {
-//            if (TextUtils.equals(dev.productId, XlinkConstants.PRODUCT_ID_SOCKET)) {
-//                String tag = dev.productId + "_" + dev.mac;
-//                XDevice device = DeviceManager.getInstance().getDevice(tag);
-//                if (device != null && device instanceof EXOSocket) {
-//                    EXOSocket socket = (EXOSocket) device;
-//                    boolean res = false;
-//                    if (socket.getS1Available()) {
-//                        group_sensor1.setText(GlobalSettings.getTemperatureText(socket.getS1Value()));
-//                        res = true;
-//                    } else {
-//                        group_sensor1.setText(null);
-//                    }
-//                    if (socket.getS2Available()) {
-//                        group_sensor2.setText(GlobalSettings.getHumidityText(socket.getS2Value()));
-//                        res = true;
-//                    } else {
-//                        group_sensor2.setText(null);
-//                    }
-//                    if (res) {
-//                        break;
-//                    }
-//                }
-//            }
-//        }
+        for (Group.Device dev : mGroup.devices) {
+            if (TextUtils.equals(dev.product_key, AliotConsts.PRODUCT_KEY_EXOSOCKET)) {
+                String key = dev.product_key + "_" + dev.device_name;
+                Device device = DeviceManager.getInstance().getDevice(key);
+                if (device != null && device instanceof ExoSocket) {
+                    ExoSocket socket = (ExoSocket) device;
+                    boolean res = false;
+                    if (socket.getSensorAvailable()) {
+                        ExoSocket.Sensor[] sensors = socket.getSensor();
+                        if (sensors == null) {
+                            group_sensor1.setText(null);
+                            group_sensor2.setText(null);
+                            continue;
+                        }
+                        if (sensors.length >= 1) {
+                            ExoSocket.Sensor sensor1 = sensors[0];
+                            int value1 = sensor1.getValue();
+                            int type1 = sensor1.getType();
+                            String s1text = SensorUtil.getSensorValueText(value1, type1) + SensorUtil.getSensorUnit(type1);
+                            group_sensor1.setText(s1text);
+                            res = true;
+                        }
+                        if (sensors.length >= 2) {
+                            ExoSocket.Sensor sensor2 = sensors[1];
+                            int value2 = sensor2.getValue();
+                            int type2 = sensor2.getType();
+                            String s2text = SensorUtil.getSensorValueText(value2, type2) + SensorUtil.getSensorUnit(type2);
+                            group_sensor2.setText(s2text);
+                            res = true;
+                        }
+                    }
+                    if (res) {
+                        break;
+                    }
+                }
+            }
+        }
     }
 
     private void refreshData() {
+        group_icon.setImageResource(GroupUtil.getGroupIcon(mGroup.remark2));
         refreshTime();
         group_sunrise.setText(TimeFormatUtil.formatMinutesTime(mTimeFormat, mGroup.getSunrise()));
         group_sunset.setText(TimeFormatUtil.formatMinutesTime(mTimeFormat, mGroup.getSunset()));
@@ -264,7 +285,7 @@ public class GroupFragment extends BaseFragment {
 
     private void gotoDeviceActivity(String deviceTag) {
         Intent intent = new Intent(getContext(), DeviceActivity.class);
-        intent.putExtra("device_tag", deviceTag);
+        intent.putExtra("deviceTag", deviceTag);
         startActivity(intent);
     }
 
@@ -272,5 +293,44 @@ public class GroupFragment extends BaseFragment {
         Intent intent = new Intent(getContext(), AddDeviceActivity.class);
         intent.putExtra(AppConstants.HOME_ID, mGroupid);
         startActivity(intent);
+    }
+
+    private void showItemActionDialog(final String groupid, final Group.Device device) {
+        final BottomSheetDialog dialog = new BottomSheetDialog(getContext());
+        View view = LayoutInflater.from(getContext()).inflate(R.layout.dialog_action, null, false);
+        Button btn_remove = view.findViewById(R.id.dialog_action_act2);
+        Button btn_cancel = view.findViewById(R.id.dialog_action_cancel);
+        btn_cancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
+        btn_remove.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AliotServer.getInstance().removeDeviceFromGroup(groupid, device.product_key, device.device_name, new HttpCallback<UserApi.Response>() {
+                    @Override
+                    public void onError(String error) {
+                        showToast(error);
+                    }
+
+                    @Override
+                    public void onSuccess(UserApi.Response result) {
+                        mGroup.removeDevice(device);
+                        EventBus.getDefault().post(new GroupDeviceChangedEvent(mGroupid));
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                dialog.dismiss();
+                            }
+                        });
+                    }
+                });
+            }
+        });
+        dialog.setContentView(view);
+        dialog.setCancelable(false);
+        dialog.show();
     }
 }

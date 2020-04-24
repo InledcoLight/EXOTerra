@@ -4,8 +4,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ADevice {
-    private String productKey;
-    private String deviceName;
+    protected String productKey;
+    protected String deviceName;
 
     private final Map<String, BaseProperty> items = new HashMap<>();
 
@@ -37,9 +37,11 @@ public class ADevice {
         if (items.containsKey(key)) {
             BaseProperty prop = items.get(key);
             if (prop != null && property != null && prop.time < property.time) {
+                property.setUpdated(true);
                 items.put(key, property);
             }
         } else {
+            property.setUpdated(true);
             items.put(key, property);
         }
     }
@@ -55,6 +57,7 @@ public class ADevice {
         if (items.containsKey(key)) {
             BaseProperty prop = items.get(key);
             if (prop != null) {
+                prop.setUpdated(false);
                 return prop.getValue();
             }
         }

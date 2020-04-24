@@ -7,7 +7,9 @@ import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
 import com.inledco.exoterra.R;
+import com.inledco.exoterra.aliot.AliotServer;
 import com.inledco.exoterra.base.BaseActivity;
+import com.inledco.exoterra.home.HomeActivity;
 import com.inledco.exoterra.login.LoginActivity;
 import com.inledco.exoterra.main.MainActivity;
 import com.inledco.exoterra.manager.UserManager;
@@ -70,7 +72,10 @@ public class SplashActivity extends BaseActivity {
             protected void onPostExecute(Boolean result) {
                 super.onPostExecute(result);
                 if (result) {
-                    gotoMainActivity();
+                    String userid = UserManager.getInstance().getUserid();
+                    String token = UserManager.getInstance().getToken();
+                    AliotServer.getInstance().init(userid, token);
+                    gotoHomeActivity();
                 } else {
                     gotoLoginActivity();
                 }
@@ -95,6 +100,12 @@ public class SplashActivity extends BaseActivity {
 
     private void gotoLoginActivity() {
         Intent intent = new Intent(this, LoginActivity.class);
+        startActivity(intent);
+        finish();
+    }
+
+    private void  gotoHomeActivity() {
+        Intent intent = new Intent(this, HomeActivity.class);
         startActivity(intent);
         finish();
     }

@@ -11,6 +11,7 @@ import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,11 +20,25 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.alibaba.fastjson.JSON;
 import com.inledco.exoterra.R;
+import com.inledco.exoterra.aliot.ADevice;
+import com.inledco.exoterra.aliot.AliotClient;
+import com.inledco.exoterra.aliot.AliotServer;
+import com.inledco.exoterra.aliot.BaseProperty;
 import com.inledco.exoterra.aliot.Device;
 import com.inledco.exoterra.aliot.DeviceBaseViewModel;
+import com.inledco.exoterra.aliot.HttpCallback;
+import com.inledco.exoterra.aliot.UserApi;
+import com.inledco.exoterra.aliot.bean.Group;
 import com.inledco.exoterra.base.BaseFragment;
-import com.inledco.exoterra.event.HomeDeviceChangedEvent;
+import com.inledco.exoterra.event.DeviceChangedEvent;
+import com.inledco.exoterra.event.DevicesRefreshedEvent;
+import com.inledco.exoterra.event.GroupDeviceChangedEvent;
+import com.inledco.exoterra.event.SimpleEvent;
+import com.inledco.exoterra.manager.DeviceManager;
+import com.inledco.exoterra.manager.GroupManager;
+import com.inledco.exoterra.manager.UserManager;
 import com.inledco.exoterra.util.DeviceUtil;
 
 import org.greenrobot.eventbus.EventBus;
@@ -34,11 +49,14 @@ import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.TimeZone;
 import java.util.Timer;
 import java.util.TimerTask;
 
 public class DeviceDetailFragment extends BaseFragment {
     private final String DEVICE_DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
+
+    private final String KEY_DEVICETIME = "DeviceTime";
 
     private Toolbar device_detail_toolbar;
     private ImageView device_detail_icon;
@@ -58,27 +76,16 @@ public class DeviceDetailFragment extends BaseFragment {
 
 //    private UpdateDialog mUpgradeDialog;
 
-    private boolean isDestroyed;
+    private boolean mDeviceAdmin;
 
     private long mCurrentTime;
-    private Timer mTimer = new Timer();
-    private TimerTask mTask = new TimerTask() {
-        @Override
-        public void run() {
-            mCurrentTime += 1000;
-            final Date date = new Date(mCurrentTime);
-            final DateFormat df = new SimpleDateFormat(DEVICE_DATE_FORMAT);
-            getActivity().runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    device_detail_datetime.setText(df.format(date));
-                }
-            });
-        }
-    };
+    private Timer mTimer;
+    private TimerTask mTask;
 
     private DeviceBaseViewModel mDeviceViewModel;
     private Device mDevice;
+    private String mProductKey;
+    private String mDeviceName;
 
     @Nullable
     @Override
@@ -97,22 +104,26 @@ public class DeviceDetailFragment extends BaseFragment {
         if (EventBus.getDefault().isRegistered(this)) {
             EventBus.getDefault().unregister(this);
         }
-        isDestroyed = true;
-        mTimer.cancel();
-        mTask.cancel();
+        if (mTimer != null) {
+            mTimer.cancel();
+        }
+        if (mTask != null) {
+            mTask.cancel();
+        }
+        mTimer = null;
+        mTask = null;
     }
 
     @Subscribe (threadMode = ThreadMode.MAIN)
-    public void onHomeDeviceChangedEvent(HomeDeviceChangedEvent event) {
-//        Log.e(TAG, "onHomeDeviceChangedEvent: " + event.getHomeid());
-//        if (mDevice == null) {
-//            return;
-//        }
-//        Group home = HomeManager.getInstance().getDeviceHome(mDevice);
-//        if (home != null) {
-//            device_detail_habitat.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
-//            device_detail_habitat.setText(home.getHome().name);
-//        }
+    public void onGroupDeviceChangedEvent(GroupDeviceChangedEvent event) {
+        if (mDevice == null || event == null) {
+            return;
+        }
+        Group group = GroupManager.getInstance().getDeviceGroup(mProductKey, mDeviceName);
+        if (group != null) {
+            device_detail_habitat.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
+            device_detail_habitat.setText(group.name);
+        }
     }
 
     @Override
@@ -147,94 +158,47 @@ public class DeviceDetailFragment extends BaseFragment {
     protected void initData() {
         mDeviceViewModel = ViewModelProviders.of(getActivity()).get(DeviceBaseViewModel.class);
         mDevice = mDeviceViewModel.getData();
-//        mDeviceViewModel.observe(this, new Observer<XDevice>() {
-//            @Override
-//            public void onChanged(@Nullable XDevice device) {
-//                if (device == null) {
-//                    return;
-//                }
-//                if (mUpgradeDialog == null) {
-//                    return;
-//                }
-//                byte state = device.getUpgradeState();
-//                if (state == 0) {
-//                    mUpgradeDialog.dismiss();
-//                }
-//                if (state == 1) {
-//                    showUpgradeProgress();
-//                    return;
-//                }
-//                if (state == 2) {
-//                    mUpgradeDialog.setMessage("Upgrade success.");
-//                    mUpgradeDialog.setResult(true);
-//                    return;
-//                }
-//                if (state < 0) {
-//                    mUpgradeDialog.setMessage("Upgrade failed, error code: " + state);
-//                    mUpgradeDialog.setResult(false);
-//                }
-//            }
-//        });
 
         if (mDevice != null) {
+            mDeviceAdmin = TextUtils.equals("管理员", mDevice.getRole());
+            mProductKey = mDevice.getProductKey();
+            mDeviceName = mDevice.getDeviceName();
             device_detail_icon.setImageResource(DeviceUtil.getProductIconSmall(mDevice.getProductKey()));
-//            Group home = HomeManager.getInstance().getDeviceHome(mDevice);
-//            if (home != null) {
-//                device_detail_habitat.setText(home.getHome().name);
-//            } else {
-//                device_detail_habitat.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_edit_white_24dp, 0);
-//            }
+            Group group = GroupManager.getInstance().getDeviceGroup(mProductKey, mDeviceName);
+            if (group != null) {
+                device_detail_habitat.setText(group.name);
+            } else {
+                device_detail_habitat.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_edit_white_24dp, 0);
+            }
             @DrawableRes int[] wifi_signals = new int[] {R.drawable.ic_signal_0_bar_white_24dp,
                                                          R.drawable.ic_signal_1_bar_white_24dp,
                                                          R.drawable.ic_signal_2_bar_white_24dp,
                                                          R.drawable.ic_signal_3_bar_white_24dp,
                                                          R.drawable.ic_signal_4_bar_white_24dp};
-//            device_detail_delete.setEnabled(mDevice.getRole() == 0);
-//            getDeviceDatetime();
+            device_detail_delete.setEnabled(TextUtils.equals(mDevice.getRole(), "管理员"));
+            Log.e(TAG, "initData: " + mDevice.getRole());
+            getDeviceDatetime();
             String name = mDevice.getName();
             if (TextUtils.isEmpty(name)) {
-                name = DeviceUtil.getDefaultName(mDevice.getProductKey());
+                name = DeviceUtil.getDefaultName(mProductKey);
             }
-            String mac = mDevice.getMac();
-//            String fwversion = mDevice.getf;
             device_detail_name.setText(name);
-//            device_detail_zone.setText(getTimezoneDesc(mDevice.getZone()));
-//            if (mDevice.getRssi() < 0) {
-//                device_detail_rssi.setText("" + mDevice.getRssi() + " dB");
-//                int level = WifiManager.calculateSignalLevel(mDevice.getRssi(), 5);
-//                device_detail_rssi.setCompoundDrawablesWithIntrinsicBounds(0, 0, wifi_signals[level], 0);
-//            }
-//            device_detail_devid.setText(String.valueOf(devid));
+            device_detail_zone.setText(getTimezoneDesc(mDevice.getZone()));
+            String mac = mDevice.getMac();
             device_detail_mac.setText(mac);
-//            device_detail_fwversion.setText(fwversion);
-
-
-//            XlinkCloudManager.getInstance().getDeviceLocation(mDevice.getXDevice(), new XlinkRequestCallback<DeviceApi.DeviceGeographyResponse>() {
-//                @Override
-//                public void onError(String error) {
-//
-//                }
-//
-//                @Override
-//                public void onSuccess(DeviceApi.DeviceGeographyResponse response) {
-//                    device_detail_location.setText(response.country + "/" + response.province + "/" + response.city);
-//                }
-//            });
+            int fwversion = mDevice.getFirmwareVersion();
+            if (fwversion > 0) {
+                device_detail_fwversion.setText(String.valueOf(fwversion));
+            }
         }
     }
 
     @Override
     protected void initEvent() {
-        device_detail_toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                getActivity().getSupportFragmentManager().popBackStack();
-            }
-        });
         device_detail_name.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (mDevice == null) {
+                if (mDevice == null || !mDeviceAdmin) {
                     return;
                 }
                 showRenameDialog();
@@ -243,11 +207,13 @@ public class DeviceDetailFragment extends BaseFragment {
         device_detail_habitat.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                Group home = HomeManager.getInstance().getDeviceHome(mDevice);
-//                if (home == null) {
-//                    int devid = mDevice.getXDevice().getDeviceId();
-//                    addFragmentToStack(R.id.device_root, SetHabitatFragment.newInstance(devid));
-//                }
+                if (!mDeviceAdmin) {
+                    return;
+                }
+                Group group = GroupManager.getInstance().getDeviceGroup(mProductKey, mDeviceName);
+                if (group == null) {
+                    addFragmentToStack(R.id.device_root, SetHabitatFragment.newInstance(mProductKey, mDeviceName, mDevice.getName()));
+                }
             }
         });
 //        device_detail_ll_location.setOnClickListener(new View.OnClickListener() {
@@ -268,16 +234,16 @@ public class DeviceDetailFragment extends BaseFragment {
         device_detail_upgrade.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (mDevice == null) {
+                if (mDevice == null || !mDeviceAdmin) {
                     return;
                 }
-//                getNewestVersion();
+                getNewestVersion();
             }
         });
         device_detail_delete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (mDevice == null) {
+                if (mDevice == null || !mDeviceAdmin) {
                     return;
                 }
                 showDeleteDialog();
@@ -291,6 +257,66 @@ public class DeviceDetailFragment extends BaseFragment {
         });
     }
 
+    @Subscribe (threadMode = ThreadMode.MAIN)
+    public void onDeviceChangedEvent(DeviceChangedEvent event) {
+        if (event != null && mDevice != null
+            && TextUtils.equals(event.getTag(), mDevice.getTag())) {
+            Group group = GroupManager.getInstance().getDeviceGroup(mProductKey, mDeviceName);
+            if (group != null) {
+                device_detail_habitat.setText(group.name);
+            } else {
+                device_detail_habitat.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_edit_white_24dp, 0);
+            }
+        }
+    }
+
+    @Subscribe (threadMode = ThreadMode.MAIN)
+    public void onDevicePropertyChangedEvent(ADevice adev) {
+        if (adev != null
+            && TextUtils.equals(adev.getProductKey(), mProductKey)
+            && TextUtils.equals(adev.getDeviceName(), mDeviceName)) {
+            BaseProperty prop = adev.getItems().get(KEY_DEVICETIME);
+            if (prop != null && prop.isUpdated()) {
+                String datetime = mDevice.getDeviceTime();
+                if (!TextUtils.isEmpty(datetime)) {
+                    try {
+                        if (mTimer != null) {
+                            mTimer.cancel();
+                        }
+                        if (mTask != null) {
+                            mTask.cancel();
+                        }
+                        mTimer = new Timer();
+                        mTask = new TimerTask() {
+                            @Override
+                            public void run() {
+                                mCurrentTime += 1000;
+                                EventBus.getDefault().post(new SimpleEvent(mCurrentTime));
+                            }
+                        };
+
+                        int offset = TimeZone.getDefault().getRawOffset();
+                        int zone = mDevice.getZone();
+                        long currentTime = Long.parseLong(datetime);
+                        mCurrentTime = currentTime + zone * 60000 - offset;
+                        EventBus.getDefault().post(new SimpleEvent(mCurrentTime));
+
+                        mTimer.scheduleAtFixedRate(mTask, 0, 1000);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
+    }
+
+    @Subscribe (threadMode = ThreadMode.MAIN)
+    public void updateDatetime(SimpleEvent event) {
+        final Date date = new Date(mCurrentTime);
+        final DateFormat df = new SimpleDateFormat(DEVICE_DATE_FORMAT);
+        device_detail_datetime.setText(df.format(date));
+    }
+
     private String getTimezoneDesc(int zone) {
         DecimalFormat df = new DecimalFormat("00");
         String zoneDesc = "GMT+";
@@ -298,41 +324,29 @@ public class DeviceDetailFragment extends BaseFragment {
             zoneDesc = "GMT-";
             zone = -zone;
         }
-        zoneDesc = zoneDesc + df.format(zone/100) + ":" + df.format(zone%100);
+        zoneDesc = zoneDesc + df.format(zone/60) + ":" + df.format(zone%60);
         return zoneDesc;
     }
 
     private void deleteDevice() {
-//        Group home = HomeManager.getInstance().getDeviceHome(mDevice);
-//        if (home != null) {
-//            int devid = mDevice.getXDevice().getDeviceId();
-//            String homeid = home.getHome().id;
-//            XlinkCloudManager.getInstance().deleteDeviceFromHome(homeid, devid, new XlinkRequestCallback<String>() {
-//                @Override
-//                public void onError(String error) {
-//                    Toast.makeText(getContext(), error, Toast.LENGTH_SHORT)
-//                         .show();
-//                }
-//
-//                @Override
-//                public void onSuccess(String s) {
-//                    getActivity().finish();
-//                }
-//            });
-//        } else {
-//            XlinkCloudManager.getInstance().unsubscribeDevice(mDevice.getXDevice(), new XlinkTaskCallback<String>() {
-//                @Override
-//                public void onError(String error) {
-//                    Toast.makeText(getContext(), error, Toast.LENGTH_SHORT)
-//                         .show();
-//                }
-//
-//                @Override
-//                public void onComplete(String s) {
-//                    getActivity().finish();
-//                }
-//            });
-//        }
+        Group group = GroupManager.getInstance().getDeviceGroup(mProductKey, mDeviceName);
+        if (group != null) {
+
+        } else {
+            AliotServer.getInstance().unsubscribeDevice(mProductKey, mDeviceName, new HttpCallback<UserApi.Response>() {
+                @Override
+                public void onError(String error) {
+                    showToast(error);
+                }
+
+                @Override
+                public void onSuccess(UserApi.Response result) {
+                    DeviceManager.getInstance().removeDevice(mDevice);
+                    EventBus.getDefault().post(new DevicesRefreshedEvent());
+                    getActivity().finish();
+                }
+            });
+        }
     }
 
     private void showDeleteDialog() {
@@ -350,12 +364,12 @@ public class DeviceDetailFragment extends BaseFragment {
                .show();
     }
 
-    private void showUpgradeProgress() {
+//    private void showUpgradeProgress() {
 //        if (mUpgradeDialog == null) {
 //            mUpgradeDialog = new UpdateDialog(getContext());
 //        }
 //        mUpgradeDialog.show();
-    }
+//    }
 
 //    private void showUpgradeDialog(@NonNull final DeviceApi.DeviceNewestVersionResponse response) {
 //        Log.e(TAG, "showUpgradeDialog: " + response.current + " " + response.newest + " " + response.description);
@@ -392,64 +406,27 @@ public class DeviceDetailFragment extends BaseFragment {
 //                   .show();
 //        }
 //    }
-//
-//    private void getNewestVersion() {
-//        XlinkCloudManager.getInstance().getNewsetVersion(mDevice.getXDevice(), new XlinkRequestCallback<DeviceApi.DeviceNewestVersionResponse>() {
-//            @Override
-//            public void onError(final String error) {
-//                getActivity().runOnUiThread(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        Toast.makeText(getContext(), error, Toast.LENGTH_SHORT)
-//                             .show();
-//                    }
-//                });
-//            }
-//
-//            @Override
-//            public void onSuccess(DeviceApi.DeviceNewestVersionResponse response) {
-//                showUpgradeDialog(response);
-//            }
-//        });
-//    }
-//
-//    private void getDeviceDatetime() {
-//        if (mDevice == null) {
-//            return;
-//        }
-//        List<Integer> ids = new ArrayList<>();
-//        ids.add(mDevice.getDeviceDatetimeIndex());
-//        XlinkCloudManager.getInstance().probeDevice(mDevice.getXDevice(), ids, new XlinkTaskCallback<List<XLinkDataPoint>>() {
-//            @Override
-//            public void onError(String error) {
-//
-//            }
-//
-//            @Override
-//            public void onComplete(List<XLinkDataPoint> dataPoints) {
-//                if (isDestroyed) {
-//                    return;
-//                }
-//                for (XLinkDataPoint dp : dataPoints) {
-//                    mDevice.setDataPoint(dp);
-//                }
-//                String time = mDevice.getDeviceDatetime();
-//                DateFormat df = new SimpleDateFormat(DEVICE_DATE_FORMAT);
-//                try {
-//                    Date date = df.parse(time);
-//                    if (date != null) {
-//                        mCurrentTime = date.getTime();
-//                        mTimer.scheduleAtFixedRate(mTask, 0, 1000);
-//                    } else {
-//                        device_detail_datetime.setText(time);
-//                    }
-//                }
-//                catch (ParseException e) {
-//                    e.printStackTrace();
-//                }
-//            }
-//        });
-//    }
+
+    private void getNewestVersion() {
+        AliotServer.getInstance().getFirmwareList(mProductKey, new HttpCallback<UserApi.FirmwaresResponse>() {
+            @Override
+            public void onError(String error) {
+                showToast(error);
+            }
+
+            @Override
+            public void onSuccess(UserApi.FirmwaresResponse result) {
+                Log.e(TAG, "onSuccess: " + JSON.toJSONString(result));
+                if (TextUtils.equals(result.data.product_key, mProductKey)) {
+                }
+            }
+        });
+    }
+
+    private void getDeviceDatetime() {
+        String product = DeviceUtil.getProductName(mProductKey).toLowerCase();
+        AliotClient.getInstance().getProperty(product, mDeviceName, "DeviceTime");
+    }
 
     private void showRenameDialog() {
         View view = LayoutInflater.from(getContext()).inflate(R.layout.dialog_rename, null, false);
@@ -469,26 +446,33 @@ public class DeviceDetailFragment extends BaseFragment {
         dialog.getButton(DialogInterface.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String name = et_name.getText().toString();
+                final String name = et_name.getText().toString();
                 if (TextUtils.isEmpty(name)) {
                     et_name.setError(getString(R.string.input_empty));
                     return;
                 }
-                String pkey = mDevice.getProductKey();
-                String dname = mDevice.getDeviceName();
-//                XlinkCloudManager.getInstance().renameDevice(pid, devid, name, new XlinkRequestCallback<DeviceApi.DeviceResponse>() {
-//                    @Override
-//                    public void onError(String error) {
-//                        Toast.makeText(getContext(), error, Toast.LENGTH_SHORT)
-//                             .show();
-//                    }
-//
-//                    @Override
-//                    public void onSuccess(DeviceApi.DeviceResponse response) {
-//                        dialog.dismiss();
-//                        device_detail_name.setText(response.name);
-//                    }
-//                });
+                String token = UserManager.getInstance().getToken();
+                final String pkey = mDevice.getProductKey();
+                final String dname = mDevice.getDeviceName();
+                AliotServer.getInstance().modifyDeviceName(token, pkey, dname, name, new HttpCallback<UserApi.Response>() {
+                    @Override
+                    public void onError(String error) {
+                        showToast(error);
+                    }
+
+                    @Override
+                    public void onSuccess(UserApi.Response result) {
+                        mDevice.setName(name);
+                        EventBus.getDefault().post(new DeviceChangedEvent(pkey, dname));
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                dialog.dismiss();
+                                device_detail_name.setText(name);
+                            }
+                        });
+                    }
+                });
             }
         });
     }

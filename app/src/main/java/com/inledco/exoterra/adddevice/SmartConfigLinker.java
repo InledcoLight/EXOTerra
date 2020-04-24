@@ -17,7 +17,6 @@ import com.inledco.exoterra.aliot.AliotServer;
 import com.inledco.exoterra.aliot.DeviceParam;
 import com.inledco.exoterra.aliot.UserApi;
 import com.inledco.exoterra.bean.Result;
-import com.inledco.exoterra.manager.UserManager;
 
 import java.lang.ref.WeakReference;
 import java.util.HashMap;
@@ -232,10 +231,8 @@ public class SmartConfigLinker {
     }
 
     private UserApi.SubscribeDeviceResponse subscribeDevice(String deviceName) {
-        String userid = UserManager.getInstance().getUserid();
-        String token = UserManager.getInstance().getToken();
         UserApi.SubscribeDeviceResponse response = AliotServer.getInstance()
-                                                              .subscribeDevice(userid, token, mProductKey, deviceName, mAddress);
+                                                              .subscribeDevice(mProductKey, deviceName, mAddress);
         return response;
     }
 

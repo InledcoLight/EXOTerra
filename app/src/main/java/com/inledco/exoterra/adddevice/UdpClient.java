@@ -83,6 +83,7 @@ public class UdpClient extends BaseClient {
             public void run() {
                 synchronized (mLock) {
                     mListening = false;
+                    mListener = null;
                     if (mSocket != null) {
                         mSocket.close();
                         mSocket = null;

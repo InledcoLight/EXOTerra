@@ -20,10 +20,16 @@
         android:orientation="horizontal"
         android:gravity="center_vertical">
 
+        <ImageView
+            android:id="@+id/item_habitat_icon"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:scaleType="fitCenter" />
         <TextView
             android:id="@+id/item_habitat_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="8dp"
             android:textColor="@color/textColorPrimary"
             android:textSize="@dimen/textSizeSubTitle"
             android:text="@string/habitat_name"/>

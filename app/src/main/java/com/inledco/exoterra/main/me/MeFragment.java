@@ -25,6 +25,8 @@ import com.inledco.exoterra.aliot.HttpCallback;
 import com.inledco.exoterra.aliot.UserApi;
 import com.inledco.exoterra.base.BaseFragment;
 import com.inledco.exoterra.login.LoginActivity;
+import com.inledco.exoterra.manager.DeviceManager;
+import com.inledco.exoterra.manager.GroupManager;
 import com.inledco.exoterra.manager.UserManager;
 import com.inledco.exoterra.manager.UserPref;
 import com.inledco.exoterra.view.AdvancedTextInputEditText;
@@ -77,40 +79,23 @@ public class MeFragment extends BaseFragment {
 
     @Override
     protected void initData() {
-//        if (XLinkUserManager.getInstance().isUserAuthorized() && TextUtils.isEmpty(UserPref.getEmail())) {
-//            XlinkCloudManager.getInstance()
-//                             .getUserInfo(XLinkUserManager.getInstance()
-//                                                          .getUid(), new XlinkRequestCallback<UserApi.GetUserInfoResponse>() {
-//                                 @Override
-//                                 public void onError(String error) {
-//
-//                                 }
-//
-//                                 @Override
-//                                 public void onSuccess(UserApi.GetUserInfoResponse response) {
-//                                     UserPref.setEmail(response.email);
-//                                     UserPref.setNickname(response.nickname);
-//                                     me_tv_nickname.setText(response.nickname);
-//                                     me_tv_email.setText(response.email);
-//                                     me_tv_nickname.setVisibility(TextUtils.isEmpty(response.nickname) ? View.GONE : View.VISIBLE);
-//                                 }
-//                             });
-//        }
+
     }
 
     @Override
     protected void initEvent() {
-//        me_icon_usr.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                if (!XLinkUserManager.getInstance().isUserAuthorized()) {
-//                    login();
-//                    getActivity().finish();
-//                } else {
+        me_icon_usr.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (!UserManager.getInstance().isAuthorized()) {
+                    login();
+                    getActivity().finish();
+                }
+//                else {
 //                    addFragmentToStack(R.id.main_fl, new MessagesFragment());
 //                }
-//            }
-//        });
+            }
+        });
         me_tv_nickname.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -126,18 +111,6 @@ public class MeFragment extends BaseFragment {
         me_btn_logout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String access_token = UserPref.readAccessToken(getContext());
-                AliotServer.getInstance().logout(access_token, new HttpCallback<UserApi.Response>() {
-                    @Override
-                    public void onError(String error) {
-                        Log.e(TAG, "onError: " + error);
-                    }
-
-                    @Override
-                    public void onSuccess(UserApi.Response result) {
-                        Log.e(TAG, "onSuccess: " + JSON.toJSONString(result));
-                    }
-                });
                 logout();
             }
         });
@@ -166,33 +139,25 @@ public class MeFragment extends BaseFragment {
                     til.setError(getString(R.string.input_empty));
                     return;
                 }
-                String userid = UserPref.readUserId(getContext());
-                String token = UserPref.readAccessToken(getContext());
-                AliotServer.getInstance().modifyUserNickname(userid, token, name, new HttpCallback<UserApi.Response>() {
+                AliotServer.getInstance().modifyUserNickname(name, new HttpCallback<UserApi.Response>() {
                     @Override
                     public void onError(String error) {
-                        Log.e(TAG, "onError: " + error);
+                        showToast(error);
                     }
 
                     @Override
                     public void onSuccess(UserApi.Response result) {
                         Log.e(TAG, "onSuccess: " + JSON.toJSONString(result));
+                        UserManager.getInstance().getUser().nickname = name;
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                me_tv_nickname.setText(name);
+                                dialog.dismiss();
+                            }
+                        });
                     }
                 });
-//                XlinkCloudManager.getInstance().modifyNickname(name, new XlinkRequestCallback<String>() {
-//                    @Override
-//                    public void onError(String error) {
-//                        Toast.makeText(getContext(), error, Toast.LENGTH_SHORT)
-//                             .show();
-//                    }
-//
-//                    @Override
-//                    public void onSuccess(String s) {
-//                        me_tv_nickname.setText(name);
-//                        UserPref.setNickname(name);
-//                        dialog.dismiss();
-//                    }
-//                });
             }
         });
     }
@@ -224,7 +189,7 @@ public class MeFragment extends BaseFragment {
                     et_old.requestFocus();
                     return;
                 }
-                String newpsw = et_new.getText().toString();
+                final String newpsw = et_new.getText().toString();
                 if (TextUtils.isEmpty(newpsw) || newpsw.length() < getResources().getInteger(R.integer.password_text_length_min)) {
                     til2.setError(getString(R.string.error_password));
                     et_new.requestFocus();
@@ -234,31 +199,41 @@ public class MeFragment extends BaseFragment {
                 AliotServer.getInstance().modifyPassword(token, oldpsw, newpsw, new HttpCallback<UserApi.Response>() {
                     @Override
                     public void onError(String error) {
-                        Log.e(TAG, "onError: " + error);
+                        showToast(error);
                     }
 
                     @Override
                     public void onSuccess(UserApi.Response result) {
                         Log.e(TAG, "onSuccess: " + JSON.toJSONString(result));
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                dialog.dismiss();
+                            }
+                        });
                     }
                 });
-//                XlinkCloudManager.getInstance().modifyPassword(oldpsw, newpsw, new XlinkRequestCallback<String>() {
-//                    @Override
-//                    public void onError(String error) {
-//                        Toast.makeText(getContext(), error, Toast.LENGTH_SHORT)
-//                             .show();
-//                    }
-//
-//                    @Override
-//                    public void onSuccess(String s) {
-//                        dialog.dismiss();
-//                    }
-//                });
             }
         });
     }
 
     private void logout() {
+        AliotServer.getInstance().logout(new HttpCallback<UserApi.Response>() {
+            @Override
+            public void onError(String error) {
+
+            }
+
+            @Override
+            public void onSuccess(UserApi.Response result) {
+
+            }
+        });
+        UserPref.clearAuthorization(getContext());
+        DeviceManager.getInstance().clear();
+        GroupManager.getInstance().clear();
+        UserManager.getInstance().deinit();
+
         Intent intent = new Intent(getContext(), LoginActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);

@@ -3,6 +3,7 @@
     package="com.inledco.exoterra">
     <!-- 存储权限为日志文件需要,如果不需要提供日志的文件存储功能,也可以不提供此权限 -->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <!-- wIFI权限用于本地及云端状态切换及网络状态的检测需要 -->
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
@@ -32,7 +33,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".login.LoginActivity"  />
+        <activity android:name=".login.LoginActivity" />
+        <activity android:name=".home.HomeActivity" />
         <activity android:name=".main.MainActivity" android:launchMode="singleTop" android:windowSoftInputMode="adjustPan"/>
         <activity android:name=".register.RegisterActivity"/>
         <activity android:name=".foundback.FoundbackActivity"/>

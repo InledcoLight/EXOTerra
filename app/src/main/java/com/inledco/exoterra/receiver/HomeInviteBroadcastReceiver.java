@@ -5,14 +5,12 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.text.TextUtils;
-import android.util.Log;
 
 import com.inledco.exoterra.AppConstants;
 
 public class HomeInviteBroadcastReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(final Context context, Intent intent) {
-        Log.e("TAG", "onReceive: " + intent.getAction());
         if (TextUtils.equals(intent.getAction(), AppConstants.HOME_INVITE)) {
             final int notification_id = intent.getIntExtra(AppConstants.NOTIFICATION_ID, 0);
             final String action = intent.getStringExtra(AppConstants.ACTION);

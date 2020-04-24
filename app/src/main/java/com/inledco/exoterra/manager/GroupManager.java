@@ -9,7 +9,9 @@ import com.inledco.exoterra.aliot.AliotServer;
 import com.inledco.exoterra.aliot.HttpCallback;
 import com.inledco.exoterra.aliot.UserApi;
 import com.inledco.exoterra.aliot.bean.Group;
-import com.inledco.exoterra.aliot.bean.XGroup;
+import com.inledco.exoterra.event.GroupsRefreshedEvent;
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -26,6 +28,7 @@ public class GroupManager {
     private List<Group> mGroups;
     private Map<String, Group> mGroupMap;
 
+    private boolean mSynchronizing;
     private boolean mSynchronized;
 
     private GroupManager() {
@@ -37,23 +40,24 @@ public class GroupManager {
         return LazyHolder.INSTANCE;
     }
 
-    public void addGroup(XGroup xGroup) {
-        if (xGroup == null) {
+    public void addGroup(Group group) {
+        if (group == null) {
             return;
         }
-        String key = xGroup.groupid;
-        if (mGroupMap.containsKey(key)) {
-            Group group = mGroupMap.get(key);
-            group.name = xGroup.name;
-            group.remark1 = xGroup.remark1;
-            group.remark2 = xGroup.remark2;
-            group.remark3 = xGroup.remark3;
-            group.creator = xGroup.creator;
-            group.create_time = xGroup.create_time;
-            group.update_time = xGroup.update_time;
-        } else {
-            mGroupMap.put(key, new Group(xGroup));
-        }
+        String key = group.groupid;
+        mGroupMap.put(key, group);
+//        if (mGroupMap.containsKey(key)) {
+//            Group group = mGroupMap.get(key);
+//            group.name = xGroup.name;
+//            group.remark1 = xGroup.remark1;
+//            group.remark2 = xGroup.remark2;
+//            group.remark3 = xGroup.remark3;
+//            group.creator = xGroup.creator;
+//            group.create_time = xGroup.create_time;
+//            group.update_time = xGroup.update_time;
+//        } else {
+//            mGroupMap.put(key, new Group(xGroup));
+//        }
     }
 
     public void removeGroup(String key) {
@@ -71,6 +75,7 @@ public class GroupManager {
     public void clear() {
         mGroupMap.clear();
         mGroups.clear();
+        mSynchronized = false;
     }
 
     public boolean contains(String key) {
@@ -94,38 +99,41 @@ public class GroupManager {
         return mGroupMap.get(key);
     }
 
-    public boolean isSynchronized() {
-        return mSynchronized;
+    public boolean needSynchronize() {
+        return !mSynchronized && !mSynchronizing;
     }
 
     public List<Group> getAllGroups() {
         return mGroups;
     }
 
-    private void updateGroups(List<XGroup> xGroups) {
+    private void updateGroups(List<Group> groups) {
         Set<String> oldsets = new HashSet<>(mGroupMap.keySet());
         Set<String> newsets = new HashSet<>();
-        for (XGroup xGroup : xGroups) {
-            newsets.add(xGroup.groupid);
+        for (Group group : groups) {
+            newsets.add(group.groupid);
         }
         for (String key : oldsets) {
             if (newsets.contains(key) == false) {
                 mGroupMap.remove(key);
             }
         }
-        for (XGroup xGroup : xGroups) {
-            addGroup(xGroup);
+        for (Group group : groups) {
+            addGroup(group);
         }
         mGroups.clear();
         mGroups.addAll(mGroupMap.values());
     }
 
-    public void getGroups(final HttpCallback<UserApi.GroupsResponse> callback) {
-        String userid = UserManager.getInstance().getUserid();
-        String token = UserManager.getInstance().getToken();
-        AliotServer.getInstance().getGroups(userid, token, new HttpCallback<UserApi.GroupsResponse>() {
+    public void getGroups(final OnErrorCallback callback) {
+        if (mSynchronizing) {
+            return;
+        }
+        mSynchronizing = true;
+        AliotServer.getInstance().getGroups(new HttpCallback<UserApi.GroupsResponse>() {
             @Override
             public void onError(String error) {
+                mSynchronizing = false;
                 if (callback != null) {
                     callback.onError(error);
                 }
@@ -135,14 +143,30 @@ public class GroupManager {
             public void onSuccess(UserApi.GroupsResponse result) {
                 updateGroups(result.data);
                 mSynchronized = true;
-                if (callback != null) {
-                    callback.onSuccess(result);
-                }
+                mSynchronizing = false;
+                EventBus.getDefault().post(new GroupsRefreshedEvent());
             }
         });
     }
 
-    public String getRemark1Text(final int zone, final int sunrise, final int sunset) {
+    public void getGroups() {
+        getGroups(null);
+    }
+
+    public Group getDeviceGroup(final String pkey, final String dname) {
+        for (Group group : mGroupMap.values()) {
+            if (group.devices != null) {
+                for (Group.Device dev : group.devices) {
+                    if (TextUtils.equals(pkey, dev.product_key) && TextUtils.equals(dname, dev.device_name)) {
+                        return group;
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+    private String getRemark1Text(final int zone, final int sunrise, final int sunset) {
         Map<String, Integer> map = new HashMap<>();
         map.put(KEY_ZONE, zone);
         map.put(KEY_SUNRISE, sunrise);
@@ -150,14 +174,30 @@ public class GroupManager {
         return JSON.toJSONString(map);
     }
 
-    public void setRemark1(final String groupid, final int zone, final int sunrise, final int sunset, HttpCallback<UserApi.GroupResponse> callback) {
+    public void setRemark1(final String groupid, final int zone, final int sunrise, final int sunset, final HttpCallback<UserApi.GroupResponse> callback) {
         if (contains(groupid) == false) {
             return;
         }
+        final Group group = getGroup(groupid);
         String token = UserManager.getInstance().getToken();
-        UserApi.GroupRequest request = new UserApi.GroupRequest();
+        final UserApi.GroupRequest request = new UserApi.GroupRequest();
         request.remark1 = getRemark1Text(zone, sunrise, sunset);
-        AliotServer.getInstance().modifyGroupInfo(token, groupid, request, callback);
+        AliotServer.getInstance().modifyGroupInfo(token, groupid, request, new HttpCallback<UserApi.GroupResponse>() {
+            @Override
+            public void onError(String error) {
+                if (callback != null) {
+                    callback.onError(error);
+                }
+            }
+
+            @Override
+            public void onSuccess(UserApi.GroupResponse result) {
+                group.remark1 = request.remark1;
+                if (callback != null) {
+                    callback.onSuccess(result);
+                }
+            }
+        });
     }
 
     private void setRemark1(final String groupid, final String key, final int value, HttpCallback<UserApi.GroupResponse> callback) {

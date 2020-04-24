@@ -27,7 +27,8 @@ import com.inledco.exoterra.aliot.HttpCallback;
 import com.inledco.exoterra.aliot.UserApi;
 import com.inledco.exoterra.base.BaseFragment;
 import com.inledco.exoterra.manager.GroupManager;
-import com.inledco.exoterra.manager.UserManager;
+import com.inledco.exoterra.util.FavouriteUtil;
+import com.inledco.exoterra.util.GroupUtil;
 import com.inledco.exoterra.util.TimeFormatUtil;
 import com.inledco.exoterra.view.AdvancedTextInputEditText;
 
@@ -47,7 +48,9 @@ public class AddHabitatFragment extends BaseFragment {
     private Button add_habitat_back;
     private Button add_habitat_save;
 
-    private final int mRawZone = TimeZone.getDefault().getRawOffset()/60000;
+    private String mIconName = GroupUtil.getDefaultIconName();
+
+    private final int mOffset = TimeZone.getDefault().getRawOffset() / 60000;
     private final BroadcastReceiver mTimeChangeReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -111,6 +114,7 @@ public class AddHabitatFragment extends BaseFragment {
 
         add_habitat_name.requestFocus();
         add_habitat_name.bindTextInputLayout(add_habitat_til);
+        add_habitat_name.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_type_1, 0, R.drawable.ic_edit_white_24dp, 0);
         add_habitat_time.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_edit_white_24dp, 0);
         add_habitat_sunrise.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_edit_white_24dp, 0);
         add_habitat_sunset.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_edit_white_24dp, 0);
@@ -135,6 +139,12 @@ public class AddHabitatFragment extends BaseFragment {
 
     @Override
     protected void initEvent() {
+        add_habitat_name.setDrawableRightClickListener(new AdvancedTextInputEditText.DrawableRightClickListener() {
+            @Override
+            public void onDrawableRightClick() {
+                showGroupIconDialog();
+            }
+        });
         add_habitat_time.setDrawableRightClickListener(new AdvancedTextInputEditText.DrawableRightClickListener() {
             @Override
             public void onDrawableRightClick() {
@@ -165,7 +175,7 @@ public class AddHabitatFragment extends BaseFragment {
                     @Override
                     public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
                         mSunrise = hourOfDay*60+minute;
-                        long time = ((1440+mSunrise-mRawZone)%1440)*60000;
+                        long time = ((1440+mSunrise - mOffset) % 1440) * 60000;
                         add_habitat_sunrise.setText(mTimeFormat.format(time));
                     }
                 });
@@ -179,7 +189,7 @@ public class AddHabitatFragment extends BaseFragment {
                     @Override
                     public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
                         mSunset = hourOfDay*60+minute;
-                        long time = ((1440+mSunset-mRawZone)%1440)*60000;
+                        long time = ((1440+mSunset - mOffset) % 1440) * 60000;
                         add_habitat_sunset.setText(mTimeFormat.format(time));
                     }
                 });
@@ -201,14 +211,14 @@ public class AddHabitatFragment extends BaseFragment {
                     add_habitat_til.setError(getString(R.string.input_empty));
                     return;
                 }
-                createHome(name, mZone, mSunrise, mSunset);
+                createHome(name, mIconName, mZone, mSunrise, mSunset);
             }
         });
     }
 
     private void refreshTime() {
         long current = System.currentTimeMillis();
-        long time = current + (mZone - mRawZone)*60000;
+        long time = current + (mZone - mOffset) * 60000;
         add_habitat_systime.setText(mDateFormat.format(current));
         add_habitat_time.setText(mDateFormat.format(time));
     }
@@ -218,8 +228,7 @@ public class AddHabitatFragment extends BaseFragment {
         dialog.show();
     }
 
-    private void createHome(final String name, final int zone, final int sunrise, final int sunset) {
-        String token = UserManager.getInstance().getToken();
+    private void createHome(final String name, final String iconName, final int zone, final int sunrise, final int sunset) {
         Map<String, Integer> map = new HashMap<>();
         map.put("zone", zone);
         map.put("sunrise", sunrise);
@@ -227,48 +236,39 @@ public class AddHabitatFragment extends BaseFragment {
         final UserApi.GroupRequest request = new UserApi.GroupRequest();
         request.name = name;
         request.remark1 = JSON.toJSONString(map);
-        AliotServer.getInstance().createGroup(token, request, new HttpCallback<UserApi.GroupResponse>() {
+        request.remark2 = iconName;
+        AliotServer.getInstance().createGroup(request, new HttpCallback<UserApi.GroupResponse>() {
             @Override
             public void onError(String error) {
-                Log.e(TAG, "onError: " + error);
+                showToast(error);
             }
 
             @Override
             public void onSuccess(UserApi.GroupResponse result) {
-                GroupManager.getInstance().addGroup(result.data);
                 Log.e(TAG, "onSuccess: " + JSON.toJSONString(result));
+                if (add_habitat_favourite.isChecked()) {
+                    FavouriteUtil.addFavourite(getContext(), result.data.groupid);
+                }
+                GroupManager.getInstance().getGroups();
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        getActivity().getSupportFragmentManager().popBackStack();
+                    }
+                });
             }
         });
+    }
 
-//        XlinkCloudManager.getInstance().createHome(name, new XlinkRequestCallback<HomeApi.HomeResponse>() {
-//            @Override
-//            public void onError(String error) {
-//                Toast.makeText(getContext(), error, Toast.LENGTH_SHORT)
-//                     .show();
-//            }
-//
-//            @Override
-//            public void onSuccess(HomeApi.HomeResponse response) {
-//                final String homeid = response.id;
-//                XlinkCloudManager.getInstance().setHomeProperty(homeid, zone, sunrise, sunset, new XlinkRequestCallback<String>() {
-//                    @Override
-//                    public void onError(String error) {
-//                        Toast.makeText(getContext(), error, Toast.LENGTH_SHORT)
-//                             .show();
-//                        HomeManager.getInstance().refreshHomeList(null);
-//                        getActivity().getSupportFragmentManager().popBackStack();
-//                    }
-//
-//                    @Override
-//                    public void onSuccess(String s) {
-//                        HomeManager.getInstance().refreshHomeList(null);
-//                        getActivity().getSupportFragmentManager().popBackStack();
-//                    }
-//                });
-//                if (add_habitat_favourite.isChecked()) {
-//                    FavouriteUtil.addFavourite(getContext(), homeid);
-//                }
-//            }
-//        });
+    private void showGroupIconDialog() {
+        GroupIconDialog dialog = new GroupIconDialog(getContext()) {
+            @Override
+            public void onChoose(String name, int res) {
+                mIconName = name;
+                add_habitat_name.setCompoundDrawablesRelativeWithIntrinsicBounds(res, 0, R.drawable.ic_edit_white_24dp, 0);
+            }
+        };
+        dialog.init(mIconName);
+        dialog.show();
     }
 }

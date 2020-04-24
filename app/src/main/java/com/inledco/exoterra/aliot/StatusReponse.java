@@ -15,6 +15,10 @@ public class StatusReponse {
     private String utcTime;
     private String status;
 
+    public String getTag() {
+        return productKey + "_" + deviceName;
+    }
+
     public String getProductKey() {
         return productKey;
     }

@@ -1,5 +1,6 @@
 package com.inledco.exoterra.base;
 
+import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.os.Looper;
 import android.support.annotation.IdRes;
@@ -8,6 +9,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,10 +18,14 @@ import android.view.animation.AnimationUtils;
 import android.widget.Toast;
 
 import com.inledco.exoterra.R;
+import com.liruya.loaddialog.LoadDialog;
 
 public abstract class BaseFragment extends Fragment {
 
     protected final String TAG = this.getClass().getSimpleName();
+
+    private LoadDialog mLoadDialog;
+    private ProgressDialog mProgressDialog;
 
     @Nullable
     @Override
@@ -77,6 +83,7 @@ public abstract class BaseFragment extends Fragment {
         if (isMainThread) {
             Toast.makeText(getContext(), msg, Toast.LENGTH_SHORT)
                  .show();
+            Log.e(TAG, "showToast: " + msg);
         } else {
             if (getActivity() == null) {
                 return;
@@ -86,9 +93,55 @@ public abstract class BaseFragment extends Fragment {
                 public void run() {
                     Toast.makeText(getContext(), msg, Toast.LENGTH_SHORT)
                          .show();
+                    Log.e(TAG, "showToast: " + msg);
                 }
             });
         }
+    }
+
+    protected void showLoadingDialog() {
+        if (mLoadDialog == null) {
+            mLoadDialog = new LoadDialog(getContext());
+            boolean isMainThread = Looper.getMainLooper().getThread().getId() == Thread.currentThread().getId();
+            if (isMainThread) {
+                mLoadDialog.show();
+            } else {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        mLoadDialog.show();
+                    }
+                });
+            }
+        }
+    }
+
+    protected void dismissLoadingDialog() {
+        if (mLoadDialog != null) {
+            boolean isMainThread = Looper.getMainLooper().getThread().getId() == Thread.currentThread().getId();
+            if (isMainThread) {
+                mLoadDialog.dismiss();
+                mLoadDialog = null;
+            } else {
+                if (getActivity() == null) {
+                    return;
+                }
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        mLoadDialog.dismiss();
+                        mLoadDialog = null;
+                    }
+                });
+            }
+        }
+    }
+
+    protected void runOnUiThread(Runnable runnable) {
+        if (getActivity() == null) {
+            return;
+        }
+        getActivity().runOnUiThread(runnable);
     }
 
     protected abstract @LayoutRes int getLayoutRes();

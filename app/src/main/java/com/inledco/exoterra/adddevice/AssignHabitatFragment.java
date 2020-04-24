@@ -1,5 +1,6 @@
 package com.inledco.exoterra.adddevice;
 
+import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -12,14 +13,23 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.inledco.exoterra.R;
+import com.inledco.exoterra.aliot.AliotServer;
+import com.inledco.exoterra.aliot.HttpCallback;
+import com.inledco.exoterra.aliot.UserApi;
+import com.inledco.exoterra.aliot.bean.Group;
 import com.inledco.exoterra.base.BaseFragment;
+import com.inledco.exoterra.event.GroupDeviceChangedEvent;
 import com.inledco.exoterra.event.GroupsRefreshedEvent;
 import com.inledco.exoterra.main.groups.AddHabitatFragment;
+import com.inledco.exoterra.manager.GroupManager;
+import com.inledco.exoterra.util.DeviceUtil;
 import com.inledco.exoterra.view.GradientCornerButton;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
+
+import java.util.List;
 
 public class AssignHabitatFragment extends BaseFragment {
     private ImageView assign_habitat_prdt;
@@ -32,7 +42,7 @@ public class AssignHabitatFragment extends BaseFragment {
     private ConnectNetViewModel mConnectNetViewModel;
     private ConnectNetBean mConnectNetBean;
 
-//    private List<Group> mHomes = HomeManager.getInstance().getHomeList();
+    private List<Group> mGroups = GroupManager.getInstance().getAllGroups();
     private AssignHabitatAdapter mAdapter;
 
     @Nullable
@@ -73,16 +83,16 @@ public class AssignHabitatFragment extends BaseFragment {
 
     @Override
     protected void initData() {
-//        mConnectNetViewModel = ViewModelProviders.of(getActivity()).get(ConnectNetViewModel.class);
-//        mConnectNetBean = mConnectNetViewModel.getData();
-//        if (mConnectNetBean == null) {
-//            return;
-//        }
-//
-//        final String pid = mConnectNetBean.getProductId();
-//        assign_habitat_prdt.setImageResource(DeviceUtil.getProductIcon(pid));
-//        mAdapter = new AssignHabitatAdapter(getContext(), mHomes);
-//        assign_habitat_rv.setAdapter(mAdapter);
+        mConnectNetViewModel = ViewModelProviders.of(getActivity()).get(ConnectNetViewModel.class);
+        mConnectNetBean = mConnectNetViewModel.getData();
+        if (mConnectNetBean == null) {
+            return;
+        }
+
+        final String pkey = mConnectNetBean.getProductKey();
+        assign_habitat_prdt.setImageResource(DeviceUtil.getProductIcon(pkey));
+        mAdapter = new AssignHabitatAdapter(getContext(), mGroups);
+        assign_habitat_rv.setAdapter(mAdapter);
     }
 
     @Override
@@ -94,32 +104,35 @@ public class AssignHabitatFragment extends BaseFragment {
             }
         });
 
-//        assign_habitat_save.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                final String homeid = mAdapter.getSelectedHomeid();
-//                if (TextUtils.isEmpty(homeid)) {
-//                    return;
-//                }
-//                XlinkCloudManager.getInstance().addDeviceToHome(homeid, mConnectNetBean.getResultDevid(), new XlinkRequestCallback<String>() {
-//                    @Override
-//                    public void onError(String error) {
-//                        Toast.makeText(getContext(), error, Toast.LENGTH_SHORT)
-//                             .show();
-//                    }
-//
-//                    @Override
-//                    public void onSuccess(String s) {
-//                        getActivity().finish();
-//                    }
-//                });
-//            }
-//        });
+        assign_habitat_save.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final Group group = mAdapter.getSelectedGroup();
+                if (group == null) {
+                    return;
+                }
+                final String pkey = mConnectNetBean.getProductKey();
+                final String dname = mConnectNetBean.getDeviceName();
+                AliotServer.getInstance().addDeviceToGroup(group.groupid, pkey, dname, new HttpCallback<UserApi.Response>() {
+                    @Override
+                    public void onError(String error) {
+                        showToast(error);
+                    }
+
+                    @Override
+                    public void onSuccess(UserApi.Response result) {
+                        group.addDevice(mConnectNetBean.getProductKey(), mConnectNetBean.getDeviceName(), mConnectNetBean.getName());
+                        EventBus.getDefault().post(new GroupDeviceChangedEvent(group.groupid));
+                        getActivity().finish();
+                    }
+                });
+            }
+        });
     }
 
     @Subscribe (threadMode = ThreadMode.MAIN)
-    public void onHomesRefreshedEvent(GroupsRefreshedEvent event) {
-//        assign_habitat_warning.setVisibility(mHomes.size() == 0 ? View.VISIBLE : View.GONE);
-//        mAdapter.notifyDataSetChanged();
+    public void onGroupsRefreshedEvent(GroupsRefreshedEvent event) {
+        assign_habitat_warning.setVisibility(mGroups.size() == 0 ? View.VISIBLE : View.GONE);
+        mAdapter.notifyDataSetChanged();
     }
 }

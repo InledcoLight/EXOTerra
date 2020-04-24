@@ -8,8 +8,10 @@ import android.view.ViewGroup;
 
 import com.inledco.exoterra.R;
 import com.inledco.exoterra.aliot.Device;
+import com.inledco.exoterra.aliot.bean.Group;
 import com.inledco.exoterra.common.DeviceViewHolder;
 import com.inledco.exoterra.common.SimpleAdapter;
+import com.inledco.exoterra.manager.GroupManager;
 import com.inledco.exoterra.util.DeviceUtil;
 
 import java.util.List;
@@ -41,18 +43,17 @@ public class DevicesAdapter extends SimpleAdapter<Device, DeviceViewHolder> {
         if (TextUtils.isEmpty(name)) {
             name = DeviceUtil.getDefaultName(pkey);
         }
-        String mac = device.getMac();
         holder.iv_icon.setImageResource(DeviceUtil.getProductIcon(pkey));
         holder.tv_name.setText(name);
-//        Group home = HomeManager.getInstance().getDeviceHome(device);
-//        if (home != null) {
-//            holder.ctv_habitat.setChecked(true);
-//            holder.ctv_habitat.setText(home.getHome().name);
-//        } else {
-//            holder.ctv_habitat.setChecked(false);
-//            holder.ctv_habitat.setText(null);
-//        }
-//        holder.ctv_habitat.setVisibility(View.VISIBLE);
+        Group group = GroupManager.getInstance().getDeviceGroup(pkey, dname);
+        if (group != null) {
+            holder.ctv_habitat.setChecked(true);
+            holder.ctv_habitat.setText(group.name);
+        } else {
+            holder.ctv_habitat.setChecked(false);
+            holder.ctv_habitat.setText(null);
+        }
+        holder.ctv_habitat.setVisibility(View.VISIBLE);
         boolean state = device.isOnline();
         holder.ctv_state.setChecked(state);
         holder.ctv_state.setText(state ? R.string.cloud_online : R.string.cloud_offline);

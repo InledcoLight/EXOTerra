@@ -8,13 +8,14 @@ import android.view.ViewGroup;
 import android.widget.CheckedTextView;
 
 import com.inledco.exoterra.R;
-import com.inledco.exoterra.bean.Group;
+import com.inledco.exoterra.aliot.bean.Group;
 import com.inledco.exoterra.common.SimpleAdapter;
 
 import java.util.List;
 
 public class AssignHabitatAdapter extends SimpleAdapter<Group, AssignHabitatAdapter.ChooseHabitatViewHolder> {
-    private String mSelectedHomeid;
+//    private String mSelectedGroupid;
+    private Group mSelectedGroup;
     private ChooseHabitatViewHolder mSelectedHolder;
 
     public AssignHabitatAdapter(@NonNull Context context, List<Group> data) {
@@ -34,32 +35,32 @@ public class AssignHabitatAdapter extends SimpleAdapter<Group, AssignHabitatAdap
 
     @Override
     public void onBindViewHolder(@NonNull final ChooseHabitatViewHolder holder, int i) {
-//        final int position = holder.getAdapterPosition();
-//        final HomeApi.HomesResponse.Group home = mData.get(position).getHome();
-//        boolean selected = TextUtils.equals(mSelectedHomeid, home.id);
-//        holder.name.setText(home.name);
-//        holder.name.setChecked(selected);
-//        if (selected) {
-//            mSelectedHolder = holder;
-//        }
-//
-//        holder.name.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                if (!holder.name.isChecked()) {
-//                    if (mSelectedHolder != null) {
-//                        mSelectedHolder.name.setChecked(false);
-//                    }
-//                    mSelectedHomeid = home.id;
-//                    mSelectedHolder = holder;
-//                    holder.name.setChecked(true);
-//                }
-//            }
-//        });
+        final int position = holder.getAdapterPosition();
+        final Group group = mData.get(position);
+        boolean selected = (mSelectedGroup == group);
+        holder.name.setText(group.name);
+        holder.name.setChecked(selected);
+        if (selected) {
+            mSelectedHolder = holder;
+        }
+
+        holder.name.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (!holder.name.isChecked()) {
+                    if (mSelectedHolder != null) {
+                        mSelectedHolder.name.setChecked(false);
+                    }
+                    mSelectedGroup = group;
+                    mSelectedHolder = holder;
+                    holder.name.setChecked(true);
+                }
+            }
+        });
     }
 
-    public String getSelectedHomeid() {
-        return mSelectedHomeid;
+    public Group getSelectedGroup() {
+        return mSelectedGroup;
     }
 
     class ChooseHabitatViewHolder extends RecyclerView.ViewHolder {

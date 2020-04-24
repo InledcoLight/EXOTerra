@@ -24,9 +24,12 @@ import com.inledco.exoterra.aliot.AliotClient;
 import com.inledco.exoterra.base.BaseActivity;
 import com.inledco.exoterra.main.devices.DevicesFragment;
 import com.inledco.exoterra.main.devices.LocalDevicesFragment;
+import com.inledco.exoterra.main.groups.DashboardFragment;
 import com.inledco.exoterra.main.groups.GroupsFragment;
 import com.inledco.exoterra.main.me.MeFragment;
 import com.inledco.exoterra.main.pref.PrefFragment;
+import com.inledco.exoterra.manager.DeviceManager;
+import com.inledco.exoterra.manager.GroupManager;
 import com.inledco.exoterra.manager.UserManager;
 import com.inledco.exoterra.scan.ScanActivity;
 import com.inledco.exoterra.smartconfig.SmartconfigActivity;
@@ -86,12 +89,12 @@ public class MainActivity extends BaseActivity {
         authorized = UserManager.getInstance().isAuthorized();
         if (authorized) {
             main_bnv.setSelectedItemId(R.id.main_bnv_home);
-            replaceFragment(R.id.main_fl_show, GroupsFragment.newInstance(true));
+            replaceFragment(R.id.main_fl_show, new DashboardFragment());
             String userid = UserManager.getInstance().getUserid();
             String secret = UserManager.getInstance().getSecret();
-            Log.e(TAG, "initData: " + userid + " " + secret);
-            AliotClient.getInstance().init(MainActivity.this, userid, secret);
-//            AliotClient.getInstance().init(MainActivity.this, UserManager.getInstance().getUserid());
+            AliotClient.getInstance().init(getApplicationContext(), userid, secret);
+            DeviceManager.getInstance().getSubscribedDevices();
+            GroupManager.getInstance().getGroups();
         } else {
             main_bnv.setSelectedItemId(R.id.main_bnv_devices);
             replaceFragment(R.id.main_fl_show, new LocalDevicesFragment());
@@ -113,10 +116,10 @@ public class MainActivity extends BaseActivity {
             public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
                 switch (menuItem.getItemId()) {
                     case R.id.main_bnv_home:
-                        replaceFragment(R.id.main_fl_show, GroupsFragment.newInstance(true));
+                        replaceFragment(R.id.main_fl_show, new DashboardFragment());
                         break;
                     case R.id.main_bnv_habitat:
-                        replaceFragment(R.id.main_fl_show, GroupsFragment.newInstance(false));
+                        replaceFragment(R.id.main_fl_show, new GroupsFragment());
                         break;
                     case R.id.main_bnv_devices:
                         if (authorized) {

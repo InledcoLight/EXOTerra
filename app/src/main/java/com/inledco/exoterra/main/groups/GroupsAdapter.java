@@ -8,6 +8,7 @@ import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -17,9 +18,10 @@ import com.inledco.exoterra.aliot.AliotConsts;
 import com.inledco.exoterra.aliot.Device;
 import com.inledco.exoterra.aliot.ExoSocket;
 import com.inledco.exoterra.aliot.bean.Group;
-import com.inledco.exoterra.aliot.bean.XDevice;
 import com.inledco.exoterra.common.SimpleAdapter;
 import com.inledco.exoterra.manager.DeviceManager;
+import com.inledco.exoterra.util.GroupUtil;
+import com.inledco.exoterra.util.SensorUtil;
 import com.inledco.exoterra.util.TimeFormatUtil;
 
 import java.text.DateFormat;
@@ -34,11 +36,11 @@ public class GroupsAdapter extends SimpleAdapter<Group, GroupsAdapter.GroupViewH
     private String mSelectedGroupid;
     private GroupViewHolder mSelectedHolder;
 
-    private final int defaultZone;
+    private final int mOffset;
 
     public GroupsAdapter(@NonNull Context context, List<Group> data) {
         super(context, data);
-        defaultZone = TimeZone.getDefault().getRawOffset()/60000;
+        mOffset = TimeZone.getDefault().getRawOffset();
         mDateFormat = GlobalSettings.getDateTimeFormat();
         mTimeFormat = GlobalSettings.getTimeFormat();
     }
@@ -61,6 +63,7 @@ public class GroupsAdapter extends SimpleAdapter<Group, GroupsAdapter.GroupViewH
         final String groupid = group.groupid;
         final boolean selected = TextUtils.equals(mSelectedGroupid, groupid);
         holder.name.setText(group.name);
+        holder.icon.setImageResource(GroupUtil.getGroupIcon(group.remark2));
 
         if (selected) {
             mSelectedHolder = holder;
@@ -107,11 +110,14 @@ public class GroupsAdapter extends SimpleAdapter<Group, GroupsAdapter.GroupViewH
     }
 
     private void showDetail(@NonNull final GroupViewHolder holder, @NonNull final Group group) {
+        if (group == null) {
+            return;
+        }
         final int zone = group.getZone();
         final int sunrise = group.getSunrise();
         final int sunset = group.getSunset();
 
-        for (XDevice dev : group.devices) {
+        for (Group.Device dev : group.devices) {
             if (TextUtils.equals(dev.product_key, AliotConsts.PRODUCT_KEY_EXOSOCKET)) {
                 String key = dev.product_key + "_" + dev.device_name;
                 Device device = DeviceManager.getInstance().getDevice(key);
@@ -126,15 +132,19 @@ public class GroupsAdapter extends SimpleAdapter<Group, GroupsAdapter.GroupViewH
                             continue;
                         }
                         if (sensors.length >= 1) {
-                            ExoSocket.Sensor sensor1 = socket.getSensor()[0];
-                            String s1text = getSensorValueText(sensor1.getValue(), sensor1.getType()) + getSensorUnit(sensor1.getType());
+                            ExoSocket.Sensor sensor1 = sensors[0];
+                            int value1 = sensor1.getValue();
+                            int type1 = sensor1.getType();
+                            String s1text = SensorUtil.getSensorValueText(value1, type1) + SensorUtil.getSensorUnit(type1);
                             holder.sensor1.setText(s1text);
                             res = true;
                         }
                         if (sensors.length >= 2) {
-                            ExoSocket.Sensor sensor2 = socket.getSensor()[1];
-                            String s2text = getSensorValueText(sensor2.getValue(), sensor2.getType()) + getSensorUnit(sensor2.getType());
-                            holder.sensor1.setText(s2text);
+                            ExoSocket.Sensor sensor2 = sensors[1];
+                            int value2 = sensor2.getValue();
+                            int type2 = sensor2.getType();
+                            String s2text = SensorUtil.getSensorValueText(value2, type2) + SensorUtil.getSensorUnit(type2);
+                            holder.sensor2.setText(s2text);
                             res = true;
                         }
                     }
@@ -145,7 +155,7 @@ public class GroupsAdapter extends SimpleAdapter<Group, GroupsAdapter.GroupViewH
             }
         }
 
-        long time = System.currentTimeMillis() + (zone-defaultZone)*60000;
+        long time = System.currentTimeMillis() + zone*60000 - mOffset;
         mSelectedHolder.time.setText(mDateFormat.format(time));
         String daynight = mContext.getString(R.string.nighttime);
         int minutes = (int) ((time / 60000 + 1440 + zone) % 1440);
@@ -181,8 +191,8 @@ public class GroupsAdapter extends SimpleAdapter<Group, GroupsAdapter.GroupViewH
     }
 
     public void refreshData() {
-        notifyDataSetChanged();
         mSelectedHolder = null;
+        notifyDataSetChanged();
     }
 
     public void updateData(int position) {
@@ -209,39 +219,14 @@ public class GroupsAdapter extends SimpleAdapter<Group, GroupsAdapter.GroupViewH
         if (mSelectedHolder != null) {
             int position = mSelectedHolder.getAdapterPosition();
             int zone = mData.get(position).getZone();
-            long time = System.currentTimeMillis() + (zone-defaultZone)*60000;
+            long time = System.currentTimeMillis() + zone*60000 - mOffset;
             mSelectedHolder.time.setText(mDateFormat.format(time));
         }
     }
 
-    private String getSensorValueText(int value, int type) {
-        String text = String.valueOf(value);
-        switch (type) {
-            case ExoSocket.SENSOR_TEMPERATURE:
-                text = GlobalSettings.getTemperatureText(value);
-                break;
-            case ExoSocket.SENSOR_HUMIDITY:
-                text = value/10 + "." + value%10;
-                break;
-        }
-        return text;
-    }
-
-    private String getSensorUnit(int type) {
-        String text = "";
-        switch (type) {
-            case ExoSocket.SENSOR_TEMPERATURE:
-                text = GlobalSettings.getTemperatureUnit();
-                break;
-            case ExoSocket.SENSOR_HUMIDITY:
-                text = "%";
-                break;
-        }
-        return text;
-    }
-
     class GroupViewHolder extends RecyclerView.ViewHolder {
         private LinearLayout title;
+        private ImageView icon;
         private TextView name;
         private ImageButton set;
         private LinearLayout more;
@@ -256,6 +241,7 @@ public class GroupsAdapter extends SimpleAdapter<Group, GroupsAdapter.GroupViewH
         public GroupViewHolder(@NonNull View itemView) {
             super(itemView);
             title = itemView.findViewById(R.id.item_habitat_title);
+            icon = itemView.findViewById(R.id.item_habitat_icon);
             name = itemView.findViewById(R.id.item_habitat_name);
             set = itemView.findViewById(R.id.item_habitat_set);
             more = itemView.findViewById(R.id.item_habitat_more);

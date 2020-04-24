@@ -3,6 +3,7 @@ package com.inledco.exoterra.aliot;
 public class BaseProperty {
     protected long time;
     protected Object value;
+    protected boolean updated;
 
     public BaseProperty() {
     }
@@ -26,5 +27,13 @@ public class BaseProperty {
 
     public void setValue(Object value) {
         this.value = value;
+    }
+
+    public boolean isUpdated() {
+        return updated;
+    }
+
+    public void setUpdated(boolean updated) {
+        this.updated = updated;
     }
 }

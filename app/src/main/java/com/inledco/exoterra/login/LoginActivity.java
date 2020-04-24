@@ -12,8 +12,10 @@ import android.view.View;
 import android.widget.Button;
 
 import com.inledco.exoterra.R;
+import com.inledco.exoterra.aliot.AliotServer;
 import com.inledco.exoterra.base.BaseActivity;
 import com.inledco.exoterra.foundback.FoundbackActivity;
+import com.inledco.exoterra.home.HomeActivity;
 import com.inledco.exoterra.main.MainActivity;
 import com.inledco.exoterra.manager.UserManager;
 import com.inledco.exoterra.manager.UserPref;
@@ -123,52 +125,6 @@ public class LoginActivity extends BaseActivity {
                     return;
                 }
                 login(email, password);
-//                showLoading();
-//                AliotServer.getInstance().login(email, password, new HttpCallback<UserApi.UserLoginResponse>() {
-//                    @Override
-//                    public void onError(final String error) {
-////                       runOnUiThread(new Runnable() {
-////                           @Override
-////                           public void run() {
-////                               new MessageDialog(LoginActivity.this).setTitle(R.string.signin_failed)
-////                                                                    .setMessage(error)
-////                                                                    .setButton(getString(R.string.ok), null)
-////                                                                    .show();
-////                               dismissLoading();
-////                           }
-////                       });
-//                       showMessageDialog(R.string.signin_failed, error);
-//                    }
-//
-//                    @Override
-//                    public void onSuccess(final UserApi.UserLoginResponse response) {
-//                        Log.e(TAG, "onSuccess: " + JSON.toJSONString(response));
-//                        AliotServer.getInstance().getUserInfo(response.userId, response.access_token, new HttpCallback<UserApi.GetUserInfoResponse>() {
-//                            @Override
-//                            public void onError(String error) {
-////                                Log.e(TAG, "onError: " + error);
-//                                showMessageDialog(R.string.signin_failed, error);
-//                            }
-//
-//                            @Override
-//                            public void onSuccess(UserApi.GetUserInfoResponse result) {
-//                                Log.e(TAG, "onSuccess: " + JSON.toJSONString(result));
-//                                UserPref.saveEmail(LoginActivity.this, email);
-//                                UserPref.savePassword(LoginActivity.this, password);
-//                                UserPref.saveUserId(LoginActivity.this, response.userId);
-//                                UserPref.saveAccessToken(LoginActivity.this, response.access_token);
-//
-//                                runOnUiThread(new Runnable() {
-//                                    @Override
-//                                    public void run() {
-//                                        dismissLoading();
-//                                        gotoMainActivity();
-//                                    }
-//                                });
-//                            }
-//                        });
-//                    }
-//                });
             }
         });
         login_btn_signup.setOnClickListener(new View.OnClickListener() {
@@ -247,8 +203,12 @@ public class LoginActivity extends BaseActivity {
             protected void onPostExecute(String result) {
                 super.onPostExecute(result);
                 if (result == null) {
+                    String userid = UserManager.getInstance().getUserid();
+                    String token = UserManager.getInstance().getToken();
+                    AliotServer.getInstance().init(userid, token);
                     dismissLoading();
-                    gotoMainActivity();
+                    gotoHomeActivity();
+//                    gotoMainActivity();
                 } else {
                     new MessageDialog(LoginActivity.this).setTitle(R.string.signin_failed)
                                                          .setMessage(result)
@@ -259,6 +219,11 @@ public class LoginActivity extends BaseActivity {
             }
         };
         authTask.execute();
+    }
+
+    private void gotoHomeActivity() {
+        Intent intent = new Intent(this, HomeActivity.class);
+        startActivity(intent);
     }
 
     private void gotoMainActivity() {

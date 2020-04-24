@@ -3,6 +3,7 @@ package com.inledco.exoterra.manager;
 import android.text.TextUtils;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONException;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -21,6 +22,8 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 
 public class OKHttpManager {
+    private final String TAG = "OKHttpManager";
+
     private static final MediaType CONTENT_TYPE_JSON = MediaType.parse("application/json; charset=utf-8");
 
     private final OkHttpClient mHttpClient;
@@ -190,10 +193,12 @@ public class OKHttpManager {
         try {
             Response response = mHttpClient.newCall(request).execute();
             if (response.isSuccessful()) {
-                return JSON.parseObject(response.body().string(), clazz);
+                String result = response.body().string();
+                return JSON.parseObject(result, clazz);
             }
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (JSONException e) {
             e.printStackTrace();
         }
         return null;

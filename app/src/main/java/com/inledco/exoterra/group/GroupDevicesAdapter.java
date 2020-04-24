@@ -11,14 +11,16 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.inledco.exoterra.R;
-import com.inledco.exoterra.aliot.bean.XDevice;
+import com.inledco.exoterra.aliot.Device;
+import com.inledco.exoterra.aliot.bean.Group;
 import com.inledco.exoterra.common.SimpleAdapter;
+import com.inledco.exoterra.manager.DeviceManager;
 import com.inledco.exoterra.util.DeviceUtil;
 
 import java.util.List;
 
-public class GroupDevicesAdapter extends SimpleAdapter<XDevice, GroupDevicesAdapter.HomeDevicesViewHolder> {
-    public GroupDevicesAdapter(@NonNull Context context, List<XDevice> data) {
+public class GroupDevicesAdapter extends SimpleAdapter<Group.Device, GroupDevicesAdapter.HomeDevicesViewHolder> {
+    public GroupDevicesAdapter(@NonNull Context context, List<Group.Device> data) {
         super(context, data);
     }
 
@@ -36,13 +38,17 @@ public class GroupDevicesAdapter extends SimpleAdapter<XDevice, GroupDevicesAdap
     @Override
     public void onBindViewHolder(@NonNull HomeDevicesViewHolder holder, int i) {
         final int position = holder.getAdapterPosition();
-        XDevice device = mData.get(position);
+        Group.Device device = mData.get(position);
         String pkey = device.product_key;
         String name = TextUtils.isEmpty(device.name) ? DeviceUtil.getDefaultName(pkey) : device.name;
         holder.iv_icon.setImageResource(DeviceUtil.getProductIconSmall(pkey));
         holder.tv_name.setText(name);
         boolean state = false;
-        holder.ctv_state.setChecked(false);
+        Device dev = DeviceManager.getInstance().getDevice(pkey + "_" + device.device_name);
+        if (dev != null) {
+            state = dev.isOnline();
+        }
+        holder.ctv_state.setChecked(state);
         holder.ctv_state.setText(state ? R.string.cloud_online : R.string.cloud_offline);
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override

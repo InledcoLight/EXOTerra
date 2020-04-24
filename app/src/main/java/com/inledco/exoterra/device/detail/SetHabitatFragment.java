@@ -4,22 +4,28 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
-import com.inledco.exoterra.AppConstants;
 import com.inledco.exoterra.R;
 import com.inledco.exoterra.adddevice.AssignHabitatAdapter;
+import com.inledco.exoterra.aliot.AliotServer;
+import com.inledco.exoterra.aliot.HttpCallback;
+import com.inledco.exoterra.aliot.UserApi;
+import com.inledco.exoterra.aliot.bean.Group;
 import com.inledco.exoterra.base.BaseFragment;
-import com.inledco.exoterra.event.GroupsRefreshedEvent;
+import com.inledco.exoterra.event.GroupDeviceChangedEvent;
+import com.inledco.exoterra.main.groups.AddHabitatFragment;
+import com.inledco.exoterra.manager.GroupManager;
 import com.inledco.exoterra.view.GradientCornerButton;
 
 import org.greenrobot.eventbus.EventBus;
-import org.greenrobot.eventbus.Subscribe;
-import org.greenrobot.eventbus.ThreadMode;
+
+import java.util.List;
 
 public class SetHabitatFragment extends BaseFragment {
 
@@ -30,14 +36,18 @@ public class SetHabitatFragment extends BaseFragment {
     private GradientCornerButton set_habitat_back;
     private GradientCornerButton set_habitat_save;
 
-//    private List<Group> mHomes = HomeManager.getInstance().getHomeList();
+    private List<Group> mGroups = GroupManager.getInstance().getAllGroups();
     private AssignHabitatAdapter mAdapter;
 
-    private int mDeviceId;
+    private String mProductKey;
+    private String mDeviceName;
+    private String mName;
 
-    public static SetHabitatFragment newInstance(final int devid) {
+    public static SetHabitatFragment newInstance(final String pkey, final String dname, final String name) {
         Bundle args = new Bundle();
-        args.putInt(AppConstants.DEVICE_ID, devid);
+        args.putString("productKey", pkey);
+        args.putString("deviceName", dname);
+        args.putString("name", name);
         SetHabitatFragment fragment = new SetHabitatFragment();
         fragment.setArguments(args);
         return fragment;
@@ -48,18 +58,9 @@ public class SetHabitatFragment extends BaseFragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = super.onCreateView(inflater, container, savedInstanceState);
 
-        EventBus.getDefault().register(this);
         initData();
         initEvent();
         return view;
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        if (EventBus.getDefault().isRegistered(this)) {
-            EventBus.getDefault().unregister(this);
-        }
     }
 
     @Override
@@ -81,57 +82,54 @@ public class SetHabitatFragment extends BaseFragment {
 
     @Override
     protected void initData() {
-//        Bundle args = getArguments();
-//        if (args != null) {
-//            mDeviceId = args.getInt(AppConstants.DEVICE_ID);
-//        }
-//
-//        mAdapter = new AssignHabitatAdapter(getContext(), mHomes);
-//        set_habitat_rv.setAdapter(mAdapter);
+        Bundle args = getArguments();
+        if (args != null) {
+            mProductKey = args.getString("productKey");
+            mDeviceName = args.getString("deviceName");
+            mName = args.getString("name");
+        }
+
+        mAdapter = new AssignHabitatAdapter(getContext(), mGroups);
+        set_habitat_rv.setAdapter(mAdapter);
     }
 
     @Override
     protected void initEvent() {
-//        set_habitat_add.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                addFragmentToStack(R.id.device_root, new AddHabitatFragment());
-//            }
-//        });
-//
-//        set_habitat_back.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                getActivity().getSupportFragmentManager().popBackStack();
-//            }
-//        });
-//
-//        set_habitat_save.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                final String homeid = mAdapter.getSelectedHomeid();
-//                if (mDeviceId == 0 || TextUtils.isEmpty(homeid)) {
-//                    return;
-//                }
-//                XlinkCloudManager.getInstance().addDeviceToHome(homeid, mDeviceId, new XlinkRequestCallback<String>() {
-//                    @Override
-//                    public void onError(String error) {
-//                        Toast.makeText(getContext(), error, Toast.LENGTH_SHORT)
-//                             .show();
-//                    }
-//
-//                    @Override
-//                    public void onSuccess(String s) {
-//                        getActivity().getSupportFragmentManager().popBackStack();
-//                    }
-//                });
-//            }
-//        });
-    }
+        set_habitat_add.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                addFragmentToStack(R.id.device_root, new AddHabitatFragment());
+            }
+        });
 
-    @Subscribe (threadMode = ThreadMode.MAIN)
-    public void onHomesRefreshedEvent(GroupsRefreshedEvent event) {
-//        set_habitat_warning.setVisibility(mHomes.size() == 0 ? View.VISIBLE : View.GONE);
-//        mAdapter.notifyDataSetChanged();
+        set_habitat_back.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getActivity().getSupportFragmentManager().popBackStack();
+            }
+        });
+
+        set_habitat_save.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final Group group = mAdapter.getSelectedGroup();
+                if (TextUtils.isEmpty(mProductKey) || TextUtils.isEmpty(mDeviceName) || group == null) {
+                    return;
+                }
+                AliotServer.getInstance().addDeviceToGroup(group.groupid, mProductKey, mDeviceName, new HttpCallback<UserApi.Response>() {
+                    @Override
+                    public void onError(String error) {
+                        showToast(error);
+                    }
+
+                    @Override
+                    public void onSuccess(UserApi.Response result) {
+                        group.addDevice(mProductKey, mDeviceName, mName);
+                        EventBus.getDefault().post(new GroupDeviceChangedEvent(group.groupid));
+                        getActivity().getSupportFragmentManager().popBackStack();
+                    }
+                });
+            }
+        });
     }
 }

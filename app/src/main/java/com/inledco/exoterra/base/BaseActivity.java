@@ -14,11 +14,13 @@ import android.widget.Toast;
 
 import com.inledco.exoterra.R;
 import com.inledco.exoterra.view.MessageDialog;
+import com.liruya.loaddialog.LoadDialog;
 
 public abstract class BaseActivity extends AppCompatActivity {
 
     protected final String TAG = this.getClass().getSimpleName();
 
+    private LoadDialog mLoadDialog;
     private MessageDialog mDialog;
 
     static {
@@ -95,6 +97,41 @@ public abstract class BaseActivity extends AppCompatActivity {
                          .show();
                 }
             });
+        }
+    }
+
+    protected void showLoadingDialog() {
+        if (mLoadDialog == null) {
+            mLoadDialog = new LoadDialog(this);
+            boolean isMainThread = Looper.getMainLooper().getThread().getId() == Thread.currentThread().getId();
+            if (isMainThread) {
+                mLoadDialog.show();
+            } else {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        mLoadDialog.show();
+                    }
+                });
+            }
+        }
+    }
+
+    protected void dismissLoadingDialog() {
+        if (mLoadDialog != null) {
+            boolean isMainThread = Looper.getMainLooper().getThread().getId() == Thread.currentThread().getId();
+            if (isMainThread) {
+                mLoadDialog.dismiss();
+                mLoadDialog = null;
+            } else {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        mLoadDialog.dismiss();
+                        mLoadDialog = null;
+                    }
+                });
+            }
         }
     }
 
