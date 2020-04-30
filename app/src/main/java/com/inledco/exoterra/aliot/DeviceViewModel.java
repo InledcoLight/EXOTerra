@@ -34,6 +34,13 @@ public class DeviceViewModel<T extends Device> extends BaseViewModel<T> {
         AliotClient.getInstance().getAllProperties(pname, dname);
     }
 
+    public void upgradeFirmware(int version, String url) {
+        String pkey = getData().getProductKey();
+        String dname = getData().getDeviceName();
+        String pname = DeviceUtil.getProductName(pkey).toLowerCase();
+        AliotClient.getInstance().upgradeFirmware(pname, dname, version, url);
+    }
+
     public void setZone(int zone) {
         KeyValue attrZone = getData().setZone(zone);
         setProperty(attrZone);

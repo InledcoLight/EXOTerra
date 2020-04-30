@@ -44,9 +44,13 @@ public class ExoMonsoon extends Device {
     public List<Integer> getCustomActions() {
         List<Integer> result = new ArrayList<>();
         int[] array = getPropertyIntArray(KEY_CUSTOM_ACTIONS);
-        if (array != null) {
+        if (array != null && array.length <= CUSTOM_ACTIONS_MAX) {
             for (int a : array) {
-                result.add(a);
+                if (a > 0 && a <= 120) {
+                    result.add(a);
+                } else {
+                    break;
+                }
             }
         }
         return result;
@@ -55,10 +59,10 @@ public class ExoMonsoon extends Device {
     public List<Timer> getTimers() {
         List<Timer> result = new ArrayList<>();
         int[] array = getPropertyIntArray(KEY_TIMERS);
-        if (array != null) {
+        if (array != null && array.length <= TIMER_COUNT_MAX) {
             for (int a : array) {
                 Timer tmr = parseIntToTimer(a);
-                if (tmr == null) {
+                if (tmr == null || !tmr.isValid()) {
                     break;
                 }
                 result.add(tmr);
@@ -120,7 +124,7 @@ public class ExoMonsoon extends Device {
     private Timer parseIntToTimer(int value) {
         int tmr = value&0x1FFFF;
         int period = (value>>17)&0x7F;
-        if (tmr > 1439 || period > 120) {
+        if (tmr > 1439 || period > 120 || period == 0) {
             return null;
         }
         int repeat = (value>>24)&0x7F;
@@ -160,8 +164,8 @@ public class ExoMonsoon extends Device {
         public int toInteger() {
             if (isValid()) {
                 int result = timer;
-                result |= (repeat<<17);
-                result |= (period<<24);
+                result |= (period<<17);
+                result |= (repeat<<24);
                 if (enable) {
                     result |= 0x80000000;
                 }

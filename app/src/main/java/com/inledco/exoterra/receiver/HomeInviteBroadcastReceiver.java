@@ -11,7 +11,7 @@ import com.inledco.exoterra.AppConstants;
 public class HomeInviteBroadcastReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(final Context context, Intent intent) {
-        if (TextUtils.equals(intent.getAction(), AppConstants.HOME_INVITE)) {
+        if (TextUtils.equals(intent.getAction(), AppConstants.GROUP_INVITE)) {
             final int notification_id = intent.getIntExtra(AppConstants.NOTIFICATION_ID, 0);
             final String action = intent.getStringExtra(AppConstants.ACTION);
             final String homeid = intent.getStringExtra(AppConstants.HOME_ID);

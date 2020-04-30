@@ -23,6 +23,29 @@ public class MessagesFragment extends BaseFragment {
     private Toolbar message_toolbar;
     private TabLayout message_tab;
     private ViewPager message_vp;
+//    private TabLayout.OnTabSelectedListener mListener = new TabLayout.OnTabSelectedListener() {
+//        @Override
+//        public void onTabSelected(TabLayout.Tab tab) {
+//            switch (tab.getPosition()) {
+//                case 0:
+//                    replaceFragment(R.id.messages_fl, InviteMsgFragment.newInstance(false));
+//                    break;
+//                case 1:
+//                    replaceFragment(R.id.messages_fl, InviteMsgFragment.newInstance(true));
+//                    break;
+//            }
+//        }
+//
+//        @Override
+//        public void onTabUnselected(TabLayout.Tab tab) {
+//
+//        }
+//
+//        @Override
+//        public void onTabReselected(TabLayout.Tab tab) {
+//
+//        }
+//    };
 
     private String[] mTitles;
     private final List<Fragment> mFragments = new ArrayList<>();
@@ -39,6 +62,12 @@ public class MessagesFragment extends BaseFragment {
     }
 
     @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+//        message_tab.removeOnTabSelectedListener(mListener);
+    }
+
+    @Override
     protected int getLayoutRes() {
         return R.layout.fragment_messages;
     }
@@ -52,9 +81,11 @@ public class MessagesFragment extends BaseFragment {
 
     @Override
     protected void initData() {
-        InviteMsgFragment inviteMsgFragment = new InviteMsgFragment();
-        mFragments.add(inviteMsgFragment);
-        mTitles = new String[] {getString(R.string.home_invite)};
+        InviteMsgFragment recvInviteFragment = InviteMsgFragment.newInstance(false);
+        InviteMsgFragment sentInviteFragment = InviteMsgFragment.newInstance(true);
+        mFragments.add(recvInviteFragment);
+        mFragments.add(sentInviteFragment);
+        mTitles = new String[] {getString(R.string.received), getString(R.string.sent)};
         mAdapter = new MessagesAdapter(getActivity().getSupportFragmentManager(), mFragments, mTitles);
         message_vp.setAdapter(mAdapter);
         message_tab.setupWithViewPager(message_vp);
@@ -68,6 +99,8 @@ public class MessagesFragment extends BaseFragment {
                 getActivity().onBackPressed();
             }
         });
+
+//        message_tab.addOnTabSelectedListener(mListener);
     }
 
     private class MessagesAdapter extends FragmentStatePagerAdapter {

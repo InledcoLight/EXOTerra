@@ -13,9 +13,9 @@ import java.util.List;
 import java.util.Map;
 
 public class DeviceUtil {
-    public static final String EXO_STRIP_REGEX = "^Test_[0-9A-Fa-f]{6}$";
-    public static final String EXO_SOCKET_REGEX = "^ExoTerraSocket_[0-9A-Fa-f]{6}$";
-    public static final String EXO_MONSOON_REGEX = "^ExoTerraMonsoon_[0-9A-Fa-f]{6}$";
+    public static final String EXO_STRIP_REGEX = "^ExoLed_[0-9A-Fa-f]{6}$";
+    public static final String EXO_SOCKET_REGEX = "^ExoSocket_[0-9A-Fa-f]{6}$";
+    public static final String EXO_MONSOON_REGEX = "^ExoMonsoon_[0-9A-Fa-f]{6}$";
 
     public static final String  EXO_STRIP_45CM = "Microtope Strip 45cm";
     public static final String  EXO_STRIP_60CM = "Microtope Strip 60cm";

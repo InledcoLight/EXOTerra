@@ -17,6 +17,7 @@ import com.inledco.exoterra.aliot.AliotServer;
 import com.inledco.exoterra.aliot.DeviceParam;
 import com.inledco.exoterra.aliot.UserApi;
 import com.inledco.exoterra.bean.Result;
+import com.inledco.exoterra.util.DeviceUtil;
 
 import java.lang.ref.WeakReference;
 import java.util.HashMap;
@@ -79,7 +80,7 @@ public class SmartConfigLinker {
         mGetTimer = new CountDownTimer(10000, 2000) {
             @Override
             public void onTick(long millisUntilFinished) {
-                getDeviceParam();
+                readDeviceParam();
             }
 
             @Override
@@ -91,7 +92,7 @@ public class SmartConfigLinker {
         mSetTimer = new CountDownTimer(10000, 2000) {
             @Override
             public void onTick(long millisUntilFinished) {
-                setDeviceParam(mDeviceSecret);
+                writeDeviceParam(mDeviceSecret);
             }
 
             @Override
@@ -158,7 +159,7 @@ public class SmartConfigLinker {
         return new Result(true, remoteAddress);
     }
 
-    private void getDeviceParam() {
+    private void readDeviceParam() {
         String[] array = new String[]{"region", "productKey", "productSecret", "deviceName", "deviceSecret"};
         Map<String, Object> map = new HashMap<>();
         map.put("get", array);
@@ -167,7 +168,7 @@ public class SmartConfigLinker {
         mClient.send(paylod);
     }
 
-    private DeviceParam parseGetParamResponse(String result) {
+    private DeviceParam parseReadParamResponse(String result) {
         try {
             JSONObject object = JSON.parseObject(result);
             if (object.containsKey("get_resp")) {
@@ -179,40 +180,56 @@ public class SmartConfigLinker {
         return null;
     }
 
-    public void setDeviceParam(String region, String pkey, String psecret, String dsecret) {
+    public Result getDeviceParam() {
+        mReceive = null;
+        DeviceParam deviceParam;
+        mGetTimer.start();
+        while (true) {
+            if (mGetTimeout) {
+                return new Result(false, "Get Param Timeout.");
+            }
+            if (mReceive != null) {
+                deviceParam = parseReadParamResponse(mReceive);
+                if (deviceParam != null) {
+                    mGetTimer.cancel();
+                    mDeviceName = deviceParam.getDeviceName();
+                    mDeviceSecret = deviceParam.getDeviceSecret();
+                    String pkey = deviceParam.getProductKey();
+                    if (TextUtils.equals(mProductKey, pkey) == false) {
+                        return new Result(false, "Invalid product:" + DeviceUtil.getProductName(pkey));
+                    } else {
+                        break;
+                    }
+                }
+                mReceive = null;
+            }
+        }
+        return new Result(true, null);
+    }
+
+    public void writeDeviceParam(String region, String pkey, String psecret, String dsecret) {
         final int zone = TimeZone.getDefault().getRawOffset() / 60000;
         final long time = System.currentTimeMillis();
         DeviceParam devParam = new DeviceParam(region, pkey, psecret, dsecret, zone, time);
         Map<String, Object> setAction = new HashMap<>();
         setAction.put("set", devParam);
         String payload = JSON.toJSONString(setAction);
-        Log.e(TAG, "setDeviceParam: " + payload);
+        Log.e(TAG, "writeDeviceParam: " + payload);
         mClient.send(payload);
     }
 
-    public void setDeviceParam(String dsecret) {
+    public void writeDeviceParam(String dsecret) {
         final int zone = TimeZone.getDefault().getRawOffset() / 60000;
         final long time = System.currentTimeMillis();
         DeviceParam devParam = new DeviceParam(dsecret, zone, time);
         Map<String, Object> setAction = new HashMap<>();
         setAction.put("set", devParam);
         String payload = JSON.toJSONString(setAction);
-        Log.e(TAG, "setDeviceParam: " + payload);
+        Log.e(TAG, "writeDeviceParam: " + payload);
         mClient.send(payload);
     }
 
-    public void setDeviceParam() {
-        final int zone = TimeZone.getDefault().getRawOffset() / 60000;
-        final long time = System.currentTimeMillis();
-        DeviceParam devParam = new DeviceParam(zone, time);
-        Map<String, Object> setAction = new HashMap<>();
-        setAction.put("set", devParam);
-        String payload = JSON.toJSONString(setAction);
-        Log.e(TAG, "setDeviceParam: " + payload);
-        mClient.send(payload);
-    }
-
-    public boolean parseSetParamResponse(String result) {
+    public boolean parseWriteParamResponse(String result) {
         try {
             JSONObject object = JSON.parseObject(result);
             if (object.containsKey("set_resp")) {
@@ -230,10 +247,40 @@ public class SmartConfigLinker {
         return false;
     }
 
-    private UserApi.SubscribeDeviceResponse subscribeDevice(String deviceName) {
+    private Result setDeviceParam() {
+        mReceive = null;
+        mSetTimer.start();
+        while (!mSetTimeout) {
+            if (mSetTimeout) {
+                return new Result(false, "Set Param Timeout.");
+            }
+            if (mReceive != null) {
+                if (parseWriteParamResponse(mReceive)) {
+                    mSetTimer.cancel();
+                    break;
+                }
+                mReceive = null;
+            }
+        }
+        return new Result(true, null);
+    }
+
+    private Result subscribeDevice() {
         UserApi.SubscribeDeviceResponse response = AliotServer.getInstance()
-                                                              .subscribeDevice(mProductKey, deviceName, mAddress);
-        return response;
+                                                              .subscribeDevice(mProductKey, mDeviceName, mAddress);
+        Log.e(TAG, "subscribeDevice: " + JSON.toJSONString(response));
+        if (response == null) {
+            return new Result(false, "Suscribe failed");
+        }
+        if (response.code != 0) {
+            return new Result(false, response.msg);
+        }
+        if (TextUtils.equals(mDeviceSecret, response.data.device_secret)) {
+            mDeviceSecret = null;
+        } else {
+            mDeviceSecret = response.data.device_secret;
+        }
+        return new Result(true, null);
     }
 
     private void delay(long ms) {
@@ -248,6 +295,9 @@ public class SmartConfigLinker {
     }
 
     public void startTask() {
+        mAddress = null;
+        mDeviceName = null;
+        mDeviceSecret = null;
         mReceive = null;
         mGetTimeout = false;
         mSetTimeout = false;
@@ -262,59 +312,21 @@ public class SmartConfigLinker {
                 }
                 publishProgress(PROGRESS_ESPTOUCH);
 
-                mGetTimer.start();
-                DeviceParam deviceParam = null;
-                while (!mGetTimeout) {
-                    if (mReceive != null) {
-                        deviceParam = parseGetParamResponse(mReceive);
-                        if (deviceParam != null) {
-                            mGetTimer.cancel();
-                            if (TextUtils.equals(mProductKey, deviceParam.getProductKey()) == false) {
-                                return new Result(false, "Invalid product.");
-                            } else {
-                                break;
-                            }
-                        }
-                        mReceive = null;
-                    }
-                }
-                if (mGetTimeout) {
-                    return new Result(false, "Get Param Timeout.");
+                result = getDeviceParam();
+                if (!result.isSuccess()) {
+                    return result;
                 }
                 publishProgress(PROGRESS_GETPARAM);
 
-                UserApi.SubscribeDeviceResponse response = subscribeDevice(deviceParam.getDeviceName());
-                if (response == null) {
-                    result.setSuccess(false);
-                    result.setMessage("Suscribe failed");
+                result = subscribeDevice();
+                if (!result.isSuccess()) {
                     return result;
                 }
-                if (response.code != 0) {
-                    result.setSuccess(false);
-                    result.setMessage(response.msg);
-                    return result;
-                }
-                if(TextUtils.equals(deviceParam.getDeviceSecret(), response.data.device_secret) == false) {
-                    mDeviceSecret = response.data.device_secret;
-                }
+                publishProgress(PROGRESS_SUBSCRIBE);
 
-                mReceive = null;
-                mSetTimer.start();
-                while (!mSetTimeout) {
-                    if (mReceive != null) {
-                        if (parseSetParamResponse(mReceive)) {
-                            mSetTimer.cancel();
-                            break;
-                        }
-                        mReceive = null;
-                    }
-                }
-                if (mSetTimeout) {
-                    return new Result(false, "Set Param Timeout.");
-                }
-
-                mDeviceName = deviceParam.getDeviceName();
-                return new Result(true, null);
+                delay(5000);
+                result = setDeviceParam();
+                return result;
             }
 
             @Override
@@ -346,6 +358,8 @@ public class SmartConfigLinker {
                 if (mListener != null) {
                     if (values[0] == PROGRESS_ESPTOUCH) {
                         mListener.onEsptouchSuccess();
+                    } else if (values[0] == PROGRESS_SUBSCRIBE) {
+                        mListener.onSubscribe(mProductKey, mDeviceName);
                     }
                     mListener.onProgressUpdate(mProgress);
                 }
@@ -375,35 +389,5 @@ public class SmartConfigLinker {
 
     private String getString(@StringRes int resid) {
         return mActivity.get().getString(resid);
-    }
-
-    class TaskResult {
-        private boolean mOver;
-        private boolean mSuccess;
-        private String mError;
-
-        public boolean isOver() {
-            return mOver;
-        }
-
-        public void setOver(boolean over) {
-            mOver = over;
-        }
-
-        public boolean isSuccess() {
-            return mSuccess;
-        }
-
-        public void setSuccess(boolean success) {
-            mSuccess = success;
-        }
-
-        public String getError() {
-            return mError;
-        }
-
-        public void setError(String error) {
-            mError = error;
-        }
     }
 }

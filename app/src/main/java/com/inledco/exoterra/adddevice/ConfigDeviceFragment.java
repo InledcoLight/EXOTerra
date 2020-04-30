@@ -14,12 +14,14 @@ import android.widget.ImageView;
 
 import com.inledco.exoterra.R;
 import com.inledco.exoterra.aliot.AliotServer;
+import com.inledco.exoterra.aliot.Device;
 import com.inledco.exoterra.aliot.HttpCallback;
 import com.inledco.exoterra.aliot.UserApi;
 import com.inledco.exoterra.aliot.bean.Group;
 import com.inledco.exoterra.base.BaseFragment;
 import com.inledco.exoterra.event.DeviceChangedEvent;
 import com.inledco.exoterra.event.GroupDeviceChangedEvent;
+import com.inledco.exoterra.manager.DeviceManager;
 import com.inledco.exoterra.manager.GroupManager;
 import com.inledco.exoterra.manager.UserManager;
 import com.inledco.exoterra.util.DeviceUtil;
@@ -91,6 +93,7 @@ public class ConfigDeviceFragment extends BaseFragment {
                     AliotServer.getInstance().modifyDeviceName(pkey, dname, name, new HttpCallback<UserApi.Response>() {
                         @Override
                         public void onError(String error) {
+                            dismissLoadDialog();
                             showToast(error);
                         }
 
@@ -98,15 +101,26 @@ public class ConfigDeviceFragment extends BaseFragment {
                         public void onSuccess(UserApi.Response result) {
                             final String pkey = mConnectNetBean.getProductKey();
                             final String dname = mConnectNetBean.getDeviceName();
-                            EventBus.getDefault().post(new DeviceChangedEvent(pkey, dname));
+                            Device device = DeviceManager.getInstance().getDevice(pkey + "_" + dname);
+                            if (device != null) {
+                                device.setName(name);
+                                EventBus.getDefault().post(new DeviceChangedEvent(pkey, dname));
+                            }
                             mConnectNetBean.setName(name);
                             final String groupid = mConnectNetBean.getGroupid();
                             if (TextUtils.isEmpty(groupid)) {
-                                replaceFragment(R.id.adddevice_fl, new AssignHabitatFragment());
+                                dismissLoadDialog();
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        replaceFragment(R.id.adddevice_fl, new AssignHabitatFragment());
+                                    }
+                                });
                             } else {
                                 AliotServer.getInstance().addDeviceToGroup(groupid, pkey, dname, new HttpCallback<UserApi.Response>() {
                                     @Override
                                     public void onError(String error) {
+                                        dismissLoadDialog();
                                         showToast(error);
                                     }
 
@@ -117,12 +131,19 @@ public class ConfigDeviceFragment extends BaseFragment {
                                             group.addDevice(pkey, dname, name);
                                             EventBus.getDefault().post(new GroupDeviceChangedEvent(groupid));
                                         }
-                                        getActivity().finish();
+                                        dismissLoadDialog();
+                                        runOnUiThread(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                getActivity().finish();
+                                            }
+                                        });
                                     }
                                 });
                             }
                         }
                     });
+                    showLoadDialog();
                 } else {
                     final String mac = mConnectNetBean.getAddress();
                     LocalDevicePrefUtil.putLocalDevice(getContext(), pkey, mac, name);

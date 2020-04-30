@@ -16,6 +16,7 @@ import android.widget.TextView;
 
 import com.inledco.exoterra.R;
 import com.inledco.exoterra.base.BaseFragment;
+import com.inledco.exoterra.manager.DeviceManager;
 import com.inledco.exoterra.util.DeviceUtil;
 import com.inledco.exoterra.util.RouterUtil;
 import com.inledco.exoterra.view.CircleSeekbar;
@@ -56,6 +57,11 @@ public class SmartConfigFragment extends BaseFragment {
         @Override
         public void onEsptouchSuccess() {
             RouterUtil.putRouterPassword(getContext(), mConnectNetViewModel.getData().getSsid(), mConnectNetViewModel.getData().getPassword());
+        }
+
+        @Override
+        public void onSubscribe(String pkey, String dname) {
+            DeviceManager.getInstance().getSubscribedDevices();
         }
     };
 

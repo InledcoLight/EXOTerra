@@ -100,6 +100,16 @@ public class AliotClient {
     private final String deviceStatusFormat = "/%1$s/%2$s/user/status";
 
     /**
+     * publish {appkey, userid, product}
+     */
+    private final String fotaUpgradeFormat = "/%1$s/%2$s/user/%3$s/fota/upgrade";
+
+    /**
+     * subscribe {appkey, userid, product}
+     */
+    private final String fotaProgressFormat = "/%1$s/%2$s/user/fota/progress";
+
+    /**
      * publish {appkey, userid}
      */
     private final String inviteFormat = "/%1$s/%2$s/user/group/invite";
@@ -114,13 +124,28 @@ public class AliotClient {
      */
     private final String inviteListenFormat = "/%1$s/%2$s/user/group/invite_listen";
 
+    /**
+     * publish {appkey, userid}
+     */
+    private final String sntpRequestFormat = "/ext/ntp/%1$s/%2$s/request";
+
+    /**
+     * subscribe {appkey, userid}
+     */
+    private final String sntpResponseFormat = "/ext/ntp/%1$s/%2$s/response";
+
+    private final String SERVER_FILE_PATH = "http://47.89.235.158:8086/imgs/";
+
     private WeakReference<Context> mWeakContext;
 
     private String mUserid;
 
-    private boolean initialized;
+    private boolean initing;
+    private boolean inited;
 
     private boolean connected;
+
+    private long mTimeOffset;
 
     private Set<String> subTopics = new HashSet<>();
 
@@ -185,7 +210,30 @@ public class AliotClient {
         }
     };
 
-    private final SubscribeParser[] subscribeParsers = new SubscribeParser[] {responseParser, statusParser, inviteParser};
+    private final SubscribeParser<UserApi.SntpResponse> sntpParser = new SubscribeParser<UserApi.SntpResponse>(sntpResponseFormat) {
+        @Override
+        public void onParse(UserApi.SntpResponse result) {
+            long deviceRecvTime = System.currentTimeMillis();
+            try {
+                long deviceSendTime = Long.parseLong(result.deviceSendTime);
+                long serverRecvTime = Long.parseLong(result.serverRecvTime);
+                long serverSendTime = Long.parseLong(result.serverSendTime);
+                mTimeOffset = (serverSendTime + serverRecvTime - deviceRecvTime - deviceSendTime) / 2;
+                Log.e(TAG, "onParse: timeoffset- " + mTimeOffset);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    };
+
+    private final SubscribeParser<UserApi.FotaProgress> fotaProgressParser = new SubscribeParser<UserApi.FotaProgress>(fotaProgressFormat) {
+        @Override
+        public void onParse(UserApi.FotaProgress result) {
+            Log.e(TAG, "onParse: " + JSON.toJSONString(result));
+        }
+    };
+
+    private final SubscribeParser[] subscribeParsers = new SubscribeParser[] {responseParser, statusParser, inviteParser, sntpParser, fotaProgressParser};
 
     private final IConnectNotifyListener mNotifyListener = new IConnectNotifyListener() {
         @Override
@@ -277,7 +325,11 @@ public class AliotClient {
 //        });
 //    }
 
-    public void init(@NonNull final Context context, final String userid, final String secret) {
+    public boolean init(@NonNull final Context context, final String userid, final String secret, final ILinkKitConnectListener calback) {
+        if (initing || inited) {
+            deinit();
+            return false;
+        }
         DeviceInfo devInfo = new DeviceInfo();
         devInfo.productKey = APP_PRODUCT_KEY;
         devInfo.deviceName = userid;
@@ -308,6 +360,10 @@ public class AliotClient {
             @Override
             public void onError(AError error) {
                 Log.e(TAG, "onError: " + JSONObject.toJSONString(error));
+                initing = false;
+                if (calback != null) {
+                    calback.onError(error);
+                }
             }
 
             @Override
@@ -319,15 +375,34 @@ public class AliotClient {
                 subscribeTopic(String.format(propertyResponseFormat, APP_PRODUCT_KEY, userid));
                 subscribeTopic(String.format(deviceStatusFormat, APP_PRODUCT_KEY, userid));
                 subscribeTopic(String.format(inviteListenFormat, APP_PRODUCT_KEY, userid));
+                subscribeTopic(String.format(sntpResponseFormat, APP_PRODUCT_KEY, userid), new IConnectSubscribeListener() {
+                    @Override
+                    public void onSuccess() {
+                        syncTime();
+                    }
+
+                    @Override
+                    public void onFailure(AError aError) {
+
+                    }
+                });
+                subscribeTopic(String.format(fotaProgressFormat, APP_PRODUCT_KEY, userid));
 
                 mWeakContext = new WeakReference<>(context);
-                IntentFilter filter = new IntentFilter(AppConstants.HOME_INVITE);
+                IntentFilter filter = new IntentFilter(AppConstants.GROUP_INVITE);
                 mWeakContext.get().registerReceiver(mGroupInviteReceiver, filter);
 
                 mUserid = userid;
-                initialized = true;
+                initing = false;
+                inited = true;
+
+                if (calback != null) {
+                    calback.onInitDone(o);
+                }
             }
         });
+        initing = true;
+        return true;
     }
 
     public void deinit() {
@@ -339,16 +414,21 @@ public class AliotClient {
             mWeakContext.clear();
         }
         connected = false;
-        initialized = false;
+        inited = false;
+        initing = false;
         mUserid = null;
     }
 
-    public boolean isInitialized() {
-        return initialized;
+    public boolean isInited() {
+        return inited;
     }
 
     public boolean isConnected() {
         return connected;
+    }
+
+    public long getTimeOffset() {
+        return mTimeOffset;
     }
 
     private void subscribeTopic(final String topic) {
@@ -365,6 +445,30 @@ public class AliotClient {
             @Override
             public void onFailure(AError aError) {
                 Log.e(TAG, "onFailure: subscribe " + topic + " " + JSON.toJSONString(aError));
+            }
+        });
+    }
+
+    private void subscribeTopic(final String topic, final IConnectSubscribeListener callback) {
+        final MqttSubscribeRequest request = new MqttSubscribeRequest();
+        request.topic = topic;
+        request.isSubscribe = true;
+        LinkKit.getInstance().subscribe(request, new IConnectSubscribeListener() {
+            @Override
+            public void onSuccess() {
+                Log.e(TAG, "onSuccess: subscribe " + topic);
+                subTopics.add(request.topic);
+                if (callback != null) {
+                    callback.onSuccess();
+                }
+            }
+
+            @Override
+            public void onFailure(AError aError) {
+                Log.e(TAG, "onFailure: subscribe " + topic + " " + JSON.toJSONString(aError));
+                if (callback != null) {
+                    callback.onFailure(aError);
+                }
             }
         });
     }
@@ -418,6 +522,16 @@ public class AliotClient {
         LinkKit.getInstance().publish(request, mPublishListener);
     }
 
+    public void syncTime() {
+        if (!inited) {
+            return;
+        }
+        String topic = String.format(sntpRequestFormat, APP_PRODUCT_KEY, mUserid);
+        UserApi.SntpRequet requet = new UserApi.SntpRequet();
+        requet.deviceSendTime = String.valueOf(System.currentTimeMillis());
+        publish(topic, JSON.toJSONString(requet));
+    }
+
     /**
      * 设置设备属性
      * @param product       产品名称
@@ -425,7 +539,7 @@ public class AliotClient {
      * @param keyValues     属性键值对
      */
     public void setProperty(String product, String dname, KeyValue... keyValues) {
-        if (!initialized || TextUtils.isEmpty(mUserid)) {
+        if (!inited || TextUtils.isEmpty(mUserid)) {
             return;
         }
         if (keyValues == null || keyValues.length == 0) {
@@ -446,7 +560,7 @@ public class AliotClient {
     }
 
     public void setProperty(String product, String dname, List<KeyValue> keyValues) {
-        if (!initialized || TextUtils.isEmpty(mUserid)) {
+        if (!inited || TextUtils.isEmpty(mUserid)) {
             return;
         }
         if (keyValues == null || keyValues.size() == 0) {
@@ -473,7 +587,7 @@ public class AliotClient {
      * @param attrKeys      属性名称
      */
     public void getProperty(String product, String dname, String... attrKeys) {
-        if (!initialized || TextUtils.isEmpty(mUserid)) {
+        if (!inited || TextUtils.isEmpty(mUserid)) {
             return;
         }
         Map<String, Object> payload = new HashMap<>();
@@ -487,8 +601,23 @@ public class AliotClient {
         getProperty(product, dname);
     }
 
+    public void upgradeFirmware(String product, String dname, int version, String url) {
+        if (!inited || TextUtils.isEmpty(mUserid)) {
+            return;
+        }
+        UserApi.FirmwareInfo info = new UserApi.FirmwareInfo();
+        info.version = String.valueOf(version);
+        info.url = SERVER_FILE_PATH + url;
+        Map<String, Object> payload = new HashMap<>();
+        payload.put("deviceName", dname);
+        payload.put("message", "success");
+        payload.put("data", info);
+        String topic = String.format(fotaUpgradeFormat, APP_PRODUCT_KEY, mUserid, product);
+        publish(topic, JSON.toJSONString(payload));
+    }
+
     public void invite(final String invitee, final String invite_id, final String groupid, final String groupname) {
-        if (!initialized || TextUtils.isEmpty(mUserid)) {
+        if (!inited || TextUtils.isEmpty(mUserid)) {
             return;
         }
         InviteMessage message = new InviteMessage();
@@ -503,7 +632,7 @@ public class AliotClient {
     }
 
     public void inviteCancel(final String invitee, final String invite_id, final String groupid, final String groupname) {
-        if (!initialized || TextUtils.isEmpty(mUserid)) {
+        if (!inited || TextUtils.isEmpty(mUserid)) {
             return;
         }
         InviteMessage message = new InviteMessage();
@@ -518,7 +647,7 @@ public class AliotClient {
     }
 
     public void inviteAccept(final String inviter, final String invite_id, final String groupid, final String groupname) {
-        if (!initialized || TextUtils.isEmpty(mUserid)) {
+        if (!inited || TextUtils.isEmpty(mUserid)) {
             return;
         }
         InviteMessage message = new InviteMessage();
@@ -533,7 +662,7 @@ public class AliotClient {
     }
 
     public void inviteDeny(final String inviter, final String invite_id, final String groupid, final String groupname) {
-        if (!initialized || TextUtils.isEmpty(mUserid)) {
+        if (!inited || TextUtils.isEmpty(mUserid)) {
             return;
         }
         InviteMessage message = new InviteMessage();
@@ -555,12 +684,12 @@ public class AliotClient {
         String groupname = message.getGroupname();
         final String inviteid = message.getInvite_id();
 
-        Intent acceptIntent = new Intent(AppConstants.HOME_INVITE);
+        Intent acceptIntent = new Intent(AppConstants.GROUP_INVITE);
         message.setAction(InviteAction.ACCEPT.getAction());
         acceptIntent.putExtra("InviteMessage", JSON.toJSONString(message));
         PendingIntent acceptPendingIntent = PendingIntent.getBroadcast(mWeakContext.get(), 0, acceptIntent, PendingIntent.FLAG_ONE_SHOT);
 
-        Intent denyIntent = new Intent(AppConstants.HOME_INVITE);
+        Intent denyIntent = new Intent(AppConstants.GROUP_INVITE);
         message.setAction(InviteAction.DENY.getAction());
         denyIntent.putExtra("InviteMessage", JSON.toJSONString(message));
         PendingIntent denyPendingIntent = PendingIntent.getBroadcast(mWeakContext.get(), 0, denyIntent, PendingIntent.FLAG_ONE_SHOT);
@@ -634,7 +763,7 @@ public class AliotClient {
         @Override
         public void onReceive(Context context, Intent intent) {
             Log.e(TAG, "onReceive: " + intent.getAction());
-            if (TextUtils.equals(intent.getAction(), AppConstants.HOME_INVITE)) {
+            if (TextUtils.equals(intent.getAction(), AppConstants.GROUP_INVITE)) {
                 final String message = intent.getStringExtra("InviteMessage");
                 Log.e(TAG, "onReceive: " + message);
                 try {

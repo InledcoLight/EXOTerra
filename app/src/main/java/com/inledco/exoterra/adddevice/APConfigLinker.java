@@ -14,9 +14,8 @@ import com.inledco.exoterra.aliot.AliotServer;
 import com.inledco.exoterra.aliot.DeviceParam;
 import com.inledco.exoterra.aliot.UserApi;
 import com.inledco.exoterra.bean.Result;
-import com.inledco.exoterra.manager.UserPref;
+import com.inledco.exoterra.util.DeviceUtil;
 
-import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.HashMap;
 import java.util.Map;
@@ -33,7 +32,6 @@ public class APConfigLinker {
     private final int TIMEOUT = 50000;
     private final int SUBSCRIBE_TIMEOUT = 10000;
 
-    private final boolean USE_TCP = false;
     //192.168.4.1
     private final String REMOTE_ADDRESS = "192.168.4.1";
     private final int REMOTE_IP = 0x0104A8C0;
@@ -77,16 +75,12 @@ public class APConfigLinker {
         mSsid = ssid;
         mBssid = bssid;
         mPassword = password;
-        if (USE_TCP) {
-            mClient = new TcpClient(REMOTE_ADDRESS, REMOTE_PORT);
-        } else {
-            mClient = new UdpClient(REMOTE_ADDRESS, REMOTE_PORT, LOCAL_PORT);
-        }
+        mClient = new UdpClient(REMOTE_ADDRESS, REMOTE_PORT, LOCAL_PORT);
 
         mGetTimer = new CountDownTimer(10000, 2000) {
             @Override
             public void onTick(long millisUntilFinished) {
-                getDeviceParam();
+                readDeviceParam();
             }
 
             @Override
@@ -98,7 +92,7 @@ public class APConfigLinker {
         mSetTimer = new CountDownTimer(10000, 2000) {
             @Override
             public void onTick(long millisUntilFinished) {
-                setDeviceParam();
+                writeDeviceParam();
             }
 
             @Override
@@ -142,7 +136,7 @@ public class APConfigLinker {
         mClient.setListener(mClientListener);
     }
 
-    private void getDeviceParam() {
+    private void readDeviceParam() {
         String[] array = new String[]{"region", "productKey", "productSecret", "deviceName", "deviceSecret", "mac"};
         Map<String, Object> map = new HashMap<>();
         map.put("get", array);
@@ -151,7 +145,7 @@ public class APConfigLinker {
         mClient.send(paylod);
     }
 
-    private DeviceParam parseGetParamResponse(String result) {
+    private DeviceParam parseReadParamResponse(String result) {
         try {
             JSONObject object = JSON.parseObject(result);
             if (object.containsKey("get_resp")) {
@@ -163,8 +157,35 @@ public class APConfigLinker {
         return null;
     }
 
+    public Result getDeviceParam() {
+        mReceive = null;
+        DeviceParam deviceParam;
+        mGetTimer.start();
+        while (true) {
+            if (mGetTimeout) {
+                return new Result(false, "Get Param Timeout.");
+            }
+            if (mReceive != null) {
+                deviceParam = parseReadParamResponse(mReceive);
+                if (deviceParam != null) {
+                    mGetTimer.cancel();
+                    mDeviceName = deviceParam.getDeviceName();
+                    mDeviceSecret = deviceParam.getDeviceSecret();
+                    mAddress = deviceParam.getMac();
+                    String pkey = deviceParam.getProductKey();
+                    if (TextUtils.equals(mProductKey, pkey) == false) {
+                        return new Result(false, "Invalid product:" + DeviceUtil.getProductName(pkey));
+                    } else {
+                        break;
+                    }
+                }
+                mReceive = null;
+            }
+        }
+        return new Result(true, null);
+    }
 
-    private void setDeviceParam() {
+    private void writeDeviceParam() {
         JSONObject object = new JSONObject();
         final int zone = TimeZone.getDefault().getRawOffset() / 60000;
         final long time = System.currentTimeMillis();
@@ -174,10 +195,12 @@ public class APConfigLinker {
         object.put(KEY_TIME, time);
         Map<String, Object> map = new HashMap<>();
         map.put("set", object);
-        mClient.send(JSON.toJSONString(map));
+        String payload = JSON.toJSONString(map);
+        Log.e(TAG, "writeDeviceParam: " + payload);
+        mClient.send(payload);
     }
 
-    public boolean parseSetParamResponse(String result) {
+    public boolean parseWriteParamResponse(String result) {
         try {
             JSONObject object = JSON.parseObject(result);
             if (object.containsKey("set_resp")) {
@@ -195,12 +218,40 @@ public class APConfigLinker {
         return false;
     }
 
-    private UserApi.SubscribeDeviceResponse subscribeDevice(String deviceName) {
-        String userid = UserPref.readUserId(mActivity.get());
-        String token = UserPref.readAccessToken(mActivity.get());
+    private Result setDeviceParam() {
+        mReceive = null;
+        mSetTimer.start();
+        while (!mSetTimeout) {
+            if (mSetTimeout) {
+                return new Result(false, "Set Param Timeout.");
+            }
+            if (mReceive != null) {
+                if (parseWriteParamResponse(mReceive)) {
+                    mSetTimer.cancel();
+                    break;
+                }
+                mReceive = null;
+            }
+        }
+        return new Result(true, null);
+    }
+
+    private Result subscribeDevice() {
         UserApi.SubscribeDeviceResponse response = AliotServer.getInstance()
-                                                              .subscribeDevice(userid, token, mProductKey, deviceName, mAddress);
-        return response;
+                                                              .subscribeDevice(mProductKey, mDeviceName, mAddress);
+        Log.e(TAG, "subscribeDevice: " + JSON.toJSONString(response));
+        if (response == null) {
+            return new Result(false, "Suscribe failed");
+        }
+        if (response.code != 0) {
+            return new Result(false, response.msg);
+        }
+        if (TextUtils.equals(mDeviceSecret, response.data.device_secret)) {
+            mDeviceSecret = null;
+        } else {
+            mDeviceSecret = response.data.device_secret;
+        }
+        return new Result(true, null);
     }
 
     private void delay(long ms) {
@@ -215,6 +266,9 @@ public class APConfigLinker {
     }
 
     public void startTask() {
+        mAddress = null;
+        mDeviceName = null;
+        mDeviceSecret = null;
         mReceive = null;
         mGetTimeout = false;
         mSetTimeout = false;
@@ -226,42 +280,16 @@ public class APConfigLinker {
                 mClient.start();
                 while (!mClient.isListening());
 
-                //  获取设备信息
-                mGetTimer.start();
-                DeviceParam deviceParam = null;
-                while (!mGetTimeout) {
-                    if (mReceive != null) {
-                        deviceParam = parseGetParamResponse(mReceive);
-                        if (deviceParam != null) {
-                            mGetTimer.cancel();
-                            if (TextUtils.equals(mProductKey, deviceParam.getProductKey()) == false) {
-                                return new Result(false, "Invalid product.");
-                            } else {
-                                break;
-                            }
-                        }
-                        mReceive = null;
-                    }
-                }
-                if (mGetTimeout) {
-                    return new Result(false, "Get Param Timeout.");
+                Result result = getDeviceParam();
+                if (!result.isSuccess()) {
+                    return result;
                 }
 
-                mAddress = deviceParam.getMac();
-                mDeviceName = deviceParam.getDeviceName();
-                mReceive = null;
-                mSetTimer.start();
-                while (!mSetTimeout) {
-                    if (mReceive != null) {
-                        if (parseSetParamResponse(mReceive)) {
-                            mSetTimer.cancel();
-                            break;
-                        }
-                        mReceive = null;
-                    }
-                }
-                if (mSetTimeout) {
-                    return new Result(false, "Set Param Timeout.");
+                delay(2000);
+
+                result = setDeviceParam();
+                if (!result.isSuccess()) {
+                    return result;
                 }
 
                 if (!mSubscribe) {
@@ -283,12 +311,7 @@ public class APConfigLinker {
                     }
                 }
 
-                //订阅设备
-                UserApi.SubscribeDeviceResponse response = subscribeDevice(deviceParam.getDeviceName());
-                if (response == null) {
-                    return new Result(false, "Suscribe failed");
-                }
-                return new Result(true, null);
+                return subscribeDevice();
             }
 
             @Override
@@ -340,18 +363,15 @@ public class APConfigLinker {
     private boolean checkNetAvailable() {
         Runtime runtime = Runtime.getRuntime();
         try {
-            Process process = runtime.exec("ping -c 4 api2.xlink.cn");
+            Process process = runtime.exec("ping -c 4 47.89.235.158");
             int result = process.waitFor();
             return (result==0);
         }
-        catch (IOException e) {
+        catch (Exception e) {
             e.printStackTrace();
-            return false;
+            Log.e(TAG, "checkNetAvailable: " + e.getMessage());
         }
-        catch (InterruptedException e) {
-            e.printStackTrace();
-            return false;
-        }
+        return false;
     }
 
     public interface APConfigListener {

@@ -9,53 +9,6 @@ import com.inledco.exoterra.aliot.bean.XGroup;
 import java.util.List;
 
 public class UserApi {
-//    public static class AResponse {
-//        public int code;
-//        public String msg;
-//    }
-
-//    public static class User {
-//        public String userid;
-//        public String email;
-//        public String nickname;
-//        public String create_date;
-//        public String corpid;
-//        public String avatar;
-//        public String remark1;
-//        public String remark2;
-//        public String remark3;
-//    }
-//
-//    public static class XDevice {
-//        public String product_key;
-//        public String device_name;
-//        public String mac;
-//        public String name;
-//        public String remark1;
-//        public String remark2;
-//        public String remark3;
-//        public int role;
-//        public int firmware_version;
-//        public boolean is_online;
-//    }
-//
-//    public static class Triad {
-//        public String product_key;
-//        public String device_name;
-//        public String device_secret;
-//    }
-//
-//    public static class Group {
-//        public String groupid;
-//        public String name;
-//        public String remark1;
-//        public String remark2;
-//        public String remark3;
-//        public List<User> users;
-//        public String creator;
-//        public String create_time;
-//        public String update_time;
-//    }
 
     public static class Response extends ApiResponse<Object> {
 
@@ -192,8 +145,8 @@ public class UserApi {
         public String group_name;
         public String inviter;
         public String invitee;
-        public String create_time;
-        public String end_time;
+        public long create_time;
+        public long end_time;
         public int status;
         public String invitee_email;
     }
@@ -204,7 +157,7 @@ public class UserApi {
 
     public static class Firmware {
         public int version;
-        public int size;
+        public float firmSize;
         public String url;
     }
 
@@ -215,6 +168,22 @@ public class UserApi {
 
     public static class FirmwaresResponse extends ApiResponse<FirmwareList> {
 
+    }
+
+    public static class FirmwareInfo {
+        public String version;
+        public String url;
+    }
+
+    public static class UpgradeProgress {
+        public int step;
+        public String desc;
+    }
+
+    public static class FotaProgress {
+        public String productKey;
+        public String deviceName;
+        public UpgradeProgress params;
     }
 
     public static class DeviceHistoryPropertiesRequest {
@@ -237,5 +206,15 @@ public class UserApi {
 
     public static class DeviceHistoryPropertiesResponse extends ApiResponse<List<PropertyDataInfo>> {
 
+    }
+
+    public static class SntpRequet {
+        public String deviceSendTime;
+    }
+
+    public static class SntpResponse {
+        public String deviceSendTime;
+        public String serverSendTime;
+        public String serverRecvTime;
     }
 }

@@ -37,6 +37,7 @@ import com.inledco.exoterra.aliot.bean.Group;
 import com.inledco.exoterra.base.BaseFragment;
 import com.inledco.exoterra.common.OnItemClickListener;
 import com.inledco.exoterra.event.GroupChangedEvent;
+import com.inledco.exoterra.event.GroupUserChangedEvent;
 import com.inledco.exoterra.event.GroupsRefreshedEvent;
 import com.inledco.exoterra.main.groups.GroupIconDialog;
 import com.inledco.exoterra.manager.GroupManager;
@@ -53,6 +54,8 @@ import org.greenrobot.eventbus.ThreadMode;
 
 import java.text.DateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 import java.util.TimeZone;
@@ -183,6 +186,18 @@ public class HabitatDetailFragment extends BaseFragment {
 
                 if (mGroup.users != null) {
                     mUsers.addAll(mGroup.users);
+                    Collections.sort(mUsers, new Comparator<Group.User>() {
+                        @Override
+                        public int compare(Group.User o1, Group.User o2) {
+                            if (TextUtils.equals(o1.role, "管理员")) {
+                                return -1;
+                            }
+                            if (TextUtils.equals(o2.role, "管理员")) {
+                                return 1;
+                            }
+                            return 0;
+                        }
+                    });
                 }
                 mAdapter = new HabitatMembersAdapter(getContext(), mGroup.creator, mUsers);
                 mAdapter.setOnItemClickListener(new OnItemClickListener() {
@@ -308,6 +323,16 @@ public class HabitatDetailFragment extends BaseFragment {
             mSunrise = mGroup.getSunrise();
             mSunset = mGroup.getSunset();
             refreshData();
+        }
+    }
+
+    @Subscribe (threadMode = ThreadMode.MAIN)
+    public void onGroupUserChangedEvent(GroupUserChangedEvent event) {
+        if (event == null || mAdapter == null) {
+            return;
+        }
+        if (TextUtils.equals(mGroupid, event.getGroupid())) {
+            mAdapter.notifyDataSetChanged();
         }
     }
 

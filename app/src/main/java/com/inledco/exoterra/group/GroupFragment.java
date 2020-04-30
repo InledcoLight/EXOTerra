@@ -300,6 +300,7 @@ public class GroupFragment extends BaseFragment {
         View view = LayoutInflater.from(getContext()).inflate(R.layout.dialog_action, null, false);
         Button btn_remove = view.findViewById(R.id.dialog_action_act2);
         Button btn_cancel = view.findViewById(R.id.dialog_action_cancel);
+        btn_remove.setText(R.string.remove);
         btn_cancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

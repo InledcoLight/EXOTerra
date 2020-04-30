@@ -8,9 +8,14 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.alibaba.fastjson.JSON;
+import com.aliyun.alink.linkkit.api.ILinkKitConnectListener;
+import com.aliyun.alink.linksdk.tools.AError;
 import com.inledco.exoterra.R;
+import com.inledco.exoterra.aliot.AliotClient;
 import com.inledco.exoterra.base.BaseActivity;
 import com.inledco.exoterra.main.MainActivity;
+import com.inledco.exoterra.manager.UserManager;
 
 public class HomeActivity extends BaseActivity implements View.OnClickListener {
 
@@ -86,7 +91,26 @@ public class HomeActivity extends BaseActivity implements View.OnClickListener {
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.home_ll_microtope:
-                startMainActivity();
+                if (UserManager.getInstance().isAuthorized()) {
+                    String userid = UserManager.getInstance().getUserid();
+                    String secret = UserManager.getInstance().getSecret();
+                    boolean result = AliotClient.getInstance().init(getApplicationContext(), userid, secret, new ILinkKitConnectListener() {
+                        @Override
+                        public void onError(AError aError) {
+                            dismissLoadDialog();
+                            showToast(JSON.toJSONString(aError));
+                        }
+
+                        @Override
+                        public void onInitDone(Object o) {
+                            dismissLoadDialog();
+                            startMainActivity();
+                        }
+                    });
+                    if (result) {
+                        showLoadDialog();
+                    }
+                }
                 break;
             case R.id.home_ll_uvb:
 

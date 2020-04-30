@@ -11,10 +11,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
+import com.alibaba.fastjson.JSON;
+import com.aliyun.alink.linkkit.api.ILinkKitConnectListener;
+import com.aliyun.alink.linksdk.tools.AError;
 import com.inledco.exoterra.R;
+import com.inledco.exoterra.aliot.AliotClient;
 import com.inledco.exoterra.base.BaseFragment;
 import com.inledco.exoterra.common.SimpleAdapter;
 import com.inledco.exoterra.main.MainActivity;
+import com.inledco.exoterra.manager.UserManager;
 import com.inledco.exoterra.view.HorizontalMatrixImageView;
 
 import java.util.ArrayList;
@@ -89,8 +94,27 @@ public class NewProductsFragment extends BaseFragment implements View.OnClickLis
                 getActivity().getSupportFragmentManager().popBackStack();
                 break;
             case R.id.new_products_microtope:
-//                getActivity().finish();
-                startMainActivity();
+//                startMainActivity();
+                if (UserManager.getInstance().isAuthorized()) {
+                    String userid = UserManager.getInstance().getUserid();
+                    String secret = UserManager.getInstance().getSecret();
+                    boolean result = AliotClient.getInstance().init(getContext().getApplicationContext(), userid, secret, new ILinkKitConnectListener() {
+                        @Override
+                        public void onError(AError aError) {
+                            dismissLoadDialog();
+                            showToast(JSON.toJSONString(aError));
+                        }
+
+                        @Override
+                        public void onInitDone(Object o) {
+                            dismissLoadDialog();
+                            startMainActivity();
+                        }
+                    });
+                    if (result) {
+                        showLoadDialog();
+                    }
+                }
                 break;
             case R.id.new_products_uvb:
 

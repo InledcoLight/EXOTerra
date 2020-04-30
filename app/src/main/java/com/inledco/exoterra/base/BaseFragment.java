@@ -99,24 +99,25 @@ public abstract class BaseFragment extends Fragment {
         }
     }
 
-    protected void showLoadingDialog() {
+    protected void showLoadDialog() {
         if (mLoadDialog == null) {
             mLoadDialog = new LoadDialog(getContext());
-            boolean isMainThread = Looper.getMainLooper().getThread().getId() == Thread.currentThread().getId();
-            if (isMainThread) {
-                mLoadDialog.show();
-            } else {
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        mLoadDialog.show();
-                    }
-                });
-            }
+            mLoadDialog.setCancelable(false);
+        }
+        boolean isMainThread = Looper.getMainLooper().getThread().getId() == Thread.currentThread().getId();
+        if (isMainThread) {
+            mLoadDialog.show();
+        } else {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    mLoadDialog.show();
+                }
+            });
         }
     }
 
-    protected void dismissLoadingDialog() {
+    protected void dismissLoadDialog() {
         if (mLoadDialog != null) {
             boolean isMainThread = Looper.getMainLooper().getThread().getId() == Thread.currentThread().getId();
             if (isMainThread) {

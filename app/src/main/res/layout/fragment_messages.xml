@@ -13,7 +13,7 @@
         android:layout_height="wrap_content"
         android:minHeight="?attr/actionBarSize"
         android:theme="?attr/actionBarTheme"
-        app:title="@string/msg"
+        app:title="@string/habitat_invitation"
         app:navigationIcon="@drawable/ic_arrow_back_white_32dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -23,6 +23,7 @@
         android:id="@+id/messages_tab"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        app:tabMode="fixed"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/messages_toolbar">
@@ -30,12 +31,12 @@
         <android.support.design.widget.TabItem
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/share_to_me"/>
+            android:text="Received"/>
 
         <android.support.design.widget.TabItem
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/home_invite"/>
+            android:text="Sent"/>
     </android.support.design.widget.TabLayout>
 
     <android.support.v4.view.ViewPager
@@ -46,4 +47,13 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/messages_tab"/>
+
+<!--    <FrameLayout-->
+<!--        android:id="@+id/messages_fl"-->
+<!--        android:layout_width="0dp"-->
+<!--        android:layout_height="0dp"-->
+<!--        app:layout_constraintBottom_toBottomOf="parent"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintTop_toBottomOf="@+id/messages_tab"/>-->
 </android.support.constraint.ConstraintLayout>

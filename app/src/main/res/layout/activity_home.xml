@@ -17,7 +17,7 @@
 
         <ImageView
             android:layout_width="match_parent"
-            android:layout_height="48dp"
+            android:layout_height="@dimen/brandHeight"
             android:scaleType="fitXY"
             app:srcCompat="@drawable/ic_myexoterra"/>
 
@@ -146,6 +146,7 @@
             android:layout_height="wrap_content"
             android:background="?attr/selectableItemBackground"
             android:layout_marginBottom="8dp"
+            android:gravity="center_vertical"
             android:textSize="@dimen/textSizePrimary"
             android:text="NEW PRODUCTS"/>
 
@@ -155,6 +156,7 @@
             android:layout_height="wrap_content"
             android:background="?attr/selectableItemBackground"
             android:layout_marginBottom="8dp"
+            android:gravity="center_vertical"
             android:textSize="@dimen/textSizePrimary"
             android:text="EVENTS"/>
 
@@ -164,6 +166,7 @@
             android:layout_height="wrap_content"
             android:background="?attr/selectableItemBackground"
             android:layout_marginBottom="8dp"
+            android:gravity="center_vertical"
             android:textSize="@dimen/textSizePrimary"
             android:text="CARE SHEETS"/>
 
@@ -172,6 +175,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="?attr/selectableItemBackground"
+            android:gravity="center_vertical"
             android:textSize="@dimen/textSizePrimary"
             android:text="EXO TERRA TV"/>
 

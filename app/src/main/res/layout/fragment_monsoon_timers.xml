@@ -52,7 +52,7 @@
                 android:visibility="invisible"
                 android:background="?attr/selectableItemBackground"
                 android:drawableRight="@drawable/selector_switch"
-                android:padding="8dp" />
+                android:layout_marginLeft="8dp" />
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -61,7 +61,7 @@
                 android:textAlignment="center"
                 android:textColor="@color/textColorPrimary"
                 android:textSize="@dimen/textSizePrimary"
-                android:text="@string/time"/>
+                android:text="@string/on"/>
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"

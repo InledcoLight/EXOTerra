@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.BottomSheetDialog;
 import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -75,23 +76,10 @@ public class MonsoonControlFragment extends BaseFragment {
         String minute = getString(R.string.minute);
         String second = getString(R.string.second);
         String spray = getString(R.string.spray);
-        for (int i = 0; i < 59; i++) {
-            mPeriods[i] = "" + (i+1) + " " + second;
+        for (int i = 0; i < 120; i++) {
+            mPeriods[i] = "" + (i+1) + " s";
+            mKeyActions[i] = spray + " " + mPeriods[i];
         }
-        mPeriods[59] = "1 " + minute;
-        for (int i = 60; i < 119; i++) {
-            mPeriods[i] = "1 " + minute + " " + (i-59) + " " + second;
-        }
-        mPeriods[119] = "2 " + minute;
-
-        for (int i = 0; i < 59; i++) {
-            mKeyActions[i] = spray + " " + (i+1) + " " + second;
-        }
-        mKeyActions[59] = spray + " 1 " + minute;
-        for (int i = 60; i < 119; i++) {
-            mKeyActions[i] = spray + " 1 " + minute + " " + (i-59) + " " + second;
-        }
-        mKeyActions[119] = spray + " 2 " + minute;
         refreshData();
     }
 
@@ -126,7 +114,7 @@ public class MonsoonControlFragment extends BaseFragment {
                 monsoon_ctrl_custom[i].setOnLongClickListener(new View.OnLongClickListener() {
                     @Override
                     public boolean onLongClick(View v) {
-                        showDialog(idx);
+                        showItemActionDialog(idx);
                         return false;
                     }
                 });
@@ -223,33 +211,48 @@ public class MonsoonControlFragment extends BaseFragment {
         }
     }
 
-    private void showDialog(final int idx) {
-        if (idx < 0 || idx >= ExoMonsoon.CUSTOM_ACTIONS_MAX) {
+    private void showItemActionDialog(final int idx) {
+        if (idx < 0 || idx >= ExoMonsoon.CUSTOM_ACTIONS_MAX || mMonsoon == null) {
             return;
         }
-        if (mMonsoon != null) {
-            final List<Integer> actions = mMonsoon.getCustomActions();
-            if (actions == null) {
-                return;
-            }
-            if (idx < actions.size()) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-                builder.setNeutralButton(R.string.cancel, null);
-                builder.setNegativeButton("Remove", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        actions.remove(idx);
-                        mMonsoonViewModel.setCustomActions(actions);
-                    }
-                });
-                builder.setPositiveButton("Modify", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        showEditCustomActionDialog(idx);
-                    }
-                });
-                builder.show();
-            }
+        final List<Integer> actions = mMonsoon.getCustomActions();
+        if (actions == null) {
+            return;
+        }
+        if (idx < actions.size()) {
+            final BottomSheetDialog dialog = new BottomSheetDialog(getContext());
+            View view = LayoutInflater.from(getContext())
+                                      .inflate(R.layout.dialog_action, null, false);
+            Button btn_modify = view.findViewById(R.id.dialog_action_act1);
+            Button btn_remove = view.findViewById(R.id.dialog_action_act2);
+            Button btn_cancel = view.findViewById(R.id.dialog_action_cancel);
+            btn_modify.setVisibility(View.VISIBLE);
+            btn_modify.setText(R.string.modify);
+            btn_remove.setText(R.string.remove);
+            btn_cancel.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    dialog.dismiss();
+                }
+            });
+            btn_modify.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    dialog.dismiss();
+                    showEditCustomActionDialog(idx);
+                }
+            });
+            btn_remove.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    actions.remove(idx);
+                    mMonsoonViewModel.setCustomActions(actions);
+                    dialog.dismiss();
+                }
+            });
+            dialog.setContentView(view);
+            dialog.setCancelable(false);
+            dialog.show();
         }
     }
 }

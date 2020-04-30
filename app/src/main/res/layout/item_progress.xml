@@ -36,6 +36,6 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="4dp"
         android:textColor="@color/textColorSencondary"
-        android:textSize="@dimen/textSizeTiny"/>
+        android:textSize="10sp"/>
 
 </LinearLayout>

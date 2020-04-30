@@ -146,14 +146,9 @@ public class MonsoonTimersFragment extends BaseFragment {
             final TimePicker tp_tmr = view.findViewById(R.id.dialog_monsoon_timer);
             final NumberPicker np = view.findViewById(R.id.dialog_monsoon_duration);
             String[] values = new String[120];
-            for (int i = 0; i < 59; i++) {
-                values[i] = "" + (i + 1) + " Sec";
+            for (int i = 0; i < 120; i++) {
+                values[i] = "" + (i + 1) + " s";
             }
-            values[59] = "1 Min";
-            for (int i = 60; i < 119; i++) {
-                values[i] = "1 Min " + (i - 59) + " Sec";
-            }
-            values[119] = "2 Min";
             np.setMinValue(1);
             np.setMaxValue(120);
             np.setDisplayedValues(values);
@@ -185,6 +180,7 @@ public class MonsoonTimersFragment extends BaseFragment {
                         }
                         timer.setRepeat(rpt);
                     }
+                    timer.setEnable(true);
                     mMonsoonViewModel.setTimers(mTimers);
                 }
             });
@@ -209,14 +205,9 @@ public class MonsoonTimersFragment extends BaseFragment {
         final TimePicker tp_tmr = view.findViewById(R.id.dialog_monsoon_timer);
         final NumberPicker np = view.findViewById(R.id.dialog_monsoon_duration);
         String[] values = new String[120];
-        for (int i = 0; i < 59; i++) {
-            values[i] = "" + (i + 1) + " Sec";
+        for (int i = 0; i < 120; i++) {
+            values[i] = "" + (i + 1) + " s";
         }
-        values[59] = "1 Min";
-        for (int i = 60; i < 119; i++) {
-            values[i] = "1 Min " + (i - 59) + " Sec";
-        }
-        values[119] = "2 Min";
         np.setMinValue(ExoMonsoon.SPRAY_MIN);
         np.setMaxValue(ExoMonsoon.SPRAY_MAX);
         np.setDisplayedValues(values);

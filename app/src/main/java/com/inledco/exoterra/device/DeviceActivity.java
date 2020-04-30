@@ -8,6 +8,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -25,12 +26,12 @@ import com.inledco.exoterra.aliot.SocketViewModel;
 import com.inledco.exoterra.aliot.bean.Group;
 import com.inledco.exoterra.base.BaseActivity;
 import com.inledco.exoterra.device.Monsoon.MonsoonFragment;
-import com.inledco.exoterra.device.Monsoon.MonsoonPowerFragment;
+import com.inledco.exoterra.device.Monsoon.MonsoonModeFragment;
 import com.inledco.exoterra.device.detail.DeviceDetailFragment;
 import com.inledco.exoterra.device.light.LightFragment;
-import com.inledco.exoterra.device.light.LightPowerFragment;
+import com.inledco.exoterra.device.light.LightModeFragment;
 import com.inledco.exoterra.device.socket.SocketFragment;
-import com.inledco.exoterra.device.socket.SocketPowerFragment;
+import com.inledco.exoterra.device.socket.SocketModeFragment;
 import com.inledco.exoterra.event.DeviceChangedEvent;
 import com.inledco.exoterra.event.DeviceStatusChangedEvent;
 import com.inledco.exoterra.event.GroupDeviceChangedEvent;
@@ -50,6 +51,7 @@ public class DeviceActivity extends BaseActivity {
     private ImageView device_status_local;
     private ImageView device_status_cloud;
     private ImageView device_status_sensor;
+    private Button device_btn_back;
 
 //    private String productKey;
 //    private String deviceName;
@@ -58,6 +60,7 @@ public class DeviceActivity extends BaseActivity {
     private DeviceBaseViewModel mDeviceBaseViewModel;
 
     private Fragment mPowerFragment;
+    private Fragment mModeFragment;
     private Fragment mDeviceFragment;
 
     @Override
@@ -91,6 +94,7 @@ public class DeviceActivity extends BaseActivity {
         device_status_local = findViewById(R.id.device_status_local);
         device_status_cloud = findViewById(R.id.device_status_cloud);
         device_status_sensor = findViewById(R.id.device_status_sensor);
+        device_btn_back = findViewById(R.id.device_btn_back);
     }
 
     @Override
@@ -109,7 +113,7 @@ public class DeviceActivity extends BaseActivity {
         if (TextUtils.isEmpty(name)) {
             name = DeviceUtil.getDefaultName(pkey);
         }
-        device_icon.setImageResource(DeviceUtil.getProductIconSmall(pkey));
+        device_icon.setImageResource(DeviceUtil.getProductIcon(pkey));
         device_name.setText(name);
         final Group group = GroupManager.getInstance().getDeviceGroup(pkey, mDevice.getDeviceName());
         if (group != null) {
@@ -124,12 +128,14 @@ public class DeviceActivity extends BaseActivity {
         if (TextUtils.equals(pkey, AliotConsts.PRODUCT_KEY_EXOLED)) {
             mDeviceViewModel = ViewModelProviders.of(DeviceActivity.this).get(LightViewModel.class);
             mDeviceViewModel.setData(mDevice);
-            mPowerFragment = new LightPowerFragment();
+//            mPowerFragment = new LightPowerFragment();
+            mModeFragment = new LightModeFragment();
             mDeviceFragment = new LightFragment();
         } else if (TextUtils.equals(pkey, AliotConsts.PRODUCT_KEY_EXOMONSOON)) {
             mDeviceViewModel = ViewModelProviders.of(DeviceActivity.this).get(MonsoonViewModel.class);
             mDeviceViewModel.setData(mDevice);
-            mPowerFragment = new MonsoonPowerFragment();
+//            mPowerFragment = new MonsoonPowerFragment();
+            mModeFragment = new MonsoonModeFragment();
             mDeviceFragment = new MonsoonFragment();
         } else if (TextUtils.equals(pkey, AliotConsts.PRODUCT_KEY_EXOSOCKET)) {
             mDeviceViewModel = ViewModelProviders.of(DeviceActivity.this).get(SocketViewModel.class);
@@ -144,13 +150,14 @@ public class DeviceActivity extends BaseActivity {
             ExoSocket socket = (ExoSocket) mDevice;
             device_status_sensor.setVisibility(View.VISIBLE);
             device_status_sensor.setImageResource(socket.getSensorAvailable() ? R.drawable.ic_sensor_on : R.drawable.ic_sensor);
-            mPowerFragment = new SocketPowerFragment();
+//            mPowerFragment = new SocketPowerFragment();
+            mModeFragment = new SocketModeFragment();
             mDeviceFragment = new SocketFragment();
         } else {
             throw new RuntimeException("Invalid productKey.");
         }
 
-        replaceFragment(R.id.device_fl_power, mPowerFragment);
+        replaceFragment(R.id.device_fl_ext, mModeFragment);
         replaceFragment(R.id.device_fl_show, mDeviceFragment);
         mDeviceViewModel.getAllProperties();
     }
@@ -161,6 +168,13 @@ public class DeviceActivity extends BaseActivity {
             @Override
             public void onClick(View v) {
                 addFragmentToStack(R.id.device_root, new DeviceDetailFragment());
+            }
+        });
+
+        device_btn_back.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
             }
         });
     }

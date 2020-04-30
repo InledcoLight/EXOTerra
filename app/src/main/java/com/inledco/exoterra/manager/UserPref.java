@@ -72,8 +72,12 @@ public class UserPref {
 
     public static String readPassword(Context context) {
         String data = PrefUtil.getString(context, PREF_FILE_USER, PREF_KEY_USER_PASSWORD, "");
-        String password = new String(Base64.decode(data, Base64.DEFAULT));
-        return password;
+        try {
+            return new String(Base64.decode(data, Base64.DEFAULT));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     public static void removePassword(Context context) {
@@ -127,7 +131,12 @@ public class UserPref {
 
     public static String readAccessToken(Context context) {
         String data = PrefUtil.getString(context, PREF_FILE_USER, PREF_KEY_USER_TOKEN, "");
-        return new String(Base64.decode(data, Base64.DEFAULT));
+        try {
+            return new String(Base64.decode(data, Base64.DEFAULT));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     public static void removeAccessToken(Context context) {
@@ -141,7 +150,12 @@ public class UserPref {
 
     public static String readSecret(Context context) {
         String data = PrefUtil.getString(context, PREF_FILE_USER, PREF_KEY_USER_SECRET, "");
-        return new String(Base64.decode(data, Base64.DEFAULT));
+        try {
+            return new String(Base64.decode(data, Base64.DEFAULT));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     public static void removeSecret(Context context) {

@@ -3,6 +3,7 @@
     <dimen name="textSizePrimary">18sp</dimen>
     <dimen name="textSizeSecondary">14sp</dimen>
     <dimen name="textSizeTiny">12sp</dimen>
+    <dimen name="textSizeMicro">10sp</dimen>
     <dimen name="textSizeTitle">24sp</dimen>
     <dimen name="textSizeSubTitle">20sp</dimen>
 

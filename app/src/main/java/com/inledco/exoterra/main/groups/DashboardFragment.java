@@ -147,8 +147,12 @@ public class DashboardFragment extends BaseFragment {
         groups_rv.setAdapter(mAdapter);
 
         if (GroupManager.getInstance().needSynchronize()) {
-            groups_refresh.setRefreshing(true);
             GroupManager.getInstance().getGroups(mCallback);
+        }
+        if (GroupManager.getInstance().isSynchronizing() && !GroupManager.getInstance().isSynchronized()) {
+            groups_refresh.setRefreshing(true);
+        } else {
+            groups_warning.setVisibility(mFavouriteGroups.size() == 0 ? View.VISIBLE : View.GONE);
         }
     }
 

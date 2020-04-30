@@ -26,6 +26,7 @@ import com.inledco.exoterra.event.GroupChangedEvent;
 import com.inledco.exoterra.event.GroupDeviceChangedEvent;
 import com.inledco.exoterra.event.GroupsRefreshedEvent;
 import com.inledco.exoterra.group.GroupFragment;
+import com.inledco.exoterra.main.me.MessagesFragment;
 import com.inledco.exoterra.manager.GroupManager;
 import com.inledco.exoterra.manager.OnErrorCallback;
 
@@ -181,8 +182,12 @@ public class GroupsFragment extends BaseFragment {
         groups_rv.setAdapter(mAdapter);
 
         if (GroupManager.getInstance().needSynchronize()) {
-            groups_refresh.setRefreshing(true);
             GroupManager.getInstance().getGroups(mCallback);
+        }
+        if (GroupManager.getInstance().isSynchronizing() && !GroupManager.getInstance().isSynchronized()) {
+            groups_refresh.setRefreshing(true);
+        } else {
+            groups_warning.setVisibility(mGroups.size() == 0 ? View.VISIBLE : View.GONE);
         }
     }
 
@@ -198,7 +203,8 @@ public class GroupsFragment extends BaseFragment {
         groups_ib_add.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                addFragmentToStack(R.id.main_fl, AddHabitatFragment.newInstance(false));
+                addFragmentToStack(R.id.main_fl, new MessagesFragment());
+//                addFragmentToStack(R.id.main_fl, AddHabitatFragment.newInstance(false));
             }
         });
     }

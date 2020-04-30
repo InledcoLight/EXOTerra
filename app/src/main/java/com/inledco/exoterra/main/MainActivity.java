@@ -8,7 +8,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.design.internal.BottomNavigationItemView;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.content.ContextCompat;
 import android.util.Base64;
@@ -26,23 +25,18 @@ import com.inledco.exoterra.main.devices.DevicesFragment;
 import com.inledco.exoterra.main.devices.LocalDevicesFragment;
 import com.inledco.exoterra.main.groups.DashboardFragment;
 import com.inledco.exoterra.main.groups.GroupsFragment;
-import com.inledco.exoterra.main.me.MeFragment;
-import com.inledco.exoterra.main.pref.PrefFragment;
+import com.inledco.exoterra.main.me.PrefFragment;
 import com.inledco.exoterra.manager.DeviceManager;
 import com.inledco.exoterra.manager.GroupManager;
 import com.inledco.exoterra.manager.UserManager;
 import com.inledco.exoterra.scan.ScanActivity;
 import com.inledco.exoterra.smartconfig.SmartconfigActivity;
 
-import q.rorbin.badgeview.Badge;
-
 public class MainActivity extends BaseActivity {
 
     private BottomNavigationView main_bnv;
-    private BottomNavigationItemView main_me;
-    private Badge badge;
 
-    private boolean authorized = true;
+    private boolean authorized;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -56,6 +50,8 @@ public class MainActivity extends BaseActivity {
     protected void onDestroy() {
         super.onDestroy();
         AliotClient.getInstance().deinit();
+        DeviceManager.getInstance().clear();
+        GroupManager.getInstance().clear();
     }
 
     @Override
@@ -77,9 +73,9 @@ public class MainActivity extends BaseActivity {
     @Override
     protected void initView() {
         main_bnv = findViewById(R.id.main_bnv);
-        main_me = main_bnv.findViewById(R.id.main_bnv_me);
 
-        main_bnv.getMenu().findItem(R.id.main_bnv_home).setVisible(authorized);
+        authorized = UserManager.getInstance().isAuthorized();
+        main_bnv.getMenu().findItem(R.id.main_bnv_dashboard).setVisible(authorized);
         main_bnv.getMenu().findItem(R.id.main_bnv_habitat).setVisible(authorized);
     }
 
@@ -88,11 +84,8 @@ public class MainActivity extends BaseActivity {
         GlobalSettings.init(this);
         authorized = UserManager.getInstance().isAuthorized();
         if (authorized) {
-            main_bnv.setSelectedItemId(R.id.main_bnv_home);
+            main_bnv.setSelectedItemId(R.id.main_bnv_dashboard);
             replaceFragment(R.id.main_fl_show, new DashboardFragment());
-            String userid = UserManager.getInstance().getUserid();
-            String secret = UserManager.getInstance().getSecret();
-            AliotClient.getInstance().init(getApplicationContext(), userid, secret);
             DeviceManager.getInstance().getSubscribedDevices();
             GroupManager.getInstance().getGroups();
         } else {
@@ -116,6 +109,9 @@ public class MainActivity extends BaseActivity {
             public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
                 switch (menuItem.getItemId()) {
                     case R.id.main_bnv_home:
+                        finish();
+                        break;
+                    case R.id.main_bnv_dashboard:
                         replaceFragment(R.id.main_fl_show, new DashboardFragment());
                         break;
                     case R.id.main_bnv_habitat:
@@ -127,9 +123,6 @@ public class MainActivity extends BaseActivity {
                         } else {
                             replaceFragment(R.id.main_fl_show, new LocalDevicesFragment());
                         }
-                        break;
-                    case R.id.main_bnv_me:
-                        replaceFragment(R.id.main_fl_show, new MeFragment());
                         break;
                     case R.id.main_bnv_pref:
                         replaceFragment(R.id.main_fl_show, new PrefFragment());

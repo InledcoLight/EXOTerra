@@ -1,38 +1,157 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:layout_width="match_parent"
-              android:layout_height="wrap_content"
-              android:layout_margin="8dp"
-              android:gravity="center_vertical"
-              android:orientation="horizontal">
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="8dp"
+    android:layout_margin="8dp"
+    android:background="?attr/selectableItemBackground"
+    android:gravity="center_horizontal"
+    android:orientation="vertical">
 
     <TextView
-        android:id="@+id/item_share_msg"
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:gravity="center_vertical"
-        android:layout_weight="7"/>
+        android:id="@+id/item_invite_create_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/textColorSencondary"
+        android:textSize="@dimen/textSizeTiny" />
 
     <LinearLayout
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_weight="3"
-        android:gravity="center"
+        android:id="@+id/item_invite_content"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:orientation="vertical">
-        <Button
-            android:id="@+id/item_msg_accept"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/accept"/>
-        <Button
-            android:id="@+id/item_msg_deny"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/deny"/>
+
         <TextView
-            android:id="@+id/item_msg_status"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+            android:text="@string/habitat_invitation"
+            android:textColor="@color/textColorPrimary"
+            android:textSize="@dimen/textSizePrimary" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:text="@string/habitat_name"
+                android:textColor="@color/textColorPrimary"
+                android:textSize="@dimen/textSizeSecondary" />
+
+            <TextView
+                android:id="@+id/item_invite_habitat_name"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="3"
+                android:textColor="@color/textColorSencondary"
+                android:textSize="@dimen/textSizeTiny" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:text="@string/habitat_id"
+                android:textColor="@color/textColorPrimary"
+                android:textSize="@dimen/textSizeSecondary" />
+
+            <TextView
+                android:id="@+id/item_invite_habitat_id"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="3"
+                android:textColor="@color/textColorSencondary"
+                android:textSize="@dimen/textSizeTiny" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/item_inviter_invitee_tag"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:text="@string/inviter"
+                android:textColor="@color/textColorPrimary"
+                android:textSize="@dimen/textSizeSecondary" />
+
+            <TextView
+                android:id="@+id/item_inviter_invitee"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="3"
+                android:textColor="@color/textColorSencondary"
+                android:textSize="@dimen/textSizeTiny" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:text="@string/expire_time"
+                android:textColor="@color/textColorPrimary"
+                android:textSize="@dimen/textSizeSecondary" />
+
+            <TextView
+                android:id="@+id/item_invite_expire_time"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="3"
+                android:textColor="@color/textColorSencondary"
+                android:textSize="@dimen/textSizeTiny" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:text="@string/status"
+                android:textColor="@color/textColorPrimary"
+                android:textSize="@dimen/textSizeSecondary" />
+
+            <TextView
+                android:id="@+id/item_invite_status"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="3"
+                android:textColor="@color/textColorSencondary"
+                android:textSize="@dimen/textSizeTiny" />
+        </LinearLayout>
     </LinearLayout>
+    <!--    <TextView-->
+    <!--        android:id="@+id/item_msg_status"-->
+    <!--        android:layout_width="wrap_content"-->
+    <!--        android:layout_height="wrap_content"-->
+    <!--        android:layout_gravity="right"-->
+    <!--        android:layout_marginTop="8dp"-->
+    <!--        android:lines="1"-->
+    <!--        android:textSize="@dimen/textSizeSecondary"-->
+    <!--        android:textColor="@color/textColorSencondary"/>-->
 
 </LinearLayout>

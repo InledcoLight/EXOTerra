@@ -3,6 +3,7 @@ package com.inledco.exoterra.manager;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.inledco.exoterra.aliot.AliotClient;
 import com.inledco.exoterra.aliot.AliotConsts;
@@ -95,6 +96,7 @@ public class DeviceManager {
         mSubcribedDevices.clear();
         mDevices.clear();
         mSynchronized = false;
+        mSynchronizing = false;
     }
 
     public boolean contains(String key) {
@@ -135,6 +137,14 @@ public class DeviceManager {
         return list;
     }
 
+    public boolean isSynchronizing() {
+        return mSynchronizing;
+    }
+
+    public boolean isSynchronized() {
+        return mSynchronized;
+    }
+
     public boolean needSynchronize() {
         return !mSynchronized && !mSynchronizing;
     }
@@ -165,6 +175,7 @@ public class DeviceManager {
         AliotServer.getInstance().getSubscribeDevices(new HttpCallback<UserApi.UserSubscribedDevicesResponse>() {
             @Override
             public void onError(String error) {
+                Log.e(TAG, "onError: " + error);
                 mSynchronizing = false;
                 if (callback != null) {
                     callback.onError(error);

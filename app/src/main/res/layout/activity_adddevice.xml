@@ -10,13 +10,13 @@
         android:id="@+id/imageView6"
         android:layout_width="0dp"
         android:layout_height="@dimen/brandHeight"
-        android:paddingLeft="8dp"
-        android:paddingRight="8dp"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"
         android:scaleType="fitXY"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@mipmap/ic_brand" />
+        app:srcCompat="@mipmap/ic_microtope_title" />
 
     <FrameLayout
         android:id="@+id/adddevice_fl"

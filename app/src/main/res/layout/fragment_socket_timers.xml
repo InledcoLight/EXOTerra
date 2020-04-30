@@ -52,7 +52,7 @@
                 android:background="?attr/selectableItemBackground"
                 android:drawableRight="@drawable/selector_switch"
                 android:visibility="invisible"
-                android:padding="8dp" />
+                android:layout_marginLeft="8dp"/>
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"

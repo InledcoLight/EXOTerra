@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:gravity="center_vertical">
+
+    <CheckedTextView
+        android:id="@+id/monsoon_mode_manual"
+        android:layout_width="96dp"
+        android:layout_height="wrap_content"
+        android:background="?attr/selectableItemBackground"
+        android:drawableTop="@drawable/selector_manual"
+        android:text="@string/manual"
+        android:textColor="@color/selector_text"
+        android:textAlignment="center"
+        android:textSize="@dimen/textSizeSecondary" />
+
+    <CheckedTextView
+        android:id="@+id/monsoon_mode_timer"
+        android:layout_width="96dp"
+        android:layout_height="wrap_content"
+        android:background="?attr/selectableItemBackground"
+        android:drawableTop="@drawable/selector_timer"
+        android:text="@string/timer"
+        android:textColor="@color/selector_text"
+        android:textAlignment="center"
+        android:textSize="@dimen/textSizeSecondary"/>
+
+    <Space
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"/>
+
+    <CheckedTextView
+        android:id="@+id/monsoon_mode_power"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:gravity="center"
+        android:layout_marginRight="8dp"
+        android:background="?attr/selectableItemBackground"
+        android:drawableTop="@drawable/selector_power_32dp"
+        android:textAllCaps="false"
+        android:textAlignment="center"
+        android:textSize="10sp"
+        android:textColor="@color/textColorPrimary"/>
+
+</LinearLayout>

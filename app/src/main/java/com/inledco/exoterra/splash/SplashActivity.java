@@ -11,7 +11,6 @@ import com.inledco.exoterra.aliot.AliotServer;
 import com.inledco.exoterra.base.BaseActivity;
 import com.inledco.exoterra.home.HomeActivity;
 import com.inledco.exoterra.login.LoginActivity;
-import com.inledco.exoterra.main.MainActivity;
 import com.inledco.exoterra.manager.UserManager;
 import com.inledco.exoterra.manager.UserPref;
 
@@ -106,12 +105,6 @@ public class SplashActivity extends BaseActivity {
 
     private void  gotoHomeActivity() {
         Intent intent = new Intent(this, HomeActivity.class);
-        startActivity(intent);
-        finish();
-    }
-
-    private void  gotoMainActivity() {
-        Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
         finish();
     }

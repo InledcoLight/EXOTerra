@@ -3,51 +3,209 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:clickable="true"
     android:paddingLeft="16dp"
     android:paddingRight="16dp"
-    android:paddingTop="8dp"
     android:gravity="center_horizontal"
     android:orientation="vertical">
 
-    <ImageView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:padding="8dp"
-        app:srcCompat="@drawable/ic_prefs_white_128dp"/>
-
-    <Switch
-        android:id="@+id/pref_timeformat"
-        style="@style/SwitchStyle2"
+    <CheckedTextView
+        android:id="@+id/pref_title_user"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingTop="4dp"
-        android:paddingBottom="4dp"
-        android:checked="false"
-        android:textOn="@string/time12h"
-        android:textOff="@string/time24h"
-        android:showText="true"
-        android:textColor="@color/textColorPrimary"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
+        android:background="?attr/selectableItemBackground"
         android:textSize="@dimen/textSizePrimary"
-        android:text="@string/timeformat"/>
-    <Switch
-        android:id="@+id/pref_tempunit"
-        style="@style/SwitchStyle2"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingTop="4dp"
-        android:paddingBottom="4dp"
-        android:checked="false"
-        android:textOn="@string/fahrenheit"
-        android:textOff="@string/celsius"
-        android:showText="true"
         android:textColor="@color/textColorPrimary"
-        android:textSize="@dimen/textSizePrimary"
-        android:text="@string/temperature_unit"/>
+        android:text="@string/personal_infomation"/>
     <LinearLayout
+        android:id="@+id/pref_usr_detail"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center_vertical">
-
+        android:layout_marginLeft="8dp"
+        android:orientation="vertical">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingTop="4dp"
+                android:paddingBottom="4dp"
+                android:textColor="@color/textColorPrimary"
+                android:textSize="@dimen/textSizeSecondary"
+                android:text="@string/hint_nickname"/>
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"/>
+            <TextView
+                android:id="@+id/pref_nickname"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingTop="4dp"
+                android:paddingBottom="4dp"
+                android:drawablePadding="8dp"
+                android:background="?attr/selectableItemBackground"
+                android:gravity="center_vertical"
+                android:textColor="@color/textColorSencondary"
+                android:textSize="@dimen/textSizeSecondary"/>
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingTop="4dp"
+                android:paddingBottom="4dp"
+                android:textColor="@color/textColorPrimary"
+                android:textSize="@dimen/textSizeSecondary"
+                android:text="@string/email"/>
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"/>
+            <TextView
+                android:id="@+id/pref_email"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="4dp"
+                android:textColor="@color/textColorSencondary"
+                android:textSize="@dimen/textSizeSecondary"/>
+        </LinearLayout>
+        <TextView
+            android:id="@+id/pref_mod_psw"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="4dp"
+            android:paddingBottom="4dp"
+            android:background="?attr/selectableItemBackground"
+            android:drawablePadding="8dp"
+            android:textColor="@color/textColorPrimary"
+            android:textSize="@dimen/textSizeSecondary"
+            android:text="@string/modify_password"/>
     </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@drawable/rect_gradient"/>
+
+    <CheckedTextView
+        android:id="@+id/pref_title_unit"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
+        android:background="?attr/selectableItemBackground"
+        android:textSize="@dimen/textSizePrimary"
+        android:textColor="@color/textColorPrimary"
+        android:text="@string/units"/>
+    <LinearLayout
+        android:id="@+id/pref_unit_detail"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="8dp"
+        android:orientation="vertical">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="4dp"
+            android:paddingBottom="4dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/textSizeSecondary"
+                android:textColor="@color/textColorPrimary"
+                android:text="@string/timeformat"/>
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"/>
+            <Switch
+                android:id="@+id/pref_timeformat"
+                style="@style/SwitchStyle2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textOn="@string/time12h"
+                android:textOff="@string/time24h"
+                android:showText="true"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="4dp"
+            android:paddingBottom="4dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/textSizeSecondary"
+                android:textColor="@color/textColorPrimary"
+                android:text="@string/temperature_unit"/>
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"/>
+            <Switch
+                android:id="@+id/pref_tempunit"
+                style="@style/SwitchStyle2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textOn="@string/fahrenheit"
+                android:textOff="@string/celsius"
+                android:showText="true"/>
+        </LinearLayout>
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@drawable/rect_gradient"/>
+
+    <CheckedTextView
+        android:id="@+id/pref_title_invite_msg"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
+        android:background="?attr/selectableItemBackground"
+        android:textSize="@dimen/textSizePrimary"
+        android:textColor="@color/textColorPrimary"
+        android:text="@string/invite_messages"/>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@drawable/rect_gradient"/>
+
+    <Space
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_weight="1"/>
+
+    <com.inledco.exoterra.view.GradientCornerButton
+        android:id="@+id/pref_logout"
+        style="?attr/buttonStyle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:background="?attr/selectableItemBackground"
+        android:text="@string/logout"
+        app:strokeWidth="@dimen/strokeWidth"
+        app:radius="@dimen/cornerRadius"
+        app:direction="horizontal"
+        app:gradientStart="@color/gradientYellow"
+        app:gradientEnd="@color/gradientWhite"/>
+
 </LinearLayout>

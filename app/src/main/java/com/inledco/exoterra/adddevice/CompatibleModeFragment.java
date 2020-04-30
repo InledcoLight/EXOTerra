@@ -16,6 +16,8 @@ import android.widget.TextView;
 
 import com.inledco.exoterra.R;
 import com.inledco.exoterra.base.BaseFragment;
+import com.inledco.exoterra.manager.DeviceManager;
+import com.inledco.exoterra.manager.UserManager;
 import com.inledco.exoterra.util.DeviceUtil;
 import com.inledco.exoterra.util.RouterUtil;
 import com.inledco.exoterra.view.CircleSeekbar;
@@ -79,8 +81,7 @@ public class CompatibleModeFragment extends BaseFragment {
 
         mConnectNetBean.setRunning(true);
         mConnectNetViewModel.postValue();
-//        boolean subscribe = UserPref.checkAuthorize(this);
-        boolean subscribe = false;
+        boolean subscribe = UserManager.getInstance().isAuthorized();
         mAPConfigLinker = new APConfigLinker(subscribe, mConnectNetBean.getProductKey(), mConnectNetBean.getSsid(), mConnectNetBean.getBssid(),
                                              mConnectNetBean.getPassword(), (AppCompatActivity) getActivity());
         mListener = new APConfigLinker.APConfigListener() {
@@ -104,6 +105,7 @@ public class CompatibleModeFragment extends BaseFragment {
                 mConnectNetBean.setAddress(mac);
                 mConnectNetViewModel.postValue();
                 RouterUtil.putRouterPassword(getContext(), mConnectNetViewModel.getData().getSsid(), mConnectNetViewModel.getData().getPassword());
+                DeviceManager.getInstance().getSubscribedDevices();
                 getActivity().getSupportFragmentManager().popBackStack(null, 1);
                 addFragmentToStack(R.id.adddevice_fl, new ConfigDeviceFragment());
             }

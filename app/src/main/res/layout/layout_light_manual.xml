@@ -30,35 +30,30 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:visibility="gone"
             layout="@layout/item_progress"/>
         <include
             android:id="@+id/light_manual_include2"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:visibility="gone"
             layout="@layout/item_progress"/>
         <include
             android:id="@+id/light_manual_include3"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:visibility="gone"
             layout="@layout/item_progress"/>
         <include
             android:id="@+id/light_manual_include4"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:visibility="gone"
             layout="@layout/item_progress"/>
         <include
             android:id="@+id/light_manual_include5"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:visibility="gone"
             layout="@layout/item_progress"/>
         <include
             android:id="@+id/light_manual_include6"

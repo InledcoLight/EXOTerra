@@ -20,7 +20,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <ImageView
-        android:id="@+id/home_member_icon"
+        android:id="@+id/habitat_member_icon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
@@ -32,7 +32,7 @@
         app:srcCompat="@drawable/ic_person_white_64dp" />
 
     <TextView
-        android:id="@+id/home_member_name"
+        android:id="@+id/habitat_member_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
@@ -41,7 +41,7 @@
         android:textSize="@dimen/textSizePrimary"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/home_member_icon" />
+        app:layout_constraintTop_toBottomOf="@+id/habitat_member_icon" />
 
     <LinearLayout
         android:id="@+id/linearLayout4"
@@ -55,7 +55,7 @@
         android:padding="8dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/home_member_name">
+        app:layout_constraintTop_toBottomOf="@+id/habitat_member_name">
 
         <TextView
             android:layout_width="wrap_content"
@@ -70,7 +70,7 @@
             android:layout_weight="1" />
 
         <TextView
-            android:id="@+id/home_member_usrid"
+            android:id="@+id/habitat_member_usrid"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text=""
@@ -105,7 +105,7 @@
             android:layout_weight="1" />
 
         <TextView
-            android:id="@+id/home_member_email"
+            android:id="@+id/habitat_member_email"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text=""
@@ -139,7 +139,7 @@
             android:layout_weight="1" />
 
         <TextView
-            android:id="@+id/home_member_role"
+            android:id="@+id/habitat_member_role"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:paddingTop="4dp"
@@ -153,13 +153,11 @@
     </LinearLayout>
 
     <com.inledco.exoterra.view.GradientCornerButton
-        android:id="@+id/home_member_back"
+        android:id="@+id/habitat_member_back"
         style="?attr/buttonStyle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginBottom="16dp"
+        android:layout_margin="16dp"
         android:background="?attr/selectableItemBackground"
         android:text="@string/back"
         app:direction="horizontal"
@@ -172,16 +170,14 @@
         app:strokeWidth="@dimen/strokeWidth" />
 
     <Button
-        android:id="@+id/home_member_delete"
+        android:id="@+id/habitat_member_delete"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginBottom="32dp"
+        android:layout_margin="16dp"
         android:text="@string/delete"
         android:theme="@style/DangerButtonTheme"
         android:visibility="gone"
-        app:layout_constraintBottom_toTopOf="@+id/home_member_back"
+        app:layout_constraintBottom_toTopOf="@+id/habitat_member_back"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 

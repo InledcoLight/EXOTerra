@@ -6,148 +6,107 @@
     android:layout_height="match_parent"
     android:clickable="true">
 
-<!--    <android.support.constraint.Guideline-->
-<!--        android:id="@+id/monsoon_gl1"-->
-<!--        android:layout_width="wrap_content"-->
+<!--    <com.inledco.exoterra.view.GradientCornerLinearLayout-->
+<!--        android:id="@+id/gradientCornerLinearLayout7"-->
+<!--        android:layout_width="0dp"-->
+<!--        android:layout_height="0dp"-->
+<!--        android:layout_marginStart="16dp"-->
+<!--        android:layout_marginTop="8dp"-->
+<!--        android:layout_marginEnd="16dp"-->
+<!--        android:orientation="vertical"-->
+<!--        android:gravity="center"-->
+<!--        android:visibility="gone"-->
+<!--        app:direction="horizontal"-->
+<!--        app:gradientEnd="@color/gradientGreen"-->
+<!--        app:gradientStart="@color/gradientYellow"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintTop_toTopOf="parent"-->
+<!--        app:radius="@dimen/cornerRadius"-->
+<!--        app:strokeWidth="@dimen/strokeWidth">-->
+
+<!--        <com.inledco.exoterra.view.CircleSeekbar-->
+<!--            android:id="@+id/monsoon_poweron_tmr"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:orientation="vertical"-->
+<!--            android:gravity="center"-->
+<!--            android:layout_margin="8dp"-->
+<!--            app:min="0"-->
+<!--            app:progressColor="@color/colorWhite"-->
+<!--            app:progressWidth="@dimen/strokeWidth">-->
+
+<!--            <CheckedTextView-->
+<!--                android:id="@+id/monsoon_power"-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:background="?attr/selectableItemBackground"-->
+<!--                android:drawableTop="@drawable/selector_power_48dp"-->
+<!--                android:textColor="@color/textColorPrimary"-->
+<!--                android:textSize="@dimen/textSizeTiny"-->
+<!--                android:textAlignment="center"-->
+<!--                android:text="@string/off"/>-->
+<!--        </com.inledco.exoterra.view.CircleSeekbar>-->
+
+<!--    </com.inledco.exoterra.view.GradientCornerLinearLayout>-->
+
+<!--    <LinearLayout-->
+<!--        android:id="@+id/socket_mode_ll"-->
+<!--        android:layout_width="match_parent"-->
 <!--        android:layout_height="wrap_content"-->
+<!--        android:gravity="center_vertical"-->
 <!--        android:orientation="horizontal"-->
-<!--        app:layout_constraintGuide_percent="0.15" />-->
+<!--        android:paddingLeft="8dp"-->
+<!--        android:paddingRight="8dp"-->
+<!--        app:layout_constraintBottom_toBottomOf="parent"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintStart_toStartOf="parent">-->
 
-    <com.inledco.exoterra.view.GradientCornerLinearLayout
-        android:id="@+id/gradientCornerLinearLayout7"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="16dp"
-        android:orientation="vertical"
-        android:gravity="center"
-        android:visibility="gone"
-        app:direction="horizontal"
-        app:gradientEnd="@color/gradientGreen"
-        app:gradientStart="@color/gradientYellow"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:radius="@dimen/cornerRadius"
-        app:strokeWidth="@dimen/strokeWidth">
+<!--        <ImageButton-->
+<!--            android:id="@+id/monsoon_ib_back"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:background="?attr/selectableItemBackground"-->
+<!--            android:padding="8dp"-->
+<!--            app:srcCompat="@drawable/ic_arrow_back_white_32dp" />-->
 
-        <com.inledco.exoterra.view.CircleSeekbar
-            android:id="@+id/monsoon_poweron_tmr"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:gravity="center"
-            android:layout_margin="8dp"
-            app:min="0"
-            app:progressColor="@color/colorWhite"
-            app:progressWidth="@dimen/strokeWidth">
+<!--        <Space-->
+<!--            android:layout_width="0dp"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_weight="1" />-->
 
-            <CheckedTextView
-                android:id="@+id/monsoon_power"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="?attr/selectableItemBackground"
-                android:drawableTop="@drawable/selector_power_48dp"
-                android:textColor="@color/textColorPrimary"
-                android:textSize="@dimen/textSizeTiny"
-                android:textAlignment="center"
-                android:text="@string/off"/>
-        </com.inledco.exoterra.view.CircleSeekbar>
+<!--        <CheckedTextView-->
+<!--            android:id="@+id/monsoon_ctv_manual"-->
+<!--            android:layout_width="0dp"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_weight="2"-->
+<!--            android:background="?attr/selectableItemBackground"-->
+<!--            android:drawableTop="@drawable/selector_manual"-->
+<!--            android:text="@string/manual"-->
+<!--            android:textAlignment="center"-->
+<!--            android:textColor="@color/selector_text"-->
+<!--            android:textSize="@dimen/textSizeSecondary" />-->
 
-    </com.inledco.exoterra.view.GradientCornerLinearLayout>
-
-    <LinearLayout
-        android:id="@+id/socket_mode_ll"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center_vertical"
-        android:orientation="horizontal"
-        android:paddingLeft="8dp"
-        android:paddingRight="8dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
-
-        <ImageButton
-            android:id="@+id/monsoon_ib_back"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="?attr/selectableItemBackground"
-            android:padding="8dp"
-            app:srcCompat="@drawable/ic_arrow_back_white_32dp" />
-
-        <Space
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1" />
-
-        <CheckedTextView
-            android:id="@+id/monsoon_ctv_manual"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="2"
-            android:background="?attr/selectableItemBackground"
-            android:drawableTop="@drawable/selector_manual"
-            android:text="@string/manual"
-            android:textAlignment="center"
-            android:textColor="@color/selector_text"
-            android:textSize="@dimen/textSizeSecondary" />
-
-        <CheckedTextView
-            android:id="@+id/monsoon_ctv_timer"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="2"
-            android:background="?attr/selectableItemBackground"
-            android:drawableTop="@drawable/selector_timer"
-            android:text="@string/timer"
-            android:textAlignment="center"
-            android:textColor="@color/selector_text"
-            android:textSize="@dimen/textSizeSecondary" />
-
-        <CheckedTextView
-            android:id="@+id/monsoon_ctv_hygrostat"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="2"
-            android:background="?attr/selectableItemBackground"
-            android:drawableTop="@drawable/selector_humidity"
-            android:text="@string/hygrostat"
-            android:textAlignment="center"
-            android:textColor="@color/selector_text"
-            android:textSize="@dimen/textSizeSecondary"
-            android:visibility="gone" />
-    </LinearLayout>
+<!--        <CheckedTextView-->
+<!--            android:id="@+id/monsoon_ctv_timer"-->
+<!--            android:layout_width="0dp"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_weight="2"-->
+<!--            android:background="?attr/selectableItemBackground"-->
+<!--            android:drawableTop="@drawable/selector_timer"-->
+<!--            android:text="@string/timer"-->
+<!--            android:textAlignment="center"-->
+<!--            android:textColor="@color/selector_text"-->
+<!--            android:textSize="@dimen/textSizeSecondary" />-->
+<!--    </LinearLayout>-->
 
     <FrameLayout
         android:id="@+id/monsoon_fl"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginBottom="8dp"
-        app:layout_constraintBottom_toTopOf="@+id/socket_mode_ll"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
-
-    <!--    <android.support.design.widget.TabLayout-->
-<!--        android:id="@+id/monsoon_tabs"-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        app:layout_constraintEnd_toEndOf="parent"-->
-<!--        app:layout_constraintStart_toStartOf="parent"-->
-<!--        app:layout_constraintTop_toTopOf="parent" />-->
-
-<!--    <android.support.v4.view.ViewPager-->
-<!--        android:id="@+id/monsoon_vp"-->
-<!--        android:layout_width="0dp"-->
-<!--        android:layout_height="0dp"-->
-<!--        app:layout_constraintBottom_toTopOf="@+id/socket_mode_ll"-->
-<!--        app:layout_constraintEnd_toEndOf="parent"-->
-<!--        app:layout_constraintStart_toStartOf="parent"-->
-<!--        app:layout_constraintTop_toBottomOf="@+id/monsoon_tabs" />-->
 
 </android.support.constraint.ConstraintLayout>

@@ -95,7 +95,7 @@ public class OKHttpManager {
      * @param callback
      */
     public boolean post(String url, Headers headers, RequestBody body, Callback callback) {
-        if (TextUtils.isEmpty(url) || body == null) {
+        if (TextUtils.isEmpty(url)) {
             return false;
         }
         Request request;
@@ -125,7 +125,12 @@ public class OKHttpManager {
         if (TextUtils.isEmpty(url)) {
             return false;
         }
-        RequestBody body = RequestBody.create(CONTENT_TYPE_JSON, json);
+        RequestBody body = null;
+        try {
+            body = RequestBody.create(CONTENT_TYPE_JSON, json);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         Request request;
         if (headers == null) {
             request = new Request.Builder().url(url)
@@ -145,7 +150,7 @@ public class OKHttpManager {
     }
 
     public <T> T blockPost(String url, Headers headers, RequestBody body, Class<T> clazz) {
-        if (TextUtils.isEmpty(url) || body == null) {
+        if (TextUtils.isEmpty(url)) {
             return null;
         }
         Request request;
@@ -173,10 +178,15 @@ public class OKHttpManager {
     }
 
     public <T> T blockPost(String url, Headers headers, String json, Class<T> clazz) {
-        if (TextUtils.isEmpty(url) || TextUtils.isEmpty(json)) {
+        if (TextUtils.isEmpty(url)) {
             return null;
         }
-        RequestBody body = RequestBody.create(CONTENT_TYPE_JSON, json);
+        RequestBody body = null;
+        try {
+            body = RequestBody.create(CONTENT_TYPE_JSON, json);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         Request request;
         if (headers == null) {
             request = new Request.Builder().url(url)
@@ -205,7 +215,7 @@ public class OKHttpManager {
     }
 
     public boolean put(String url, Headers headers, RequestBody body, Callback callback) {
-        if (TextUtils.isEmpty(url) || body == null) {
+        if (TextUtils.isEmpty(url)) {
             return false;
         }
         Request request;
@@ -226,10 +236,15 @@ public class OKHttpManager {
     }
 
     public boolean put(String url, Headers headers, String json, Callback callback) {
-        if (TextUtils.isEmpty(url) || TextUtils.isEmpty(json)) {
+        if (TextUtils.isEmpty(url)) {
             return false;
         }
-        RequestBody body = RequestBody.create(CONTENT_TYPE_JSON, json);
+        RequestBody body = null;
+        try {
+            body = RequestBody.create(CONTENT_TYPE_JSON, json);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         Request request;
         if (headers == null) {
             request = new Request.Builder().url(url)
@@ -249,7 +264,7 @@ public class OKHttpManager {
     }
 
     public <T> T blockPut(String url, Headers headers, RequestBody body, Class<T> clazz) {
-        if (TextUtils.isEmpty(url) || body == null) {
+        if (TextUtils.isEmpty(url)) {
             return null;
         }
         Request request;
@@ -277,10 +292,15 @@ public class OKHttpManager {
     }
 
     public <T> T blockPut(String url, Headers headers, String json, Class<T> clazz) {
-        if (TextUtils.isEmpty(url) || TextUtils.isEmpty(json)) {
+        if (TextUtils.isEmpty(url)) {
             return null;
         }
-        RequestBody body = RequestBody.create(CONTENT_TYPE_JSON, json);
+        RequestBody body = null;
+        try {
+            body = RequestBody.create(CONTENT_TYPE_JSON, json);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         Request request;
         if (headers == null) {
             request = new Request.Builder().url(url)
@@ -307,7 +327,7 @@ public class OKHttpManager {
     }
 
     public boolean delete(String url, Headers headers, RequestBody body, Callback callback) {
-        if (TextUtils.isEmpty(url) || body == null) {
+        if (TextUtils.isEmpty(url)) {
             return false;
         }
         Request request;
@@ -328,10 +348,15 @@ public class OKHttpManager {
     }
 
     public boolean delete(String url, Headers headers, String json, Callback callback) {
-        if (TextUtils.isEmpty(url) || TextUtils.isEmpty(json)) {
+        if (TextUtils.isEmpty(url)) {
             return false;
         }
-        RequestBody body = RequestBody.create(CONTENT_TYPE_JSON, json);
+        RequestBody body = null;
+        try {
+            body = RequestBody.create(CONTENT_TYPE_JSON, json);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         Request request;
         if (headers == null) {
             request = new Request.Builder().url(url)

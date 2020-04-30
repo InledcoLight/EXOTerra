@@ -119,6 +119,7 @@ public class SetHabitatFragment extends BaseFragment {
                 AliotServer.getInstance().addDeviceToGroup(group.groupid, mProductKey, mDeviceName, new HttpCallback<UserApi.Response>() {
                     @Override
                     public void onError(String error) {
+                        dismissLoadDialog();
                         showToast(error);
                     }
 
@@ -126,9 +127,16 @@ public class SetHabitatFragment extends BaseFragment {
                     public void onSuccess(UserApi.Response result) {
                         group.addDevice(mProductKey, mDeviceName, mName);
                         EventBus.getDefault().post(new GroupDeviceChangedEvent(group.groupid));
-                        getActivity().getSupportFragmentManager().popBackStack();
+                        dismissLoadDialog();
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                getActivity().getSupportFragmentManager().popBackStack();
+                            }
+                        });
                     }
                 });
+                showLoadDialog();
             }
         });
     }

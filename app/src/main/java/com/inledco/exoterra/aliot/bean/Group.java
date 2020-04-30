@@ -69,6 +69,19 @@ public class Group {
         devices.add(device);
     }
 
+    public void removeDevice(String pkey, String dname) {
+        if (devices == null) {
+            return;
+        }
+        for (int i = 0; i < devices.size(); i++) {
+            if (TextUtils.equals(devices.get(i).product_key, pkey)
+                && TextUtils.equals(devices.get(i).device_name, dname)) {
+                devices.remove(i);
+                return;
+            }
+        }
+    }
+
     public void removeDevice(Device device) {
         if (devices == null || device == null) {
             return;
@@ -78,6 +91,17 @@ public class Group {
                 && TextUtils.equals(devices.get(i).device_name, device.device_name)) {
                 devices.remove(i);
                 return;
+            }
+        }
+    }
+
+    public void removeUser(String userid) {
+        if (users != null && userid != null) {
+            for (int i = 0; i < users.size(); i++) {
+                if (TextUtils.equals(userid, users.get(i).userid)) {
+                    users.remove(i);
+                    return;
+                }
             }
         }
     }

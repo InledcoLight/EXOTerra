@@ -76,6 +76,7 @@ public class GroupManager {
         mGroupMap.clear();
         mGroups.clear();
         mSynchronized = false;
+        mSynchronizing = false;
     }
 
     public boolean contains(String key) {
@@ -97,6 +98,14 @@ public class GroupManager {
             return null;
         }
         return mGroupMap.get(key);
+    }
+
+    public boolean isSynchronizing() {
+        return mSynchronizing;
+    }
+
+    public boolean isSynchronized() {
+        return mSynchronized;
     }
 
     public boolean needSynchronize() {

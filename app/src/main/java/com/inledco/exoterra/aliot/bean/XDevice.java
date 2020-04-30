@@ -10,5 +10,4 @@ public class XDevice {
     public String remark3;
     public String role;
     public String is_online;
-    public int firmware_version;
 }

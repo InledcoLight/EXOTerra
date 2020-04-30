@@ -302,7 +302,6 @@ public class AliotServer {
         request.device_name = dname;
         request.mac = mac;
         String json = JSON.toJSONString(request);
-        Log.e(TAG, "subscribeDevice: " + json);
         return OKHttpManager.getInstance().blockPost(url, headers, json, UserApi.SubscribeDeviceResponse.class);
     }
 
@@ -522,6 +521,7 @@ public class AliotServer {
                                                .build();
         UserApi.GroupInviteRequest request = new UserApi.GroupInviteRequest();
         request.email = email;
+        request.expire_time = 48;
         String json = JSON.toJSONString(request);
         OKHttpManager.getInstance().post(url, headers, json, callback);
     }

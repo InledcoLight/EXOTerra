@@ -58,7 +58,7 @@ public class AppConstants {
     public static final String  KEY_TIMEFORMAT = "timeformat";
     public static final String  KEY_TEMPUNIT = "tempunit";
 
-    public static final String  HOME_INVITE = "home_invite";
+    public static final String GROUP_INVITE = "home_invite";
     public static final String  NOTIFICATION_ID = "notification_id";
     public static final String  INVITE_ID = "invite_id";
     public static final String  DENY = "deny";

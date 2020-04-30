@@ -26,40 +26,6 @@ public abstract class MonsoonTimerAdapter extends SimpleAdapter<ExoMonsoon.Timer
         notifyDataSetChanged();
     }
 
-    private String getDurationDesc(int value) {
-        if (value >= 0 && value <= 59) {
-            return "" + value + " Sec";
-        }
-        if (value >= 60 && value <= 119) {
-            return "1 Min " + value%60 + " Sec";
-        }
-        if (value == 120) {
-            return "2 Min";
-        }
-        if (value == 121) {
-            return "3 Min";
-        }
-        if (value == 122) {
-            return "4 Min";
-        }
-        if (value == 123) {
-            return "5 Min";
-        }
-        if (value == 124) {
-            return "6 Min";
-        }
-        if (value == 125) {
-            return "8 Min";
-        }
-        if (value == 126) {
-            return "10 Min";
-        }
-        if (value == 127) {
-            return "15 Min";
-        }
-        return "Invalid";
-    }
-
     @Override
     protected int getItemLayoutResId() {
         return R.layout.item_timer;

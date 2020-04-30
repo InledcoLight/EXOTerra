@@ -51,8 +51,6 @@ public class DevicesFragment extends BaseFragment {
     private final List<Device> mDevices = new ArrayList<>();
     private DevicesAdapter mAdapter;
 
-//    private AsyncTask<Void, Void, Void> mGetPropertyTask;
-
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -104,8 +102,12 @@ public class DevicesFragment extends BaseFragment {
         devices_rv_show.setAdapter(mAdapter);
 
         if (DeviceManager.getInstance().needSynchronize()) {
-            devices_swipe_refresh.setRefreshing(true);
             refreshDevices();
+        }
+        if (DeviceManager.getInstance().isSynchronizing() && !DeviceManager.getInstance().isSynchronized()) {
+            devices_swipe_refresh.setRefreshing(true);
+        } else {
+            devices_warning.setVisibility(mDevices.size() == 0 ? View.VISIBLE : View.GONE);
         }
     }
 
@@ -236,33 +238,4 @@ public class DevicesFragment extends BaseFragment {
             }
         });
     }
-
-//    private void initList() {
-//        mDevices.clear();
-//        //  ExoLed
-//        Device exoLed = new ExoLed();
-//        exoLed.setProductKey(AliotConsts.PRODUCT_KEY_EXOLED);
-//        exoLed.setDeviceName("2CF432121FC9");
-//        exoLed.setMac("2CF432121FC9");
-//        exoLed.setName("2CF432121FC9");
-//
-//        //  ExoSocket
-//        Device exoSocket = new ExoSocket();
-//        exoSocket.setProductKey(AliotConsts.PRODUCT_KEY_EXOSOCKET);
-//        exoSocket.setDeviceName("2CF432121F42");
-//        exoSocket.setMac("2CF432121F42");
-//        exoSocket.setName("2CF432121F42");
-//
-//        //ExoMonsoon
-//        Device exoMonsoon = new ExoMonsoon();
-//        exoMonsoon.setProductKey(AliotConsts.PRODUCT_KEY_EXOMONSOON);
-//        exoMonsoon.setDeviceName("2CF4322CF664");
-//        exoMonsoon.setMac("2CF4322CF664");
-//        exoMonsoon.setName("2CF4322CF664");
-//
-//        DeviceManager.getInstance().addDevice(exoLed);
-//        DeviceManager.getInstance().addDevice(exoSocket);
-//        DeviceManager.getInstance().addDevice(exoMonsoon);
-//        mDevices.addAll(DeviceManager.getInstance().getAllDevices());
-//    }
 }

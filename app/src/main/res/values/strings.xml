@@ -135,7 +135,7 @@
     <string name="home_invite">Home Invite</string>
     <string name="denied">Denied</string>
     <string name="accepted">Accepted</string>
-    <string name="canceled">Canceled</string>
+    <string name="cancelled">Cancelled</string>
     <string name="overtime">Overtime</string>
     <string name="unsubscribed">Unsubscribed</string>
     <string name="invalid">Invalid</string>
@@ -330,7 +330,7 @@
     <string name="time24h">24h</string>
     <string name="time12h">12h</string>
     <string name="favourites">Favourites</string>
-    <string name="status">status</string>
+    <string name="status">Status</string>
     <string name="presets">Presets</string>
     <string name="visitor">Visitor</string>
     <string name="delete_user">Delete user</string>
@@ -342,4 +342,22 @@
     <string name="restore_rays">Restore The Rays</string>
     <string name="habitat_icon">Habitat icon</string>
     <string name="habitat_name_icon"><![CDATA[Habitat name & icon]]></string>
+    <string name="expired">Expired</string>
+    <string name="habitat_invitation">Habitat invitation</string>
+    <string name="habitat_id">Habitat ID</string>
+    <string name="inviter">Inviter</string>
+    <string name="expire_time">Expire time</string>
+    <string name="pending">Pending</string>
+    <string name="invitee">Invitee</string>
+    <string name="cancel_invitation">Cancel Invitation</string>
+    <string name="modify">Modify</string>
+    <string name="ipaddress">IP Address</string>
+    <string name="personal_infomation">Personal Information</string>
+    <string name="units">Units</string>
+    <string name="dashboard">Dashboard</string>
+    <string name="upgradable">Upgradable</string>
+    <string name="upgrade_msg">Newest version %1$d, confirm to upgrade?</string>
+    <string name="invite_messages">Invite Messages</string>
+    <string name="received">Received</string>
+    <string name="sent">Sent</string>
 </resources>

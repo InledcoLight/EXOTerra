@@ -13,12 +13,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.ImageButton;
-import android.widget.ImageView;
+import android.widget.CheckedTextView;
+import android.widget.CompoundButton;
 import android.widget.LinearLayout;
+import android.widget.Switch;
 import android.widget.TextView;
 
 import com.alibaba.fastjson.JSON;
+import com.inledco.exoterra.GlobalSettings;
 import com.inledco.exoterra.R;
 import com.inledco.exoterra.aliot.AliotServer;
 import com.inledco.exoterra.aliot.HttpCallback;
@@ -32,14 +34,18 @@ import com.inledco.exoterra.manager.UserPref;
 import com.inledco.exoterra.view.AdvancedTextInputEditText;
 import com.inledco.exoterra.view.PasswordEditText;
 
-public class MeFragment extends BaseFragment {
-    private ImageView me_icon_usr;
-    private TextView me_tv_signin;
-    private LinearLayout me_usr_detail;
-    private TextView me_tv_nickname;
-    private TextView me_tv_email;
-    private ImageButton me_mod_psw;
-    private Button me_btn_logout;
+public class PrefFragment extends BaseFragment {
+    private CheckedTextView pref_title_user;
+    private LinearLayout pref_usr_detail;
+    private TextView pref_nickname;
+    private TextView pref_email;
+    private TextView pref_mod_psw;
+    private CheckedTextView pref_title_unit;
+    private LinearLayout pref_unit_detail;
+    private Switch pref_timeformat;
+    private Switch pref_tempunit;
+    private CheckedTextView pref_title_invite_msg;
+    private Button pref_logout;
 
     @Nullable
     @Override
@@ -53,28 +59,35 @@ public class MeFragment extends BaseFragment {
 
     @Override
     protected int getLayoutRes() {
-        return R.layout.fragment_me;
+        return R.layout.fragment_pref;
     }
 
     @Override
     protected void initView(View view) {
-        me_icon_usr = view.findViewById(R.id.me_icon_usr);
-        me_tv_signin = view.findViewById(R.id.me_tv_signin);
-        me_usr_detail = view.findViewById(R.id.me_usr_detail);
-        me_tv_nickname = view.findViewById(R.id.me_tv_nickname);
-        me_tv_email = view.findViewById(R.id.me_tv_email);
-        me_mod_psw = view.findViewById(R.id.me_mod_psw);
-        me_btn_logout = view.findViewById(R.id.me_btn_logout);
+        pref_title_user = view.findViewById(R.id.pref_title_user);
+        pref_usr_detail = view.findViewById(R.id.pref_usr_detail);
+        pref_nickname = view.findViewById(R.id.pref_nickname);
+        pref_email = view.findViewById(R.id.pref_email);
+        pref_mod_psw = view.findViewById(R.id.pref_mod_psw);
+        pref_title_unit = view.findViewById(R.id.pref_title_unit);
+        pref_unit_detail = view.findViewById(R.id.pref_unit_detail);
+        pref_timeformat = view.findViewById(R.id.pref_timeformat);
+        pref_tempunit = view.findViewById(R.id.pref_tempunit);
+        pref_title_invite_msg = view.findViewById(R.id.pref_title_invite_msg);
+        pref_logout = view.findViewById(R.id.pref_logout);
 
-        me_tv_nickname.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_edit_white_24dp, 0);
+        pref_title_user.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_add_white_24dp, 0);
+        pref_title_unit.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_add_white_24dp, 0);
+        pref_title_invite_msg.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_add_white_24dp, 0);
+        pref_nickname.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_edit_white_24dp, 0);
+        pref_mod_psw.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_edit_white_24dp, 0);
+        pref_usr_detail.setVisibility(View.GONE);
+        pref_unit_detail.setVisibility(View.GONE);
 
-        boolean login = UserManager.getInstance().isAuthorized();
-        me_tv_signin.setVisibility(login ? View.INVISIBLE : View.VISIBLE);
-        me_usr_detail.setVisibility(login ? View.VISIBLE : View.INVISIBLE);
-        me_btn_logout.setVisibility(login ? View.VISIBLE : View.GONE);
+        pref_logout.setText(UserManager.getInstance().isAuthorized() ? R.string.logout : R.string.signin);
 
-        me_tv_nickname.setText(UserManager.getInstance().getNickname());
-        me_tv_email.setText(UserManager.getInstance().getEmail());
+        pref_nickname.setText(UserManager.getInstance().getNickname());
+        pref_email.setText(UserManager.getInstance().getEmail());
     }
 
     @Override
@@ -84,31 +97,60 @@ public class MeFragment extends BaseFragment {
 
     @Override
     protected void initEvent() {
-        me_icon_usr.setOnClickListener(new View.OnClickListener() {
+        pref_title_user.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (!UserManager.getInstance().isAuthorized()) {
-                    login();
-                    getActivity().finish();
+                    return;
                 }
-//                else {
-//                    addFragmentToStack(R.id.main_fl, new MessagesFragment());
-//                }
+                boolean checked = !pref_title_user.isChecked();
+                int res = checked ? 0 : R.drawable.ic_add_white_24dp;
+                pref_title_user.setChecked(checked);
+                pref_title_user.setCompoundDrawablesWithIntrinsicBounds(0, 0, res, 0);
+                pref_usr_detail.setVisibility(checked ? View.VISIBLE : View.GONE);
             }
         });
-        me_tv_nickname.setOnClickListener(new View.OnClickListener() {
+        pref_nickname.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 showModifyNicknameDialog();
             }
         });
-        me_mod_psw.setOnClickListener(new View.OnClickListener() {
+        pref_mod_psw.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 showModifyPasswordDialog();
             }
         });
-        me_btn_logout.setOnClickListener(new View.OnClickListener() {
+        pref_title_unit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                boolean checked = !pref_title_unit.isChecked();
+                int res = checked ? 0 : R.drawable.ic_add_white_24dp;
+                pref_title_unit.setChecked(checked);
+                pref_title_unit.setCompoundDrawablesWithIntrinsicBounds(0, 0, res, 0);
+                pref_unit_detail.setVisibility(checked ? View.VISIBLE : View.GONE);
+            }
+        });
+        pref_timeformat.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                GlobalSettings.setIs24HourFormat(getContext(), !isChecked);
+            }
+        });
+        pref_tempunit.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                GlobalSettings.setIsCelsius(getContext(), !isChecked);
+            }
+        });
+        pref_title_invite_msg.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                addFragmentToStack(R.id.main_fl, new MessagesFragment());
+            }
+        });
+        pref_logout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 logout();
@@ -142,6 +184,7 @@ public class MeFragment extends BaseFragment {
                 AliotServer.getInstance().modifyUserNickname(name, new HttpCallback<UserApi.Response>() {
                     @Override
                     public void onError(String error) {
+                        dismissLoadDialog();
                         showToast(error);
                     }
 
@@ -149,15 +192,17 @@ public class MeFragment extends BaseFragment {
                     public void onSuccess(UserApi.Response result) {
                         Log.e(TAG, "onSuccess: " + JSON.toJSONString(result));
                         UserManager.getInstance().getUser().nickname = name;
+                        dismissLoadDialog();
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                me_tv_nickname.setText(name);
+                                pref_nickname.setText(name);
                                 dialog.dismiss();
                             }
                         });
                     }
                 });
+                showLoadDialog();
             }
         });
     }
@@ -195,16 +240,17 @@ public class MeFragment extends BaseFragment {
                     et_new.requestFocus();
                     return;
                 }
-                String token = UserPref.readAccessToken(getContext());
-                AliotServer.getInstance().modifyPassword(token, oldpsw, newpsw, new HttpCallback<UserApi.Response>() {
+                AliotServer.getInstance().modifyPassword(oldpsw, newpsw, new HttpCallback<UserApi.Response>() {
                     @Override
                     public void onError(String error) {
+                        dismissLoadDialog();
                         showToast(error);
                     }
 
                     @Override
                     public void onSuccess(UserApi.Response result) {
-                        Log.e(TAG, "onSuccess: " + JSON.toJSONString(result));
+                        UserPref.savePassword(getContext(), newpsw);
+                        dismissLoadDialog();
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
@@ -213,6 +259,7 @@ public class MeFragment extends BaseFragment {
                         });
                     }
                 });
+                showLoadDialog();
             }
         });
     }

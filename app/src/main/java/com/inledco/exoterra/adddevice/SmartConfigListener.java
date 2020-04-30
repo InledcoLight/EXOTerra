@@ -8,4 +8,6 @@ public interface SmartConfigListener {
     void onSuccess(String deviceName, String mac);
 
     void onEsptouchSuccess();
+
+    void onSubscribe(String pkey, String dname);
 }
