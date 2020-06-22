@@ -6,7 +6,10 @@ public enum InviteAction {
     INVITE("invite"),
     CANCEL("cancel"),
     ACCEPT("accept"),
-    DENY("deny");
+    DENY("deny"),
+    REMOVE("remove"),
+    EXIT("exit"),
+    DELETE("delete");
 
     private final String action;
 

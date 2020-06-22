@@ -9,10 +9,10 @@ import android.view.ViewGroup;
 import com.inledco.exoterra.R;
 import com.inledco.exoterra.aliot.Device;
 import com.inledco.exoterra.aliot.bean.Group;
+import com.inledco.exoterra.bean.ExoProduct;
 import com.inledco.exoterra.common.DeviceViewHolder;
 import com.inledco.exoterra.common.SimpleAdapter;
 import com.inledco.exoterra.manager.GroupManager;
-import com.inledco.exoterra.util.DeviceUtil;
 
 import java.util.List;
 
@@ -40,10 +40,13 @@ public class DevicesAdapter extends SimpleAdapter<Device, DeviceViewHolder> {
         String pkey = device.getProductKey();
         String dname = device.getDeviceName();
         String name = device.getName();
-        if (TextUtils.isEmpty(name)) {
-            name = DeviceUtil.getDefaultName(pkey);
+        ExoProduct product =ExoProduct.getExoProduct(pkey);
+        if (product != null) {
+            if (TextUtils.isEmpty(name)) {
+                name = product.getDefaultName();
+            }
+            holder.iv_icon.setImageResource(product.getIcon());
         }
-        holder.iv_icon.setImageResource(DeviceUtil.getProductIcon(pkey));
         holder.tv_name.setText(name);
         Group group = GroupManager.getInstance().getDeviceGroup(pkey, dname);
         if (group != null) {

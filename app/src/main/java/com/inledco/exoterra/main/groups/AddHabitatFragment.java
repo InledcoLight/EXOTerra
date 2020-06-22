@@ -240,6 +240,7 @@ public class AddHabitatFragment extends BaseFragment {
         AliotServer.getInstance().createGroup(request, new HttpCallback<UserApi.GroupResponse>() {
             @Override
             public void onError(String error) {
+                dismissLoadDialog();
                 showToast(error);
             }
 
@@ -250,6 +251,7 @@ public class AddHabitatFragment extends BaseFragment {
                     FavouriteUtil.addFavourite(getContext(), result.data.groupid);
                 }
                 GroupManager.getInstance().getGroups();
+                dismissLoadDialog();
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
@@ -258,6 +260,7 @@ public class AddHabitatFragment extends BaseFragment {
                 });
             }
         });
+        showLoadDialog();
     }
 
     private void showGroupIconDialog() {

@@ -1,17 +1,18 @@
 package com.inledco.exoterra.login;
 
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.annotation.StringRes;
 import android.support.design.widget.TextInputLayout;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 
+import com.aliyun.alink.linkkit.api.ILinkKitConnectListener;
+import com.aliyun.alink.linksdk.tools.AError;
 import com.inledco.exoterra.R;
+import com.inledco.exoterra.aliot.AliotClient;
 import com.inledco.exoterra.aliot.AliotServer;
 import com.inledco.exoterra.base.BaseActivity;
 import com.inledco.exoterra.foundback.FoundbackActivity;
@@ -20,11 +21,11 @@ import com.inledco.exoterra.main.MainActivity;
 import com.inledco.exoterra.manager.UserManager;
 import com.inledco.exoterra.manager.UserPref;
 import com.inledco.exoterra.register.RegisterActivity;
+import com.inledco.exoterra.scan.ScanActivity;
 import com.inledco.exoterra.util.RegexUtil;
 import com.inledco.exoterra.view.AdvancedTextInputEditText;
 import com.inledco.exoterra.view.MessageDialog;
 import com.inledco.exoterra.view.PasswordEditText;
-import com.liruya.loaddialog.LoadDialog;
 
 public class LoginActivity extends BaseActivity {
 
@@ -36,8 +37,6 @@ public class LoginActivity extends BaseActivity {
     private Button login_btn_forget;
     private Button login_btn_signup;
     private Button login_btn_skip;
-    private LoadDialog mLoadDialog;
-    private ProgressDialog mProgressDialog;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -45,12 +44,6 @@ public class LoginActivity extends BaseActivity {
 
         initData();
         initEvent();
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        dismissLoading();
     }
 
     @Override
@@ -104,7 +97,6 @@ public class LoginActivity extends BaseActivity {
         } else {
             login_et_password.requestFocus();
         }
-        mLoadDialog = new LoadDialog(this);
     }
 
     @Override
@@ -142,7 +134,9 @@ public class LoginActivity extends BaseActivity {
         login_btn_skip.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                gotoMainActivity();
+//                gotoScanActivity();
+                setResult(1);
+                finish();
             }
         });
     }
@@ -155,37 +149,6 @@ public class LoginActivity extends BaseActivity {
         return login_et_password.getText().toString();
     }
 
-    private void showMessageDialog(@StringRes final int res, final String message) {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                new MessageDialog(LoginActivity.this).setTitle(res)
-                                                     .setMessage(message)
-                                                     .setButton(R.string.ok, null)
-                                                     .show();
-                dismissLoading();
-            }
-        });
-    }
-
-    private void showLoading() {
-//        mLoadDialog.show();
-        if (mProgressDialog == null) {
-            mProgressDialog = new ProgressDialog(this);
-            mProgressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-            mProgressDialog.setIndeterminate(true);
-        }
-        mProgressDialog.show();
-    }
-
-    private void dismissLoading() {
-//        mLoadDialog.dismiss();
-        if (mProgressDialog != null) {
-            mProgressDialog.dismiss();
-            mProgressDialog = null;
-        }
-    }
-
     private void login(final String email, final String password) {
         AsyncTask<String, Void, String> authTask = new AsyncTask<String, Void, String>() {
             @Override
@@ -196,25 +159,37 @@ public class LoginActivity extends BaseActivity {
             @Override
             protected void onPreExecute() {
                 super.onPreExecute();
-                showLoading();
+                showLoadDialog();
             }
 
             @Override
             protected void onPostExecute(String result) {
                 super.onPostExecute(result);
+                dismissLoadDialog();
                 if (result == null) {
                     String userid = UserManager.getInstance().getUserid();
                     String token = UserManager.getInstance().getToken();
+                    String secret = UserManager.getInstance().getSecret();
                     AliotServer.getInstance().init(userid, token);
-                    dismissLoading();
-                    gotoHomeActivity();
-//                    gotoMainActivity();
+                    AliotClient.getInstance().init(getApplicationContext(), userid, secret, new ILinkKitConnectListener() {
+                        @Override
+                        public void onError(AError aError) {
+
+                        }
+
+                        @Override
+                        public void onInitDone(Object o) {
+
+                        }
+                    });
+                    setResult(1);
+                    finish();
+//                    gotoHomeActivity();
                 } else {
                     new MessageDialog(LoginActivity.this).setTitle(R.string.signin_failed)
                                                          .setMessage(result)
                                                          .setButton(R.string.ok, null)
                                                          .show();
-                    dismissLoading();
                 }
             }
         };
@@ -224,12 +199,18 @@ public class LoginActivity extends BaseActivity {
     private void gotoHomeActivity() {
         Intent intent = new Intent(this, HomeActivity.class);
         startActivity(intent);
+        finish();
     }
 
     private void gotoMainActivity() {
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
         finish();
+    }
+
+    private void gotoScanActivity() {
+        Intent intent = new Intent(this, ScanActivity.class);
+        startActivity(intent);
     }
 
     private void gotoRegisterActivity() {

@@ -1,4 +1,4 @@
-package com.inledco.exoterra.adddevice;
+package com.inledco.exoterra.udptcp;
 
 import android.support.annotation.NonNull;
 
@@ -13,33 +13,27 @@ import java.util.Arrays;
 public class UdpClient extends BaseClient {
     private final String TAG = "UdpClient";
 
-    private final int UDP_SEND_BUFFER_SIZE = 1024;
-    private final int UDP_RECEIVE_BUFFER_SIZE = 1024;
-
-    private int mLocalPort;
+    private final int UDP_SEND_BUFFER_SIZE = 2048;
+    private final int UDP_RECEIVE_BUFFER_SIZE = 2048;
 
     private DatagramSocket mSocket;
 
-    public UdpClient(String remoteAddress, int remotePort, int localPort) {
+    private Listener mListener;
+
+    public UdpClient() {
+        super();
+    }
+
+    public UdpClient(String remoteAddress, int remotePort) {
         super(remoteAddress, remotePort);
-        if (localPort < 0 || localPort > 65535) {
-            throw new RuntimeException("Invalid local port.");
-        }
-        mLocalPort = localPort;
     }
 
-    public int getLocalPort() {
-        return mLocalPort;
-    }
-
-    public void setLocalPort(int localPort) {
-        if (!mListening && localPort >= 0 && localPort <= 65535) {
-            mLocalPort = localPort;
-        }
+    public void setListener(Listener listener) {
+        mListener = listener;
     }
 
     @Override
-    protected synchronized void start() {
+    public synchronized void start() {
         if (mListening) {
             return;
         }
@@ -48,11 +42,11 @@ public class UdpClient extends BaseClient {
             public void run() {
                 try {
                     synchronized (mLock) {
-                        mSocket = new DatagramSocket(mLocalPort);
+                        mSocket = new DatagramSocket(0);
                         mSocket.setSendBufferSize(UDP_SEND_BUFFER_SIZE);
                         mSocket.setReceiveBufferSize(UDP_RECEIVE_BUFFER_SIZE);
 
-                        Thread.sleep(100);
+//                        Thread.sleep(100);
                         mListening = true;
                     }
                     receive();
@@ -63,18 +57,12 @@ public class UdpClient extends BaseClient {
                         mListener.onError(e.getMessage());
                     }
                 }
-                catch (InterruptedException e) {
-                    e.printStackTrace();
-                    if (mListener != null) {
-                        mListener.onError(e.getMessage());
-                    }
-                }
             }
         });
     }
 
     @Override
-    protected synchronized void stop() {
+    public synchronized void stop() {
         if (!mListening) {
             return;
         }
@@ -93,8 +81,7 @@ public class UdpClient extends BaseClient {
         });
     }
 
-    @Override
-    protected synchronized void send(@NonNull final byte[] bytes) {
+    public synchronized void send(@NonNull final String ip, final int port, @NonNull final byte[] bytes) {
         if (!mListening || mSocket == null || mSocket.isClosed() || bytes.length == 0) {
             return;
         }
@@ -103,8 +90,8 @@ public class UdpClient extends BaseClient {
             public void run() {
                 try {
                     synchronized (mLock) {
-                        InetAddress address = InetAddress.getByName(mRemoteAddress);
-                        DatagramPacket packet = new DatagramPacket(bytes, bytes.length, address, mRemotePort);
+                        InetAddress address = InetAddress.getByName(ip);
+                        DatagramPacket packet = new DatagramPacket(bytes, bytes.length, address, port);
                         mSocket.send(packet);
                     }
                 }
@@ -118,24 +105,38 @@ public class UdpClient extends BaseClient {
         });
     }
 
+    public synchronized void send(@NonNull final String ip, final int port, @NonNull final String data) {
+        send(ip, port, data.getBytes());
+    }
+
     @Override
-    protected void receive() {
+    public synchronized void send(@NonNull final byte[] bytes) {
+        send(mRemoteAddress, mRemotePort, bytes);
+    }
+
+    @Override
+    public void receive() {
         byte[] rxBuffer = new byte[UDP_RECEIVE_BUFFER_SIZE];
         try {
-            InetAddress address = InetAddress.getByName(mRemoteAddress);
-            DatagramPacket rcvPacket = new DatagramPacket( rxBuffer, rxBuffer.length );
+//            InetAddress address = InetAddress.getByName(mRemoteAddress);
+            DatagramPacket rcvPacket = new DatagramPacket(rxBuffer, rxBuffer.length);
             while (mListening) {
                 if (mSocket == null) {
                     continue;
                 }
                 mSocket.receive(rcvPacket);
                 int len = rcvPacket.getLength();
-                if (rcvPacket.getAddress().equals(address) && len > 0) {
-                    if (mListener != null) {
-                        byte[] bytes = Arrays.copyOf(rxBuffer, len);
-                        mListener.onReceive(bytes);
-                    }
+                if (len > 0 && mListener != null) {
+                    InetAddress address = rcvPacket.getAddress();
+                    byte[] bytes = Arrays.copyOf(rxBuffer, len);
+                    mListener.onReceive(address.getHostAddress(), rcvPacket.getPort(), bytes);
                 }
+//                if (rcvPacket.getAddress().equals(address) && len > 0) {
+//                    if (mListener != null) {
+//                        byte[] bytes = Arrays.copyOf(rxBuffer, len);
+//                        mListener.onReceive(bytes);
+//                    }
+//                }
                 //重置长度 否则可能会数据截断 丢失数据
                 rcvPacket.setLength(rxBuffer.length);
             }
@@ -152,5 +153,10 @@ public class UdpClient extends BaseClient {
                 mListener.onError(e.getMessage());
             }
         }
+    }
+
+    public interface Listener {
+        void onError(String error);
+        void onReceive(String ip, int port, byte[] bytes);
     }
 }

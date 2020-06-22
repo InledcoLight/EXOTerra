@@ -139,7 +139,7 @@
         android:layout_marginBottom="24dp"
         android:background="?attr/selectableItemBackground"
         android:text="@string/local_mode"
-        android:visibility="invisible"
+        android:visibility="gone"
         app:direction="horizontal"
         app:gradientEnd="@color/gradientWhite"
         app:gradientStart="@color/gradientYellow"

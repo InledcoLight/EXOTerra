@@ -1,67 +1,78 @@
 package com.inledco.exoterra.scan;
 
-import android.app.ProgressDialog;
-import android.support.v7.widget.DividerItemDecoration;
+import android.Manifest;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
+import android.os.Bundle;
+import android.provider.Settings;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
-import android.widget.ToggleButton;
 
 import com.inledco.exoterra.R;
-import com.inledco.exoterra.base.BaseActivity;
+import com.inledco.exoterra.adddevice.AddDeviceActivity;
+import com.inledco.exoterra.aliot.Device;
+import com.inledco.exoterra.base.BasePermissionActivity;
+import com.inledco.exoterra.bean.ExoProduct;
+import com.inledco.exoterra.common.OnItemClickListener;
+import com.inledco.exoterra.device.DeviceActivity;
+import com.scwang.smartrefresh.layout.SmartRefreshLayout;
+import com.scwang.smartrefresh.layout.api.RefreshLayout;
+import com.scwang.smartrefresh.layout.header.BezierRadarHeader;
+import com.scwang.smartrefresh.layout.listener.OnRefreshListener;
 
-public class ScanActivity extends BaseActivity {
+import java.util.ArrayList;
+import java.util.List;
+
+public class ScanActivity extends BasePermissionActivity {
+    private final int REMOTE_PORT = 8899;
     private final int SCAN_DEVICE_TIMEOUT = 10000;
     private final int SCAN_RETRY_INTERVAL = 1000;
 
     private Toolbar scan_toolbar;
-    private ToggleButton scan_tb_scan;
+    private SmartRefreshLayout scan_refresh;
     private RecyclerView scan_rv_show;
 
-//    private Set<String> mSubscribedDevices;
-//    private List<XDevice> mScannedDevices;
-//    private ScanAdapter mAdapter;
-//    private XLinkScanDeviceTask mScanTask;
-//    private XLinkScanDeviceListener mScanDeviceListener;
-//    private boolean mScanning;
+    private final List<Device> mLocalDevices = new ArrayList<>();
+    private ScanAdapter mAdapter;
 
-    private ProgressDialog mProgressDialog;
+    private ScanDeviceTask mTask;
 
     @Override
-    protected void onStart() {
-        super.onStart();
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
 
         initData();
         initEvent();
     }
 
     @Override
-    protected void onStop() {
-        super.onStop();
-//        stopScan();
+    protected void onPause() {
+        super.onPause();
+        stopScan();
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-//        getMenuInflater().inflate(R.menu.menu_scan, menu);
-//        MenuItem menuItem = menu.findItem(R.id.menu_scan_scan);
-//        scan_tb_scan = menuItem.getActionView()
-//                               .findViewById(R.id.scan_tb_scan);
-//        final ProgressBar scan_progress = menuItem.getActionView()
-//                                                  .findViewById(R.id.scan_progress);
-//        scan_tb_scan.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-//            @Override
-//            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-//                scan_progress.setVisibility(isChecked ? View.VISIBLE : View.GONE);
-//                if (isChecked) {
-//                    startScan();
-//                } else {
-//                    stopScan();
-//                }
-//            }
-//        });
-//        scan_tb_scan.setChecked(true);
+        getMenuInflater().inflate(R.menu.menu_scan, menu);
+        MenuItem menuConfig = menu.findItem(R.id.menu_scan_config);
+        menuConfig.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                stopScan();
+                startAdddeviceActivity();
+                return false;
+            }
+        });
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -74,75 +85,25 @@ public class ScanActivity extends BaseActivity {
     protected void initView() {
         scan_toolbar = findViewById(R.id.scan_toolbar);
         setSupportActionBar(scan_toolbar);
+        scan_refresh = findViewById(R.id.scan_refresh);
         scan_rv_show = findViewById(R.id.scan_rv_show);
-        scan_rv_show.addItemDecoration(new DividerItemDecoration(ScanActivity.this, DividerItemDecoration.VERTICAL));
-
-        mProgressDialog = new ProgressDialog(ScanActivity.this);
-        mProgressDialog.setCancelable(false);
+        BezierRadarHeader header = new BezierRadarHeader(this);
+        header.setPrimaryColor(0x00000000);
+        scan_refresh.setRefreshHeader(header);
     }
 
     @Override
     protected void initData() {
-//        mSubscribedDevices = DeviceManager.getInstance().getAllDeviceAddress();
-//        mScannedDevices = new ArrayList<>();
-//        mAdapter = new ScanAdapter(ScanActivity.this, mScannedDevices, mSubscribedDevices) {
-//            @Override
-//            public void onItemClick(final XDevice device) {
-//                XlinkCloudManager.getInstance().addDevice(device, 10000, new XlinkTaskCallback<XDevice>() {
-//                    @Override
-//                    public void onError(String error) {
-//                        mProgressDialog.dismiss();
-//                        Toast.makeText(ScanActivity.this, error, Toast.LENGTH_SHORT)
-//                             .show();
-//                    }
-//
-//                    @Override
-//                    public void onStart() {
-//                        mProgressDialog.show();
-//                    }
-//
-//                    @Override
-//                    public void onComplete(XDevice xDevice) {
-//                        mProgressDialog.dismiss();
-//                        Intent intent = new Intent(ScanActivity.this, DeviceActivity.class);
-//                        intent.putExtra("device_tag", DeviceManager.getInstance().getDeviceTag(device));
-//                        startActivity(intent);
-//                        finish();
-//                    }
-//                });
-//            }
-//        };
-//        scan_rv_show.setAdapter(mAdapter);
-//        mScanDeviceListener = new XLinkScanDeviceListener() {
-//            @Override
-//            public void onScanResult(XDevice xDevice) {
-//                if (xDevice != null) {
-//                    if (!containsDevice(xDevice)) {
-//                        mScannedDevices.add(xDevice);
-//                        mAdapter.notifyItemInserted(mScannedDevices.size()-1);
-//                    }
-//                }
-//            }
-//
-//            @Override
-//            public void onError(XLinkCoreException e) {
-//                mScanning = false;
-//                scan_tb_scan.setChecked(false);
-//                stopScan();
-//            }
-//
-//            @Override
-//            public void onStart() {
-//                mScanning = true;
-//            }
-//
-//            @Override
-//            public void onComplete(Void aVoid) {
-//                mScanning = false;
-//                scan_tb_scan.setChecked(false);
-//                stopScan();
-//            }
-//        };
+        mAdapter = new ScanAdapter(this, mLocalDevices);
+        mAdapter.setOnItemClickListener(new OnItemClickListener() {
+            @Override
+            public void onItemClick(int position) {
+                stopScan();
+                Device result = mLocalDevices.get(position);
+                gotoDeviceActivity(result.getProductKey(), result.getDeviceName(), result.getIp(), result.getPort());
+            }
+        });
+        scan_rv_show.setAdapter(mAdapter);
     }
 
     @Override
@@ -153,30 +114,132 @@ public class ScanActivity extends BaseActivity {
                 onBackPressed();
             }
         });
+
+        scan_refresh.setOnRefreshListener(new OnRefreshListener() {
+            @Override
+            public void onRefresh(@NonNull RefreshLayout refreshLayout) {
+                if (!startScan()) {
+                    scan_refresh.finishRefresh();
+                }
+            }
+        });
+
+        startScan();
     }
 
-//    private boolean containsDevice(XDevice xDevice) {
-//        for (XDevice xd : mScannedDevices) {
-//            if (TextUtils.equals(xDevice.getDeviceTag(), xd.getMacAddress())) {
-//                return true;
-//            }
-//        }
-//        return false;
-//    }
+    private boolean startScan() {
+        // check location permission first, otherwise check wifi would be incorrect
+        if (!checkPermission(Manifest.permission.ACCESS_COARSE_LOCATION)) {
+            requestPermission(0, Manifest.permission.ACCESS_COARSE_LOCATION);
+            return false;
+        }
+        if (!checkWifi()) {
+            showWifiSettingsDialog();
+            return false;
+        }
+        if (mTask == null) {
+            mLocalDevices.clear();
+            mAdapter.notifyDataSetChanged();
+            mTask = new ScanDeviceTask(REMOTE_PORT, SCAN_DEVICE_TIMEOUT, SCAN_RETRY_INTERVAL) {
+                @Override
+                public void onDeviceScanned(Device device) {
+                    mLocalDevices.add(device);
+                    if (mAdapter != null) {
+                        mAdapter.notifyItemInserted(mLocalDevices.size()-1);
+                    }
+                }
 
-//    private void startScan() {
-//        if (mScanning) {
-//            return;
-//        }
-//        mScannedDevices.clear();
-//        mAdapter.notifyDataSetChanged();
-//        mScanTask = XlinkCloudManager.getInstance().createScanDeviceTask(XlinkConstants.XLINK_PRODUCTS, SCAN_DEVICE_TIMEOUT, SCAN_RETRY_INTERVAL, mScanDeviceListener);
-//        XLinkSDK.startTask(mScanTask);
-//    }
-//
-//    private void stopScan() {
-//        XLinkSDK.stopTask(mScanTask);
-//        mScanTask = null;
-//        mScanning = false;
-//    }
+                @Override
+                public void onFinished() {
+                    stopScan();
+                }
+            };
+            mTask.start(ExoProduct.ExoLed.getProductKey(),
+                        ExoProduct.ExoSocket.getProductKey(),
+                        ExoProduct.ExoMonsoon.getProductKey());
+
+            scan_refresh.autoRefresh();
+            return true;
+        }
+        return false;
+    }
+
+    private void stopScan() {
+        if (mTask != null) {
+            mTask.stop();
+            mTask = null;
+
+            scan_refresh.finishRefresh();
+        }
+    }
+
+    private void gotoDeviceActivity(String productKey, String deviceName, String deviceIp, int devicePort) {
+        Intent intent = new Intent(this, DeviceActivity.class);
+        intent.putExtra("productKey", productKey);
+        intent.putExtra("deviceName", deviceName);
+        intent.putExtra("deviceIp", deviceIp);
+        intent.putExtra("devicePort", devicePort);
+        startActivity(intent);
+    }
+
+    private boolean checkWifi() {
+        WifiManager manager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+        if (!manager.isWifiEnabled()) {
+            return false;
+//            manager.setWifiEnabled(true);
+        }
+        WifiInfo wifiInfo = manager.getConnectionInfo();
+        if (wifiInfo == null || wifiInfo.getNetworkId() == -1) {
+            return false;
+        }
+        return true;
+    }
+
+    private void gotoSystemWifiSettings() {
+        Intent intent = new Intent(Settings.ACTION_WIFI_SETTINGS);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
+    }
+
+    private void showWifiSettingsDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(R.string.connect_wifi)
+               .setMessage(R.string.scan_device_msg)
+               .setCancelable(false)
+               .setNegativeButton(R.string.cancel, null)
+               .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                   @Override
+                   public void onClick(DialogInterface dialog, int which) {
+                       gotoSystemWifiSettings();
+                   }
+               })
+               .show();
+    }
+
+    @Override
+    protected void onPermissionGranted(String permission) {
+        if (TextUtils.equals(Manifest.permission.ACCESS_COARSE_LOCATION, permission)) {
+            startScan();
+        }
+    }
+
+    @Override
+    protected void onPermissionDenied(String permission) {
+        if (TextUtils.equals(Manifest.permission.ACCESS_COARSE_LOCATION, permission)) {
+            showToast(R.string.msg_location_permission);
+        }
+    }
+
+    @Override
+    protected void onPermissionPermanentDenied(String permission) {
+        if (TextUtils.equals(Manifest.permission.ACCESS_COARSE_LOCATION, permission)) {
+            showPermissionDialog(getString(R.string.title_location_permission),
+                                 getString(R.string.msg_location_permission));
+        }
+    }
+
+    private void startAdddeviceActivity() {
+        Intent intent = new Intent(this, AddDeviceActivity.class);
+        startActivity(intent);
+    }
 }

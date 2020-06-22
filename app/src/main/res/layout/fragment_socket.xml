@@ -7,7 +7,7 @@
     android:clickable="true">
 
     <com.inledco.exoterra.view.GradientCornerLinearLayout
-        android:id="@+id/gradientCornerLinearLayout7"
+        android:id="@+id/socket_sensor_group"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:orientation="horizontal"
@@ -134,7 +134,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/gradientCornerLinearLayout7">
+        app:layout_constraintTop_toBottomOf="@+id/socket_sensor_group">
 
     </FrameLayout>
 

@@ -6,22 +6,31 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
 import com.inledco.exoterra.aliot.bean.XDevice;
+import com.inledco.exoterra.util.RegexUtil;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
-public class Device extends ADevice{
-    private final String TAG = "XDevice";
+public class Device extends ADevice {
+    private final String TAG = "Device";
 
-    private final String KEY_FIRMWARE_VERSION   = "FirmwareVersion";
-    private final String KEY_DEVICE_INFO        = "DeviceInfo";
-    private final String KEY_ZONE               = "Zone";
-    private final String KEY_DEVICETIME         = "DeviceTime";
-    private final String KEY_SUNRISE            = "Sunrise";
-    private final String KEY_SUNSET             = "Sunset";
+    private static final String KEY_FIRMWARE_VERSION   = "FirmwareVersion";
+    private static final String KEY_DEVICE_INFO        = "DeviceInfo";
+    private static final String KEY_ZONE               = "Zone";
+    private static final String KEY_DEVICETIME         = "DeviceTime";
+    private static final String KEY_SUNRISE            = "Sunrise";
+    private static final String KEY_SUNSET             = "Sunset";
 
     private String name;
     private String mac;
+
+    //  local
+    private String ip;
+    private int port;
+
+    //  cloud
     private String remark1;
     private String remark2;
     private String remark3;
@@ -29,6 +38,24 @@ public class Device extends ADevice{
 
     private boolean isOnline;
     private long statusUpdateTime;
+
+    protected static final Set<String> attrKeys = new HashSet<>();
+
+    static {
+        attrKeys.add(KEY_FIRMWARE_VERSION);
+        attrKeys.add(KEY_DEVICE_INFO);
+        attrKeys.add(KEY_ZONE);
+        attrKeys.add(KEY_DEVICETIME);
+        attrKeys.add(KEY_SUNRISE);
+        attrKeys.add(KEY_SUNSET);
+    }
+
+    public Device() {
+    }
+
+    public Device(String productKey, String deviceName) {
+        super(productKey, deviceName);
+    }
 
     public Device(XDevice xDevice) {
         if (xDevice != null) {
@@ -58,6 +85,22 @@ public class Device extends ADevice{
 
     public void setMac(String mac) {
         this.mac = mac;
+    }
+
+    public String getIp() {
+        return ip;
+    }
+
+    public void setIp(String ip) {
+        this.ip = ip;
+    }
+
+    public int getPort() {
+        return port;
+    }
+
+    public void setPort(int port) {
+        this.port = port;
     }
 
     public String getRemark1() {
@@ -174,9 +217,10 @@ public class Device extends ADevice{
             JSONArray ja = (JSONArray) obj;
             List<T> result = new ArrayList<>();
             for (int i = 0; i < ja.size(); i++) {
-                if (ja.get(i) != null) {
+                try {
                     result.add(ja.getObject(i, clazz));
-                } else {
+                } catch (JSONException e) {
+                    e.printStackTrace();
                     return null;
                 }
             }
@@ -187,6 +231,29 @@ public class Device extends ADevice{
 
     public DeviceInfo getDeviceInfo() {
         return getPropertyObject(KEY_DEVICE_INFO, DeviceInfo.class);
+    }
+
+    public int getDeviceIp() {
+        DeviceInfo devInfo = getDeviceInfo();
+        if (devInfo != null) {
+            String ip = devInfo.getIp();
+            if (RegexUtil.isIP(ip)) {
+                try {
+                    String[] addr = ip.split(".");
+                    if (addr != null && addr.length == 4) {
+                        int addr1 = Integer.parseInt(addr[0]);
+                        int addr2 = Integer.parseInt(addr[1]);
+                        int addr3 = Integer.parseInt(addr[2]);
+                        int addr4 = Integer.parseInt(addr[3]);
+                        int result = (addr4<<24)|(addr3<<16)|(addr2<<8)|addr1;
+                        return result;
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return 0;
     }
 
     public int getFirmwareVersion() {

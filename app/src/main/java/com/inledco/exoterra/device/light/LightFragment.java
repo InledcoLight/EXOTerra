@@ -1,5 +1,7 @@
 package com.inledco.exoterra.device.light;
 
+import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -8,6 +10,8 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.inledco.exoterra.R;
+import com.inledco.exoterra.aliot.ExoLed;
+import com.inledco.exoterra.aliot.LightViewModel;
 import com.inledco.exoterra.base.BaseFragment;
 
 public class LightFragment extends BaseFragment {
@@ -17,8 +21,10 @@ public class LightFragment extends BaseFragment {
 //    private CheckedTextView light_ctv_auto;
 //    private CheckedTextView light_ctv_pro;
 
-//    private LightViewModel mLightViewModel;
-//    private ExoLed mLight;
+    private LightViewModel mLightViewModel;
+    private ExoLed mLight;
+
+    private int currMode = -1;
 
     @Nullable
     @Override
@@ -45,15 +51,15 @@ public class LightFragment extends BaseFragment {
 
     @Override
     protected void initData() {
-//        mLightViewModel = ViewModelProviders.of(getActivity()).get(LightViewModel.class);
-//        mLight = mLightViewModel.getData();
-//        mLightViewModel.observe(this, new Observer<ExoLed>() {
-//            @Override
-//            public void onChanged(@Nullable ExoLed exoLed) {
-//                refreshData();
-//            }
-//        });
-//        refreshData();
+        mLightViewModel = ViewModelProviders.of(getActivity()).get(LightViewModel.class);
+        mLight = mLightViewModel.getData();
+        mLightViewModel.observe(this, new Observer<ExoLed>() {
+            @Override
+            public void onChanged(@Nullable ExoLed exoLed) {
+                refreshData();
+            }
+        });
+        refreshData();
     }
 
     @Override
@@ -86,10 +92,28 @@ public class LightFragment extends BaseFragment {
 //        });
     }
 
-//    private void refreshData() {
-//        if (mLight == null) {
-//            return;
-//        }
+    private void refreshData() {
+        if (mLight == null) {
+            return;
+        }
+        int newMode = mLight.getMode();
+        if (currMode != newMode) {
+            switch (newMode) {
+                case ExoLed.MODE_MANUAL:
+                    currMode = newMode;
+                    replaceFragment(R.id.device_fl_show, new LightManualFragment());
+                    break;
+                case ExoLed.MODE_AUTO:
+                    currMode = newMode;
+                    replaceFragment(R.id.device_fl_show, new LightAutoFragment());
+                    break;
+                case ExoLed.MODE_PRO:
+                    currMode = newMode;
+                    replaceFragment(R.id.device_fl_show, new LightProFragment());
+                    break;
+            }
+        }
+
 //        if (!light_ctv_auto.isChecked() && mLight.getMode() == ExoLed.MODE_AUTO) {
 //            light_ctv_manual.setChecked(false);
 //            light_ctv_auto.setChecked(true);
@@ -106,5 +130,5 @@ public class LightFragment extends BaseFragment {
 //            light_ctv_pro.setChecked(false);
 //            replaceFragment(R.id.light_fl_show, new LightManualFragment());
 //        }
-//    }
+    }
 }

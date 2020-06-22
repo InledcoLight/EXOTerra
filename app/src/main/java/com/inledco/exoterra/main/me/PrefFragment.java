@@ -1,5 +1,7 @@
 package com.inledco.exoterra.main.me;
 
+import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -22,11 +24,14 @@ import android.widget.TextView;
 import com.alibaba.fastjson.JSON;
 import com.inledco.exoterra.GlobalSettings;
 import com.inledco.exoterra.R;
+import com.inledco.exoterra.aliot.AliotClient;
 import com.inledco.exoterra.aliot.AliotServer;
 import com.inledco.exoterra.aliot.HttpCallback;
 import com.inledco.exoterra.aliot.UserApi;
 import com.inledco.exoterra.base.BaseFragment;
 import com.inledco.exoterra.login.LoginActivity;
+import com.inledco.exoterra.main.AuthStatus;
+import com.inledco.exoterra.main.MainViewModel;
 import com.inledco.exoterra.manager.DeviceManager;
 import com.inledco.exoterra.manager.GroupManager;
 import com.inledco.exoterra.manager.UserManager;
@@ -47,6 +52,9 @@ public class PrefFragment extends BaseFragment {
     private CheckedTextView pref_title_invite_msg;
     private Button pref_logout;
 
+    private MainViewModel mMainViewModel;
+    private AuthStatus mAuthStatus;
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -55,6 +63,12 @@ public class PrefFragment extends BaseFragment {
         initData();
         initEvent();
         return view;
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        Log.e(TAG, "onActivityResult: " + requestCode + " " + resultCode);
     }
 
     @Override
@@ -83,16 +97,20 @@ public class PrefFragment extends BaseFragment {
         pref_mod_psw.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_edit_white_24dp, 0);
         pref_usr_detail.setVisibility(View.GONE);
         pref_unit_detail.setVisibility(View.GONE);
-
-        pref_logout.setText(UserManager.getInstance().isAuthorized() ? R.string.logout : R.string.signin);
-
-        pref_nickname.setText(UserManager.getInstance().getNickname());
-        pref_email.setText(UserManager.getInstance().getEmail());
     }
 
     @Override
     protected void initData() {
+        mMainViewModel = ViewModelProviders.of(getActivity()).get(MainViewModel.class);
+        mAuthStatus = mMainViewModel.getData();
+        mMainViewModel.observe(this, new Observer<AuthStatus>() {
+            @Override
+            public void onChanged(@Nullable AuthStatus authStatus) {
+                refreshData();
+            }
+        });
 
+        refreshData();
     }
 
     @Override
@@ -100,7 +118,8 @@ public class PrefFragment extends BaseFragment {
         pref_title_user.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (!UserManager.getInstance().isAuthorized()) {
+                if (!mAuthStatus.isAuthorized()) {
+                    showToast(R.string.signin_msg);
                     return;
                 }
                 boolean checked = !pref_title_user.isChecked();
@@ -147,15 +166,34 @@ public class PrefFragment extends BaseFragment {
         pref_title_invite_msg.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (!mAuthStatus.isAuthorized()) {
+                    showToast(R.string.signin_msg);
+                    return;
+                }
                 addFragmentToStack(R.id.main_fl, new MessagesFragment());
             }
         });
         pref_logout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                logout();
+                if (mAuthStatus.isAuthorized()) {
+                    logout();
+                } else {
+                    login();
+                }
             }
         });
+    }
+
+    private void refreshData() {
+        pref_logout.setText(mAuthStatus.isAuthorized() ? R.string.logout : R.string.signin);
+        if (mAuthStatus.isAuthorized()) {
+            pref_nickname.setText(UserManager.getInstance().getNickname());
+            pref_email.setText(UserManager.getInstance().getEmail());
+        } else {
+            pref_nickname.setText(null);
+            pref_email.setText(null);
+        }
     }
 
     private void showModifyNicknameDialog() {
@@ -276,18 +314,25 @@ public class PrefFragment extends BaseFragment {
 
             }
         });
+        AliotClient.getInstance().deinit();
+        mAuthStatus.setAuthorized(false);
         UserPref.clearAuthorization(getContext());
         DeviceManager.getInstance().clear();
         GroupManager.getInstance().clear();
         UserManager.getInstance().deinit();
 
-        Intent intent = new Intent(getContext(), LoginActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        startActivity(intent);
+        pref_title_user.setChecked(false);
+        pref_title_user.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_add_white_24dp, 0);
+        pref_usr_detail.setVisibility(View.GONE);
+        pref_logout.setText(R.string.signin);
+
+//        Intent intent = new Intent(getContext(), LoginActivity.class);
+//        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+//        startActivity(intent);
     }
 
     private void login() {
         Intent intent = new Intent(getContext(), LoginActivity.class);
-        startActivity(intent);
+        getActivity().startActivityForResult(intent, 1);
     }
 }

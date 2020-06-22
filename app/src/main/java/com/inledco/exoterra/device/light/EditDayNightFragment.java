@@ -6,7 +6,6 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -78,6 +77,18 @@ public class EditDayNightFragment extends BaseFragment {
         initEvent();
         return view;
     }
+
+//    @Override
+//    public void onResume() {
+//        super.onResume();
+//        EventBus.getDefault().post(new FragmentShowEvent("LightAutoFragment", false));
+//    }
+//
+//    @Override
+//    public void onPause() {
+//        super.onPause();
+//        EventBus.getDefault().post(new FragmentShowEvent("LightAutoFragment", true));
+//    }
 
     @Override
     protected int getLayoutRes() {
@@ -303,7 +314,6 @@ public class EditDayNightFragment extends BaseFragment {
         if (mLightSpectrum == null) {
             return;
         }
-        Log.e(TAG, "refreshData: ");
         for (int i = 0; i < mLight.getChannelCount(); i++) {
             mLightSpectrum.setGain(i, ((float) mCircleSeekbars[i].getProgress()) / 100);
         }

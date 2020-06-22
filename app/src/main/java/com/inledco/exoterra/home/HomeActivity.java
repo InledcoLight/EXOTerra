@@ -3,12 +3,12 @@ package com.inledco.exoterra.home;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.alibaba.fastjson.JSON;
 import com.aliyun.alink.linkkit.api.ILinkKitConnectListener;
 import com.aliyun.alink.linksdk.tools.AError;
 import com.inledco.exoterra.R;
@@ -16,6 +16,8 @@ import com.inledco.exoterra.aliot.AliotClient;
 import com.inledco.exoterra.base.BaseActivity;
 import com.inledco.exoterra.main.MainActivity;
 import com.inledco.exoterra.manager.UserManager;
+import com.inledco.exoterra.push.FCMMessageService;
+import com.inledco.exoterra.push.FCMTokenListener;
 
 public class HomeActivity extends BaseActivity implements View.OnClickListener {
 
@@ -38,6 +40,13 @@ public class HomeActivity extends BaseActivity implements View.OnClickListener {
 
         initData();
         initEvent();
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        dismissLoadDialog();
+        AliotClient.getInstance().deinit();
     }
 
     @Override
@@ -68,7 +77,12 @@ public class HomeActivity extends BaseActivity implements View.OnClickListener {
 
     @Override
     protected void initData() {
-
+        FCMMessageService.syncToken(new FCMTokenListener() {
+            @Override
+            public void onTokenResult(String token) {
+                Log.e(TAG, "onTokenResult: " + token);
+            }
+        });
     }
 
     @Override
@@ -89,16 +103,17 @@ public class HomeActivity extends BaseActivity implements View.OnClickListener {
 
     @Override
     public void onClick(View v) {
+        boolean authorized = UserManager.getInstance().isAuthorized();
         switch (v.getId()) {
             case R.id.home_ll_microtope:
-                if (UserManager.getInstance().isAuthorized()) {
+                if (authorized) {
                     String userid = UserManager.getInstance().getUserid();
                     String secret = UserManager.getInstance().getSecret();
                     boolean result = AliotClient.getInstance().init(getApplicationContext(), userid, secret, new ILinkKitConnectListener() {
                         @Override
                         public void onError(AError aError) {
                             dismissLoadDialog();
-                            showToast(JSON.toJSONString(aError));
+                            showToast(aError.getMsg());
                         }
 
                         @Override
@@ -110,6 +125,8 @@ public class HomeActivity extends BaseActivity implements View.OnClickListener {
                     if (result) {
                         showLoadDialog();
                     }
+                } else {
+                    startMainActivity();
                 }
                 break;
             case R.id.home_ll_uvb:
@@ -143,7 +160,17 @@ public class HomeActivity extends BaseActivity implements View.OnClickListener {
 
                 break;
             case R.id.home_ib_email:
-
+//                OKHttpManager.getInstance().get(CloudApi.test(), null, new Callback() {
+//                    @Override
+//                    public void onFailure(Call call, IOException e) {
+//                        Log.e(TAG, "onFailure: " + e.getMessage());
+//                    }
+//
+//                    @Override
+//                    public void onResponse(Call call, Response response) throws IOException {
+//                        Log.e(TAG, "onResponse: " + response.body().string());
+//                    }
+//                });
                 break;
         }
     }

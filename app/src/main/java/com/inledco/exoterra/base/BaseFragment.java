@@ -7,6 +7,7 @@ import android.support.annotation.IdRes;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
@@ -34,6 +35,12 @@ public abstract class BaseFragment extends Fragment {
         initView(view);
 
         return view;
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        dismissLoadDialog();
     }
 
     @Override
@@ -91,12 +98,16 @@ public abstract class BaseFragment extends Fragment {
             getActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    Toast.makeText(getContext(), msg, Toast.LENGTH_SHORT)
+                    Toast.makeText(getContext(), msg, Toast.LENGTH_LONG)
                          .show();
                     Log.e(TAG, "showToast: " + msg);
                 }
             });
         }
+    }
+
+    protected void showToast(@StringRes int res) {
+        showToast(getString(res));
     }
 
     protected void showLoadDialog() {

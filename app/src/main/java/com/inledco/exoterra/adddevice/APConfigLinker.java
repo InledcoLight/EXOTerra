@@ -1,5 +1,8 @@
 package com.inledco.exoterra.adddevice;
 
+import android.content.Context;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
 import android.os.CountDownTimer;
 import android.support.annotation.NonNull;
@@ -13,8 +16,9 @@ import com.alibaba.fastjson.JSONObject;
 import com.inledco.exoterra.aliot.AliotServer;
 import com.inledco.exoterra.aliot.DeviceParam;
 import com.inledco.exoterra.aliot.UserApi;
+import com.inledco.exoterra.bean.ExoProduct;
 import com.inledco.exoterra.bean.Result;
-import com.inledco.exoterra.util.DeviceUtil;
+import com.inledco.exoterra.udptcp.UdpClient;
 
 import java.lang.ref.WeakReference;
 import java.util.HashMap;
@@ -36,8 +40,6 @@ public class APConfigLinker {
     private final String REMOTE_ADDRESS = "192.168.4.1";
     private final int REMOTE_IP = 0x0104A8C0;
     private final int REMOTE_PORT = 8266;
-    //for udp
-    private final int LOCAL_PORT = 5000;
 
     private final int PROGRESS_SUCCESS = 100;
 
@@ -47,6 +49,7 @@ public class APConfigLinker {
     private final String mSsid;
     private final String mBssid;
     private final String mPassword;
+    private final int mNetworkId;
     private String mAddress;
     private String mDeviceName;
     private String mDeviceSecret;
@@ -63,19 +66,20 @@ public class APConfigLinker {
 
     private final CountDownTimer mTimer;
 
-    private final BaseClient mClient;
-    private BaseClient.Listener mClientListener;
+    private final UdpClient mClient;
+    private UdpClient.Listener mClientListener;
     private String mReceive;
     private AsyncTask<Void, Integer, Result> mTask;
 
-    public APConfigLinker(boolean subscribe, @NonNull String pkey, @NonNull String ssid, String bssid, String password, AppCompatActivity activity) {
+    public APConfigLinker(boolean subscribe, @NonNull String pkey, @NonNull String ssid, String bssid, String password, int networkId, AppCompatActivity activity) {
         mActivity = new WeakReference<>(activity);
         mSubscribe = subscribe;
         mProductKey = pkey;
         mSsid = ssid;
         mBssid = bssid;
         mPassword = password;
-        mClient = new UdpClient(REMOTE_ADDRESS, REMOTE_PORT, LOCAL_PORT);
+        mNetworkId = networkId;
+        mClient = new UdpClient(REMOTE_ADDRESS, REMOTE_PORT);
 
         mGetTimer = new CountDownTimer(10000, 2000) {
             @Override
@@ -121,16 +125,16 @@ public class APConfigLinker {
             }
         };
 
-        mClientListener = new BaseClient.Listener() {
+        mClientListener = new UdpClient.Listener() {
             @Override
             public void onError(String error) {
                 Log.e(TAG, "onError: " + error);
             }
 
             @Override
-            public void onReceive(byte[] bytes) {
+            public void onReceive(String ip, int port, byte[] bytes) {
                 mReceive = new String(bytes);
-                Log.e(TAG, "onReceive: " + mReceive);
+                Log.e(TAG, "onReceive: " + ip + ":" + port + " " + mReceive);
             }
         };
         mClient.setListener(mClientListener);
@@ -174,7 +178,12 @@ public class APConfigLinker {
                     mAddress = deviceParam.getMac();
                     String pkey = deviceParam.getProductKey();
                     if (TextUtils.equals(mProductKey, pkey) == false) {
-                        return new Result(false, "Invalid product:" + DeviceUtil.getProductName(pkey));
+                        ExoProduct product = ExoProduct.getExoProduct(pkey);
+                        String name = "";
+                        if (product != null) {
+                            name = product.getProductName();
+                        }
+                        return new Result(false, "Invalid product:" + name);
                     } else {
                         break;
                     }
@@ -221,7 +230,7 @@ public class APConfigLinker {
     private Result setDeviceParam() {
         mReceive = null;
         mSetTimer.start();
-        while (!mSetTimeout) {
+        while (true) {
             if (mSetTimeout) {
                 return new Result(false, "Set Param Timeout.");
             }
@@ -276,6 +285,13 @@ public class APConfigLinker {
         mTask = new AsyncTask<Void, Integer, Result>() {
             @Override
             protected Result doInBackground(Void... voids) {
+                //获取当前连接设备热点的netwerkid
+                int netid = -1;
+                WifiManager manager = (WifiManager) mActivity.get().getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+                WifiInfo wifiInfo = manager.getConnectionInfo();
+                if (wifiInfo != null) {
+                    netid = wifiInfo.getNetworkId();
+                }
                 //开启客户端
                 mClient.start();
                 while (!mClient.isListening());
@@ -285,24 +301,27 @@ public class APConfigLinker {
                     return result;
                 }
 
-                delay(2000);
-
+                delay(200);
                 result = setDeviceParam();
+                mClient.stop();
+                manager.disableNetwork(netid);
+                manager.removeNetwork(netid);
+                manager.enableNetwork(mNetworkId, true);
                 if (!result.isSuccess()) {
                     return result;
                 }
 
                 if (!mSubscribe) {
-                    delay(5000);
+                    delay(1000);
                     return new Result(true, null);
                 }
+
                 //等待手机联网成功
                 while(true) {
                     try {
-                        Thread.sleep(1000);
+                        Thread.sleep(2000);
                         if (checkNetAvailable()) {
-                            mClient.stop();
-                            Thread.sleep(5000);
+                            Thread.sleep(2000);
                             break;
                         }
                     }
@@ -324,7 +343,7 @@ public class APConfigLinker {
                         mListener.onProgressUpdate(mProgress);
                         mListener.onAPConfigSuccess(mDeviceName, mAddress);
                     } else {
-                        mListener.onAPConfigFailed(result.getMessage());
+                        mListener.onAPConfigFailed(result.getMessage() + "\n" + mAddress);
                     }
                 }
             }
@@ -369,7 +388,6 @@ public class APConfigLinker {
         }
         catch (Exception e) {
             e.printStackTrace();
-            Log.e(TAG, "checkNetAvailable: " + e.getMessage());
         }
         return false;
     }

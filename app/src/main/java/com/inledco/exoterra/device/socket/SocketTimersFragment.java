@@ -7,6 +7,7 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.BottomSheetDialog;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
@@ -15,6 +16,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ImageButton;
@@ -137,17 +139,29 @@ public class SocketTimersFragment extends BaseFragment {
     }
 
     private void showRemoveDialog(final int position) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-        builder.setTitle(R.string.remove_timer);
-        builder.setNegativeButton(R.string.cancel, null);
-        builder.setPositiveButton(R.string.remove, new DialogInterface.OnClickListener() {
+        final BottomSheetDialog dialog = new BottomSheetDialog(getContext());
+        View view = LayoutInflater.from(getContext()).inflate(R.layout.dialog_action, null, false);
+        Button btn_remove = view.findViewById(R.id.dialog_action_act2);
+        Button btn_cancel = view.findViewById(R.id.dialog_action_cancel);
+        btn_remove.setText(R.string.remove);
+        btn_cancel.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(DialogInterface dialog, int which) {
-                mTimers.remove(position);
-                mSocketViewModel.setTimers(mTimers);
+            public void onClick(View v) {
+                dialog.dismiss();
             }
         });
-        builder.show();
+        btn_remove.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                List<ExoSocket.Timer> timers = new ArrayList<>(mTimers);
+                timers.remove(position);
+                mSocketViewModel.setTimers(timers);
+                dialog.dismiss();
+            }
+        });
+        dialog.setContentView(view);
+        dialog.setCancelable(false);
+        dialog.show();
     }
 
     private void showEditTimerDialog(final int idx) {
@@ -278,9 +292,13 @@ public class SocketTimersFragment extends BaseFragment {
                 end_minute = timer.getEndMinute();
                 end_second = timer.getEndSecond();
             } else {
+                action = 2;
                 hour = (byte) Calendar.getInstance().get(Calendar.HOUR_OF_DAY);
                 minute = (byte) Calendar.getInstance().get(Calendar.MINUTE);
                 second = (byte) Calendar.getInstance().get(Calendar.SECOND);
+                end_hour = (hour + 1)%24;
+                end_minute = minute;
+                end_second = second;
             }
             sp_action.setSelection(action, true);
             showStartText();

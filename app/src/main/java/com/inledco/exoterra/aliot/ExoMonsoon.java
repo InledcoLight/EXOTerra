@@ -6,20 +6,26 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ExoMonsoon extends Device {
-    private final String TAG = "ExoMonsoon";
+    private static final String TAG = "ExoMonsoon";
 
-    public static final int TIMER_COUNT_MAX     = 24;
-    public static final int SPRAY_OFF           = 0;
-    public static final int SPRAY_DEFAULT       = 5;
-    public static final int SPRAY_MIN           = 1;
-    public static final int SPRAY_MAX           = 120;
-    public static final int CUSTOM_ACTIONS_MAX  = 8;
+    public static final int TIMER_COUNT_MAX         = 24;
+    public static final int SPRAY_OFF               = 0;
+    public static final int SPRAY_DEFAULT           = 5;
+    public static final int SPRAY_MIN               = 1;
+    public static final int SPRAY_MAX               = 120;
+    public static final int CUSTOM_ACTIONS_MAX      = 8;
 
-    private final String KEY_BUTTON_ACTION  = "KeyAction";
-    private final String KEY_POWER          = "Power";
-    private final String KEY_COUNTDOWN      = "Countdown";
-    private final String KEY_CUSTOM_ACTIONS = "CustomActions";
-    private final String KEY_TIMERS         = "Timers";
+    private static final String KEY_BUTTON_ACTION   = "KeyAction";
+    private static final String KEY_POWER           = "Power";
+    private static final String KEY_CUSTOM_ACTIONS  = "CustomActions";
+    private static final String KEY_TIMERS          = "Timers";
+
+    public ExoMonsoon() {
+    }
+
+    public ExoMonsoon(String productKey, String deviceName) {
+        super(productKey, deviceName);
+    }
 
     public ExoMonsoon(XDevice xDevice) {
         super(xDevice);
@@ -35,10 +41,6 @@ public class ExoMonsoon extends Device {
 
     public long getPowerTime() {
         return getPropertyTime(KEY_POWER);
-    }
-
-    public int getCountdown() {
-        return getPropertyInt(KEY_COUNTDOWN);
     }
 
     public List<Integer> getCustomActions() {

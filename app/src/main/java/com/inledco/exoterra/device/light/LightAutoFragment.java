@@ -10,6 +10,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.constraint.ConstraintLayout;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -45,6 +46,7 @@ import java.util.Arrays;
 import java.util.List;
 
 public class LightAutoFragment extends BaseFragment {
+    private ConstraintLayout light_auto_root;
     private LineChart auto_line_chart;
     private BarChart auto_spectrum;
 //    private ImageView auto_iv_sunrise;
@@ -113,6 +115,7 @@ public class LightAutoFragment extends BaseFragment {
 
     @Override
     protected void initView(View view) {
+        light_auto_root = view.findViewById(R.id.light_auto_root);
         auto_line_chart = view.findViewById(R.id.auto_line_chart);
         auto_spectrum = view.findViewById(R.id.light_auto_spectrum);
         auto_sunrise = view.findViewById(R.id.light_auto_sunrise);
@@ -178,35 +181,35 @@ public class LightAutoFragment extends BaseFragment {
             @Override
             public void onClick(View v) {
 //                showEditSunriseDialog(false);
-                addFragmentToStack(R.id.device_fl_show, EditSunriseSusetFragment.newInstance(false));
+                addFragmentToStack(R.id.device_fl_btm, EditSunriseSusetFragment.newInstance(false));
             }
         });
         auto_sunset_edit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 //                showEditSunriseDialog(true);
-                addFragmentToStack(R.id.device_fl_show, EditSunriseSusetFragment.newInstance(true));
+                addFragmentToStack(R.id.device_fl_btm, EditSunriseSusetFragment.newInstance(true));
             }
         });
         auto_turnoff_edit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 //                showEditTurnoffDialog();
-                addFragmentToStack(R.id.device_fl_show, new EditTurnoffFragment());
+                addFragmentToStack(R.id.device_fl_btm, new EditTurnoffFragment());
             }
         });
         auto_daylight_edit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 //                showEditDayNightDialog(false);
-                addFragmentToStack(R.id.device_fl_show, EditDayNightFragment.newInstance(false));
+                addFragmentToStack(R.id.device_fl_btm, EditDayNightFragment.newInstance(false));
             }
         });
         auto_nightlight_edit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 //                showEditDayNightDialog(true);
-                addFragmentToStack(R.id.device_fl_show, EditDayNightFragment.newInstance(true));
+                addFragmentToStack(R.id.device_fl_btm, EditDayNightFragment.newInstance(true));
             }
         });
     }
@@ -220,8 +223,14 @@ public class LightAutoFragment extends BaseFragment {
         turnoffEnable = mLight.getTurnoffEnable();
         turnoffTime = mLight.getTurnoffTime();
         int[] brights = mLight.getDayBrights();
+        if (brights == null) {
+            return;
+        }
         dayBrights = Arrays.copyOf(brights, brights.length);
         brights = mLight.getNightBrights();
+        if (brights == null) {
+            return;
+        }
         nightBrights = Arrays.copyOf(brights, brights.length);
     }
 
@@ -294,7 +303,7 @@ public class LightAutoFragment extends BaseFragment {
                     }
                     break;
                 }
-            } else {
+            } else if (time[i] > time[j]) {
                 if (minutes >= time[i] || minutes < time[j]) {
                     duration = 1440 - time[i] + time[j];
                     span = 1440 - time[i] + minutes;
@@ -302,6 +311,13 @@ public class LightAutoFragment extends BaseFragment {
                         int db = brights[j][k] - brights[i][k];
                         int val = brights[i][k] + db * span / duration;
                         mLightSpectrum.setGain(k, ((float) val)/100);
+                    }
+                    break;
+                }
+            } else {
+                if (minutes == time[j]) {
+                    for (int k = 0; k < cnt; k++) {
+                        mLightSpectrum.setGain(k, ((float) brights[j][k])/100);
                     }
                     break;
                 }

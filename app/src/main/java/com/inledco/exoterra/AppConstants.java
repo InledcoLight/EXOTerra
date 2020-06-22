@@ -37,9 +37,6 @@ public class AppConstants {
     public static final String  TIME_FORMAT_24HOUR      = "HH:mm";
     public static final String  TIME_FORMAT_12HOUR      = "hh:mm a";
 
-    public static final String  KEY_FCM_TOKEN           = "fcm_token";
-
-
     //通知
     public static final String  NOTIFY_CHANNEL_SHARE            = "share";
     public static final String  NOTIFY_CHANNEL_SHARE_RECEIPT    = "share_receipt";

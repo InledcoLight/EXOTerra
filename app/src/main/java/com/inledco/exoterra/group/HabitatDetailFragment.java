@@ -29,7 +29,6 @@ import android.widget.TimePicker;
 import com.alibaba.fastjson.JSON;
 import com.inledco.exoterra.GlobalSettings;
 import com.inledco.exoterra.R;
-import com.inledco.exoterra.aliot.AliotClient;
 import com.inledco.exoterra.aliot.AliotServer;
 import com.inledco.exoterra.aliot.HttpCallback;
 import com.inledco.exoterra.aliot.UserApi;
@@ -40,6 +39,7 @@ import com.inledco.exoterra.event.GroupChangedEvent;
 import com.inledco.exoterra.event.GroupUserChangedEvent;
 import com.inledco.exoterra.event.GroupsRefreshedEvent;
 import com.inledco.exoterra.main.groups.GroupIconDialog;
+import com.inledco.exoterra.manager.DeviceManager;
 import com.inledco.exoterra.manager.GroupManager;
 import com.inledco.exoterra.manager.UserManager;
 import com.inledco.exoterra.util.FavouriteUtil;
@@ -314,6 +314,13 @@ public class HabitatDetailFragment extends BaseFragment {
     }
 
     @Subscribe (threadMode = ThreadMode.MAIN)
+    public void onGroupsRefreshedEvent(GroupsRefreshedEvent event) {
+        if (event == null) {
+            return;
+        }
+    }
+
+    @Subscribe (threadMode = ThreadMode.MAIN)
     public void onGroupChangedEvent(GroupChangedEvent event) {
         if (event == null) {
             return;
@@ -332,6 +339,8 @@ public class HabitatDetailFragment extends BaseFragment {
             return;
         }
         if (TextUtils.equals(mGroupid, event.getGroupid())) {
+            mUsers.clear();
+            mUsers.addAll(mGroup.users);
             mAdapter.notifyDataSetChanged();
         }
     }
@@ -482,7 +491,7 @@ public class HabitatDetailFragment extends BaseFragment {
             public void onSuccess(UserApi.GroupInviteResponse result) {
                 Log.e(TAG, "onSuccess: " + JSON.toJSONString(result));
                 showToast("Invite user success");
-                AliotClient.getInstance().invite(result.data.invitee, result.data.invite_id, mGroupid, mGroup.name);
+                AliotServer.getInstance().invite(result.data.invitee, result.data.invite_id, mGroupid, mGroup.name);
             }
         });
     }
@@ -498,14 +507,26 @@ public class HabitatDetailFragment extends BaseFragment {
                        final HttpCallback<UserApi.Response> callback = new HttpCallback<UserApi.Response>() {
                            @Override
                            public void onError(String error) {
+                               dismissLoadDialog();
                                showToast(error);
                            }
 
                            @Override
                            public void onSuccess(UserApi.Response result) {
-                                GroupManager.getInstance().removeGroup(mGroupid);
-                                EventBus.getDefault().post(new GroupsRefreshedEvent());
-                                getActivity().getSupportFragmentManager().popBackStack(null, 1);
+                               dismissLoadDialog();
+                               if (!mGroupAdmin) {
+                                   DeviceManager.getInstance().getSubscribedDevices();
+                                   AliotServer.getInstance().exitGroup(mGroup.creator, mGroupid, mGroup.name);
+                               } else {
+                                   for (Group.User user : mGroup.users) {
+                                       if (!TextUtils.equals(user.userid, mGroup.creator)) {
+                                           AliotServer.getInstance().deleteGroup(user.userid, mGroupid, mGroup.name);
+                                       }
+                                   }
+                               }
+                               GroupManager.getInstance().removeGroup(mGroupid);
+                               EventBus.getDefault().post(new GroupsRefreshedEvent());
+                               getActivity().getSupportFragmentManager().popBackStack(null, 1);
                            }
                        };
                        if (mGroupAdmin) {
@@ -513,6 +534,7 @@ public class HabitatDetailFragment extends BaseFragment {
                        } else {
                            AliotServer.getInstance().exitGroup(mGroupid, callback);
                        }
+                       showLoadDialog();
                    }
                })
                .setCancelable(false)

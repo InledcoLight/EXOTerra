@@ -1,4 +1,4 @@
-package com.inledco.exoterra.adddevice;
+package com.inledco.exoterra.udptcp;
 
 import android.support.annotation.NonNull;
 import android.util.Log;
@@ -24,6 +24,8 @@ public class TcpClient extends BaseClient {
     private BufferedInputStream mInputStream;
     private BufferedOutputStream mOutputStream;
 
+    private Listener mListener;
+
     public TcpClient(String remoteAddress, int remotePort, int connectTimeout) {
         super(remoteAddress, remotePort);
         mConnectTimeout = connectTimeout;
@@ -43,8 +45,12 @@ public class TcpClient extends BaseClient {
         }
     }
 
+    public void setListener(Listener listener) {
+        mListener = listener;
+    }
+
     @Override
-    protected synchronized void start() {
+    public synchronized void start() {
         if (mListening) {
             return;
         }
@@ -62,7 +68,7 @@ public class TcpClient extends BaseClient {
                         mInputStream = new BufferedInputStream(mSocket.getInputStream());
                         mOutputStream = new BufferedOutputStream(mSocket.getOutputStream());
 
-                        Thread.sleep(100);
+//                        Thread.sleep(100);
                         mListening = true;
                     }
                     receive();
@@ -81,15 +87,12 @@ public class TcpClient extends BaseClient {
                         mListener.onError(e.getMessage());
                     }
                 }
-                catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
             }
         });
     }
 
     @Override
-    protected synchronized void stop() {
+    public synchronized void stop() {
         if (!mListening) {
             return;
         }
@@ -125,7 +128,7 @@ public class TcpClient extends BaseClient {
     }
 
     @Override
-    protected synchronized void send(@NonNull final byte[] bytes) {
+    public synchronized void send(@NonNull final byte[] bytes) {
         if (!mListening || mSocket == null || mSocket.isClosed() || mOutputStream == null || bytes.length == 0) {
             return;
         }
@@ -157,7 +160,7 @@ public class TcpClient extends BaseClient {
     }
 
     @Override
-    protected void receive() {
+    public void receive() {
         byte[] rxBuffer = new byte[TCP_RECEIVE_BUFFER_SIZE];
         while (mListening) {
             if (mInputStream != null) {
@@ -178,5 +181,10 @@ public class TcpClient extends BaseClient {
                 }
             }
         }
+    }
+
+    public interface Listener {
+        void onError(String error);
+        void onReceive(byte[] bytes);
     }
 }

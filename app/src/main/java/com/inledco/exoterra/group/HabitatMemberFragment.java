@@ -143,6 +143,7 @@ public class HabitatMemberFragment extends BaseFragment {
         AliotServer.getInstance().removeUserFromGroup(mGroupid, mUserId, new HttpCallback<UserApi.Response>() {
             @Override
             public void onError(String error) {
+                dismissLoadDialog();
                 showToast(error);
             }
 
@@ -152,11 +153,12 @@ public class HabitatMemberFragment extends BaseFragment {
                 if (group != null) {
                     group.removeUser(mUserId);
                     EventBus.getDefault().post(new GroupUserChangedEvent(mGroupid));
+                    AliotServer.getInstance().removeUser(mUserId, mGroupid, group.name);
                 }
+                dismissLoadDialog();
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        dismissLoadDialog();
                         getActivity().getSupportFragmentManager().popBackStack();
                     }
                 });

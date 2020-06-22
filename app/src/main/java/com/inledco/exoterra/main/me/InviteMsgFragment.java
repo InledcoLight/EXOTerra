@@ -76,7 +76,7 @@ public class InviteMsgFragment extends MsgFragment<UserApi.InviteRecord> {
             }
         });
         msg_rv_show.setAdapter(mAdapter);
-        msg_swipe_refresh.setRefreshing(true);
+        msg_swipe_refresh.autoRefresh();
         getMessages();
     }
 
@@ -89,7 +89,7 @@ public class InviteMsgFragment extends MsgFragment<UserApi.InviteRecord> {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        msg_swipe_refresh.setRefreshing(false);
+                        msg_swipe_refresh.finishRefresh(500);
                     }
                 });
             }
@@ -103,7 +103,7 @@ public class InviteMsgFragment extends MsgFragment<UserApi.InviteRecord> {
                     @Override
                     public void run() {
                         mAdapter.notifyDataSetChanged();
-                        msg_swipe_refresh.setRefreshing(false);
+                        msg_swipe_refresh.finishRefresh(500);
                     }
                 });
             }
@@ -174,6 +174,7 @@ public class InviteMsgFragment extends MsgFragment<UserApi.InviteRecord> {
 
                            @Override
                            public void onSuccess(UserApi.Response result) {
+                               AliotServer.getInstance().inviteDeny(record.inviter, record.invite_id, record.groupid, record.group_name);
                                record.status = InviteStatus.DENIED.getStatus();
                                EventBus.getDefault().post(record);
                                dismissLoadDialog();
@@ -194,6 +195,7 @@ public class InviteMsgFragment extends MsgFragment<UserApi.InviteRecord> {
 
                            @Override
                            public void onSuccess(UserApi.Response result) {
+                               AliotServer.getInstance().inviteAccept(record.inviter, record.invite_id, record.groupid, record.group_name);
                                record.status = InviteStatus.ACCEPTED.getStatus();
                                EventBus.getDefault().post(record);
                                dismissLoadDialog();

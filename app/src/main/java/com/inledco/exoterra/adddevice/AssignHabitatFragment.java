@@ -18,11 +18,11 @@ import com.inledco.exoterra.aliot.HttpCallback;
 import com.inledco.exoterra.aliot.UserApi;
 import com.inledco.exoterra.aliot.bean.Group;
 import com.inledco.exoterra.base.BaseFragment;
+import com.inledco.exoterra.bean.ExoProduct;
 import com.inledco.exoterra.event.GroupDeviceChangedEvent;
 import com.inledco.exoterra.event.GroupsRefreshedEvent;
 import com.inledco.exoterra.main.groups.AddHabitatFragment;
 import com.inledco.exoterra.manager.GroupManager;
-import com.inledco.exoterra.util.DeviceUtil;
 import com.inledco.exoterra.view.GradientCornerButton;
 
 import org.greenrobot.eventbus.EventBus;
@@ -88,9 +88,10 @@ public class AssignHabitatFragment extends BaseFragment {
         if (mConnectNetBean == null) {
             return;
         }
-
-        final String pkey = mConnectNetBean.getProductKey();
-        assign_habitat_prdt.setImageResource(DeviceUtil.getProductIcon(pkey));
+        ExoProduct product = ExoProduct.getExoProduct(mConnectNetBean.getProductKey());
+        if (product != null) {
+            assign_habitat_prdt.setImageResource(product.getIcon());
+        }
         mAdapter = new AssignHabitatAdapter(getContext(), mGroups);
         assign_habitat_rv.setAdapter(mAdapter);
     }

@@ -16,6 +16,7 @@ import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Headers;
 import okhttp3.MediaType;
+import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
@@ -24,7 +25,8 @@ import okhttp3.Response;
 public class OKHttpManager {
     private final String TAG = "OKHttpManager";
 
-    private static final MediaType CONTENT_TYPE_JSON = MediaType.parse("application/json; charset=utf-8");
+    private final MediaType CONTENT_TYPE_JSON = MediaType.parse("application/json; charset=utf-8");
+    private final MediaType CONTENT_TYPE_FORM = MediaType.parse("multipart/form-data");
 
     private final OkHttpClient mHttpClient;
 
@@ -212,6 +214,29 @@ public class OKHttpManager {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public boolean upload(String url, Headers headers, String fileName, String filePath, Callback callback) {
+        if (TextUtils.isEmpty(url) || TextUtils.isEmpty(fileName) || TextUtils.isEmpty(filePath)) {
+            return false;
+        }
+        RequestBody requestBody = new MultipartBody.Builder()
+                                  .setType(MultipartBody.FORM)
+                                  .addFormDataPart("file", fileName, RequestBody.create(CONTENT_TYPE_FORM, new File(filePath)))
+                                  .build();
+        Request request;
+        if (headers == null) {
+            request = new Request.Builder().url(url)
+                                           .post(requestBody)
+                                           .build();
+        } else {
+            request = new Request.Builder().url(url)
+                                           .headers(headers)
+                                           .post(requestBody)
+                                           .build();
+        }
+        mHttpClient.newCall(request).enqueue(callback);
+        return true;
     }
 
     public boolean put(String url, Headers headers, RequestBody body, Callback callback) {

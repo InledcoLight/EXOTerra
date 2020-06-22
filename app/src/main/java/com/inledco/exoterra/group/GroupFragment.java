@@ -178,8 +178,7 @@ public class GroupFragment extends BaseFragment {
                     @Override
                     public void onItemClick(int position) {
                         Group.Device device = mGroup.devices.get(position);
-                        String deviceTag = device.product_key + "_" + device.device_name;
-                        gotoDeviceActivity(deviceTag);
+                        gotoDeviceActivity(device.product_key, device.device_name);
                     }
                 });
                 mAdapter.setOnItemLongClickListener(new OnItemLongClickListener() {
@@ -283,9 +282,10 @@ public class GroupFragment extends BaseFragment {
         refreshSensor();
     }
 
-    private void gotoDeviceActivity(String deviceTag) {
+    private void gotoDeviceActivity(String productKey, String deviceName) {
         Intent intent = new Intent(getContext(), DeviceActivity.class);
-        intent.putExtra("deviceTag", deviceTag);
+        intent.putExtra("productKey", productKey);
+        intent.putExtra("deviceName", deviceName);
         startActivity(intent);
     }
 

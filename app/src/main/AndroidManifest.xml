@@ -26,29 +26,28 @@
         android:supportsRtl="true"
         android:networkSecurityConfig="@xml/network_security_config"
         android:theme="@style/AppTheme">
-        <activity android:name=".splash.SplashActivity" android:theme="@style/LaunchTheme">
+        <activity android:name=".splash.SplashActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/LaunchTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".login.LoginActivity" />
-        <activity android:name=".home.HomeActivity" />
-        <activity android:name=".main.MainActivity" android:launchMode="singleTop" android:windowSoftInputMode="adjustPan"/>
-        <activity android:name=".register.RegisterActivity"/>
-        <activity android:name=".foundback.FoundbackActivity"/>
-        <activity android:name=".smartconfig.SmartconfigActivity"/>
-        <activity android:name=".scan.ScanActivity"/>
-        <activity android:name=".adddevice.AddDeviceActivity" android:windowSoftInputMode="adjustPan" />
-        <activity android:name=".device.DeviceActivity" android:windowSoftInputMode="adjustPan" />
-
-
-        <receiver android:name=".receiver.HomeInviteBroadcastReceiver"/>
+        <activity android:name=".login.LoginActivity" android:launchMode="singleTask" android:screenOrientation="portrait"/>
+        <activity android:name=".home.HomeActivity" android:launchMode="singleTask" android:screenOrientation="portrait"/>
+        <activity android:name=".main.MainActivity" android:launchMode="singleTop" android:windowSoftInputMode="adjustPan" android:screenOrientation="portrait"/>
+        <activity android:name=".register.RegisterActivity" android:launchMode="singleTask" android:screenOrientation="portrait"/>
+        <activity android:name=".foundback.FoundbackActivity" android:launchMode="singleTask" android:screenOrientation="portrait"/>
+        <activity android:name=".smartconfig.SmartconfigActivity" android:launchMode="singleTask" android:screenOrientation="portrait"/>
+        <activity android:name=".scan.ScanActivity" android:launchMode="singleTask" android:screenOrientation="portrait"/>
+        <activity android:name=".adddevice.AddDeviceActivity" android:launchMode="singleTask" android:windowSoftInputMode="adjustPan" android:screenOrientation="portrait"/>
+        <activity android:name=".device.DeviceActivity" android:launchMode="singleTask" android:windowSoftInputMode="adjustPan" android:screenOrientation="portrait"/>
+        <activity android:name=".web.WebActivity" android:launchMode="singleTask"/>
 
         <service android:name=".push.FCMMessageService"
-            android:exported="false"
-            android:stopWithTask="false">
+            android:exported="false">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>

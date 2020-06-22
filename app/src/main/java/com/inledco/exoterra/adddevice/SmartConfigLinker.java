@@ -16,8 +16,9 @@ import com.espressif.iot.esptouch.IEsptouchTask;
 import com.inledco.exoterra.aliot.AliotServer;
 import com.inledco.exoterra.aliot.DeviceParam;
 import com.inledco.exoterra.aliot.UserApi;
+import com.inledco.exoterra.bean.ExoProduct;
 import com.inledco.exoterra.bean.Result;
-import com.inledco.exoterra.util.DeviceUtil;
+import com.inledco.exoterra.udptcp.UdpClient;
 
 import java.lang.ref.WeakReference;
 import java.util.HashMap;
@@ -31,11 +32,10 @@ public class SmartConfigLinker {
 
     private final int PROGRESS_ESPTOUCH         = 60;
     private final int PROGRESS_GETPARAM         = 70;
-    private final int PROGRESS_SUBSCRIBE        = 80;
+    private final int PROGRESS_SUBSCRIBE        = 85;
     private final int PROGRESS_SUCCESS          = 100;
 
     private final int REMOTE_PORT               = 8899;
-    private final int LOCAL_PORT                = 5000;
 
     private final boolean mSubscribe;
 
@@ -59,7 +59,7 @@ public class SmartConfigLinker {
     private SmartConfigListener mListener;
 
     private UdpClient mClient;
-    private BaseClient.Listener mClientListener;
+    private UdpClient.Listener mClientListener;
     private String mReceive;
     private CountDownTimer mGetTimer;
     private boolean mGetTimeout;
@@ -101,16 +101,16 @@ public class SmartConfigLinker {
             }
         };
 
-        mClientListener = new BaseClient.Listener() {
+        mClientListener = new UdpClient.Listener() {
             @Override
             public void onError(String error) {
                 Log.e(TAG, "onError: " + error);
             }
 
             @Override
-            public void onReceive(byte[] bytes) {
+            public void onReceive(String ip, int port, byte[] bytes) {
                 mReceive = new String(bytes);
-                Log.e(TAG, "onReceive: " + mReceive);
+                Log.e(TAG, "onReceive: " + ip + ":" + port + " " + mReceive);
             }
         };
 
@@ -152,7 +152,7 @@ public class SmartConfigLinker {
         byte[] addr = esptouchResult.getInetAddress().getAddress();
         String remoteAddress = String.format("%1$d.%2$d.%3$d.%4$d", addr[0]&0xFF, addr[1]&0xFF, addr[2]&0xFF, addr[3]&0xFF);
         Log.e(TAG, "esptouch: " + remoteAddress);
-        mClient = new UdpClient(remoteAddress, REMOTE_PORT, LOCAL_PORT);
+        mClient = new UdpClient(remoteAddress, REMOTE_PORT);
         mClient.setListener(mClientListener);
         mClient.start();
         while (!mClient.isListening());
@@ -196,7 +196,12 @@ public class SmartConfigLinker {
                     mDeviceSecret = deviceParam.getDeviceSecret();
                     String pkey = deviceParam.getProductKey();
                     if (TextUtils.equals(mProductKey, pkey) == false) {
-                        return new Result(false, "Invalid product:" + DeviceUtil.getProductName(pkey));
+                        ExoProduct product = ExoProduct.getExoProduct(pkey);
+                        String name = "";
+                        if (product != null) {
+                            name = product.getProductName();
+                        }
+                        return new Result(false, "Invalid product:" + name);
                     } else {
                         break;
                     }
@@ -250,7 +255,7 @@ public class SmartConfigLinker {
     private Result setDeviceParam() {
         mReceive = null;
         mSetTimer.start();
-        while (!mSetTimeout) {
+        while (true) {
             if (mSetTimeout) {
                 return new Result(false, "Set Param Timeout.");
             }
@@ -301,7 +306,6 @@ public class SmartConfigLinker {
         mReceive = null;
         mGetTimeout = false;
         mSetTimeout = false;
-        mDeviceSecret = null;
         mProgress = 0;
         mTask = new AsyncTask<Void, Integer, Result>() {
             @Override
@@ -312,20 +316,24 @@ public class SmartConfigLinker {
                 }
                 publishProgress(PROGRESS_ESPTOUCH);
 
-                result = getDeviceParam();
-                if (!result.isSuccess()) {
-                    return result;
-                }
-                publishProgress(PROGRESS_GETPARAM);
+                if (mSubscribe) {
+                    result = getDeviceParam();
+                    if (!result.isSuccess()) {
+                        return result;
+                    }
+                    publishProgress(PROGRESS_GETPARAM);
+                    delay(2000);
 
-                result = subscribeDevice();
-                if (!result.isSuccess()) {
-                    return result;
+                    result = subscribeDevice();
+                    if (!result.isSuccess()) {
+                        return result;
+                    }
+                    publishProgress(PROGRESS_SUBSCRIBE);
                 }
-                publishProgress(PROGRESS_SUBSCRIBE);
 
-                delay(5000);
+                delay(2000);
                 result = setDeviceParam();
+                mClient.stop();
                 return result;
             }
 
@@ -341,7 +349,7 @@ public class SmartConfigLinker {
                         mListener.onProgressUpdate(mProgress);
                         mListener.onSuccess(mDeviceName, mAddress);
                     } else {
-                        mListener.onError(result.getMessage());
+                        mListener.onError(result.getMessage() + "\n" + mAddress);
                     }
                 }
             }

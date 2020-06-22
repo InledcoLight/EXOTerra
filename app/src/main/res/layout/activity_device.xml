@@ -112,39 +112,44 @@
         </com.inledco.exoterra.view.GradientCornerLinearLayout>
 
         <FrameLayout
-            android:id="@+id/device_fl_show"
+            android:id="@+id/device_fl_btm"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="1"
-            android:layout_marginTop="8dp"
-            android:layout_marginLeft="16dp"
-            android:layout_marginRight="16dp"
-            android:layout_marginBottom="8dp"/>
+            android:layout_weight="1">
 
-        <com.inledco.exoterra.view.GradientCornerButton
-            android:id="@+id/device_btn_back"
-            style="?attr/buttonStyle"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="16dp"
-            android:layout_marginRight="16dp"
-            android:layout_marginBottom="16dp"
-            android:background="?attr/selectableItemBackground"
-            android:text="@string/back"
-            app:direction="horizontal"
-            app:strokeWidth="@dimen/strokeWidth"
-            app:radius="@dimen/cornerRadius"
-            app:gradientStart="@color/gradientYellow"
-            app:gradientEnd="@color/gradientWhite"/>
+            <LinearLayout
+                android:id="@+id/device_ll_show"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
 
-<!--        <Button-->
-<!--            android:id="@+id/device_btn_back"-->
-<!--            android:layout_width="match_parent"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:layout_marginStart="16dp"-->
-<!--            android:layout_marginEnd="16dp"-->
-<!--            android:layout_marginBottom="8dp"-->
-<!--            android:text="@string/back"/>-->
+                <FrameLayout
+                    android:id="@+id/device_fl_show"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginRight="16dp"/>
+
+                <com.inledco.exoterra.view.GradientCornerButton
+                    android:id="@+id/device_btn_back"
+                    style="?attr/buttonStyle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="16dp"
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginRight="16dp"
+                    android:background="?attr/selectableItemBackground"
+                    android:text="@string/back"
+                    app:direction="horizontal"
+                    app:strokeWidth="@dimen/strokeWidth"
+                    app:radius="@dimen/cornerRadius"
+                    app:gradientStart="@color/gradientYellow"
+                    app:gradientEnd="@color/gradientWhite"/>
+            </LinearLayout>
+        </FrameLayout>
 
     </LinearLayout>
 </FrameLayout>

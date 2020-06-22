@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.util.Log;
@@ -33,6 +32,10 @@ import com.inledco.exoterra.manager.GroupManager;
 import com.inledco.exoterra.manager.OnErrorCallback;
 import com.inledco.exoterra.scan.ScanActivity;
 import com.inledco.exoterra.smartconfig.SmartconfigActivity;
+import com.scwang.smartrefresh.layout.SmartRefreshLayout;
+import com.scwang.smartrefresh.layout.api.RefreshLayout;
+import com.scwang.smartrefresh.layout.header.ClassicsHeader;
+import com.scwang.smartrefresh.layout.listener.OnRefreshListener;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -42,7 +45,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DevicesFragment extends BaseFragment {
-    private SwipeRefreshLayout devices_swipe_refresh;
+    private SmartRefreshLayout devices_swipe_refresh;
     private View devices_warning;
     private TextView warning_tv_msg;
     private RecyclerView devices_rv_show;
@@ -71,6 +74,16 @@ public class DevicesFragment extends BaseFragment {
         }
     }
 
+    private void initHeader() {
+        ClassicsHeader.REFRESH_HEADER_LOADING = getString(R.string.loading);
+        ClassicsHeader.REFRESH_HEADER_PULLING = getString(R.string.pulldown_to_refresh);
+        ClassicsHeader.REFRESH_HEADER_RELEASE = getString(R.string.release_to_refresh);
+        ClassicsHeader.REFRESH_HEADER_REFRESHING = getString(R.string.refreshing);
+        ClassicsHeader.REFRESH_HEADER_FAILED = getString(R.string.refresh_failed);
+        ClassicsHeader.REFRESH_HEADER_FINISH = getString(R.string.refresh_success);
+        ClassicsHeader.REFRESH_HEADER_UPDATE = getString(R.string.last_update);
+    }
+
     @Override
     protected int getLayoutRes() {
         return R.layout.fragment_devices;
@@ -85,6 +98,9 @@ public class DevicesFragment extends BaseFragment {
         devices_ib_add = view.findViewById(R.id.devices_ib_add);
 
         warning_tv_msg.setText(R.string.no_device_warning);
+        initHeader();
+        ClassicsHeader header = new ClassicsHeader(getContext());
+        devices_swipe_refresh.setRefreshHeader(header);
     }
 
     @Override
@@ -95,8 +111,7 @@ public class DevicesFragment extends BaseFragment {
             @Override
             public void onItemClick(final int position) {
                 final Device device = mDevices.get(position);
-                Log.e(TAG, "onItemClick: " + device.getTag());
-                gotoDeviceActivity(device.getTag());
+                gotoDeviceActivity(device.getProductKey(), device.getDeviceName());
             }
         });
         devices_rv_show.setAdapter(mAdapter);
@@ -105,7 +120,7 @@ public class DevicesFragment extends BaseFragment {
             refreshDevices();
         }
         if (DeviceManager.getInstance().isSynchronizing() && !DeviceManager.getInstance().isSynchronized()) {
-            devices_swipe_refresh.setRefreshing(true);
+            devices_swipe_refresh.autoRefresh();
         } else {
             devices_warning.setVisibility(mDevices.size() == 0 ? View.VISIBLE : View.GONE);
         }
@@ -113,9 +128,9 @@ public class DevicesFragment extends BaseFragment {
 
     @Override
     protected void initEvent() {
-        devices_swipe_refresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+        devices_swipe_refresh.setOnRefreshListener(new OnRefreshListener() {
             @Override
-            public void onRefresh() {
+            public void onRefresh(@NonNull RefreshLayout refreshLayout) {
                 refreshDevices();
             }
         });
@@ -166,7 +181,7 @@ public class DevicesFragment extends BaseFragment {
         Log.e(TAG, "onDevicesRefreshedEvent: ");
         mDevices.clear();
         mDevices.addAll(DeviceManager.getInstance().getAllDevices());
-        devices_swipe_refresh.setRefreshing(false);
+        devices_swipe_refresh.finishRefresh(500);
         devices_warning.setVisibility(mDevices.size() == 0 ? View.VISIBLE : View.GONE);
         mAdapter.notifyDataSetChanged();
     }
@@ -201,9 +216,16 @@ public class DevicesFragment extends BaseFragment {
         DeviceManager.getInstance().getSubscribedDevices(new OnErrorCallback() {
             @Override
             public void onError(String error) {
-                stopRefresh();
+                devices_swipe_refresh.finishRefresh(1000, false, false);
             }
         });
+    }
+
+    private void gotoDeviceActivity(String productKey, String deviceName) {
+        Intent intent = new Intent(getContext(), DeviceActivity.class);
+        intent.putExtra("productKey", productKey);
+        intent.putExtra("deviceName", deviceName);
+        startActivity(intent);
     }
 
     private void gotoDeviceActivity(String tag) {
@@ -225,17 +247,5 @@ public class DevicesFragment extends BaseFragment {
     private void startAdddeviceActivity() {
         Intent intent = new Intent(getContext(), AddDeviceActivity.class);
         startActivity(intent);
-    }
-
-    private void stopRefresh() {
-        if (getActivity() == null) {
-            return;
-        }
-        getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                devices_swipe_refresh.setRefreshing(false);
-            }
-        });
     }
 }

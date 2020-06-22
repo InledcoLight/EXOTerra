@@ -10,6 +10,11 @@ import android.support.v7.app.AlertDialog;
 import com.inledco.exoterra.AppConstants;
 import com.inledco.exoterra.R;
 import com.inledco.exoterra.base.BaseActivity;
+import com.inledco.exoterra.event.DisconnectIotEvent;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 public class AddDeviceActivity extends BaseActivity {
 
@@ -22,8 +27,17 @@ public class AddDeviceActivity extends BaseActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        EventBus.getDefault().register(this);
         initData();
         initEvent();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (EventBus.getDefault().isRegistered(this)) {
+            EventBus.getDefault().unregister(this);
+        }
     }
 
     @Override
@@ -79,5 +93,10 @@ public class AddDeviceActivity extends BaseActivity {
         } else {
             super.onBackPressed();
         }
+    }
+
+    @Subscribe (threadMode = ThreadMode.MAIN)
+    public void onDiconnectIotEvent(DisconnectIotEvent event) {
+        finish();
     }
 }

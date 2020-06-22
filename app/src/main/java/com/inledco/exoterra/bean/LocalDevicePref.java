@@ -1,28 +1,28 @@
 package com.inledco.exoterra.bean;
 
 public class LocalDevicePref {
-    private final String pid;
+    private final String productKey;
+    private final String deviceName;
     private final String mac;
-    private final String name;
     private final long addTime;
 
-    public LocalDevicePref(String pid, String mac, String name, long addTime) {
-        this.pid = pid;
+    public LocalDevicePref(String productKey, String deviceName, String mac, long addTime) {
+        this.productKey = productKey;
+        this.deviceName = deviceName;
         this.mac = mac;
-        this.name = name;
         this.addTime = addTime;
     }
 
-    public String getPid() {
-        return pid;
+    public String getProductKey() {
+        return productKey;
     }
 
     public String getMac() {
         return mac;
     }
 
-    public String getName() {
-        return name;
+    public String getDeviceName() {
+        return deviceName;
     }
 
     public long getAddTime() {
@@ -30,6 +30,6 @@ public class LocalDevicePref {
     }
 
     public String getTag() {
-        return pid + "_" + mac;
+        return productKey + "_" + mac;
     }
 }

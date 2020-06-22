@@ -34,9 +34,12 @@ import android.widget.TextView;
 import com.inledco.exoterra.R;
 import com.inledco.exoterra.aliot.AliotConsts;
 import com.inledco.exoterra.base.BaseFragment;
+import com.inledco.exoterra.bean.ExoProduct;
 import com.inledco.exoterra.util.DeviceUtil;
 
 public class ConfigGuideFragment extends BaseFragment {
+    public final int ESP8266_GATEWAY = 0x0104A8C0;
+
     private TextView config_guide_title;
     private ImageView config_guide_prdt;
     private ImageView config_guide_icon;
@@ -46,6 +49,8 @@ public class ConfigGuideFragment extends BaseFragment {
 
     private ConnectNetViewModel mConnectNetViewModel;
     private ConnectNetBean mConnectNetBean;
+
+    private ExoProduct mProduct;
 
     private ValueAnimator mAnimator;
 
@@ -100,16 +105,19 @@ public class ConfigGuideFragment extends BaseFragment {
     protected void initData() {
         mConnectNetViewModel = ViewModelProviders.of(getActivity()).get(ConnectNetViewModel.class);
         mConnectNetBean = mConnectNetViewModel.getData();
-        if (mConnectNetBean == null) {
-            return;
-        }
         mConnectNetViewModel.observe(this, new Observer<ConnectNetBean>() {
             @Override
             public void onChanged(@Nullable ConnectNetBean connectNetBean) {
                 refreshData();
             }
         });
-
+        if (mConnectNetBean == null) {
+            return;
+        }
+        mProduct = ExoProduct.getExoProduct(mConnectNetBean.getProductKey());
+        if (mProduct == null) {
+            return;
+        }
         refreshData();
 
 //        int duration = 500;
@@ -197,7 +205,7 @@ public class ConfigGuideFragment extends BaseFragment {
 
     private void refreshData() {
         unregisterWifiReceiver();
-        config_guide_prdt.setImageResource(DeviceUtil.getProductIcon(mConnectNetBean.getProductKey()));
+        config_guide_prdt.setImageResource(mProduct.getIcon());
         config_guide_next.setEnabled(!mConnectNetBean.isCompatibleMode());
         if (mAnimator != null) {
             mAnimator.cancel();
@@ -208,19 +216,30 @@ public class ConfigGuideFragment extends BaseFragment {
             config_guide_title.setText(R.string.set_device_compatiblemode );
             duration = 1500;
             SpannableStringBuilder ssb = new SpannableStringBuilder();
-            String ssid;
-            if (TextUtils.equals(AliotConsts.PRODUCT_KEY_EXOLED, mConnectNetBean.getProductKey())) {
-                ssid = AliotConsts.EXOLED_AP_SSID;
-                ssb.append(getString(R.string.apconfig_guide_strip, ssid));
-            } else if (TextUtils.equals(AliotConsts.PRODUCT_KEY_EXOSOCKET, mConnectNetBean.getProductKey())) {
-                ssid = AliotConsts.EXOSOCKET_AP_SSID;
-                ssb.append(getString(R.string.apconfig_guide_default, ssid));
-            } else if (TextUtils.equals(AliotConsts.PRODUCT_KEY_EXOMONSOON, mConnectNetBean.getProductKey())) {
-                ssid = AliotConsts.EXOMONSOON_AP_SSID;
-                ssb.append(getString(R.string.apconfig_guide_default, ssid));
-            } else {
-                return;
+            String ssid = mProduct.getProductName() + "_XXXXXX";
+            switch (mProduct) {
+                case ExoLed:
+                    ssb.append(getString(R.string.apconfig_guide_strip, ssid));
+                    break;
+                case ExoSocket:
+                case ExoMonsoon:
+                    ssb.append(getString(R.string.apconfig_guide_default, ssid));
+                    break;
+                default:
+                    return;
             }
+//            if (TextUtils.equals(AliotConsts.PRODUCT_KEY_EXOLED, mConnectNetBean.getProductKey())) {
+//                ssid = AliotConsts.EXOLED_AP_SSID;
+//                ssb.append(getString(R.string.apconfig_guide_strip, ssid));
+//            } else if (TextUtils.equals(AliotConsts.PRODUCT_KEY_EXOSOCKET, mConnectNetBean.getProductKey())) {
+//                ssid = AliotConsts.EXOSOCKET_AP_SSID;
+//                ssb.append(getString(R.string.apconfig_guide_default, ssid));
+//            } else if (TextUtils.equals(AliotConsts.PRODUCT_KEY_EXOMONSOON, mConnectNetBean.getProductKey())) {
+//                ssid = AliotConsts.EXOMONSOON_AP_SSID;
+//                ssb.append(getString(R.string.apconfig_guide_default, ssid));
+//            } else {
+//                return;
+//            }
             ClickableSpan clickableText = new ClickableSpan() {
                 @Override
                 public void onClick(@NonNull View widget) {
@@ -270,29 +289,42 @@ public class ConfigGuideFragment extends BaseFragment {
     }
 
     private void onWiFiChanged(WifiInfo wifiInfo, DhcpInfo dhcpInfo) {
-        if (wifiInfo == null || dhcpInfo == null) {
+        if (wifiInfo == null || dhcpInfo == null || dhcpInfo.gateway != ESP8266_GATEWAY) {
+            config_guide_next.setEnabled(false);
             return;
         }
-        if (dhcpInfo.gateway == DeviceUtil.ESP8266_GATEWAY) {
-            String ssid = wifiInfo.getSSID();
-            if (ssid.startsWith("\"") && ssid.endsWith("\"")) {
-                ssid = ssid.substring(1, ssid.length()-1);
-            }
-            if (TextUtils.equals(mConnectNetBean.getProductKey(), AliotConsts.PRODUCT_KEY_EXOLED) &&
-                ssid.matches(DeviceUtil.EXO_STRIP_REGEX)) {
-                config_guide_next.setEnabled(true);
-                return;
-            } else if (TextUtils.equals(mConnectNetBean.getProductKey(), AliotConsts.PRODUCT_KEY_EXOSOCKET) &&
-                       ssid.matches(DeviceUtil.EXO_SOCKET_REGEX)) {
-                config_guide_next.setEnabled(true);
-                return;
-            } else if (TextUtils.equals(mConnectNetBean.getProductKey(), AliotConsts.PRODUCT_KEY_EXOMONSOON) &&
-                       ssid.matches(DeviceUtil.EXO_MONSOON_REGEX)) {
-                config_guide_next.setEnabled(true);
-                return;
-            }
+        String ssid = wifiInfo.getSSID();
+        if (ssid.startsWith("\"") && ssid.endsWith("\"")) {
+            ssid = ssid.substring(1, ssid.length()-1);
         }
-        config_guide_next.setEnabled(false);
+        if (ssid.matches(mProduct.getSsidRegex())) {
+            config_guide_next.setEnabled(true);
+        }
+//        if (dhcpInfo.gateway == DeviceUtil.ESP8266_GATEWAY) {
+//            String ssid = wifiInfo.getSSID();
+//            if (ssid.startsWith("\"") && ssid.endsWith("\"")) {
+//                ssid = ssid.substring(1, ssid.length()-1);
+//            }
+//            switch (mProduct) {
+//                case ExoLed:
+//
+//                    break;
+//            }
+//            if (TextUtils.equals(mConnectNetBean.getProductKey(), AliotConsts.PRODUCT_KEY_EXOLED) &&
+//                ssid.matches(DeviceUtil.EXO_STRIP_REGEX)) {
+//                config_guide_next.setEnabled(true);
+//                return;
+//            } else if (TextUtils.equals(mConnectNetBean.getProductKey(), AliotConsts.PRODUCT_KEY_EXOSOCKET) &&
+//                       ssid.matches(DeviceUtil.EXO_SOCKET_REGEX)) {
+//                config_guide_next.setEnabled(true);
+//                return;
+//            } else if (TextUtils.equals(mConnectNetBean.getProductKey(), AliotConsts.PRODUCT_KEY_EXOMONSOON) &&
+//                       ssid.matches(DeviceUtil.EXO_MONSOON_REGEX)) {
+//                config_guide_next.setEnabled(true);
+//                return;
+//            }
+//        }
+//        config_guide_next.setEnabled(false);
     }
 
     private void registerWifiReceiver() {

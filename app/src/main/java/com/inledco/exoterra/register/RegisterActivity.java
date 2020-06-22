@@ -1,6 +1,5 @@
 package com.inledco.exoterra.register;
 
-import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.design.widget.TextInputLayout;
@@ -21,7 +20,6 @@ import com.inledco.exoterra.util.RegexUtil;
 import com.inledco.exoterra.view.AdvancedTextInputEditText;
 import com.inledco.exoterra.view.MessageDialog;
 import com.inledco.exoterra.view.PasswordEditText;
-import com.liruya.loaddialog.LoadDialog;
 
 public class RegisterActivity extends BaseActivity {
     private Toolbar register_toolbar;
@@ -34,10 +32,6 @@ public class RegisterActivity extends BaseActivity {
     private TextInputLayout register_til_password;
     private PasswordEditText register_et_password;
     private Button register_btn_signup;
-    private LoadDialog mLoadDialog;
-    private ProgressDialog mProgressDialog;
-
-//    private boolean showPassword;
 
     private VerifycodeManager mVerifycodeManager;
 
@@ -82,18 +76,13 @@ public class RegisterActivity extends BaseActivity {
 
     @Override
     protected void initData() {
-        mLoadDialog = new LoadDialog(this);
-        mProgressDialog = new ProgressDialog(this);
-        mProgressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-
         mVerifycodeCallback = new HttpCallback<UserApi.Response>() {
             @Override
             public void onError(final String error) {
+                dismissLoadDialog();
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        Toast.makeText(RegisterActivity.this, error, Toast.LENGTH_SHORT)
-                             .show();
                         getMessageDialog().setTitle(R.string.title_verifycode_sent_failed)
                                           .setMessage(error)
                                           .show();
@@ -103,6 +92,7 @@ public class RegisterActivity extends BaseActivity {
 
             @Override
             public void onSuccess(UserApi.Response result) {
+                dismissLoadDialog();
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
@@ -117,7 +107,7 @@ public class RegisterActivity extends BaseActivity {
         mRegisterCallback = new HttpCallback<UserApi.Response>() {
             @Override
             public void onError(String error) {
-                dismissLoading();
+                dismissLoadDialog();
                 new MessageDialog(RegisterActivity.this).setTitle(R.string.signup_failed)
                                                         .setMessage(error)
                                                         .setButton(getString(R.string.ok), null)
@@ -126,7 +116,7 @@ public class RegisterActivity extends BaseActivity {
 
             @Override
             public void onSuccess(UserApi.Response result) {
-                dismissLoading();
+                dismissLoadDialog();
                 backtoLoginActivity(true);
             }
         };
@@ -160,23 +150,10 @@ public class RegisterActivity extends BaseActivity {
                     return;
                 }
                 AliotServer.getInstance().getEmailVerifycode(email, mVerifycodeCallback);
+                showLoadDialog();
                 mVerifycodeManager.addRegisterVerifycode(email);
             }
         });
-
-//        register_et_password.setDrawableRightClickListener(new AdvancedTextInputEditText.DrawableRightClickListener() {
-//            @Override
-//            public void onDrawableRightClick() {
-//                showPassword = !showPassword;
-//                if (showPassword) {
-//                    register_et_password.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_lock_white_24dp, 0, R.drawable.design_ic_visibility, 0);
-//                    register_et_password.setTransformationMethod(HideReturnsTransformationMethod.getInstance());
-//                } else {
-//                    register_et_password.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_lock_white_24dp, 0, R.drawable.design_ic_visibility_off, 0);
-//                    register_et_password.setTransformationMethod(PasswordTransformationMethod.getInstance());
-//                }
-//            }
-//        });
 
         register_btn_signup.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -205,8 +182,8 @@ public class RegisterActivity extends BaseActivity {
                     register_et_password.requestFocus();
                     return;
                 }
-                showLoading();
                 AliotServer.getInstance().register(email, password, verifycode, nickname, mRegisterCallback);
+                showLoadDialog();
             }
         });
     }
@@ -225,16 +202,6 @@ public class RegisterActivity extends BaseActivity {
 
     private String getPasswordText() {
         return register_et_password.getText().toString();
-    }
-
-    private void showLoading() {
-//        mLoadDialog.show();
-        mProgressDialog.show();
-    }
-
-    private void dismissLoading() {
-//        mLoadDialog.dismiss();
-        mProgressDialog.dismiss();
     }
 
     private void showRegisterSuccessDialog() {

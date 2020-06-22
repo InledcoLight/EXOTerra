@@ -16,8 +16,9 @@ import android.widget.TextView;
 
 import com.inledco.exoterra.R;
 import com.inledco.exoterra.base.BaseFragment;
+import com.inledco.exoterra.bean.ExoProduct;
 import com.inledco.exoterra.manager.DeviceManager;
-import com.inledco.exoterra.util.DeviceUtil;
+import com.inledco.exoterra.manager.UserManager;
 import com.inledco.exoterra.util.RouterUtil;
 import com.inledco.exoterra.view.CircleSeekbar;
 
@@ -29,6 +30,7 @@ public class SmartConfigFragment extends BaseFragment {
     private TextView netconfig_progress;
     private Button netconfig_back;
 
+    private boolean mSubscribe;
     private SmartConfigLinker mSmartConfigLinker;
     private SmartConfigListener mSmartConfigListener = new SmartConfigListener() {
         @Override
@@ -50,8 +52,13 @@ public class SmartConfigFragment extends BaseFragment {
             mConnectNetViewModel.getData().setDeviceName(dname);
             mConnectNetViewModel.getData().setAddress(mac);
             mConnectNetViewModel.postValue();
-            getActivity().getSupportFragmentManager().popBackStack(null, 1);
-            replaceFragment(R.id.adddevice_fl, new ConfigDeviceFragment());
+            if (mSubscribe) {
+                DeviceManager.getInstance().getSubscribedDevices();
+                getActivity().getSupportFragmentManager().popBackStack(null, 1);
+                replaceFragment(R.id.adddevice_fl, new ConfigDeviceFragment());
+            } else {
+                showSmartConfigSuccessDialog();
+            }
         }
 
         @Override
@@ -105,15 +112,18 @@ public class SmartConfigFragment extends BaseFragment {
         mConnectNetViewModel = ViewModelProviders.of(getActivity()).get(ConnectNetViewModel.class);
         ConnectNetBean bean = mConnectNetViewModel.getData();
 
-        netconfig_prdt.setImageResource(DeviceUtil.getProductIcon(bean.getProductKey()));
+        ExoProduct product = ExoProduct.getExoProduct(bean.getProductKey());
+        if (product != null) {
+            netconfig_prdt.setImageResource(product.getIcon());
+        }
         netconfig_title.setText(R.string.smartconfig);
 
-        boolean subscribe = true;
+        mSubscribe = UserManager.getInstance().isAuthorized();
         String pid = bean.getProductKey();
         String ssid = bean.getSsid();
         String gateway = bean.getBssid();
         String psw = bean.getPassword();
-        mSmartConfigLinker = new SmartConfigLinker((AppCompatActivity) getActivity(), subscribe, pid, ssid, gateway, psw);
+        mSmartConfigLinker = new SmartConfigLinker((AppCompatActivity) getActivity(), mSubscribe, pid, ssid, gateway, psw);
         mSmartConfigLinker.setSmartConfigListener(mSmartConfigListener);
 
         mSmartConfigLinker.startTask();
@@ -153,6 +163,20 @@ public class SmartConfigFragment extends BaseFragment {
                        mConnectNetViewModel.getData().setCompatibleMode(true);
                        mConnectNetViewModel.postValue();
                        getActivity().getSupportFragmentManager().popBackStack();
+                   }
+               })
+               .setCancelable(false)
+               .show();
+    }
+
+    private void showSmartConfigSuccessDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        builder.setTitle("Config Success")
+               .setMessage(mConnectNetViewModel.getData().getAddress())
+               .setPositiveButton(R.string.close, new DialogInterface.OnClickListener() {
+                   @Override
+                   public void onClick(DialogInterface dialog, int which) {
+                       getActivity().finish();
                    }
                })
                .setCancelable(false)

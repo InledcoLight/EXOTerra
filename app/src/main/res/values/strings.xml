@@ -19,7 +19,7 @@
     <string name="error_email">Invalid email</string>
     <string name="error_password">Password length 6 ~ 16</string>
     <string name="error_nickname">Nickname can not be empty</string>
-    <string name="error_verifycode">Verify code is 6 digits</string>
+    <string name="error_verifycode">Verify code is 4 digits</string>
     <string name="hint_nickname">Nickname</string>
     <string name="has_account_signin">Already has account? Back to signin</string>
     <string name="new_password">New password</string>
@@ -157,27 +157,20 @@
 
     <string name="smartconfig_guide_default">
         1.  Press and hold the device key until the green led flashes once every second\n
-
     </string>
     <string name="smartconfig_guide_strip">
         1.  Press the touch key to change the led to green\n
-
         2.  Press and hold the touch key until the green led flashes once every second\n
     </string>
     <string name="apconfig_guide_default">
         1.  Press and hold the device key until the green led flashes once every second\n
-
         2.  Again press and hold the device key until the green led flashes once every three seconds\n
-
         3.  Connect your phone to %1$s\n
     </string>
     <string name="apconfig_guide_strip">
         1.  Press the touch key to change the led to green\n
-
         2.  Press and hold the touch key until the green led flashes once every second\n
-
         3.  Again press and hold the touch key until the green led flashes once every three second\n
-
         4.  Connect your phone to %1$s\n
     </string>
     <string name="config_guide">Config guide</string>
@@ -360,4 +353,21 @@
     <string name="invite_messages">Invite Messages</string>
     <string name="received">Received</string>
     <string name="sent">Sent</string>
+    <string name="scan">Scan</string>
+    <string name="connect_wifi">Connect WiFi</string>
+    <string name="scan_device_msg">You need connect WiFi to scan local devices.</string>
+    <string name="refreshing">Refreshing...</string>
+    <string name="pulldown_to_refresh">Pulldown to refresh</string>
+    <string name="release_to_refresh">Release to refresh</string>
+    <string name="loading">Loading...</string>
+    <string name="refresh_failed">Refresh failed</string>
+    <string name="refresh_success">Refresh success</string>
+    <string name="last_update">\'Last update\' M-d HH:mm</string>
+    <string name="signin_msg">You have not signin, please signin.</string>
+    <string name="scan_local_devices">Scan Local Devices</string>
+    <string name="scan_devices_warning">
+        No device was scanned!\n
+        \n
+        Make sure the device and phone are connected to the same network.
+    </string>
 </resources>

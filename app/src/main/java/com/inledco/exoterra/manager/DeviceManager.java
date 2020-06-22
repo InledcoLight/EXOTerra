@@ -5,7 +5,7 @@ import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.inledco.exoterra.aliot.AliotClient;
+import com.inledco.exoterra.aliot.ADevice;
 import com.inledco.exoterra.aliot.AliotConsts;
 import com.inledco.exoterra.aliot.AliotServer;
 import com.inledco.exoterra.aliot.Device;
@@ -16,7 +16,6 @@ import com.inledco.exoterra.aliot.HttpCallback;
 import com.inledco.exoterra.aliot.UserApi;
 import com.inledco.exoterra.aliot.bean.XDevice;
 import com.inledco.exoterra.event.DevicesRefreshedEvent;
-import com.inledco.exoterra.util.DeviceUtil;
 
 import org.greenrobot.eventbus.EventBus;
 
@@ -199,13 +198,14 @@ public class DeviceManager {
     }
 
     public void getExoSocketSensors() {
-        final Set<String> deviceNames = new HashSet<>();
+        final Set<Device> devices = new HashSet<>();
         for (Device device : mDevices) {
-            if (TextUtils.equals(device.getProductKey(), AliotConsts.PRODUCT_KEY_EXOSOCKET)) {
-                deviceNames.add(device.getDeviceName());
+            if (TextUtils.equals(device.getProductKey(), AliotConsts.PRODUCT_KEY_EXOSOCKET)
+                && device.isOnline()) {
+                devices.add(device);
             }
         }
-        if (deviceNames.size() == 0) {
+        if (devices.size() == 0) {
             return;
         }
         if (mAsyncTask != null) {
@@ -214,9 +214,50 @@ public class DeviceManager {
         mAsyncTask = new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... voids) {
-                final String prodcut = DeviceUtil.getProductName(AliotConsts.PRODUCT_KEY_EXOSOCKET).toLowerCase();
-                for (String dname : deviceNames) {
-                    AliotClient.getInstance().getProperty(prodcut, dname, "SensorAvailable", "Sensor");
+//                HttpCallback<UserApi.PublishTopicResponse> callback = new HttpCallback<UserApi.PublishTopicResponse>() {
+//                    @Override
+//                    public void onError(String error) {
+//
+//                    }
+//
+//                    @Override
+//                    public void onSuccess(UserApi.PublishTopicResponse result) {
+//
+//                    }
+//                };
+                HttpCallback<UserApi.GetDevicePropertiesResponse> callback = new HttpCallback<UserApi.GetDevicePropertiesResponse>() {
+                    @Override
+                    public void onError(String error) {
+
+                    }
+
+                    @Override
+                    public void onSuccess(UserApi.GetDevicePropertiesResponse result) {
+
+                    }
+                };
+                for (final Device device : devices) {
+                    AliotServer.getInstance().getDeviceProperties(device.getProductKey(),
+                                                                  device.getDeviceName(),
+                                                                  new HttpCallback<UserApi.GetDevicePropertiesResponse>() {
+                                                                      @Override
+                                                                      public void onError(String error) {
+
+                                                                      }
+
+                                                                      @Override
+                                                                      public void onSuccess(UserApi.GetDevicePropertiesResponse result) {
+                                                                          device.updateProperties(result.data);
+                                                                          ADevice adev = new ADevice(device.getProductKey(), device.getDeviceName());
+                                                                          EventBus.getDefault().post(adev);
+                                                                      }
+                                                                  });
+//                    AliotServer.getInstance()
+//                               .getDeviceProperties(AliotConsts.PRODUCT_KEY_EXOSOCKET,
+//                                                    dname,
+//                                                    callback,
+//                                                    "SensorAvailable", "Sensor");
+
                     try {
                         Thread.sleep(20);
                     } catch (InterruptedException e) {

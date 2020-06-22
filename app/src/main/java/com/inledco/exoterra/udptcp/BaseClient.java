@@ -1,4 +1,4 @@
-package com.inledco.exoterra.adddevice;
+package com.inledco.exoterra.udptcp;
 
 import android.support.annotation.NonNull;
 
@@ -13,9 +13,12 @@ public abstract class BaseClient {
     protected boolean mListening;
     protected final ExecutorService mExecutorService;
 
-    protected Listener mListener;
-
     protected final Object mLock;
+
+    public BaseClient() {
+        mExecutorService = Executors.newCachedThreadPool();
+        mLock = new Object();
+    }
 
     public BaseClient(String remoteAddress, int remotePort) {
         if (!RegexUtil.isIP(remoteAddress)) {
@@ -54,21 +57,12 @@ public abstract class BaseClient {
         return mListening;
     }
 
-    public void setListener(Listener listener) {
-        mListener = listener;
-    }
-
-    protected void send(@NonNull String value) {
+    public void send(@NonNull String value) {
         send(value.getBytes());
     }
 
-    protected abstract void start();
-    protected abstract void stop();
-    protected abstract void send(@NonNull byte[] bytes);
-    protected abstract void receive();
-
-    public interface Listener {
-        void onError(String error);
-        void onReceive(byte[] bytes);
-    }
+    public abstract void start();
+    public abstract void stop();
+    public abstract void send(@NonNull byte[] bytes);
+    public abstract void receive();
 }

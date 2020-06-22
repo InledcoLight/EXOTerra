@@ -8,9 +8,9 @@ import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.inledco.exoterra.GlobalSettings;
 import com.inledco.exoterra.R;
 import com.inledco.exoterra.aliot.ExoSocket;
 import com.inledco.exoterra.aliot.SocketViewModel;
@@ -18,6 +18,7 @@ import com.inledco.exoterra.base.BaseFragment;
 import com.inledco.exoterra.util.SensorUtil;
 
 public class SocketFragment extends BaseFragment {
+    private LinearLayout socket_sensor_group;
     private TextView socket_sensor1;
     private TextView socket_sensor2;
 //    private ImageButton socket_power;
@@ -48,6 +49,7 @@ public class SocketFragment extends BaseFragment {
 
     @Override
     protected void initView(View view) {
+        socket_sensor_group = view.findViewById(R.id.socket_sensor_group);
         socket_sensor1 = view.findViewById(R.id.socket_sensor1);
         socket_sensor2 = view.findViewById(R.id.socket_sensor2);
 //        socket_power = view.findViewById(R.id.socket_power);
@@ -73,20 +75,13 @@ public class SocketFragment extends BaseFragment {
 
     @Override
     protected void initEvent() {
-//        socket_power.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                mSocketViewModel.setPower(!mSocket.getPower());
-//            }
-//        });
-//
-//        socket_ib_back.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                getActivity().finish();
-//            }
-//        });
-//
+        socket_sensor_group.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                addFragmentToStack(R.id.device_root, new SensorHistoryFragment());
+            }
+        });
+
 //        socket_ctv_timer.setOnClickListener(new View.OnClickListener() {
 //            @Override
 //            public void onClick(View v) {
@@ -174,31 +169,5 @@ public class SocketFragment extends BaseFragment {
                 }
                 break;
         }
-    }
-
-    private String getSensorValueText(int value, int type) {
-        String text = String.valueOf(value);
-        switch (type) {
-            case ExoSocket.SENSOR_TEMPERATURE:
-                text = GlobalSettings.getTemperatureText(value);
-                break;
-            case ExoSocket.SENSOR_HUMIDITY:
-                text = value/10 + "." + value%10;
-                break;
-        }
-        return text;
-    }
-
-    private String getSensorUnit(int type) {
-        String text = "";
-        switch (type) {
-            case ExoSocket.SENSOR_TEMPERATURE:
-                text = GlobalSettings.getTemperatureUnit();
-                break;
-            case ExoSocket.SENSOR_HUMIDITY:
-                text = "%";
-                break;
-        }
-        return text;
     }
 }

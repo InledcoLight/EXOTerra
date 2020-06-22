@@ -15,10 +15,11 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.inledco.exoterra.R;
+import com.inledco.exoterra.aliot.AliotClient;
 import com.inledco.exoterra.base.BaseFragment;
+import com.inledco.exoterra.bean.ExoProduct;
 import com.inledco.exoterra.manager.DeviceManager;
 import com.inledco.exoterra.manager.UserManager;
-import com.inledco.exoterra.util.DeviceUtil;
 import com.inledco.exoterra.util.RouterUtil;
 import com.inledco.exoterra.view.CircleSeekbar;
 
@@ -33,6 +34,7 @@ public class CompatibleModeFragment extends BaseFragment {
     private ConnectNetViewModel mConnectNetViewModel;
     private ConnectNetBean mConnectNetBean;
 
+    private boolean mSubscribe;
     private APConfigLinker mAPConfigLinker;
     private APConfigLinker.APConfigListener mListener;
 
@@ -41,6 +43,7 @@ public class CompatibleModeFragment extends BaseFragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = super.onCreateView(inflater, container, savedInstanceState);
 
+        AliotClient.getInstance().deinit();
         initData();
         initEvent();
         return view;
@@ -49,6 +52,11 @@ public class CompatibleModeFragment extends BaseFragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
+        if (UserManager.getInstance().isAuthorized()) {
+            String userid = UserManager.getInstance().getUserid();
+            String secret = UserManager.getInstance().getSecret();
+            AliotClient.getInstance().init(getContext().getApplicationContext(), userid, secret, null);
+        }
         if (mAPConfigLinker != null) {
             mAPConfigLinker.stopTask();
             mConnectNetViewModel.getData().setRunning(false);
@@ -76,14 +84,22 @@ public class CompatibleModeFragment extends BaseFragment {
         if (mConnectNetBean == null) {
             return;
         }
-        netconfig_prdt.setImageResource(DeviceUtil.getProductIcon(mConnectNetBean.getProductKey()));
+        ExoProduct product = ExoProduct.getExoProduct(mConnectNetBean.getProductKey());
+        if (product != null) {
+            netconfig_prdt.setImageResource(product.getIcon());
+        }
         netconfig_title.setText(R.string.compatible_mode);
 
         mConnectNetBean.setRunning(true);
         mConnectNetViewModel.postValue();
-        boolean subscribe = UserManager.getInstance().isAuthorized();
-        mAPConfigLinker = new APConfigLinker(subscribe, mConnectNetBean.getProductKey(), mConnectNetBean.getSsid(), mConnectNetBean.getBssid(),
-                                             mConnectNetBean.getPassword(), (AppCompatActivity) getActivity());
+        mSubscribe = UserManager.getInstance().isAuthorized();
+        mAPConfigLinker = new APConfigLinker(mSubscribe,
+                                             mConnectNetBean.getProductKey(),
+                                             mConnectNetBean.getSsid(),
+                                             mConnectNetBean.getBssid(),
+                                             mConnectNetBean.getPassword(),
+                                             mConnectNetBean.getNetworkId(),
+                                             (AppCompatActivity) getActivity());
         mListener = new APConfigLinker.APConfigListener() {
             @Override
             public void onProgressUpdate(int progress) {
@@ -105,9 +121,13 @@ public class CompatibleModeFragment extends BaseFragment {
                 mConnectNetBean.setAddress(mac);
                 mConnectNetViewModel.postValue();
                 RouterUtil.putRouterPassword(getContext(), mConnectNetViewModel.getData().getSsid(), mConnectNetViewModel.getData().getPassword());
-                DeviceManager.getInstance().getSubscribedDevices();
-                getActivity().getSupportFragmentManager().popBackStack(null, 1);
-                addFragmentToStack(R.id.adddevice_fl, new ConfigDeviceFragment());
+                if (mSubscribe) {
+                    DeviceManager.getInstance().getSubscribedDevices();
+                    getActivity().getSupportFragmentManager().popBackStack(null, 1);
+                    addFragmentToStack(R.id.adddevice_fl, new ConfigDeviceFragment());
+                } else {
+                    showAPConfigSuccessDialog();
+                }
             }
 
             @Override
@@ -153,6 +173,20 @@ public class CompatibleModeFragment extends BaseFragment {
                        mConnectNetViewModel.getData().setCompatibleMode(false);
                        mConnectNetViewModel.postValue();
                        getActivity().getSupportFragmentManager().popBackStack();
+                   }
+               })
+               .setCancelable(false)
+               .show();
+    }
+
+    private void showAPConfigSuccessDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        builder.setTitle("Config Success")
+               .setMessage(mConnectNetBean.getAddress())
+               .setPositiveButton(R.string.close, new DialogInterface.OnClickListener() {
+                   @Override
+                   public void onClick(DialogInterface dialog, int which) {
+                       getActivity().finish();
                    }
                })
                .setCancelable(false)

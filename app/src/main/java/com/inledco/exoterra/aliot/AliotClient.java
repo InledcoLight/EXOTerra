@@ -17,10 +17,15 @@ import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
 import com.aliyun.alink.dm.api.DeviceInfo;
 import com.aliyun.alink.dm.api.IoTApiClientConfig;
+import com.aliyun.alink.h2.api.CompletableListener;
+import com.aliyun.alink.h2.entity.Http2Request;
+import com.aliyun.alink.h2.stream.api.CompletableDataListener;
+import com.aliyun.alink.h2.stream.api.IStreamSender;
 import com.aliyun.alink.linkkit.api.ILinkKitConnectListener;
 import com.aliyun.alink.linkkit.api.IoTMqttClientConfig;
 import com.aliyun.alink.linkkit.api.LinkKit;
 import com.aliyun.alink.linkkit.api.LinkKitInitParams;
+import com.aliyun.alink.linksdk.channel.core.persistent.mqtt.MqttConfigure;
 import com.aliyun.alink.linksdk.cmp.connect.channel.MqttPublishRequest;
 import com.aliyun.alink.linksdk.cmp.connect.channel.MqttSubscribeRequest;
 import com.aliyun.alink.linksdk.cmp.core.base.AMessage;
@@ -31,23 +36,29 @@ import com.aliyun.alink.linksdk.cmp.core.listener.IConnectNotifyListener;
 import com.aliyun.alink.linksdk.cmp.core.listener.IConnectSendListener;
 import com.aliyun.alink.linksdk.cmp.core.listener.IConnectSubscribeListener;
 import com.aliyun.alink.linksdk.cmp.core.listener.IConnectUnscribeListener;
-import com.aliyun.alink.linksdk.tmp.device.payload.ValueWrapper;
 import com.aliyun.alink.linksdk.tools.AError;
+import com.aliyun.alink.linksdk.tools.ALog;
+import com.inledco.exoterra.AppConfig;
 import com.inledco.exoterra.AppConstants;
 import com.inledco.exoterra.R;
+import com.inledco.exoterra.aliot.bean.AttrKey;
+import com.inledco.exoterra.aliot.bean.CotaConfigRequest;
+import com.inledco.exoterra.aliot.bean.DeleteLabelRequest;
+import com.inledco.exoterra.aliot.bean.DeviceLabel;
 import com.inledco.exoterra.aliot.bean.InviteAction;
 import com.inledco.exoterra.aliot.bean.InviteMessage;
+import com.inledco.exoterra.aliot.bean.UpdateLabelRequest;
 import com.inledco.exoterra.event.DeviceStatusChangedEvent;
 import com.inledco.exoterra.manager.DeviceManager;
+import com.inledco.exoterra.manager.GroupManager;
 
 import org.greenrobot.eventbus.EventBus;
 
 import java.lang.ref.WeakReference;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class AliotClient {
 
@@ -66,77 +77,67 @@ public class AliotClient {
     private final String IOT_DOMAIN;
 
     /**
+     * {productKey, region}
+     */
+    private final String IOTH2_EDNPOINT_FMT = "https://%1$s.iot-as-http2.%2$s.aliyuncs.com:443";
+    private final String IOTH2_ENDPOINT;
+
+    /**
      * {productKey}  {region}
      */
     private final String MQTT_DOMAIN_FMT = "%1$s.iot-as-mqtt.%2$s.aliyuncs.com:1883";
     private final String MQTT_DOMAIN;
 
-    private final String REGION = "us-west-1";
-
-    private final String APP_PRODUCT_KEY = "a3jdKlLMaEn";
-    private final String APP_PRODUCT_SECRET = "AAWBJNSJkaxi3nvh";
+//    private final String REGION = "us-west-1";
+//    private final String APP_KEY = "a3jdKlLMaEn";
+//    private final String APP_SECRET = "AAWBJNSJkaxi3nvh";
+    private final String REGION;
+    private final String APP_KEY;
+    private final String APP_SECRET;
 
     private final String CODE_SUCCESS = "200";
     private final String KEY_DEVICE_SECRET = "deviceSecret";
 
     /**
-     * publish {appkey, userid(deviceName), product}
+     * publish {APP_KEY, userid}
      */
-    private final String propertySetFormat = "/%1$s/%2$s/user/%3$s/property/set";
 
-    /**
-     * publish {appkey, userid(deviceName), product}
-     */
-    private final String propertyGetFormat = "/%1$s/%2$s/user/%3$s/property/get";
+    private final String propertySetFormat = "/%1$s/%2$s/user/property/set";
 
-    /**
-     * subscribe {appkey, userid(deviceName)}
-     */
-    private final String propertyResponseFormat = "/%1$s/%2$s/user/property/response";
+    private final String propertyGetFormat = "/%1$s/%2$s/user/property/get";
 
-    /**
-     * subscribe {appkey, userid(deviceName)}
-     */
-    private final String deviceStatusFormat = "/%1$s/%2$s/user/status";
+    private final String fotaUpgradeFormat = "/%1$s/%2$s/user/fota/upgrade";
 
-    /**
-     * publish {appkey, userid, product}
-     */
-    private final String fotaUpgradeFormat = "/%1$s/%2$s/user/%3$s/fota/upgrade";
-
-    /**
-     * subscribe {appkey, userid, product}
-     */
-    private final String fotaProgressFormat = "/%1$s/%2$s/user/fota/progress";
-
-    /**
-     * publish {appkey, userid}
-     */
-    private final String inviteFormat = "/%1$s/%2$s/user/group/invite";
-
-    /**
-     * publish {appkey, userid}
-     */
-    private final String inviteReplyFormat = "/%1$s/%2$s/user/group/invite_reply";
-
-    /**
-     * subscribe {appkey, userid}
-     */
-    private final String inviteListenFormat = "/%1$s/%2$s/user/group/invite_listen";
-
-    /**
-     * publish {appkey, userid}
-     */
     private final String sntpRequestFormat = "/ext/ntp/%1$s/%2$s/request";
 
-    /**
-     * subscribe {appkey, userid}
-     */
-    private final String sntpResponseFormat = "/ext/ntp/%1$s/%2$s/response";
+    private final String inviterFormat = "/%1$s/%2$s/user/group/inviter";
 
-    private final String SERVER_FILE_PATH = "http://47.89.235.158:8086/imgs/";
+    private final String inviteeFormat = "/%1$s/%2$s/user/group/invitee";
+    /*********************************************************************************************/
+
+
+    /**
+     * subscribe {APP_KEY, userid(deviceName)}
+     */
+
+    private final String propertyResponseFormat = "/%1$s/%2$s/user/property/response";
+
+    private final String deviceStatusFormat = "/%1$s/%2$s/user/status";
+
+    private final String fotaProgressFormat = "/%1$s/%2$s/user/fota/progress";
+
+    private final String inviteListenFormat = "/%1$s/%2$s/user/group/listen";
+
+    private final String sntpResponseFormat = "/ext/ntp/%1$s/%2$s/response";
+    /*********************************************************************************************/
+
+//    private final String SERVER_FILE_PATH = "http://47.89.235.158:8086/imgs/";
 
     private WeakReference<Context> mWeakContext;
+
+    private final ExecutorService mExecutorService;
+
+    private int msgid;
 
     private String mUserid;
 
@@ -160,6 +161,7 @@ public class AliotClient {
                     device.setOnline(true);
                     EventBus.getDefault().post(new DeviceStatusChangedEvent(result.getProductKey(), result.getDeviceName()));
                 }
+                device.setRequestId(result.getRequestId());
                 device.updateProperties(result.getItems());
                 EventBus.getDefault().post(result);
             }
@@ -178,7 +180,7 @@ public class AliotClient {
         }
     };
 
-    private final SubscribeParser<InviteMessage> inviteParser = new SubscribeParser<InviteMessage>(inviteListenFormat) {
+    private final SubscribeParser<InviteMessage> inviteListenParser = new SubscribeParser<InviteMessage>(inviteListenFormat) {
         @Override
         public void onParse(InviteMessage result) {
             InviteAction action = InviteAction.getInviteAction(result);
@@ -196,14 +198,30 @@ public class AliotClient {
 
                     }
                     break;
+                case REMOVE:
+                    if (TextUtils.equals(mUserid, result.getInvitee())) {
+
+                    }
+                    break;
+                case DELETE:
+                    if (TextUtils.equals(mUserid, result.getInvitee())) {
+
+                    }
+                    break;
                 case ACCEPT:
                     if (TextUtils.equals(mUserid, result.getInviter())) {
+                        GroupManager.getInstance().getGroups();
                         showAcceptInviteMessage(result);
                     }
                     break;
                 case DENY:
                     if (TextUtils.equals(mUserid, result.getInviter())) {
                         showDenyInviteMessage(result);
+                    }
+                    break;
+                case EXIT:
+                    if (TextUtils.equals(mUserid, result.getInviter())) {
+
                     }
                     break;
             }
@@ -230,18 +248,24 @@ public class AliotClient {
         @Override
         public void onParse(UserApi.FotaProgress result) {
             Log.e(TAG, "onParse: " + JSON.toJSONString(result));
+            EventBus.getDefault().post(result);
         }
     };
 
-    private final SubscribeParser[] subscribeParsers = new SubscribeParser[] {responseParser, statusParser, inviteParser, sntpParser, fotaProgressParser};
+    private final SubscribeParser[] subscribeParsers = new SubscribeParser[] {
+        responseParser,
+        statusParser, inviteListenParser,
+        sntpParser,
+        fotaProgressParser
+    };
 
     private final IConnectNotifyListener mNotifyListener = new IConnectNotifyListener() {
         @Override
-        public void onNotify(String s, String s1, AMessage aMessage) {
+        public void onNotify(String connectId, String topic, AMessage aMessage) {
             String payload = new String((byte[]) aMessage.getData());
-            Log.e(TAG, "onNotify: " + s + " " + s1 + " " + payload);
+            Log.e(TAG, "onNotify: " + connectId + " " + topic + " " + payload);
             for (SubscribeParser parser : subscribeParsers) {
-                if (TextUtils.equals(s1, parser.getTopic(APP_PRODUCT_KEY, mUserid))) {
+                if (TextUtils.equals(topic, parser.getTopic(APP_KEY, mUserid))) {
                     parser.parse(payload);
                     return;
                 }
@@ -249,15 +273,28 @@ public class AliotClient {
         }
 
         @Override
-        public boolean shouldHandle(String s, String s1) {
-            Log.e(TAG, "shouldHandle: " + s + " " + s1);
-            return subTopics.contains(s1);
+        public boolean shouldHandle(String connectId, String topic) {
+            Log.e(TAG, "shouldHandle: " + connectId + " " + topic);
+//            return subTopics.contains(topic);
+            return true;
         }
 
         @Override
-        public void onConnectStateChange(String s, ConnectState connectState) {
-            Log.e(TAG, "onConnectStateChange: " + s + " " + connectState);
+        public void onConnectStateChange(String connectId, ConnectState connectState) {
+            Log.e(TAG, "onConnectStateChange: " + connectId + " " + connectState);
             connected = (connectState == ConnectState.CONNECTED);
+            if (connected) {
+                    //                subscribeTopic(String.format(customTopicFormat, APP_KEY, userid));
+                subscribeTopic(String.format(propertyResponseFormat, APP_KEY, mUserid));
+                subscribeTopic(String.format(deviceStatusFormat, APP_KEY, mUserid));
+                subscribeTopic(String.format(fotaProgressFormat, APP_KEY, mUserid));
+                subscribeTopic(String.format(inviteListenFormat, APP_KEY, mUserid));
+                if (!inited) {
+                    inited = true;
+
+                    syncTime();
+                }
+            }
         }
     };
 
@@ -274,56 +311,20 @@ public class AliotClient {
     };
 
     private AliotClient() {
+        REGION = AppConfig.getString("region");
+        APP_KEY = AppConfig.getString("appKey");
+        APP_SECRET = AppConfig.getString("appSecret");
         IOTAUTH_DOMAIN = String.format(IOTAUTH_DOMAIN_FMT, REGION);
         IOT_DOMAIN = String.format(IOT_DOMAIN_FMT, REGION);
-        MQTT_DOMAIN = String.format(MQTT_DOMAIN_FMT, APP_PRODUCT_KEY, REGION);
+        IOTH2_ENDPOINT = String.format(IOTH2_EDNPOINT_FMT, APP_KEY, REGION);
+        MQTT_DOMAIN = String.format(MQTT_DOMAIN_FMT, APP_KEY, REGION);
+
+        mExecutorService = Executors.newCachedThreadPool();
     }
 
     public static AliotClient getInstance() {
         return LazyHolder.INSTANCE;
     }
-
-//    public void dynamicRegister(final Context context, final String userid) {
-//        final DeviceInfo devInfo = new DeviceInfo();
-//        devInfo.productKey = APP_PRODUCT_KEY;
-//        devInfo.productSecret = APP_PRODUCT_SECRET;
-//        devInfo.deviceName = userid;
-//
-//        LinkKitInitParams params = new LinkKitInitParams();
-//        params.deviceInfo = devInfo;
-//        HubApiRequest request = new HubApiRequest();
-//        request.domain = IOTAUTH_DOMAIN;
-//        request.path = "/auth/register/device";
-//
-//        LinkKit.getInstance().deviceRegister(context, params, request, new IConnectSendListener() {
-//            @Override
-//            public void onResponse(ARequest aRequest, AResponse aResponse) {
-//                Log.e(TAG, "onResponse: " + JSON.toJSONString(aResponse));
-//                if (aResponse == null || aResponse.data == null) {
-//                    return;
-//                }
-//                String payload = aResponse.data.toString();
-//                Type type = new TypeReference<ResponseModel<Map<String, String>>>(){}.getType();
-//                try {
-//                    ResponseModel<Map<String, String>> response = JSONObject.parseObject(payload, type);
-//                    if (CODE_SUCCESS.equals(response.code) && response.data != null && response.data.containsKey(KEY_DEVICE_SECRET)) {
-//                        String deviceSecret = response.data.get(KEY_DEVICE_SECRET);
-//                        if (!TextUtils.isEmpty(deviceSecret)) {
-//                            devInfo.deviceSecret = deviceSecret;
-//                            UserPref.setSecret(context, deviceSecret);
-//                        }
-//                    }
-//                } catch (JSONException e) {
-//                    e.printStackTrace();
-//                }
-//            }
-//
-//            @Override
-//            public void onFailure(ARequest aRequest, AError aError) {
-//                Log.e(TAG, "onFailure: " + JSON.toJSONString(aError));
-//            }
-//        });
-//    }
 
     public boolean init(@NonNull final Context context, final String userid, final String secret, final ILinkKitConnectListener calback) {
         if (initing || inited) {
@@ -331,29 +332,35 @@ public class AliotClient {
             return false;
         }
         DeviceInfo devInfo = new DeviceInfo();
-        devInfo.productKey = APP_PRODUCT_KEY;
+        devInfo.productKey = APP_KEY;
+        devInfo.productSecret = APP_SECRET;
         devInfo.deviceName = userid;
         devInfo.deviceSecret = secret;
 
-        IoTMqttClientConfig clientConfig = new IoTMqttClientConfig(APP_PRODUCT_KEY, userid, secret);
-        // 慎用 设置 mqtt 请求域名, 默认 productKey+".iot-as-mqtt.cn-shanghai.aliyuncs.com:1883", 如果无具体的业务需求, 请不要设置
+        MqttConfigure.clientId = userid;
+        MqttConfigure.setKeepAliveInterval(120);
+        IoTMqttClientConfig clientConfig = new IoTMqttClientConfig(APP_KEY, userid, secret);
         clientConfig.channelHost = MQTT_DOMAIN;
         clientConfig.isCheckChannelRootCrt = false;
-        clientConfig.secureMode = 3;
+        clientConfig.secureMode = MqttConfigure.MQTT_SECURE_MODE_TCP;
+
         IoTApiClientConfig connectConfig = new IoTApiClientConfig();
         connectConfig.domain = IOT_DOMAIN;
 
-        Map<String, ValueWrapper> propertyValues = new HashMap<>();
+//        Map<String, ValueWrapper> propertyValues = new HashMap<>();
+//
+//        IoTH2Config ioTH2Config = new IoTH2Config();
+//        ioTH2Config.clientId = userid;
+//        ioTH2Config.endPoint = IOTH2_ENDPOINT;
 
         LinkKitInitParams params = new LinkKitInitParams();
         params.deviceInfo = devInfo;
-        params.propertyValues = propertyValues;
         params.mqttClientConfig = clientConfig;
         params.connectConfig = connectConfig;
+//        params.propertyValues = propertyValues;
+//        params.iotH2InitParams = ioTH2Config;
 
-        Log.e(TAG, "init: " + JSON.toJSONString(devInfo));
-        Log.e(TAG, "init: " + JSON.toJSONString(clientConfig));
-        Log.e(TAG, "init: " + JSON.toJSONString(connectConfig));
+        Log.e(TAG, "init: LinkKit SDK Version - " + LinkKit.getInstance().getSDKVersion());
         Log.e(TAG, "init: " + JSON.toJSONString(params));
         final long time = System.currentTimeMillis();
         LinkKit.getInstance().init(context, params, new ILinkKitConnectListener() {
@@ -367,56 +374,53 @@ public class AliotClient {
             }
 
             @Override
-            public void onInitDone(Object o) {
+            public void onInitDone(final Object o) {
                 Log.e(TAG, "onInitDone: " + (System.currentTimeMillis() - time));
-
-                LinkKit.getInstance().registerOnPushListener(mNotifyListener);
-
-                subscribeTopic(String.format(propertyResponseFormat, APP_PRODUCT_KEY, userid));
-                subscribeTopic(String.format(deviceStatusFormat, APP_PRODUCT_KEY, userid));
-                subscribeTopic(String.format(inviteListenFormat, APP_PRODUCT_KEY, userid));
-                subscribeTopic(String.format(sntpResponseFormat, APP_PRODUCT_KEY, userid), new IConnectSubscribeListener() {
-                    @Override
-                    public void onSuccess() {
-                        syncTime();
-                    }
-
-                    @Override
-                    public void onFailure(AError aError) {
-
-                    }
-                });
-                subscribeTopic(String.format(fotaProgressFormat, APP_PRODUCT_KEY, userid));
 
                 mWeakContext = new WeakReference<>(context);
                 IntentFilter filter = new IntentFilter(AppConstants.GROUP_INVITE);
                 mWeakContext.get().registerReceiver(mGroupInviteReceiver, filter);
 
+//                subscribeTopic(String.format(customTopicFormat, APP_KEY, userid));
+//                subscribeTopic(String.format(propertyResponseFormat, APP_KEY, userid));
+//                subscribeTopic(String.format(deviceStatusFormat, APP_KEY, userid));
+//                subscribeTopic(String.format(fotaProgressFormat, APP_KEY, userid));
+//                subscribeTopic(String.format(inviteListenFormat, APP_KEY, userid));
+//                syncTime();
+
                 mUserid = userid;
                 initing = false;
-                inited = true;
+//                inited = true;
 
                 if (calback != null) {
                     calback.onInitDone(o);
                 }
             }
         });
+        LinkKit.getInstance().registerOnPushListener(mNotifyListener);
         initing = true;
+        ALog.setLevel(ALog.LEVEL_DEBUG);
         return true;
     }
 
     public void deinit() {
-        unsubscribeAllTopics();
-        LinkKit.getInstance().unRegisterOnPushListener(mNotifyListener);
-        LinkKit.getInstance().deinit();
-        if (mWeakContext != null && mWeakContext.get() != null) {
-            mWeakContext.get().unregisterReceiver(mGroupInviteReceiver);
-            mWeakContext.clear();
-        }
-        connected = false;
-        inited = false;
-        initing = false;
-        mUserid = null;
+        mExecutorService.execute(new Runnable() {
+            @Override
+            public void run() {
+                unsubscribeAllTopics();
+                LinkKit.getInstance().unRegisterOnPushListener(mNotifyListener);
+                LinkKit.getInstance().deinit();
+                if (mWeakContext != null && mWeakContext.get() != null) {
+                    mWeakContext.get().unregisterReceiver(mGroupInviteReceiver);
+                    mWeakContext.clear();
+                    mWeakContext = null;
+                }
+                connected = false;
+                inited = false;
+                initing = false;
+                mUserid = null;
+            }
+        });
     }
 
     public boolean isInited() {
@@ -435,6 +439,7 @@ public class AliotClient {
         final MqttSubscribeRequest request = new MqttSubscribeRequest();
         request.topic = topic;
         request.isSubscribe = true;
+        request.qos = 1;
         LinkKit.getInstance().subscribe(request, new IConnectSubscribeListener() {
             @Override
             public void onSuccess() {
@@ -453,6 +458,7 @@ public class AliotClient {
         final MqttSubscribeRequest request = new MqttSubscribeRequest();
         request.topic = topic;
         request.isSubscribe = true;
+        request.qos = 1;
         LinkKit.getInstance().subscribe(request, new IConnectSubscribeListener() {
             @Override
             public void onSuccess() {
@@ -477,15 +483,16 @@ public class AliotClient {
         MqttSubscribeRequest request = new MqttSubscribeRequest();
         request.topic = topic;
         request.isSubscribe = false;
+        request.qos = 0;
         LinkKit.getInstance().unsubscribe(request, new IConnectUnscribeListener() {
             @Override
             public void onSuccess() {
-
+                Log.e(TAG, "onSuccess: unsub ");
             }
 
             @Override
             public void onFailure(AError aError) {
-
+                Log.e(TAG, "onFailure: unsub " + JSON.toJSONString(aError));
             }
         });
     }
@@ -496,6 +503,7 @@ public class AliotClient {
             MqttSubscribeRequest request = new MqttSubscribeRequest();
             request.topic = topic;
             request.isSubscribe = false;
+            request.qos = 0;
             LinkKit.getInstance().unsubscribe(request, new IConnectUnscribeListener() {
                 @Override
                 public void onSuccess() {
@@ -511,170 +519,291 @@ public class AliotClient {
         }
     }
 
-    private void publish(@NonNull final String topic, @NonNull final String payload) {
+    private void publish(@NonNull final String topic, int qos, @NonNull final String payload) {
         MqttPublishRequest request = new MqttPublishRequest();
         request.topic = topic;
         request.payloadObj = payload;
-        request.qos = 0;
+        if (qos != 1) {
+            request.qos = 0;
+        }
         request.isRPC = false;
         Log.e(TAG, "publish: " + topic);
         Log.e(TAG, "publish: " + payload);
         LinkKit.getInstance().publish(request, mPublishListener);
     }
 
-    public void syncTime() {
+    public void updateLabel(DeviceLabel... labels) {
+        if (!inited || labels == null || labels.length == 0) {
+            return;
+        }
+        msgid++;
+        UpdateLabelRequest request = new UpdateLabelRequest(msgid);
+        for (DeviceLabel l : labels) {
+            request.params.add(l);
+        }
+        LinkKit.getInstance().getDeviceLabel().labelUpdate(request, new IConnectSendListener() {
+            @Override
+            public void onResponse(ARequest aRequest, AResponse aResponse) {
+                Log.e(TAG, "onResponse: label " + JSON.toJSONString(aResponse));
+            }
+
+            @Override
+            public void onFailure(ARequest aRequest, AError aError) {
+                Log.e(TAG, "onFailure: label " + JSON.toJSONString(aError));
+            }
+        });
+    }
+
+    public void deleteLabel(AttrKey... attrKeys) {
+        if (!inited || attrKeys == null || attrKeys.length == 0) {
+            return;
+        }
+        msgid++;
+        DeleteLabelRequest requet = new DeleteLabelRequest(msgid);
+        for (AttrKey key : attrKeys) {
+            requet.params.add(key);
+        }
+        LinkKit.getInstance().getDeviceLabel().labelDelete(requet, new IConnectSendListener() {
+            @Override
+            public void onResponse(ARequest aRequest, AResponse aResponse) {
+                Log.e(TAG, "onResponse: label " + JSON.toJSONString(aResponse));
+            }
+
+            @Override
+            public void onFailure(ARequest aRequest, AError aError) {
+                Log.e(TAG, "onFailure: label " + JSON.toJSONString(aError));
+            }
+        });
+    }
+
+    public void getCotaConfig() {
         if (!inited) {
             return;
         }
-        String topic = String.format(sntpRequestFormat, APP_PRODUCT_KEY, mUserid);
+        msgid++;
+        CotaConfigRequest request = new CotaConfigRequest(msgid);
+        LinkKit.getInstance().getDeviceCOTA().COTAGet(request, new IConnectSendListener() {
+            @Override
+            public void onResponse(ARequest aRequest, AResponse aResponse) {
+                Log.e(TAG, "onResponse: " + JSON.toJSONString(aResponse));
+            }
+
+            @Override
+            public void onFailure(ARequest aRequest, AError aError) {
+                Log.e(TAG, "onFailure: " + JSON.toJSONString(aError));
+            }
+        });
+    }
+
+    public void uploadFile(final String uploadFile) {
+        final IStreamSender client = LinkKit.getInstance().getH2StreamClient();
+        final CompletableListener disconnCallback = new CompletableListener() {
+            @Override
+            public void complete(Object o) {
+                Log.e(TAG, "complete: disconnect");
+            }
+
+            @Override
+            public void completeExceptionally(Throwable throwable) {
+                Log.e(TAG, "completeExceptionally: diconnect - " + throwable.getMessage());
+            }
+        };
+        final CompletableDataListener uploadCallback = new CompletableDataListener() {
+            @Override
+            public void callBack(String s) {
+                Log.e(TAG, "callBack: upload - " + s);
+            }
+
+            @Override
+            public void complete(Object o) {
+                Log.e(TAG, "complete: upload");
+                client.disconnect(disconnCallback);
+            }
+
+            @Override
+            public void completeExceptionally(Throwable throwable) {
+                Log.e(TAG, "completeExceptionally: upload - " + throwable.getMessage());
+                client.disconnect(disconnCallback);
+            }
+        };
+        CompletableListener connCallback = new CompletableListener() {
+            @Override
+            public void complete(Object o) {
+                Log.e(TAG, "complete: connect");
+                final Http2Request request = new Http2Request();
+                //OSS上存储的文件名。文件名校验规则正则表达式为[a-zA-Z][a-zA-Z0-9_.]*。
+                request.getHeaders().add("x-file-name", "fileName");
+                //是否覆盖同名文件。0(不覆盖), 1(覆盖)。默认为0。如果文件已存在，并指定了不默认覆盖，则创建流失败
+                request.getHeaders().add("x-file-overwrite", "1");
+                //文件类型，不指定则由OSS自动指定。
+                // request.getHeaders().add("x-file-content-type", "jpg");
+
+                String serviceName = "/c/iot/sys/thing/file/upload";
+                // 注意替换成真实上传文件的路径
+                String filePath = uploadFile;
+                client.uploadFile(serviceName, request, filePath, uploadCallback);
+            }
+
+            @Override
+            public void completeExceptionally(Throwable throwable) {
+                Log.e(TAG, "completeExceptionally: connect - " + throwable.getMessage());
+            }
+        };
+        client.connect(connCallback);
+    }
+
+    public void syncTime() {
+        String topic = String.format(sntpRequestFormat, APP_KEY, mUserid);
         UserApi.SntpRequet requet = new UserApi.SntpRequet();
         requet.deviceSendTime = String.valueOf(System.currentTimeMillis());
-        publish(topic, JSON.toJSONString(requet));
+        publish(topic, 1, JSON.toJSONString(requet));
     }
 
-    /**
-     * 设置设备属性
-     * @param product       产品名称
-     * @param dname         设备ID
-     * @param keyValues     属性键值对
-     */
-    public void setProperty(String product, String dname, KeyValue... keyValues) {
-        if (!inited || TextUtils.isEmpty(mUserid)) {
-            return;
-        }
-        if (keyValues == null || keyValues.length == 0) {
-            return;
-        }
-        Map<String, Object> params = new HashMap<>();
-        for (KeyValue attr : keyValues) {
-            if (attr == null) {
-                return;
-            }
-            params.put(attr.getAttrKey(), attr.getAttrValue());
-        }
-        Map<String, Object> payload = new HashMap<>();
-        payload.put("deviceName", dname);
-        payload.put("params", params);
-        String topic = String.format(propertySetFormat, APP_PRODUCT_KEY, mUserid, product);
-        publish(topic, JSON.toJSONString(payload));
-    }
+//    /**
+//     * 设置设备属性
+//     * @param pkey          产品Key
+//     * @param dname         设备ID
+//     * @param keyValues     属性键值对
+//     */
+//    public void setProperty(String pkey, String dname, KeyValue... keyValues) {
+//        if (!inited || TextUtils.isEmpty(mUserid)) {
+//            return;
+//        }
+//        if (keyValues == null || keyValues.length == 0) {
+//            return;
+//        }
+//        Map<String, Object> params = new HashMap<>();
+//        for (KeyValue attr : keyValues) {
+//            if (attr == null) {
+//                return;
+//            }
+//            params.put(attr.getAttrKey(), attr.getAttrValue());
+//        }
+//        Map<String, Object> payload = new HashMap<>();
+//        payload.put("productKey", pkey);
+//        payload.put("deviceName", dname);
+//        payload.put("params", params);
+//        String topic = String.format(propertySetFormat, APP_KEY, mUserid);
+//        publish(topic, JSON.toJSONString(payload));
+//    }
+//
+//    public void setProperty(String pkey, String dname, List<KeyValue> keyValues) {
+//        if (!inited || TextUtils.isEmpty(mUserid)) {
+//            return;
+//        }
+//        if (keyValues == null || keyValues.size() == 0) {
+//            return;
+//        }
+//        Map<String, Object> params = new HashMap<>();
+//        for (KeyValue attr : keyValues) {
+//            if (attr == null) {
+//                return;
+//            }
+//            params.put(attr.getAttrKey(), attr.getAttrValue());
+//        }
+//        Map<String, Object> payload = new HashMap<>();
+//        payload.put("productKey", pkey);
+//        payload.put("deviceName", dname);
+//        payload.put("params", params);
+//        String topic = String.format(propertySetFormat, APP_KEY, mUserid);
+//        publish(topic, JSON.toJSONString(payload));
+//    }
 
-    public void setProperty(String product, String dname, List<KeyValue> keyValues) {
-        if (!inited || TextUtils.isEmpty(mUserid)) {
-            return;
-        }
-        if (keyValues == null || keyValues.size() == 0) {
-            return;
-        }
-        Map<String, Object> params = new HashMap<>();
-        for (KeyValue attr : keyValues) {
-            if (attr == null) {
-                return;
-            }
-            params.put(attr.getAttrKey(), attr.getAttrValue());
-        }
-        Map<String, Object> payload = new HashMap<>();
-        payload.put("deviceName", dname);
-        payload.put("params", params);
-        String topic = String.format(propertySetFormat, APP_PRODUCT_KEY, mUserid, product);
-        publish(topic, JSON.toJSONString(payload));
-    }
+//    /**
+//     * 获取设备属性
+//     * @param pkey          产品Key
+//     * @param dname         设备ID
+//     * @param attrKeys      属性名称
+//     */
+//    public void getProperty(String pkey, String dname, String... attrKeys) {
+//        if (!inited || TextUtils.isEmpty(mUserid)) {
+//            return;
+//        }
+//        Map<String, Object> payload = new HashMap<>();
+//        payload.put("productKey", pkey);
+//        payload.put("deviceName", dname);
+//        payload.put("params", attrKeys);
+//        String topic = String.format(propertyGetFormat, APP_KEY, mUserid);
+//        publish(topic, JSON.toJSONString(payload));
+//    }
 
-    /**
-     * 获取设备属性
-     * @param product       产品名称
-     * @param dname         设备ID
-     * @param attrKeys      属性名称
-     */
-    public void getProperty(String product, String dname, String... attrKeys) {
-        if (!inited || TextUtils.isEmpty(mUserid)) {
-            return;
-        }
-        Map<String, Object> payload = new HashMap<>();
-        payload.put("deviceName", dname);
-        payload.put("params", attrKeys);
-        String topic = String.format(propertyGetFormat, APP_PRODUCT_KEY, mUserid, product);
-        publish(topic, JSON.toJSONString(payload));
-    }
+//    public void getAllProperties(String pkey, String dname) {
+//        getProperty(pkey, dname);
+//    }
 
-    public void getAllProperties(String product, String dname) {
-        getProperty(product, dname);
-    }
+//    public void upgradeFirmware(String pkey, String dname, int version, String url) {
+//        if (!inited || TextUtils.isEmpty(mUserid)) {
+//            return;
+//        }
+//        UserApi.FirmwareInfo info = new UserApi.FirmwareInfo();
+//        info.version = String.valueOf(version);
+//        info.url = SERVER_FILE_PATH + url;
+//        Map<String, Object> payload = new HashMap<>();
+//        payload.put("productKey", pkey);
+//        payload.put("deviceName", dname);
+//        payload.put("message", "success");
+//        payload.put("data", info);
+//        String topic = String.format(fotaUpgradeFormat, APP_KEY, mUserid);
+//        publish(topic, JSON.toJSONString(payload));
+//    }
 
-    public void upgradeFirmware(String product, String dname, int version, String url) {
-        if (!inited || TextUtils.isEmpty(mUserid)) {
-            return;
-        }
-        UserApi.FirmwareInfo info = new UserApi.FirmwareInfo();
-        info.version = String.valueOf(version);
-        info.url = SERVER_FILE_PATH + url;
-        Map<String, Object> payload = new HashMap<>();
-        payload.put("deviceName", dname);
-        payload.put("message", "success");
-        payload.put("data", info);
-        String topic = String.format(fotaUpgradeFormat, APP_PRODUCT_KEY, mUserid, product);
-        publish(topic, JSON.toJSONString(payload));
-    }
+//    private void sendGroupMessage(@NonNull InviteAction action, final String inviter, final String invitee, final String invite_id, final String groupid, final String groupname) {
+//        if (!inited || TextUtils.isEmpty(mUserid)) {
+//            return;
+//        }
+//        String topic;
+//        switch (action) {
+//            case INVITE:
+//            case CANCEL:
+//            case REMOVE:
+//            case DELETE:
+//                topic = String.format(inviterFormat, APP_KEY, inviter);
+//                break;
+//            case ACCEPT:
+//            case DENY:
+//            case EXIT:
+//                topic = String.format(inviteeFormat, APP_KEY, invitee);
+//                break;
+//            default:
+//                return;
+//        }
+//        InviteMessage message = new InviteMessage();
+//        message.setAction(action.getAction());
+//        message.setInviter(inviter);
+//        message.setInvitee(invitee);
+//        message.setInvite_id(invite_id);
+//        message.setGroupid(groupid);
+//        message.setGroupname(groupname);
+//        publish(topic, JSON.toJSONString(message));
+//    }
 
-    public void invite(final String invitee, final String invite_id, final String groupid, final String groupname) {
-        if (!inited || TextUtils.isEmpty(mUserid)) {
-            return;
-        }
-        InviteMessage message = new InviteMessage();
-        message.setAction(InviteAction.INVITE.getAction());
-        message.setInviter(mUserid);
-        message.setInvitee(invitee);
-        message.setInvite_id(invite_id);
-        message.setGroupid(groupid);
-        message.setGroupname(groupname);
-        String topic = String.format(inviteFormat, APP_PRODUCT_KEY, mUserid);
-        publish(topic, JSON.toJSONString(message));
-    }
+//    public void invite(final String invitee, final String invite_id, final String groupid, final String groupname) {
+//        sendGroupMessage(InviteAction.INVITE, mUserid, invitee, invite_id, groupid, groupname);
+//    }
 
-    public void inviteCancel(final String invitee, final String invite_id, final String groupid, final String groupname) {
-        if (!inited || TextUtils.isEmpty(mUserid)) {
-            return;
-        }
-        InviteMessage message = new InviteMessage();
-        message.setAction(InviteAction.CANCEL.getAction());
-        message.setInviter(mUserid);
-        message.setInvitee(invitee);
-        message.setInvite_id(invite_id);
-        message.setGroupid(groupid);
-        message.setGroupname(groupname);
-        String topic = String.format(inviteFormat, APP_PRODUCT_KEY, mUserid);
-        publish(topic, JSON.toJSONString(message));
-    }
+//    public void inviteCancel(final String invitee, final String invite_id, final String groupid, final String groupname) {
+//        sendGroupMessage(InviteAction.CANCEL, mUserid, invitee, invite_id, groupid, groupname);
+//    }
 
-    public void inviteAccept(final String inviter, final String invite_id, final String groupid, final String groupname) {
-        if (!inited || TextUtils.isEmpty(mUserid)) {
-            return;
-        }
-        InviteMessage message = new InviteMessage();
-        message.setAction(InviteAction.ACCEPT.getAction());
-        message.setInviter(inviter);
-        message.setInvitee(mUserid);
-        message.setInvite_id(invite_id);
-        message.setGroupid(groupid);
-        message.setGroupname(groupname);
-        String topic = String.format(inviteReplyFormat, APP_PRODUCT_KEY, mUserid);
-        publish(topic, JSON.toJSONString(message));
-    }
+//    public void inviteAccept(final String inviter, final String invite_id, final String groupid, final String groupname) {
+//        sendGroupMessage(InviteAction.ACCEPT, inviter, mUserid, invite_id, groupid, groupname);
+//    }
+//
+//    public void inviteDeny(final String inviter, final String invite_id, final String groupid, final String groupname) {
+//        sendGroupMessage(InviteAction.INVITE, inviter, mUserid, invite_id, groupid, groupname);
+//    }
 
-    public void inviteDeny(final String inviter, final String invite_id, final String groupid, final String groupname) {
-        if (!inited || TextUtils.isEmpty(mUserid)) {
-            return;
-        }
-        InviteMessage message = new InviteMessage();
-        message.setAction(InviteAction.DENY.getAction());
-        message.setInviter(inviter);
-        message.setInvitee(mUserid);
-        message.setInvite_id(invite_id);
-        message.setGroupid(groupid);
-        message.setGroupname(groupname);
-        String topic = String.format(inviteReplyFormat, APP_PRODUCT_KEY, mUserid);
-        publish(topic, JSON.toJSONString(message));
-    }
+//    public void removeUser(final String invitee, final String groupid, final String groupname) {
+//        sendGroupMessage(InviteAction.REMOVE, mUserid, invitee, null, groupid, groupname);
+//    }
+//
+//    public void exitGroup(final String inviter, final String groupid, final String groupname) {
+//        sendGroupMessage(InviteAction.EXIT, inviter, mUserid, null, groupid, groupname);
+//    }
+//
+//    public void deleteGroup(final String invitee, final String groupid, final String groupname) {
+//        sendGroupMessage(InviteAction.DELETE, mUserid, invitee, null, groupid, groupname);
+//    }
 
     private void showReceiveGroupInviteMessage(@NonNull final InviteMessage message) {
         if (mWeakContext == null || mWeakContext.get() == null) {
@@ -791,7 +920,7 @@ public class AliotClient {
                                 @Override
                                 public void onSuccess(UserApi.Response result) {
                                     EventBus.getDefault().post(inviteMessage);
-                                    AliotClient.getInstance().inviteAccept(inviter, inviteid, groupid, groupname);
+                                    AliotServer.getInstance().inviteAccept(inviter, inviteid, groupid, groupname);
                                 }
                             });
                             manager.cancel(inviteid, 0);
@@ -805,7 +934,7 @@ public class AliotClient {
 
                                 @Override
                                 public void onSuccess(UserApi.Response result) {
-                                    AliotClient.getInstance().inviteDeny(inviter, inviteid, groupid, groupname);
+                                    AliotServer.getInstance().inviteDeny(inviter, inviteid, groupid, groupname);
                                 }
                             });
                             manager.cancel(inviteid, 0);
@@ -817,6 +946,49 @@ public class AliotClient {
             }
         }
     }
+
+//    public void dynamicRegister(final Context context, final String userid) {
+//        final DeviceInfo devInfo = new DeviceInfo();
+//        devInfo.productKey = APP_KEY;
+//        devInfo.productSecret = APP_SECRET;
+//        devInfo.deviceName = userid;
+//
+//        LinkKitInitParams params = new LinkKitInitParams();
+//        params.deviceInfo = devInfo;
+//        HubApiRequest request = new HubApiRequest();
+//        request.domain = IOTAUTH_DOMAIN;
+//        request.path = "/auth/register/device";
+//
+//        LinkKit.getInstance().deviceRegister(context, params, request, new IConnectSendListener() {
+//            @Override
+//            public void onResponse(ARequest aRequest, AResponse aResponse) {
+//                Log.e(TAG, "onResponse: " + JSON.toJSONString(aResponse));
+//                if (aResponse == null || aResponse.data == null) {
+//                    return;
+//                }
+//                String payload = aResponse.data.toString();
+//                Type type = new TypeReference<ResponseModel<Map<String, String>>>(){}.getType();
+//                try {
+//                    ResponseModel<Map<String, String>> response = JSONObject.parseObject(payload, type);
+//                    if (CODE_SUCCESS.equals(response.code) && response.data != null && response.data.containsKey(KEY_DEVICE_SECRET)) {
+//                        String deviceSecret = response.data.get(KEY_DEVICE_SECRET);
+//                        if (!TextUtils.isEmpty(deviceSecret)) {
+//                            devInfo.deviceSecret = deviceSecret;
+//                            UserPref.setSecret(context, deviceSecret);
+//                        }
+//                    }
+//                } catch (JSONException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//
+//            @Override
+//            public void onFailure(ARequest aRequest, AError aError) {
+//                Log.e(TAG, "onFailure: " + JSON.toJSONString(aError));
+//            }
+//        });
+//    }
+
 //    public enum SubscribeEnum {
 //        TOPIC_PROPERTY_RESPONSE(propertyResponseFormat) {
 //            @Override
@@ -905,8 +1077,8 @@ public class AliotClient {
 //            topicFormat = format;
 //        }
 //
-//        public String getTopic(String appkey, String userid) {
-//            return String.format(topicFormat, appkey, userid);
+//        public String getTopic(String APP_KEY, String userid) {
+//            return String.format(topicFormat, APP_KEY, userid);
 //        }
 //
 //        protected <T> T parse(String payload) {

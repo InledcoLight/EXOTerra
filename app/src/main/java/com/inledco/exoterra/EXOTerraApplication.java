@@ -6,20 +6,34 @@ import android.app.NotificationManager;
 import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.support.annotation.RequiresApi;
 
-import com.inledco.exoterra.base.BaseActivity;
+import com.inledco.exoterra.aliot.AliotClient;
+import com.inledco.exoterra.event.DisconnectIotEvent;
 
-import java.lang.ref.WeakReference;
+import org.greenrobot.eventbus.EventBus;
 
 import androidx.multidex.MultiDexApplication;
 
 public class EXOTerraApplication extends MultiDexApplication {
     private static final String TAG = "EXOTerraApplication";
 
-    private WeakReference<BaseActivity> mCurrentActivity;
-
     private NotificationManager mNotificationManager;
+
+    private final int PENDING_TIMEOUT = 600000;
+    private int count = 0;
+    private final CountDownTimer timer = new CountDownTimer(PENDING_TIMEOUT, PENDING_TIMEOUT/2) {
+        @Override
+        public void onTick(long millisUntilFinished) {
+
+        }
+
+        @Override
+        public void onFinish() {
+            EventBus.getDefault().post(new DisconnectIotEvent());
+        }
+    };
 
     @Override
     public void onCreate() {
@@ -33,9 +47,8 @@ public class EXOTerraApplication extends MultiDexApplication {
 
             @Override
             public void onActivityStarted(Activity activity) {
-                if (activity instanceof BaseActivity) {
-                    mCurrentActivity = new WeakReference<>((BaseActivity) activity);
-                }
+                count++;
+                timer.cancel();
             }
 
             @Override
@@ -50,8 +63,13 @@ public class EXOTerraApplication extends MultiDexApplication {
 
             @Override
             public void onActivityStopped(Activity activity) {
-                if (activity.equals(mCurrentActivity.get())) {
-                    mCurrentActivity = new WeakReference<>(null);
+                if (count > 0) {
+                    count--;
+                    if (count == 0) {
+                        if (AliotClient.getInstance().isInited()) {
+                            timer.start();
+                        }
+                    }
                 }
             }
 
@@ -66,14 +84,15 @@ public class EXOTerraApplication extends MultiDexApplication {
             }
         });
 
+        AppConfig.load(this, "AppConfig");
+        GlobalSettings.init(this);
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             createNotificationChannel(getString(R.string.notify_chnid_invite), getString(R.string.notify_chn_invite), NotificationManager.IMPORTANCE_HIGH);
             createNotificationChannel(getString(R.string.notify_chnid_home_member_changed), getString(R.string.notify_chn_home_member_changed), NotificationManager.IMPORTANCE_HIGH);
             createNotificationChannel(getString(R.string.notify_chnid_delete_home), getString(R.string.notify_chn_delete_home), NotificationManager.IMPORTANCE_HIGH);
             createNotificationChannel(getString(R.string.notify_chnid_alarm), getString(R.string.notify_chn_alarm), NotificationManager.IMPORTANCE_HIGH);
         }
-
-//        GcmRegister.register(this, AppConstants.ALIPUSH_SENDID, AppConstants.ALIPUSH_APPID);
     }
 
     private NotificationManager getNotificationManager() {

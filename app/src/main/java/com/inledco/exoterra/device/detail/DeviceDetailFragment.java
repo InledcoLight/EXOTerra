@@ -1,10 +1,13 @@
 package com.inledco.exoterra.device.detail;
 
+import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
 import android.support.design.widget.TextInputEditText;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AlertDialog;
@@ -16,29 +19,27 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.alibaba.fastjson.JSON;
 import com.inledco.exoterra.R;
-import com.inledco.exoterra.aliot.ADevice;
-import com.inledco.exoterra.aliot.AliotClient;
 import com.inledco.exoterra.aliot.AliotServer;
 import com.inledco.exoterra.aliot.BaseProperty;
 import com.inledco.exoterra.aliot.Device;
-import com.inledco.exoterra.aliot.DeviceBaseViewModel;
 import com.inledco.exoterra.aliot.DeviceInfo;
+import com.inledco.exoterra.aliot.DeviceViewModel;
 import com.inledco.exoterra.aliot.HttpCallback;
 import com.inledco.exoterra.aliot.UserApi;
 import com.inledco.exoterra.aliot.bean.Group;
 import com.inledco.exoterra.base.BaseFragment;
+import com.inledco.exoterra.bean.ExoProduct;
 import com.inledco.exoterra.event.DeviceChangedEvent;
 import com.inledco.exoterra.event.DevicesRefreshedEvent;
 import com.inledco.exoterra.event.GroupDeviceChangedEvent;
 import com.inledco.exoterra.event.SimpleEvent;
 import com.inledco.exoterra.manager.DeviceManager;
 import com.inledco.exoterra.manager.GroupManager;
-import com.inledco.exoterra.manager.UserManager;
-import com.inledco.exoterra.util.DeviceUtil;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -73,7 +74,7 @@ public class DeviceDetailFragment extends BaseFragment {
     private TextView device_detail_fwversion;
     private Button device_detail_back;
 
-//    private UpdateDialog mUpgradeDialog;
+    private UpdateDialog mUpgradeDialog;
 
     private boolean mDeviceAdmin;
 
@@ -81,7 +82,7 @@ public class DeviceDetailFragment extends BaseFragment {
     private Timer mTimer;
     private TimerTask mTask;
 
-    private DeviceBaseViewModel mDeviceViewModel;
+    private DeviceViewModel mDeviceViewModel;
     private Device mDevice;
     private String mProductKey;
     private String mDeviceName;
@@ -111,17 +112,9 @@ public class DeviceDetailFragment extends BaseFragment {
         }
         mTimer = null;
         mTask = null;
-    }
-
-    @Subscribe (threadMode = ThreadMode.MAIN)
-    public void onGroupDeviceChangedEvent(GroupDeviceChangedEvent event) {
-        if (mDevice == null || event == null) {
-            return;
-        }
-        Group group = GroupManager.getInstance().getDeviceGroup(mProductKey, mDeviceName);
-        if (group != null) {
-            device_detail_habitat.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
-            device_detail_habitat.setText(group.name);
+        if (mUpgradeDialog != null) {
+            mUpgradeDialog.dismiss();
+            mUpgradeDialog = null;
         }
     }
 
@@ -155,14 +148,27 @@ public class DeviceDetailFragment extends BaseFragment {
 
     @Override
     protected void initData() {
-        mDeviceViewModel = ViewModelProviders.of(getActivity()).get(DeviceBaseViewModel.class);
-        mDevice = mDeviceViewModel.getData();
+        mDeviceViewModel = ViewModelProviders.of(getActivity()).get(DeviceViewModel.class);
+        mDevice = (Device) mDeviceViewModel.getData();
+        mDeviceViewModel.observe(this, new Observer() {
+            @Override
+            public void onChanged(@Nullable Object o) {
+                checkDeviceDatetime();
+            }
+        });
 
         if (mDevice != null) {
             mDeviceAdmin = TextUtils.equals("管理员", mDevice.getRole());
             mProductKey = mDevice.getProductKey();
             mDeviceName = mDevice.getDeviceName();
-            device_detail_icon.setImageResource(DeviceUtil.getProductIconSmall(mDevice.getProductKey()));
+            String name = mDevice.getName();
+            ExoProduct product = ExoProduct.getExoProduct(mProductKey);
+            if (product != null) {
+                if (TextUtils.isEmpty(name)) {
+                    name = product.getDefaultName();
+                }
+                device_detail_icon.setImageResource(product.getIconSmall());
+            }
             Group group = GroupManager.getInstance().getDeviceGroup(mProductKey, mDeviceName);
             if (group != null) {
                 device_detail_habitat.setText(group.name);
@@ -171,10 +177,7 @@ public class DeviceDetailFragment extends BaseFragment {
             }
             device_detail_delete.setEnabled(TextUtils.equals(mDevice.getRole(), "管理员"));
             getDeviceDatetime();
-            String name = mDevice.getName();
-            if (TextUtils.isEmpty(name)) {
-                name = DeviceUtil.getDefaultName(mProductKey);
-            }
+
             device_detail_name.setText(name);
             device_detail_zone.setText(getTimezoneDesc(mDevice.getZone()));
             String mac = mDevice.getMac();
@@ -252,6 +255,42 @@ public class DeviceDetailFragment extends BaseFragment {
         });
     }
 
+    private void checkDeviceDatetime() {
+        BaseProperty prop = mDevice.getItems().get(KEY_DEVICETIME);
+        if (prop != null && prop.isUpdated()) {
+            Log.e(TAG, "checkDeviceDatetime: ");
+            String datetime = mDevice.getDeviceTime();
+            if (!TextUtils.isEmpty(datetime)) {
+                try {
+                    if (mTimer != null) {
+                        mTimer.cancel();
+                    }
+                    if (mTask != null) {
+                        mTask.cancel();
+                    }
+                    mTimer = new Timer();
+                    mTask = new TimerTask() {
+                        @Override
+                        public void run() {
+                            mCurrentTime += 1000;
+                            EventBus.getDefault().post(new SimpleEvent(mCurrentTime));
+                        }
+                    };
+
+                    int offset = TimeZone.getDefault().getRawOffset();
+                    int zone = mDevice.getZone();
+                    long currentTime = Long.parseLong(datetime);
+                    mCurrentTime = currentTime + zone * 60000 - offset;
+                    EventBus.getDefault().post(new SimpleEvent(mCurrentTime));
+
+                    mTimer.scheduleAtFixedRate(mTask, 0, 1000);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
     @Subscribe (threadMode = ThreadMode.MAIN)
     public void onDeviceChangedEvent(DeviceChangedEvent event) {
         if (event != null && mDevice != null
@@ -266,41 +305,42 @@ public class DeviceDetailFragment extends BaseFragment {
     }
 
     @Subscribe (threadMode = ThreadMode.MAIN)
-    public void onDevicePropertyChangedEvent(ADevice adev) {
-        if (adev != null
-            && TextUtils.equals(adev.getProductKey(), mProductKey)
-            && TextUtils.equals(adev.getDeviceName(), mDeviceName)) {
-            BaseProperty prop = adev.getItems().get(KEY_DEVICETIME);
-            if (prop != null && prop.isUpdated()) {
-                String datetime = mDevice.getDeviceTime();
-                if (!TextUtils.isEmpty(datetime)) {
-                    try {
-                        if (mTimer != null) {
-                            mTimer.cancel();
-                        }
-                        if (mTask != null) {
-                            mTask.cancel();
-                        }
-                        mTimer = new Timer();
-                        mTask = new TimerTask() {
-                            @Override
-                            public void run() {
-                                mCurrentTime += 1000;
-                                EventBus.getDefault().post(new SimpleEvent(mCurrentTime));
-                            }
-                        };
+    public void onGroupDeviceChangedEvent(GroupDeviceChangedEvent event) {
+        if (mDevice == null || event == null) {
+            return;
+        }
+        Group group = GroupManager.getInstance().getDeviceGroup(mProductKey, mDeviceName);
+        if (group != null) {
+            device_detail_habitat.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
+            device_detail_habitat.setText(group.name);
+        }
+    }
 
-                        int offset = TimeZone.getDefault().getRawOffset();
-                        int zone = mDevice.getZone();
-                        long currentTime = Long.parseLong(datetime);
-                        mCurrentTime = currentTime + zone * 60000 - offset;
-                        EventBus.getDefault().post(new SimpleEvent(mCurrentTime));
-
-                        mTimer.scheduleAtFixedRate(mTask, 0, 1000);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
+    @Subscribe (threadMode = ThreadMode.MAIN)
+    public void onFotaProgressEvent(UserApi.FotaProgress event) {
+        if (event == null) {
+            return;
+        }
+        if (mDeviceAdmin && TextUtils.equals(mProductKey, event.productKey) && TextUtils.equals(mDeviceName, event.deviceName)) {
+            if (mUpgradeDialog == null) {
+                mUpgradeDialog = new UpdateDialog(getContext());
+            }
+//            if (event.params.step == 0) {
+//                mUpgradeDialog.show();
+//                return;
+//            }
+            if (!mUpgradeDialog.isShowing()) {
+                mUpgradeDialog.show();
+            }
+            if (event.params.step == 0) {
+                return;
+            }
+            if (event.params.step == 100) {
+                mUpgradeDialog.setMessage("Upgrade success.");
+                mUpgradeDialog.setResult(true);
+            } else {
+                mUpgradeDialog.setMessage("Upgrade failed: " + event.params.desc);
+                mUpgradeDialog.setResult(false);
             }
         }
     }
@@ -367,49 +407,6 @@ public class DeviceDetailFragment extends BaseFragment {
                .show();
     }
 
-//    private void showUpgradeProgress() {
-//        if (mUpgradeDialog == null) {
-//            mUpgradeDialog = new UpdateDialog(getContext());
-//        }
-//        mUpgradeDialog.show();
-//    }
-
-//    private void showUpgradeDialog(@NonNull final DeviceApi.DeviceNewestVersionResponse response) {
-//        Log.e(TAG, "showUpgradeDialog: " + response.current + " " + response.newest + " " + response.description);
-//        int current = Integer.parseInt(response.current);
-//        final int newest = Integer.parseInt(response.newest);
-//        if (current >= newest) {
-//            new MessageDialog(getContext(), true).setTitle(R.string.upgrade)
-//                                                 .setMessage(R.string.device_firmware_uptodate)
-//                                                 .setButton(R.string.ok, null)
-//                                                 .show();
-//        } else {
-//            AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-//            builder.setTitle(R.string.upgrade)
-//                   .setMessage(getString(R.string.device_upgrade_msg, current, newest))
-//                   .setNegativeButton(R.string.cancel, null)
-//                   .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-//                       @Override
-//                       public void onClick(DialogInterface dialog, int which) {
-//                           XlinkCloudManager.getInstance().upgradeDevice(mDevice.getXDevice(), new XlinkRequestCallback<String>() {
-//                               @Override
-//                               public void onError(String error) {
-//                                   Toast.makeText(getContext(), error, Toast.LENGTH_SHORT)
-//                                        .show();
-//                               }
-//
-//                               @Override
-//                               public void onSuccess(String s) {
-//                                   showUpgradeProgress();
-//                               }
-//                           });
-//                       }
-//                   })
-//                   .setCancelable(false)
-//                   .show();
-//        }
-//    }
-
     private void getNewestVersion() {
         final int version = mDevice.getFirmwareVersion();
         if (version <= 0) {
@@ -454,8 +451,17 @@ public class DeviceDetailFragment extends BaseFragment {
                .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                    @Override
                    public void onClick(DialogInterface dialog, int which) {
-                       String pname = DeviceUtil.getProductName(mProductKey).toLowerCase();
-                       AliotClient.getInstance().upgradeFirmware(pname, mDeviceName, version, url);
+                       AliotServer.getInstance().upgradeFirmware(mProductKey, mDeviceName, version, url, new HttpCallback<UserApi.PublishTopicResponse>() {
+                           @Override
+                           public void onError(String error) {
+                               showToast(error);
+                           }
+
+                           @Override
+                           public void onSuccess(UserApi.PublishTopicResponse result) {
+
+                           }
+                       });
                    }
                })
                .setCancelable(false);
@@ -468,8 +474,7 @@ public class DeviceDetailFragment extends BaseFragment {
     }
 
     private void getDeviceDatetime() {
-        String product = DeviceUtil.getProductName(mProductKey).toLowerCase();
-        AliotClient.getInstance().getProperty(product, mDeviceName, "DeviceTime");
+        mDeviceViewModel.getProperty("DeviceTime");
     }
 
     private void showRenameDialog() {
@@ -495,10 +500,9 @@ public class DeviceDetailFragment extends BaseFragment {
                     et_name.setError(getString(R.string.input_empty));
                     return;
                 }
-                String token = UserManager.getInstance().getToken();
                 final String pkey = mDevice.getProductKey();
                 final String dname = mDevice.getDeviceName();
-                AliotServer.getInstance().modifyDeviceName(token, pkey, dname, name, new HttpCallback<UserApi.Response>() {
+                AliotServer.getInstance().modifyDeviceName(pkey, dname, name, new HttpCallback<UserApi.Response>() {
                     @Override
                     public void onError(String error) {
                         dismissLoadDialog();
@@ -524,64 +528,68 @@ public class DeviceDetailFragment extends BaseFragment {
         });
     }
 
-//    private final class UpdateDialog {
-//        private AlertDialog mDialog;
-//        private ProgressBar mProgressBar;
-//        private TextView mMessageText;
-//        private ImageView mResultIcon;
-//
-//        protected UpdateDialog(@NonNull Context context) {
-//            View view = LayoutInflater.from(getContext()).inflate(R.layout.dialog_upgrade, null, false);
-//            mProgressBar = view.findViewById(R.id.dialog_upgrade_pb);
-//            mMessageText = view.findViewById(R.id.dialog_upgrade_msg);
-//            mResultIcon = view.findViewById(R.id.dialog_upgrade_result);
-//            AlertDialog.Builder builder = new AlertDialog.Builder(context);
-//            builder.setTitle(R.string.upgrading);
-//            builder.setCancelable(false);
-//            builder.setView(view);
-//            builder.setPositiveButton(R.string.close, null);
-//            mDialog = builder.create();
-//        }
-//
-//        public void setMessage(String msg) {
-//            mMessageText.setText(msg);
-//        }
-//
-//        public void setMessage(@StringRes int res) {
-//            mMessageText.setText(getString(res));
-//        }
-//
-//        public void show() {
-//            if (!mDialog.isShowing()) {
-//                mProgressBar.setVisibility(View.VISIBLE);
-//                mResultIcon.setVisibility(View.INVISIBLE);
-//                mDialog.show();
-//                mDialog.getButton(DialogInterface.BUTTON_POSITIVE).setVisibility(View.GONE);
-//            }
-//        }
-//
-//        public void dismiss() {
-//            mDialog.dismiss();
-//        }
-//
-//        public void setResult(final boolean result) {
-//            if (mDialog.isShowing()) {
-//                mProgressBar.setVisibility(View.INVISIBLE);
-//                mResultIcon.setImageResource(result ? R.drawable.ic_done_green_64dp : R.drawable.ic_fail_red_64dp);
-//                mResultIcon.setVisibility(View.VISIBLE);
-//                Button btn = mDialog.getButton(DialogInterface.BUTTON_POSITIVE);
-//                btn.setOnClickListener(new View.OnClickListener() {
-//                    @Override
-//                    public void onClick(View v) {
-//                        if (result) {
-//                            getActivity().finish();
-//                        } else {
-//                            mDialog.dismiss();
-//                        }
-//                    }
-//                });
-//                btn.setVisibility(View.VISIBLE);
-//            }
-//        }
-//    }
+    private final class UpdateDialog {
+        private final AlertDialog mDialog;
+        private ProgressBar mProgressBar;
+        private TextView mMessageText;
+        private ImageView mResultIcon;
+
+        protected UpdateDialog(@NonNull Context context) {
+            View view = LayoutInflater.from(getContext()).inflate(R.layout.dialog_upgrade, null, false);
+            mProgressBar = view.findViewById(R.id.dialog_upgrade_pb);
+            mMessageText = view.findViewById(R.id.dialog_upgrade_msg);
+            mResultIcon = view.findViewById(R.id.dialog_upgrade_result);
+            AlertDialog.Builder builder = new AlertDialog.Builder(context);
+            builder.setTitle(R.string.upgrading);
+            builder.setCancelable(false);
+            builder.setView(view);
+            builder.setPositiveButton(R.string.close, null);
+            mDialog = builder.create();
+        }
+
+        public void setMessage(String msg) {
+            mMessageText.setText(msg);
+        }
+
+        public void setMessage(@StringRes int res) {
+            mMessageText.setText(getString(res));
+        }
+
+        public void show() {
+            if (!mDialog.isShowing()) {
+                mProgressBar.setVisibility(View.VISIBLE);
+                mResultIcon.setVisibility(View.INVISIBLE);
+                mDialog.show();
+                mDialog.getButton(DialogInterface.BUTTON_POSITIVE).setVisibility(View.GONE);
+            }
+        }
+
+        public void dismiss() {
+            mDialog.dismiss();
+        }
+
+        public boolean isShowing() {
+            return mDialog.isShowing();
+        }
+
+        public void setResult(final boolean result) {
+            if (mDialog.isShowing()) {
+                mProgressBar.setVisibility(View.INVISIBLE);
+                mResultIcon.setImageResource(result ? R.drawable.ic_done_green_64dp : R.drawable.ic_fail_red_64dp);
+                mResultIcon.setVisibility(View.VISIBLE);
+                Button btn = mDialog.getButton(DialogInterface.BUTTON_POSITIVE);
+                btn.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if (result) {
+                            getActivity().finish();
+                        } else {
+                            mDialog.dismiss();
+                        }
+                    }
+                });
+                btn.setVisibility(View.VISIBLE);
+            }
+        }
+    }
 }

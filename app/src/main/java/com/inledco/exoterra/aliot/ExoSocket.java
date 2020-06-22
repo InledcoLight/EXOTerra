@@ -1,6 +1,7 @@
 package com.inledco.exoterra.aliot;
 
 import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONException;
 import com.inledco.exoterra.aliot.bean.XDevice;
 
 import java.util.ArrayList;
@@ -8,48 +9,45 @@ import java.util.Arrays;
 import java.util.List;
 
 public class ExoSocket extends Device {
-    private final String TAG = "ExoSocket";
+    private static final String TAG = "ExoSocket";
 
-    public static final int TIMER_COUNT_MAX     = 24;
-    public static final int MODE_TIMER          = 0;
-    public static final int MODE_SENSOR1        = 1;
-    public static final int MODE_SENSOR2        = 2;
-    public static final int SENSOR_COUNT_MAX    = 2;
-    public static final int SENSOR_TEMPERATURE  = 1;
-    public static final int SENSOR_HUMIDITY     = 2;
+    public static final int TIMER_COUNT_MAX             = 24;
+    public static final int MODE_TIMER                  = 0;
+    public static final int MODE_SENSOR1                = 1;
+    public static final int MODE_SENSOR2                = 2;
+    public static final int SENSOR_COUNT_MAX            = 2;
+    public static final int SENSOR_TEMPERATURE          = 1;
+    public static final int SENSOR_HUMIDITY             = 2;
 
-    private final String KEY_SWITCH_COUNT_MAX   = "SwitchCountMax";
-    private final String KEY_SWITCH_COUNT       = "SwitchCount";
-
-    private final String KEY_MODE               = "Mode";
-
-    private final String KEY_POWER              = "Power";
-
-    private final String KEY_TIMER1             = "Timer1";
-    private final String KEY_TIMER2             = "Timer2";
-    private final String KEY_TIMER3             = "Timer3";
-    private final String KEY_TIMER4             = "Timer4";
-    private final String KEY_TIMER5             = "Timer5";
-    private final String KEY_TIMER6             = "Timer6";
-    private final String KEY_TIMER7             = "Timer7";
-    private final String KEY_TIMER8             = "Timer8";
-    private final String KEY_TIMER9             = "Timer9";
-    private final String KEY_TIMER10            = "Timer10";
-    private final String KEY_TIMER11            = "Timer11";
-    private final String KEY_TIMER12            = "Timer12";
-    private final String KEY_TIMER13            = "Timer13";
-    private final String KEY_TIMER14            = "Timer14";
-    private final String KEY_TIMER15            = "Timer15";
-    private final String KEY_TIMER16            = "Timer16";
-    private final String KEY_TIMER17            = "Timer17";
-    private final String KEY_TIMER18            = "Timer18";
-    private final String KEY_TIMER19            = "Timer19";
-    private final String KEY_TIMER20            = "Timer20";
-    private final String KEY_TIMER21            = "Timer21";
-    private final String KEY_TIMER22            = "Timer22";
-    private final String KEY_TIMER23            = "Timer23";
-    private final String KEY_TIMER24            = "Timer24";
-    private final String[] KEY_TIMERS           = new String[] {
+    private static final String KEY_SWITCH_MAX          = "SwitchMax";
+    private static final String KEY_SWITCH_COUNT        = "SwitchCount";
+    private static final String KEY_MODE                = "Mode";
+    private static final String KEY_POWER               = "Power";
+    private static final String KEY_TIMER1              = "T1";
+    private static final String KEY_TIMER2              = "T2";
+    private static final String KEY_TIMER3              = "T3";
+    private static final String KEY_TIMER4              = "T4";
+    private static final String KEY_TIMER5              = "T5";
+    private static final String KEY_TIMER6              = "T6";
+    private static final String KEY_TIMER7              = "T7";
+    private static final String KEY_TIMER8              = "T8";
+    private static final String KEY_TIMER9              = "T9";
+    private static final String KEY_TIMER10             = "T10";
+    private static final String KEY_TIMER11             = "T11";
+    private static final String KEY_TIMER12             = "T12";
+    private static final String KEY_TIMER13             = "T13";
+    private static final String KEY_TIMER14             = "T14";
+    private static final String KEY_TIMER15             = "T15";
+    private static final String KEY_TIMER16             = "T16";
+    private static final String KEY_TIMER17             = "T17";
+    private static final String KEY_TIMER18             = "T18";
+    private static final String KEY_TIMER19             = "T19";
+    private static final String KEY_TIMER20             = "T20";
+    private static final String KEY_TIMER21             = "T21";
+    private static final String KEY_TIMER22             = "T22";
+    private static final String KEY_TIMER23             = "T23";
+    private static final String KEY_TIMER24             = "T24";
+    private static final String[] KEY_TIMERS            = new String[] {
         KEY_TIMER1,
         KEY_TIMER2,
         KEY_TIMER3,
@@ -75,17 +73,23 @@ public class ExoSocket extends Device {
         KEY_TIMER23,
         KEY_TIMER24
     };
+    private static final String KEY_SENSOR_AVAILABLE    = "SensorAvailable";
+    private static final String KEY_SENSOR              = "Sensor";
+    private static final String KEY_SENSOR_CONFIG       = "SensorConfig";
 
-    private final String KEY_SENSOR_AVAILABLE   = "SensorAvailable";
-    private final String KEY_SENSOR             = "Sensor";
-    private final String KEY_SENSOR_CONFIG      = "SensorConfig";
+    public ExoSocket() {
+    }
+
+    public ExoSocket(String productKey, String deviceName) {
+        super(productKey, deviceName);
+    }
 
     public ExoSocket(XDevice xDevice) {
         super(xDevice);
     }
 
     public int getSwitchCountMax() {
-        return getPropertyInt(KEY_SWITCH_COUNT_MAX);
+        return getPropertyInt(KEY_SWITCH_MAX);
     }
 
     public int getSwitchCount() {
@@ -131,9 +135,10 @@ public class ExoSocket extends Device {
             JSONArray ja = (JSONArray) obj;
             Sensor[] result = new Sensor[ja.size()];
             for (int i = 0; i < ja.size(); i++) {
-                if (ja.get(i) != null) {
+                try {
                     result[i] = ja.getObject(i, Sensor.class);
-                } else {
+                } catch (JSONException e) {
+                    e.printStackTrace();
                     return null;
                 }
             }
@@ -148,9 +153,10 @@ public class ExoSocket extends Device {
             JSONArray ja = (JSONArray) obj;
             SensorConfig[] result = new SensorConfig[ja.size()];
             for (int i = 0; i < ja.size(); i++) {
-                if (ja.get(i) != null) {
+                try {
                     result[i] = ja.getObject(i, SensorConfig.class);
-                } else {
+                } catch (JSONException e) {
+                    e.printStackTrace();
                     return null;
                 }
             }
@@ -183,7 +189,7 @@ public class ExoSocket extends Device {
             return null;
         }
         List<KeyValue> result = new ArrayList<>();
-        int[] dummyArray = new int[] {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
+        int[] dummyArray = new int[0];
         int cnt = 0;
         for (int i = 0; i < timers.size(); i++) {
             Timer tmr = timers.get(i);
@@ -219,7 +225,7 @@ public class ExoSocket extends Device {
             return null;
         }
         //  repeat
-        if (array[2] < 0 || array[2] > 0x7F) {
+        if (array[2] < 0 || array[2] > 0xFF) {
             return null;
         }
         //  hour
@@ -250,7 +256,7 @@ public class ExoSocket extends Device {
         Timer timer = new Timer();
         timer.setEnable(enable);
         timer.setAction(array[1]);
-        timer.setRepeat(array[2]);
+        timer.setRepeat(array[2]&0x7F);
         timer.setHour(array[3]);
         timer.setMinute(array[4]);
         timer.setSecond(array[5]);
@@ -417,8 +423,8 @@ public class ExoSocket extends Device {
     public static class Sensor {
         private int Type;
         private int Value;
-        private int ThrdLower;
-        private int ThrdUpper;
+        private int Min;
+        private int Max;
 
         public int getType() {
             return Type;
@@ -428,12 +434,12 @@ public class ExoSocket extends Device {
             return Value;
         }
 
-        public int getThrdLower() {
-            return ThrdLower;
+        public int getMin() {
+            return Min;
         }
 
-        public int getThrdUpper() {
-            return ThrdUpper;
+        public int getMax() {
+            return Max;
         }
 
         public void setType(int type) {
@@ -444,20 +450,20 @@ public class ExoSocket extends Device {
             Value = value;
         }
 
-        public void setThrdLower(int thrdLower) {
-            ThrdLower = thrdLower;
+        public void setMin(int min) {
+            Min = min;
         }
 
-        public void setThrdUpper(int thrdUpper) {
-            ThrdUpper = thrdUpper;
+        public void setMax(int max) {
+            Max = max;
         }
     }
 
     public static class SensorConfig {
         private int Type;
-        private int NtfyEnable;
-        private int NtfyLower;
-        private int NtfyUpper;
+        private int Ntfy;
+        private int Lower;
+        private int Upper;
         private int Day;
         private int Night;
 
@@ -469,28 +475,28 @@ public class ExoSocket extends Device {
             Type = type;
         }
 
-        public int getNtfyEnable() {
-            return NtfyEnable;
+        public int getNtfy() {
+            return Ntfy;
         }
 
-        public void setNtfyEnable(int ntfyEnable) {
-            NtfyEnable = ntfyEnable;
+        public void setNtfy(int ntfy) {
+            Ntfy = ntfy;
         }
 
-        public int getNtfyLower() {
-            return NtfyLower;
+        public int getLower() {
+            return Lower;
         }
 
-        public void setNtfyLower(int ntfyLower) {
-            NtfyLower = ntfyLower;
+        public void setLower(int lower) {
+            Lower = lower;
         }
 
-        public int getNtfyUpper() {
-            return NtfyUpper;
+        public int getUpper() {
+            return Upper;
         }
 
-        public void setNtfyUpper(int ntfyUpper) {
-            NtfyUpper = ntfyUpper;
+        public void setUpper(int upper) {
+            Upper = upper;
         }
 
         public int getDay() {

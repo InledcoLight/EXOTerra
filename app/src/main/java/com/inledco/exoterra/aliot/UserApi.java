@@ -7,6 +7,7 @@ import com.inledco.exoterra.aliot.bean.XDevice;
 import com.inledco.exoterra.aliot.bean.XGroup;
 
 import java.util.List;
+import java.util.Map;
 
 public class UserApi {
 
@@ -155,6 +156,44 @@ public class UserApi {
 
     }
 
+//    public static class ThingProperty {
+//        public String identifier;
+//        public String value;
+//        public String time;
+//        public String dateType;
+//    }
+
+    public static class GetDevicePropertiesResponse extends ApiResponse<List<ThingProperty>> {
+
+    }
+
+    public static class SetDevicePropertiesRequest {
+        public String items;
+    }
+
+    public static class SetDevicePropertiesResponse extends ApiResponse<String> {
+
+    }
+
+    public static class PublishTopicRequest {
+        public String topic;
+        public String message;
+        public int qos;
+    }
+
+    public static class PublishTopicResponse extends ApiResponse<String> {
+
+    }
+
+    public static class CommonAliyuncsRequest {
+        public String action;
+        public Map<String, String> params;
+    }
+
+    public static class CommonAliyuncsResponse extends ApiResponse<String> {
+
+    }
+
     public static class Firmware {
         public int version;
         public float firmSize;
@@ -195,8 +234,8 @@ public class UserApi {
     }
 
     public static class KeyValue {
-        public long Time;
-        public Object Value;
+        public String Time;
+        public String Value;
     }
 
     public static class PropertyDataInfo {
@@ -216,5 +255,9 @@ public class UserApi {
         public String deviceSendTime;
         public String serverSendTime;
         public String serverRecvTime;
+    }
+
+    public static class FileUploadResponse extends ApiResponse<String> {
+
     }
 }

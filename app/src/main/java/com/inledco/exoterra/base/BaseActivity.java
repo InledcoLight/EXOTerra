@@ -6,6 +6,7 @@ import android.support.annotation.IdRes;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
@@ -33,6 +34,12 @@ public abstract class BaseActivity extends AppCompatActivity {
         setContentView(getLayoutRes());
 
         initView();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        dismissLoadDialog();
     }
 
     @Override
@@ -93,17 +100,22 @@ public abstract class BaseActivity extends AppCompatActivity {
         } else {runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    Toast.makeText(BaseActivity.this, msg, Toast.LENGTH_SHORT)
+                    Toast.makeText(BaseActivity.this, msg, Toast.LENGTH_LONG)
                          .show();
                 }
             });
         }
     }
 
+    protected void showToast(@StringRes int res) {
+        showToast(getString(res));
+    }
+
     protected void showLoadDialog() {
         if (mLoadDialog == null) {
             mLoadDialog = new LoadDialog(this);
-            mLoadDialog.setCancelable(false);
+            mLoadDialog.setCancelable(true);
+            mLoadDialog.setCanceledOnTouchOutside(false);
         }
         boolean isMainThread = Looper.getMainLooper().getThread().getId() == Thread.currentThread().getId();
         if (isMainThread) {

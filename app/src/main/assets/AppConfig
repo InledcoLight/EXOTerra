@@ -1,0 +1,14 @@
+#   物联网平台区域
+region              = us-west-1
+
+#   APP在物联网平台的productKey
+appKey              = a3jdKlLMaEn
+
+#   APP在物联网平台的productSecret
+appSecret           = AAWBJNSJkaxi3nvh
+
+#   服务器API接口
+apiServer           = http://47.89.235.158:8086
+
+#   服务器文件URL
+fileUrl             = http://47.89.235.158:8086/imgs/

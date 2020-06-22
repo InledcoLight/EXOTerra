@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:clickable="true"
-    android:background="@mipmap/ic_background"
-    android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@mipmap/ic_background"
+    android:clickable="true"
+    android:orientation="vertical">
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/device_detail_toolbar"
@@ -14,160 +13,180 @@
         android:layout_height="wrap_content"
         android:minHeight="?attr/actionBarSize"
         android:theme="?attr/actionBarTheme"
-        app:title="@string/device_detail"/>
+        app:title="@string/device_detail" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"
         android:layout_marginLeft="8dp"
         android:layout_marginRight="8dp"
+        android:layout_weight="1"
         android:orientation="vertical">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="8dp"
+            android:gravity="center_vertical"
             android:orientation="horizontal"
-            android:gravity="center_vertical">
+            android:padding="8dp">
 
             <ImageButton
                 android:id="@+id/device_detail_icon"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="@color/colorTransparent"/>
+                android:background="?attr/selectableItemBackground"
+                android:scaleType="fitCenter" />
+
             <LinearLayout
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="8dp"
                 android:layout_weight="1"
-                android:orientation="vertical"
-                android:gravity="bottom">
+                android:gravity="bottom"
+                android:orientation="vertical">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:text="@string/device_name"
                     android:textColor="@color/textColorPrimary"
-                    android:textSize="@dimen/textSizePrimary"
-                    android:text="@string/device_name"/>
+                    android:textSize="@dimen/textSizePrimary" />
+
+                <Space
+                    android:layout_width="wrap_content"
+                    android:layout_height="0dp"
+                    android:layout_weight="1" />
+
                 <TextView
                     android:id="@+id/device_detail_name"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:background="?attr/selectableItemBackground"
                     android:layout_gravity="right"
-                    android:gravity="center_vertical"
+                    android:background="?attr/selectableItemBackground"
                     android:drawablePadding="8dp"
+                    android:gravity="center_vertical"
+                    android:text=""
                     android:textColor="@color/textColorSencondary"
-                    android:textSize="@dimen/textSizeSecondary"
-                    android:text=""/>
+                    android:textSize="@dimen/textSizeSecondary" />
             </LinearLayout>
         </LinearLayout>
+
         <View
             android:layout_width="match_parent"
             android:layout_height="@dimen/dividerWidth"
             android:layout_marginLeft="8dp"
             android:layout_marginRight="8dp"
-            android:background="@drawable/shape_rect_gradient"/>
+            android:background="@drawable/shape_rect_gradient" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="8dp"
+            android:gravity="center_vertical"
             android:orientation="horizontal"
-            android:gravity="center_vertical">
+            android:padding="8dp">
 
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@color/colorTransparent"
-                app:srcCompat="@drawable/ic_habitats_white"/>
+                app:srcCompat="@drawable/ic_habitats_white" />
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="8dp"
-                android:gravity="center_vertical"
                 android:drawablePadding="8dp"
-                android:textColor="@color/textColorPrimary"
-                android:text="@string/habitat"/>
+                android:gravity="center_vertical"
+                android:text="@string/habitat"
+                android:textColor="@color/textColorPrimary" />
+
             <Space
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"/>
+                android:layout_weight="1" />
+
             <TextView
                 android:id="@+id/device_detail_habitat"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="?attr/selectableItemBackground"
                 android:textColor="@color/textColorSencondary"
-                android:textSize="@dimen/textSizeSecondary"/>
+                android:textSize="@dimen/textSizeSecondary" />
         </LinearLayout>
+
         <View
             android:layout_width="match_parent"
             android:layout_height="@dimen/dividerWidth"
             android:layout_marginLeft="8dp"
             android:layout_marginRight="8dp"
-            android:background="@drawable/shape_rect_gradient"/>
+            android:background="@drawable/shape_rect_gradient" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="8dp"
+            android:gravity="center_vertical"
             android:orientation="horizontal"
-            android:gravity="center_vertical">
+            android:padding="8dp">
 
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@color/colorTransparent"
-                app:srcCompat="@drawable/ic_time_white_24dp"/>
+                app:srcCompat="@drawable/ic_time_white_24dp" />
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="8dp"
-                android:textColor="@color/textColorPrimary"
-                android:text="@string/device_datetime"/>
+                android:text="@string/device_datetime"
+                android:textColor="@color/textColorPrimary" />
+
             <Space
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"/>
+                android:layout_weight="1" />
+
             <TextView
                 android:id="@+id/device_detail_datetime"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:text=""
                 android:textColor="@color/textColorSencondary"
-                android:textSize="@dimen/textSizeSecondary"
-                android:text=""/>
+                android:textSize="@dimen/textSizeSecondary" />
         </LinearLayout>
+
         <TextView
             android:id="@+id/device_detail_zone"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingBottom="8dp"
+            android:layout_gravity="right"
             android:layout_marginLeft="8dp"
             android:layout_marginRight="8dp"
-            android:layout_gravity="right"
+            android:paddingBottom="8dp"
+            android:text=""
             android:textColor="@color/textColorSencondary"
-            android:textSize="@dimen/textSizeSecondary"
-            android:text=""/>
+            android:textSize="@dimen/textSizeSecondary" />
+
         <View
             android:layout_width="match_parent"
             android:layout_height="@dimen/dividerWidth"
             android:layout_marginLeft="8dp"
             android:layout_marginRight="8dp"
-            android:background="@drawable/shape_rect_gradient"/>
+            android:background="@drawable/shape_rect_gradient" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="8dp"
+            android:gravity="center_vertical"
             android:orientation="horizontal"
-            android:gravity="center_vertical">
+            android:padding="8dp">
 
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@color/colorTransparent"
-                app:srcCompat="@drawable/ic_update"/>
+                app:srcCompat="@drawable/ic_update" />
+
             <TextView
                 android:id="@+id/device_detail_upgrade"
                 android:layout_width="match_parent"
@@ -175,32 +194,33 @@
                 android:layout_marginLeft="8dp"
                 android:background="?attr/selectableItemBackground"
                 android:gravity="center_vertical"
-                android:textColor="@color/textColorPrimary"
-                android:text="@string/upgrade"/>
+                android:text="@string/upgrade"
+                android:textColor="@color/textColorPrimary" />
         </LinearLayout>
+
         <View
             android:layout_width="match_parent"
             android:layout_height="@dimen/dividerWidth"
             android:layout_marginLeft="8dp"
             android:layout_marginRight="8dp"
-            android:background="@drawable/shape_rect_gradient"/>
+            android:background="@drawable/shape_rect_gradient" />
 
         <TextView
             android:id="@+id/device_detail_user_list"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="?attr/selectableItemBackground"
-            android:visibility="gone"
-            android:padding="8dp"
             android:gravity="center_vertical"
+            android:padding="8dp"
+            android:text="@string/user_list"
             android:textColor="@color/textColorPrimary"
-            android:text="@string/user_list"/>
+            android:visibility="gone" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="8dp"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:padding="8dp">
 
             <TextView
                 android:id="@+id/device_detail_delete"
@@ -208,143 +228,165 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="32dp"
                 android:background="?attr/selectableItemBackground"
-                android:gravity="center_vertical"
-                android:enabled="false"
-                android:drawablePadding="8dp"
                 android:drawableRight="@drawable/selector_delete"
-                android:textColor="@color/selector_enable"
-                android:text="@string/delete_device"/>
+                android:drawablePadding="8dp"
+                android:enabled="false"
+                android:gravity="center_vertical"
+                android:text="@string/delete_device"
+                android:textColor="@color/selector_enable" />
         </LinearLayout>
+
         <View
             android:layout_width="match_parent"
             android:layout_height="@dimen/dividerWidth"
             android:layout_marginLeft="8dp"
             android:layout_marginRight="8dp"
-            android:background="@drawable/shape_rect_gradient"/>
+            android:background="@drawable/shape_rect_gradient" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:padding="8dp"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:padding="8dp">
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:text="@string/technical_details"
                 android:textColor="@color/textColorPrimary"
-                android:textSize="@dimen/textSizePrimary"
-                android:text="@string/technical_details"/>
+                android:textSize="@dimen/textSizePrimary" />
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
+                android:layout_marginLeft="16dp"
                 android:gravity="center_vertical"
-                android:layout_marginLeft="16dp">
+                android:orientation="horizontal">
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textColor="@color/textColorSencondary"
-                    android:text="@string/router"/>
+                    android:text="@string/router"
+                    android:textColor="@color/textColorSencondary" />
+
                 <Space
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"/>
+                    android:layout_weight="1" />
+
                 <TextView
                     android:id="@+id/device_detail_router"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textColor="@color/textColorSencondary"/>
+                    android:textColor="@color/textColorSencondary" />
             </LinearLayout>
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
+                android:layout_marginLeft="16dp"
                 android:gravity="center_vertical"
-                android:layout_marginLeft="16dp">
+                android:orientation="horizontal">
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textColor="@color/textColorSencondary"
-                    android:text="@string/ipaddress"/>
+                    android:text="@string/ipaddress"
+                    android:textColor="@color/textColorSencondary" />
+
                 <Space
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"/>
+                    android:layout_weight="1" />
+
                 <TextView
                     android:id="@+id/device_detail_ipaddress"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textColor="@color/textColorSencondary"/>
+                    android:textColor="@color/textColorSencondary" />
             </LinearLayout>
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
+                android:layout_marginLeft="16dp"
                 android:gravity="center_vertical"
-                android:layout_marginLeft="16dp">
+                android:orientation="horizontal">
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textColor="@color/textColorSencondary"
-                    android:text="@string/rssi"/>
+                    android:text="@string/rssi"
+                    android:textColor="@color/textColorSencondary" />
+
                 <Space
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"/>
+                    android:layout_weight="1" />
+
                 <TextView
                     android:id="@+id/device_detail_rssi"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textColor="@color/textColorSencondary"/>
+                    android:textColor="@color/textColorSencondary" />
             </LinearLayout>
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
+                android:layout_marginLeft="16dp"
                 android:gravity="center_vertical"
-                android:layout_marginLeft="16dp">
+                android:orientation="horizontal">
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textColor="@color/textColorSencondary"
-                    android:text="@string/macaddress"/>
+                    android:text="@string/macaddress"
+                    android:textColor="@color/textColorSencondary" />
+
                 <Space
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"/>
+                    android:layout_weight="1" />
+
                 <TextView
                     android:id="@+id/device_detail_mac"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textColor="@color/textColorSencondary"/>
+                    android:textColor="@color/textColorSencondary" />
             </LinearLayout>
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
+                android:layout_marginLeft="16dp"
                 android:gravity="center_vertical"
-                android:layout_marginLeft="16dp">
+                android:orientation="horizontal">
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textColor="@color/textColorSencondary"
-                    android:text="@string/firmware_version"/>
+                    android:text="@string/firmware_version"
+                    android:textColor="@color/textColorSencondary" />
+
                 <Space
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"/>
+                    android:layout_weight="1" />
+
                 <TextView
                     android:id="@+id/device_detail_fwversion"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textColor="@color/textColorSencondary"/>
+                    android:textColor="@color/textColorSencondary" />
             </LinearLayout>
         </LinearLayout>
 
         <Space
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="1"/>
+            android:layout_weight="1" />
 
         <com.inledco.exoterra.view.GradientCornerButton
             android:id="@+id/device_detail_back"
@@ -357,10 +399,10 @@
             android:background="?attr/selectableItemBackground"
             android:text="@string/back"
             app:direction="horizontal"
-            app:strokeWidth="@dimen/strokeWidth"
-            app:radius="@dimen/cornerRadius"
+            app:gradientEnd="@color/gradientWhite"
             app:gradientStart="@color/gradientYellow"
-            app:gradientEnd="@color/gradientWhite"/>
+            app:radius="@dimen/cornerRadius"
+            app:strokeWidth="@dimen/strokeWidth" />
     </LinearLayout>
 
 </LinearLayout>

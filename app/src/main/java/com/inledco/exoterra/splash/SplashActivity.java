@@ -74,10 +74,11 @@ public class SplashActivity extends BaseActivity {
                     String userid = UserManager.getInstance().getUserid();
                     String token = UserManager.getInstance().getToken();
                     AliotServer.getInstance().init(userid, token);
-                    gotoHomeActivity();
-                } else {
-                    gotoLoginActivity();
                 }
+                gotoHomeActivity();
+//                } else {
+//                    gotoLoginActivity();
+//                }
             }
         };
         mAuthTask.execute(mEmail, mPassword, mUserid, mToken, mSecret);

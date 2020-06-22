@@ -255,8 +255,8 @@ public class SocketSensorFragment extends BaseFragment {
         if (sensor == null || config == null) {
             return;
         }
-        int min = sensor.getThrdLower();
-        int max = sensor.getThrdUpper();
+        int min = sensor.getMin();
+        int max = sensor.getMax();
         String unit = getSensorUnit(sensor.getType());
         String[] values = new String[max-min+1];
         for (int i = 0; i < values.length; i++) {

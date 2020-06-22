@@ -8,23 +8,23 @@ import java.util.List;
 public class ExoLed extends Device {
     private final String TAG = "ExoLed";
 
-    private final int CHANNEL_COUNT_MAX         = 6;
-    public static final int MODE_MANUAL         = 0;
-    public static final int MODE_AUTO           = 1;
-    public static final int MODE_PRO            = 2;
-    private final int BRIGHT_MIN                = 0;
-    private final int BRIGHT_MAX                = 1000;
-    private final int RAMP_MIN                  = 0;
-    private final int RAMP_MAX                  = 240;
+    private static final int CHANNEL_COUNT_MAX          = 6;
+    public static final int MODE_MANUAL                 = 0;
+    public static final int MODE_AUTO                   = 1;
+    public static final int MODE_PRO                    = 2;
+    private static final int BRIGHT_MIN                 = 0;
+    private static final int BRIGHT_MAX                 = 1000;
+    private static final int RAMP_MIN                   = 0;
+    private static final int RAMP_MAX                   = 240;
 
-    private final String KEY_CHANNEL_COUNT      = "ChannelCount";
-    private final String KEY_CHN1_NAME          = "Chn1Name";
-    private final String KEY_CHN2_NAME          = "Chn2Name";
-    private final String KEY_CHN3_NAME          = "Chn3Name";
-    private final String KEY_CHN4_NAME          = "Chn4Name";
-    private final String KEY_CHN5_NAME          = "Chn5Name";
-    private final String KEY_CHN6_NAME          = "Chn6Name";
-    private final String[] KEY_CHN_NAMES        = new String[] {
+    private static final String KEY_CHANNEL_COUNT       = "ChannelCount";
+    private static final String KEY_CHN1_NAME           = "Chn1Name";
+    private static final String KEY_CHN2_NAME           = "Chn2Name";
+    private static final String KEY_CHN3_NAME           = "Chn3Name";
+    private static final String KEY_CHN4_NAME           = "Chn4Name";
+    private static final String KEY_CHN5_NAME           = "Chn5Name";
+    private static final String KEY_CHN6_NAME           = "Chn6Name";
+    private static final String[] KEY_CHN_NAMES         = new String[] {
         KEY_CHN1_NAME,
         KEY_CHN2_NAME,
         KEY_CHN3_NAME,
@@ -33,16 +33,16 @@ public class ExoLed extends Device {
         KEY_CHN6_NAME
     };
 
-    private final String KEY_MODE               = "Mode";
+    private static final String KEY_MODE                = "Mode";
 
-    private final String KEY_POWER              = "Power";
-    private final String KEY_CHN1_BRIGHT        = "Chn1Bright";
-    private final String KEY_CHN2_BRIGHT        = "Chn2Bright";
-    private final String KEY_CHN3_BRIGHT        = "Chn3Bright";
-    private final String KEY_CHN4_BRIGHT        = "Chn4Bright";
-    private final String KEY_CHN5_BRIGHT        = "Chn5Bright";
-    private final String KEY_CHN6_BRIGHT        = "Chn6Bright";
-    private final String[] KEY_CHN_BRIGHTS      = new String[] {
+    private static final String KEY_POWER               = "Power";
+    private static final String KEY_CHN1_BRIGHT         = "Chn1Bright";
+    private static final String KEY_CHN2_BRIGHT         = "Chn2Bright";
+    private static final String KEY_CHN3_BRIGHT         = "Chn3Bright";
+    private static final String KEY_CHN4_BRIGHT         = "Chn4Bright";
+    private static final String KEY_CHN5_BRIGHT         = "Chn5Bright";
+    private static final String KEY_CHN6_BRIGHT         = "Chn6Bright";
+    private static final String[] KEY_CHN_BRIGHTS       = new String[] {
         KEY_CHN1_BRIGHT,
         KEY_CHN2_BRIGHT,
         KEY_CHN3_BRIGHT,
@@ -50,23 +50,30 @@ public class ExoLed extends Device {
         KEY_CHN5_BRIGHT,
         KEY_CHN6_BRIGHT
     };
-    private final String KEY_CUSTOM1_BRIGHTS    = "Custom1Brights";
-    private final String KEY_CUSTOM2_BRIGHTS    = "Custom2Brights";
-    private final String KEY_CUSTOM3_BRIGHTS    = "Custom3Brights";
-    private final String KEY_CUSTOM4_BRIGHTS    = "Custom4Brights";
-    private final String[] KEY_CUSTOM_BRIGHTS     = new String[] {
+    private static final String KEY_CUSTOM1_BRIGHTS     = "Custom1Brights";
+    private static final String KEY_CUSTOM2_BRIGHTS     = "Custom2Brights";
+    private static final String KEY_CUSTOM3_BRIGHTS     = "Custom3Brights";
+    private static final String KEY_CUSTOM4_BRIGHTS     = "Custom4Brights";
+    private static final String[] KEY_CUSTOM_BRIGHTS    = new String[] {
         KEY_CUSTOM1_BRIGHTS,
         KEY_CUSTOM2_BRIGHTS,
         KEY_CUSTOM3_BRIGHTS,
         KEY_CUSTOM4_BRIGHTS
     };
 
-    private final String KEY_SUNRISE_RAMP       = "SunriseRamp";
-    private final String KEY_SUNSET_RAMP        = "SunsetRamp";
-    private final String KEY_DAY_BRIGHTS        = "DayBrights";
-    private final String KEY_NIGHT_BRIGHTS      = "NightBrights";
-    private final String KEY_TURNOFF_ENABLE     = "TurnoffEnable";
-    private final String KEY_TURNOFF_TIME       = "TurnoffTime";
+    private static final String KEY_SUNRISE_RAMP       = "SunriseRamp";
+    private static final String KEY_SUNSET_RAMP        = "SunsetRamp";
+    private static final String KEY_DAY_BRIGHTS        = "DayBrights";
+    private static final String KEY_NIGHT_BRIGHTS      = "NightBrights";
+    private static final String KEY_TURNOFF_ENABLE     = "TurnoffEnable";
+    private static final String KEY_TURNOFF_TIME       = "TurnoffTime";
+
+    public ExoLed() {
+    }
+
+    public ExoLed(String productKey, String deviceName) {
+        super(productKey, deviceName);
+    }
 
     public ExoLed(XDevice xDevice) {
         super(xDevice);

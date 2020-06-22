@@ -41,11 +41,12 @@
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:layout_marginLeft="8dp"
+                android:gravity="center_vertical"
                 android:orientation="vertical">
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textSize="@dimen/textSizeSubTitle"
+                    android:textSize="@dimen/textSizePrimary"
                     android:text="MICROTOPE"/>
                 <View
                     android:layout_width="match_parent"
@@ -78,11 +79,12 @@
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:layout_marginLeft="8dp"
+                android:gravity="center_vertical"
                 android:orientation="vertical">
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textSize="@dimen/textSizeSubTitle"
+                    android:textSize="@dimen/textSizePrimary"
                     android:text="UVB BUDDY"/>
                 <View
                     android:layout_width="match_parent"
@@ -115,11 +117,12 @@
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:layout_marginLeft="8dp"
+                android:gravity="center_vertical"
                 android:orientation="vertical">
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textSize="@dimen/textSizeSubTitle"
+                    android:textSize="@dimen/textSizePrimary"
                     android:text="RESTORE THE RAYS"/>
                 <View
                     android:layout_width="match_parent"
@@ -136,8 +139,8 @@
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="8dp"
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="4dp"
             android:background="@color/colorDivider"/>
 
         <TextView
@@ -145,9 +148,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="?attr/selectableItemBackground"
-            android:layout_marginBottom="8dp"
+            android:layout_marginBottom="4dp"
             android:gravity="center_vertical"
-            android:textSize="@dimen/textSizePrimary"
+            android:textSize="@dimen/textSizeSecondary"
             android:text="NEW PRODUCTS"/>
 
         <TextView
@@ -155,9 +158,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="?attr/selectableItemBackground"
-            android:layout_marginBottom="8dp"
+            android:layout_marginBottom="4dp"
             android:gravity="center_vertical"
-            android:textSize="@dimen/textSizePrimary"
+            android:textSize="@dimen/textSizeSecondary"
             android:text="EVENTS"/>
 
         <TextView
@@ -165,9 +168,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="?attr/selectableItemBackground"
-            android:layout_marginBottom="8dp"
+            android:layout_marginBottom="4dp"
             android:gravity="center_vertical"
-            android:textSize="@dimen/textSizePrimary"
+            android:textSize="@dimen/textSizeSecondary"
             android:text="CARE SHEETS"/>
 
         <TextView
@@ -176,14 +179,14 @@
             android:layout_height="wrap_content"
             android:background="?attr/selectableItemBackground"
             android:gravity="center_vertical"
-            android:textSize="@dimen/textSizePrimary"
+            android:textSize="@dimen/textSizeSecondary"
             android:text="EXO TERRA TV"/>
 
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="8dp"
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="4dp"
             android:background="@color/colorDivider"/>
 
         <TextView
@@ -202,6 +205,7 @@
                 android:id="@+id/home_ib_facebook"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:padding="4dp"
                 android:background="?attr/selectableItemBackground"
                 android:scaleType="center"
                 app:srcCompat="@drawable/ic_facebook"/>
@@ -213,6 +217,7 @@
                 android:id="@+id/home_ib_twitter"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:padding="4dp"
                 android:background="?attr/selectableItemBackground"
                 android:scaleType="center"
                 app:srcCompat="@drawable/ic_twitter"/>
@@ -224,6 +229,7 @@
                 android:id="@+id/home_ib_instagram"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:padding="4dp"
                 android:background="?attr/selectableItemBackground"
                 android:scaleType="center"
                 app:srcCompat="@drawable/ic_instagram"/>
@@ -235,6 +241,7 @@
                 android:id="@+id/home_ib_youtube"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:padding="4dp"
                 android:background="?attr/selectableItemBackground"
                 android:scaleType="center"
                 app:srcCompat="@drawable/ic_youtube"/>
@@ -246,6 +253,7 @@
                 android:id="@+id/home_ib_email"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:padding="4dp"
                 android:background="?attr/selectableItemBackground"
                 android:scaleType="center"
                 app:srcCompat="@drawable/ic_email"/>

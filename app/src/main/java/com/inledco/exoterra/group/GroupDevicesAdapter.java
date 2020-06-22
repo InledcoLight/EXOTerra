@@ -13,9 +13,9 @@ import android.widget.TextView;
 import com.inledco.exoterra.R;
 import com.inledco.exoterra.aliot.Device;
 import com.inledco.exoterra.aliot.bean.Group;
+import com.inledco.exoterra.bean.ExoProduct;
 import com.inledco.exoterra.common.SimpleAdapter;
 import com.inledco.exoterra.manager.DeviceManager;
-import com.inledco.exoterra.util.DeviceUtil;
 
 import java.util.List;
 
@@ -40,8 +40,14 @@ public class GroupDevicesAdapter extends SimpleAdapter<Group.Device, GroupDevice
         final int position = holder.getAdapterPosition();
         Group.Device device = mData.get(position);
         String pkey = device.product_key;
-        String name = TextUtils.isEmpty(device.name) ? DeviceUtil.getDefaultName(pkey) : device.name;
-        holder.iv_icon.setImageResource(DeviceUtil.getProductIconSmall(pkey));
+        String name = device.name;
+        ExoProduct product = ExoProduct.getExoProduct(pkey);
+        if (product != null) {
+            if (TextUtils.isEmpty(name)) {
+                name = product.getDefaultName();
+            }
+            holder.iv_icon.setImageResource(product.getIconSmall());
+        }
         holder.tv_name.setText(name);
         boolean state = false;
         Device dev = DeviceManager.getInstance().getDevice(pkey + "_" + device.device_name);

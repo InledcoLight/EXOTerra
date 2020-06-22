@@ -1,20 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:orientation="horizontal"
-              android:layout_width="wrap_content"
-              android:layout_height="wrap_content">
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:gravity="center_vertical"
+    android:orientation="horizontal">
 
     <ProgressBar
         android:id="@+id/scan_progress"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:visibility="gone"/>
-    <ToggleButton
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:visibility="gone" />
+
+    <CheckedTextView
         android:id="@+id/scan_tb_scan"
+        style="@style/Widget.AppCompat.Button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textOff="@string/start"
-        android:textOn="@string/stop"
-        android:background="@android:color/transparent"/>
+        android:background="?attr/selectableItemBackground"
+        android:textAlignment="center"
+        android:text="@string/scan"
+        android:textOff="@string/scan"
+        android:textOn="@string/stop" />
 
 </LinearLayout>

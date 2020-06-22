@@ -9,13 +9,13 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.inledco.exoterra.R;
+import com.inledco.exoterra.bean.ExoProduct;
 import com.inledco.exoterra.common.SimpleAdapter;
-import com.inledco.exoterra.util.DeviceUtil;
 
 import java.util.List;
 
-public class ProductAdapter extends SimpleAdapter<String, ProductAdapter.ProductViewHolder> {
-    public ProductAdapter(@NonNull Context context, List<String> data) {
+public class ProductAdapter extends SimpleAdapter<ExoProduct, ProductAdapter.ProductViewHolder> {
+    public ProductAdapter(@NonNull Context context, List<ExoProduct> data) {
         super(context, data);
     }
 
@@ -32,12 +32,9 @@ public class ProductAdapter extends SimpleAdapter<String, ProductAdapter.Product
 
     @Override
     public void onBindViewHolder(@NonNull ProductViewHolder holder, final int position) {
-        final String pkey = mData.get(position);
-        if (DeviceUtil.containsProduct(pkey) == false) {
-            return;
-        }
-        holder.iv_icon.setImageResource(DeviceUtil.getProductIcon(pkey));
-        holder.tv_type.setText(DeviceUtil.getProductName(pkey));
+        final ExoProduct product = mData.get(position);
+        holder.iv_icon.setImageResource(product.getIcon());
+        holder.tv_type.setText(product.getProductName());
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

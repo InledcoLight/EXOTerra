@@ -3,7 +3,6 @@ package com.inledco.exoterra.main.groups;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
@@ -23,6 +22,10 @@ import com.inledco.exoterra.group.GroupFragment;
 import com.inledco.exoterra.manager.GroupManager;
 import com.inledco.exoterra.manager.OnErrorCallback;
 import com.inledco.exoterra.util.FavouriteUtil;
+import com.scwang.smartrefresh.layout.SmartRefreshLayout;
+import com.scwang.smartrefresh.layout.api.RefreshLayout;
+import com.scwang.smartrefresh.layout.header.ClassicsHeader;
+import com.scwang.smartrefresh.layout.listener.OnRefreshListener;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -34,7 +37,7 @@ import java.util.Set;
 
 public class DashboardFragment extends BaseFragment {
     private TextView groups_title;
-    private SwipeRefreshLayout groups_refresh;
+    private SmartRefreshLayout groups_refresh;
     private View groups_warning;
     private TextView warning_tv_msg;
     private RecyclerView groups_rv;
@@ -49,7 +52,7 @@ public class DashboardFragment extends BaseFragment {
     private final OnErrorCallback mCallback = new OnErrorCallback() {
         @Override
         public void onError(String error) {
-            stopRefresh();
+            groups_refresh.finishRefresh(1000, false, false);
         }
     };
 
@@ -88,7 +91,7 @@ public class DashboardFragment extends BaseFragment {
         if (mAdapter != null) {
             mAdapter.notifyDataSetChanged();
         }
-        groups_refresh.setRefreshing(false);
+        groups_refresh.finishRefresh(500);
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -102,6 +105,16 @@ public class DashboardFragment extends BaseFragment {
                 return;
             }
         }
+    }
+
+    private void initHeader() {
+        ClassicsHeader.REFRESH_HEADER_LOADING = getString(R.string.loading);
+        ClassicsHeader.REFRESH_HEADER_PULLING = getString(R.string.pulldown_to_refresh);
+        ClassicsHeader.REFRESH_HEADER_RELEASE = getString(R.string.release_to_refresh);
+        ClassicsHeader.REFRESH_HEADER_REFRESHING = getString(R.string.refreshing);
+        ClassicsHeader.REFRESH_HEADER_FAILED = getString(R.string.refresh_failed);
+        ClassicsHeader.REFRESH_HEADER_FINISH = getString(R.string.refresh_success);
+        ClassicsHeader.REFRESH_HEADER_UPDATE = getString(R.string.last_update);
     }
 
     @Override
@@ -120,6 +133,9 @@ public class DashboardFragment extends BaseFragment {
 
         warning_tv_msg.setText(R.string.no_habitat_warning);
         groups_rv.setLayoutManager(new GridLayoutManager(getContext(), 4));
+        initHeader();
+        ClassicsHeader header = new ClassicsHeader(getContext());
+        groups_refresh.setRefreshHeader(header);
     }
 
     @Override
@@ -150,7 +166,7 @@ public class DashboardFragment extends BaseFragment {
             GroupManager.getInstance().getGroups(mCallback);
         }
         if (GroupManager.getInstance().isSynchronizing() && !GroupManager.getInstance().isSynchronized()) {
-            groups_refresh.setRefreshing(true);
+            groups_refresh.autoRefresh();
         } else {
             groups_warning.setVisibility(mFavouriteGroups.size() == 0 ? View.VISIBLE : View.GONE);
         }
@@ -158,9 +174,9 @@ public class DashboardFragment extends BaseFragment {
 
     @Override
     protected void initEvent() {
-        groups_refresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+        groups_refresh.setOnRefreshListener(new OnRefreshListener() {
             @Override
-            public void onRefresh() {
+            public void onRefresh(@NonNull RefreshLayout refreshLayout) {
                 GroupManager.getInstance().getGroups(mCallback);
             }
         });
@@ -169,18 +185,6 @@ public class DashboardFragment extends BaseFragment {
             @Override
             public void onClick(View v) {
                 addFragmentToStack(R.id.main_fl, AddHabitatFragment.newInstance(true));
-            }
-        });
-    }
-
-    private void stopRefresh() {
-        if (getActivity() == null) {
-            return;
-        }
-        getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                groups_refresh.setRefreshing(false);
             }
         });
     }

@@ -40,7 +40,7 @@ public class GroupManager {
         return LazyHolder.INSTANCE;
     }
 
-    public void addGroup(Group group) {
+    private void addGroup(Group group) {
         if (group == null) {
             return;
         }
@@ -63,6 +63,8 @@ public class GroupManager {
     public void removeGroup(String key) {
         if (mGroupMap.containsKey(key)) {
             mGroupMap.remove(key);
+            mGroups.clear();
+            mGroups.addAll(mGroupMap.values());
         }
     }
 

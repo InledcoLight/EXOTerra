@@ -1,6 +1,5 @@
 package com.inledco.exoterra.foundback;
 
-import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -24,7 +23,6 @@ import com.inledco.exoterra.manager.VerifycodeManager;
 import com.inledco.exoterra.util.RegexUtil;
 import com.inledco.exoterra.view.AdvancedTextInputEditText;
 import com.inledco.exoterra.view.PasswordEditText;
-import com.liruya.loaddialog.LoadDialog;
 
 public class FoundbackActivity extends BaseActivity {
 
@@ -36,8 +34,6 @@ public class FoundbackActivity extends BaseActivity {
     private TextInputLayout foundback_til_verifycode;
     private AdvancedTextInputEditText foundback_et_verifycode;
     private Button foundback_btn_found;
-    private LoadDialog mLoadDialog;
-    private ProgressDialog mProgressDialog;
 
     private HttpCallback<UserApi.Response> mVerifycodeCallback;
     private HttpCallback<UserApi.Response> mFoundbackPasswordCallback;
@@ -79,9 +75,6 @@ public class FoundbackActivity extends BaseActivity {
 
     @Override
     protected void initData() {
-        mLoadDialog = new LoadDialog(this);
-        mProgressDialog = new ProgressDialog(this);
-        mProgressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
         foundback_et_email.requestFocus();
         Intent intent = getIntent();
         if (intent != null) {
@@ -95,23 +88,17 @@ public class FoundbackActivity extends BaseActivity {
             @Override
             public void onError(final String error) {
                 Log.e(TAG, "onError: " + error);
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        dismissLoading();
-                        Toast.makeText(FoundbackActivity.this, error, Toast.LENGTH_SHORT)
-                             .show();
-                    }
-                });
+                dismissLoadDialog();
+                showToast(error);
             }
 
             @Override
             public void onSuccess(UserApi.Response result) {
                 Log.e(TAG, "onSuccess: " + JSON.toJSONString(result));
+                dismissLoadDialog();
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        dismissLoading();
                         getMessageDialog().setTitle(R.string.title_verifycode_sent)
                                           .setMessage(R.string.msg_get_verifycode)
                                           .show();
@@ -123,24 +110,17 @@ public class FoundbackActivity extends BaseActivity {
             @Override
             public void onError(final String error) {
                 Log.e(TAG, "onError: " + error);
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        dismissLoading();
-                        getMessageDialog().setTitle(R.string.foundback_failed)
-                                          .setMessage(error)
-                                          .show();
-                    }
-                });
+                dismissLoadDialog();
+                showToast(error);
             }
 
             @Override
             public void onSuccess(UserApi.Response result) {
                 Log.e(TAG, "onSuccess: " + JSON.toJSONString(result));
+                dismissLoadDialog();
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        dismissLoading();
                         showFoundbackSuccessDialog();
                     }
                 });
@@ -176,6 +156,7 @@ public class FoundbackActivity extends BaseActivity {
                     return;
                 }
                 AliotServer.getInstance().getEmailVerifycode(email, mVerifycodeCallback);
+                showLoadDialog();
                 mVerifycodeManager.addResetVerifycode(email);
             }
         });
@@ -202,6 +183,7 @@ public class FoundbackActivity extends BaseActivity {
                     return;
                 }
                 AliotServer.getInstance().resetPassword(email, verifycode, password, mFoundbackPasswordCallback);
+                showLoadDialog();
             }
         });
     }
@@ -216,16 +198,6 @@ public class FoundbackActivity extends BaseActivity {
 
     private String getVerifycodeText() {
         return foundback_et_verifycode.getText().toString();
-    }
-
-    private void showLoading() {
-//        mLoadDialog.show();
-        mProgressDialog.show();
-    }
-
-    private void dismissLoading() {
-//        mLoadDialog.dismiss();
-        mProgressDialog.dismiss();
     }
 
     private void showFoundbackSuccessDialog() {

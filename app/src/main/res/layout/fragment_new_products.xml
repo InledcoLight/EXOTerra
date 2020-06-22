@@ -52,6 +52,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:textSize="8sp"
             android:background="?attr/selectableItemBackground"
             android:drawableTop="@drawable/ic_reptile"/>
         <Button
@@ -59,12 +60,15 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:textSize="8sp"
             android:background="?attr/selectableItemBackground"
             android:drawableTop="@drawable/ic_microtope"/>
         <Button
             android:id="@+id/new_products_uvb"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textSize="8sp"
             android:background="?attr/selectableItemBackground"
             android:drawableTop="@drawable/ic_uvb"/>
         <Button
@@ -72,6 +76,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:textSize="8sp"
             android:background="?attr/selectableItemBackground"
             android:drawableTop="@drawable/ic_resore"/>
         <Button
@@ -79,6 +84,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:textSize="8sp"
             android:background="?attr/selectableItemBackground"
             android:drawableTop="@drawable/ic_prefs_white"/>
     </LinearLayout>

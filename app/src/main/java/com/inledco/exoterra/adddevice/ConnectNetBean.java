@@ -1,11 +1,15 @@
 package com.inledco.exoterra.adddevice;
 
+import com.inledco.exoterra.bean.ExoProduct;
+
 public class ConnectNetBean {
     private String mGroupid;
+    private ExoProduct mProduct;
     private String mProductKey;
     private String mSsid;
     private String mBssid;
     private String mPassword;
+    private int mNetworkId = -1;
 
     private String mDeviceName;
     private String mAddress;
@@ -25,6 +29,14 @@ public class ConnectNetBean {
 
     public String getGroupid() {
         return mGroupid;
+    }
+
+    public ExoProduct getProduct() {
+        return mProduct;
+    }
+
+    public void setProduct(ExoProduct product) {
+        mProduct = product;
     }
 
     public String getProductKey() {
@@ -57,6 +69,14 @@ public class ConnectNetBean {
 
     public void setPassword(String password) {
         mPassword = password;
+    }
+
+    public int getNetworkId() {
+        return mNetworkId;
+    }
+
+    public void setNetworkId(int networkId) {
+        mNetworkId = networkId;
     }
 
     public String getDeviceName() {

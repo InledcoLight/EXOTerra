@@ -15,14 +15,14 @@ import java.util.Map;
 public class LocalDevicePrefUtil {
     private static final String filename = "local_devices";
 
-    public static void putLocalDevice(@NonNull Context context, @NonNull String pid, @NonNull String mac, String name) {
-        LocalDevicePref pref = new LocalDevicePref(pid, mac, name, System.currentTimeMillis());
+    public static void putLocalDevice(@NonNull Context context, @NonNull String pid, @NonNull String dname, String mac) {
+        LocalDevicePref pref = new LocalDevicePref(pid, dname, mac, System.currentTimeMillis());
         String json = new Gson().toJson(pref);
         PrefUtil.put(context, filename, pref.getTag(), json);
     }
 
-    public static void deleteLocalDevice(@NonNull Context context, @NonNull String pid, @NonNull String mac) {
-        PrefUtil.remove(context, filename, pid + "_" + mac);
+    public static void deleteLocalDevice(@NonNull Context context, @NonNull String pid, @NonNull String dname) {
+        PrefUtil.remove(context, filename, pid + "_" + dname);
     }
 
     public static List<LocalDevicePref> getLocalDevicePrefs(@NonNull Context context) {

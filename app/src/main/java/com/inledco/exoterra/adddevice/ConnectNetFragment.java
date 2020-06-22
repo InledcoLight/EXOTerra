@@ -19,7 +19,6 @@ import android.support.design.widget.TextInputLayout;
 import android.text.TextUtils;
 import android.text.method.HideReturnsTransformationMethod;
 import android.text.method.PasswordTransformationMethod;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,8 +27,8 @@ import android.widget.ImageView;
 
 import com.inledco.exoterra.R;
 import com.inledco.exoterra.base.BaseFragment;
+import com.inledco.exoterra.bean.ExoProduct;
 import com.inledco.exoterra.helper.WifiHelper;
-import com.inledco.exoterra.util.DeviceUtil;
 import com.inledco.exoterra.util.RouterUtil;
 import com.inledco.exoterra.view.AdvancedTextInputEditText;
 
@@ -59,7 +58,6 @@ public class ConnectNetFragment extends BaseFragment {
                 return;
             }
             WifiManager wifiManager = (WifiManager) getActivity().getApplicationContext().getSystemService(Context.WIFI_SERVICE);
-            wifiManager.getConfiguredNetworks();
             if (wifiManager != null) {
                 WifiInfo wifiInfo = wifiManager.getConnectionInfo();
                 DhcpInfo dhcpInfo = wifiManager.getDhcpInfo();
@@ -119,7 +117,13 @@ public class ConnectNetFragment extends BaseFragment {
     protected void initData() {
         mWifiHelper = new WifiHelper(getContext());
         mConnectNetViewModel = ViewModelProviders.of(getActivity()).get(ConnectNetViewModel.class);
-        connect_net_prdt.setImageResource(DeviceUtil.getProductIcon(mConnectNetViewModel.getData().getProductKey()));
+        ConnectNetBean bean = mConnectNetViewModel.getData();
+        if (bean != null) {
+            ExoProduct product = ExoProduct.getExoProduct(bean.getProductKey());
+            if (product != null) {
+                connect_net_prdt.setImageResource(product.getIcon());
+            }
+        }
     }
 
     @Override
@@ -153,6 +157,7 @@ public class ConnectNetFragment extends BaseFragment {
                     connect_net_tl2.setError(error);
                     return;
                 }
+
                 mConnectNetViewModel.getData().setSsid(getSsid());
                 mConnectNetViewModel.getData().setBssid(mWifiHelper.getGatewayMacAddress());
                 mConnectNetViewModel.getData().setPassword(getPassword());
@@ -167,6 +172,13 @@ public class ConnectNetFragment extends BaseFragment {
                 if (error != null) {
                     connect_net_tl2.setError(error);
                     return;
+                }
+                WifiManager wifiManager = (WifiManager) getActivity().getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+                if (wifiManager != null) {
+                    WifiInfo wifiInfo = wifiManager.getConnectionInfo();
+                    if (wifiInfo != null) {
+                        mConnectNetViewModel.getData().setNetworkId(wifiInfo.getNetworkId());
+                    }
                 }
                 mConnectNetViewModel.getData().setSsid(getSsid());
                 mConnectNetViewModel.getData().setBssid(mWifiHelper.getGatewayMacAddress());
@@ -221,7 +233,7 @@ public class ConnectNetFragment extends BaseFragment {
     }
 
     private void onWiFiChanged(WifiInfo wifiInfo, DhcpInfo dhcpInfo) {
-        if (wifiInfo == null) {
+        if (wifiInfo == null || wifiInfo.getNetworkId() == -1) {
             return;
         }
         WifiManager wifiManager = (WifiManager) getActivity().getApplicationContext().getSystemService(Context.WIFI_SERVICE);
@@ -233,7 +245,6 @@ public class ConnectNetFragment extends BaseFragment {
         connect_net_tl2.setError(null);
 
         String ssid = wifiInfo.getSSID();
-        Log.e(TAG, "onWiFiChanged: " + wifiInfo.getMacAddress() + "  " + wifiInfo.getBSSID() + " " + (dhcpInfo==null?"dhcpinfo=null":dhcpInfo.toString()));
         if (ssid.length() >= 2 && ssid.startsWith("\"") && ssid.endsWith("\"")) {
             ssid = ssid.substring(1, ssid.length() - 1);
         }
@@ -243,19 +254,16 @@ public class ConnectNetFragment extends BaseFragment {
         if (connected) {
             if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP && wifiInfo.getFrequency() > 4900 && wifiInfo.getFrequency() < 5900) {
                 connect_net_tl1.setError(getString(R.string.warn_device_donot_support_5g));
-                connect_net_smartconfig.setEnabled(false);
-                connect_net_apconfig.setEnabled(false);
             } else {
                 connect_net_tl1.setError(null);
                 connect_net_password.requestFocus();
-                connect_net_smartconfig.setEnabled(true);
-                connect_net_apconfig.setEnabled(true);
             }
         } else {
             connect_net_tl1.setError("Please connect router.");
-            connect_net_smartconfig.setEnabled(false);
-            connect_net_apconfig.setEnabled(false);
         }
+        connect_net_smartconfig.setEnabled(connected);
+        connect_net_apconfig.setEnabled(connected);
+
         boolean conflict = false;
         if (dhcpInfo != null) {
             int gw1 = dhcpInfo.gateway&0xFF;

@@ -19,12 +19,12 @@ import com.inledco.exoterra.aliot.HttpCallback;
 import com.inledco.exoterra.aliot.UserApi;
 import com.inledco.exoterra.aliot.bean.Group;
 import com.inledco.exoterra.base.BaseFragment;
+import com.inledco.exoterra.bean.ExoProduct;
 import com.inledco.exoterra.event.DeviceChangedEvent;
 import com.inledco.exoterra.event.GroupDeviceChangedEvent;
 import com.inledco.exoterra.manager.DeviceManager;
 import com.inledco.exoterra.manager.GroupManager;
 import com.inledco.exoterra.manager.UserManager;
-import com.inledco.exoterra.util.DeviceUtil;
 import com.inledco.exoterra.util.LocalDevicePrefUtil;
 import com.inledco.exoterra.view.GradientCornerButton;
 
@@ -70,9 +70,11 @@ public class ConfigDeviceFragment extends BaseFragment {
         if (mConnectNetBean == null) {
             return;
         }
-        final String pkey = mConnectNetBean.getProductKey();
-        config_device_prdt.setImageResource(DeviceUtil.getProductIcon(pkey));
-        config_device_name.setText(DeviceUtil.getDefaultName(pkey));
+        ExoProduct product = ExoProduct.getExoProduct(mConnectNetBean.getProductKey());
+        if (product != null) {
+            config_device_prdt.setImageResource(product.getIcon());
+            config_device_name.setText(product.getDefaultName());
+        }
         config_device_name.requestFocus();
     }
 
