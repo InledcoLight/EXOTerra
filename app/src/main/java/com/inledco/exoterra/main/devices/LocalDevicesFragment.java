@@ -204,7 +204,7 @@ public class LocalDevicesFragment extends BasePermissionFragment {
 
     private void startLoginActivity() {
         Intent intent = new Intent(getContext(), LoginActivity.class);
-        startActivityForResult(intent, 1);
+        getActivity().startActivityForResult(intent, 1);
     }
 
     private void startDeviceActivity(String productKey, String deviceName, String deviceIp, int devicePort) {
