@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Microtope</string>
+    <string name="app_name">myExoTerra</string>
 
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
@@ -370,4 +370,7 @@
         \n
         Make sure the device and phone are connected to the same network.
     </string>
+    <string name="turnon_gps">Turnon GPS</string>
+    <string name="msg_turnon_gps">Need to turnon GPS after Android 9.0.</string>
+    <string name="please_connect_router">Please connect router</string>
 </resources>

@@ -1,24 +1,17 @@
 package com.inledco.exoterra.main;
 
-import android.Manifest;
-import android.annotation.TargetApi;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
-import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.MenuItem;
 
-import com.google.zxing.integration.android.IntentIntegrator;
 import com.inledco.exoterra.R;
-import com.inledco.exoterra.adddevice.AddDeviceActivity;
 import com.inledco.exoterra.aliot.AliotClient;
 import com.inledco.exoterra.aliot.bean.InviteAction;
 import com.inledco.exoterra.aliot.bean.InviteMessage;
@@ -34,8 +27,6 @@ import com.inledco.exoterra.manager.DeviceManager;
 import com.inledco.exoterra.manager.GroupManager;
 import com.inledco.exoterra.manager.UserManager;
 import com.inledco.exoterra.manager.UserPref;
-import com.inledco.exoterra.scan.ScanActivity;
-import com.inledco.exoterra.smartconfig.SmartconfigActivity;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -72,12 +63,6 @@ public class MainActivity extends BaseActivity {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         Log.e(TAG, "onActivityResult: " + requestCode + " " + resultCode);
-//        IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
-//        if (result != null) {
-//            String code = result.getContents();
-//            String rawOcde = new String(Base64.decode(code.getBytes(), Base64.DEFAULT));
-//            Log.e(TAG, "onActivityResult: " + code + "\n" + rawOcde);
-//        }
         if (requestCode == 1 && resultCode == 1) {
             mAuthStatus.setAuthorized(UserManager.getInstance().isAuthorized());
             if (mAuthStatus.isAuthorized()) {
@@ -174,37 +159,5 @@ public class MainActivity extends BaseActivity {
         }
         GroupManager.getInstance().getGroups();
         DeviceManager.getInstance().getSubscribedDevices();
-    }
-
-    private void startSmartconfigActivity() {
-        Intent intent = new Intent(MainActivity.this, SmartconfigActivity.class);
-        startActivity(intent);
-    }
-
-    private void startScanActivity() {
-        Intent intent = new Intent(MainActivity.this, ScanActivity.class);
-        startActivity(intent);
-    }
-
-    private void startAdddeviceActivity() {
-        Intent intent = new Intent(MainActivity.this, AddDeviceActivity.class);
-        startActivity(intent);
-    }
-
-    private boolean checkCameraPermissions() {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-            return false;
-        }
-        return ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED;
-    }
-
-    @TargetApi (Build.VERSION_CODES.M)
-    private void requestCameraPermission() {
-        requestPermissions(new String[]{Manifest.permission.CAMERA}, 1);
-    }
-
-    private void scanQrCode() {
-        IntentIntegrator integrator = new IntentIntegrator(this);
-        integrator.setBeepEnabled(false).initiateScan();
     }
 }

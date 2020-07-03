@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,12 +24,14 @@ import com.inledco.exoterra.event.GroupDeviceChangedEvent;
 import com.inledco.exoterra.event.GroupsRefreshedEvent;
 import com.inledco.exoterra.main.groups.AddHabitatFragment;
 import com.inledco.exoterra.manager.GroupManager;
+import com.inledco.exoterra.manager.UserManager;
 import com.inledco.exoterra.view.GradientCornerButton;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class AssignHabitatFragment extends BaseFragment {
@@ -42,7 +45,7 @@ public class AssignHabitatFragment extends BaseFragment {
     private ConnectNetViewModel mConnectNetViewModel;
     private ConnectNetBean mConnectNetBean;
 
-    private List<Group> mGroups = GroupManager.getInstance().getAllGroups();
+    private List<Group> mGroups = new ArrayList<>();
     private AssignHabitatAdapter mAdapter;
 
     @Nullable
@@ -91,6 +94,11 @@ public class AssignHabitatFragment extends BaseFragment {
         ExoProduct product = ExoProduct.getExoProduct(mConnectNetBean.getProductKey());
         if (product != null) {
             assign_habitat_prdt.setImageResource(product.getIcon());
+        }
+        for (Group group : GroupManager.getInstance().getAllGroups()) {
+            if (TextUtils.equals(group.creator, UserManager.getInstance().getUserid())) {
+                mGroups.add(group);
+            }
         }
         mAdapter = new AssignHabitatAdapter(getContext(), mGroups);
         assign_habitat_rv.setAdapter(mAdapter);
@@ -141,6 +149,12 @@ public class AssignHabitatFragment extends BaseFragment {
 
     @Subscribe (threadMode = ThreadMode.MAIN)
     public void onGroupsRefreshedEvent(GroupsRefreshedEvent event) {
+        mGroups.clear();
+        for (Group group : GroupManager.getInstance().getAllGroups()) {
+            if (TextUtils.equals(group.creator, UserManager.getInstance().getUserid())) {
+                mGroups.add(group);
+            }
+        }
         assign_habitat_warning.setVisibility(mGroups.size() == 0 ? View.VISIBLE : View.GONE);
         mAdapter.notifyDataSetChanged();
     }

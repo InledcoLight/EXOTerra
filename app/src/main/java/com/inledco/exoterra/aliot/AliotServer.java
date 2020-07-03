@@ -137,7 +137,7 @@ public class AliotServer {
     private String mToken;
 
     private AliotServer() {
-        APP_KEY = AppConfig.getString("APP_KEY");
+        APP_KEY = AppConfig.getString("appKey");
         API_SERVER = AppConfig.getString("apiServer");
         SERVER_FILE_PATH = AppConfig.getString("fileUrl");
     }

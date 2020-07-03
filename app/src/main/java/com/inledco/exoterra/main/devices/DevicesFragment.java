@@ -30,8 +30,6 @@ import com.inledco.exoterra.event.GroupsRefreshedEvent;
 import com.inledco.exoterra.manager.DeviceManager;
 import com.inledco.exoterra.manager.GroupManager;
 import com.inledco.exoterra.manager.OnErrorCallback;
-import com.inledco.exoterra.scan.ScanActivity;
-import com.inledco.exoterra.smartconfig.SmartconfigActivity;
 import com.scwang.smartrefresh.layout.SmartRefreshLayout;
 import com.scwang.smartrefresh.layout.api.RefreshLayout;
 import com.scwang.smartrefresh.layout.header.ClassicsHeader;
@@ -231,16 +229,6 @@ public class DevicesFragment extends BaseFragment {
     private void gotoDeviceActivity(String tag) {
         Intent intent = new Intent(getContext(), DeviceActivity.class);
         intent.putExtra("deviceTag", tag);
-        startActivity(intent);
-    }
-
-    private void startSmartconfigActivity() {
-        Intent intent = new Intent(getContext(), SmartconfigActivity.class);
-        startActivity(intent);
-    }
-
-    private void startScanActivity() {
-        Intent intent = new Intent(getContext(), ScanActivity.class);
         startActivity(intent);
     }
 

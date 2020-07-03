@@ -4,8 +4,10 @@ import android.Manifest;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.location.LocationManager;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
@@ -13,6 +15,7 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -69,6 +72,13 @@ public class LocalDevicesFragment extends BasePermissionFragment {
     @Override
     public void onPause() {
         super.onPause();
+        stopScan();
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        Log.e(TAG, "onActivityResult: " + requestCode + " " + resultCode);
     }
 
     @Override
@@ -147,6 +157,10 @@ public class LocalDevicesFragment extends BasePermissionFragment {
         // check location permission first, otherwise check wifi would be incorrect
         if (!checkPermission(Manifest.permission.ACCESS_COARSE_LOCATION)) {
             requestPermission(0, Manifest.permission.ACCESS_COARSE_LOCATION);
+            return false;
+        }
+        if (!checkLocation()) {
+            showLocationDialog();
             return false;
         }
         if (!checkWifi()) {
@@ -256,5 +270,36 @@ public class LocalDevicesFragment extends BasePermissionFragment {
             showPermissionDialog(getString(R.string.title_location_permission),
                                  getString(R.string.msg_location_permission));
         }
+    }
+
+    private void gotoLoactionSettings() {
+        Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+        startActivity(intent);
+    }
+
+    private void showLocationDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        builder.setTitle(R.string.turnon_gps)
+               .setMessage(R.string.msg_turnon_gps)
+               .setCancelable(false)
+               .setNegativeButton(R.string.cancel, null)
+               .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                   @Override
+                   public void onClick(DialogInterface dialog, int which) {
+                       gotoLoactionSettings();
+                   }
+               })
+               .show();
+    }
+
+    private boolean checkLocation() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            LocationManager manager = (LocationManager) getContext().getSystemService(Context.LOCATION_SERVICE);
+            if (manager.isLocationEnabled()) {
+                return true;
+            }
+            return false;
+        }
+        return true;
     }
 }

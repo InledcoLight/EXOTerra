@@ -42,7 +42,6 @@
                 android:layout_gravity="right"
                 android:padding="8dp"
                 android:gravity="center_vertical"
-                android:textAlignment="center"
                 android:drawablePadding="8dp"
                 android:background="?attr/selectableItemBackground"
                 android:textSize="@dimen/textSizeSecondary"

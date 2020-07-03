@@ -5,6 +5,9 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
+import android.view.View;
+import android.widget.Button;
+import android.widget.VideoView;
 
 import com.inledco.exoterra.R;
 import com.inledco.exoterra.aliot.AliotServer;
@@ -16,7 +19,9 @@ import com.inledco.exoterra.manager.UserPref;
 
 public class SplashActivity extends BaseActivity {
 
-    private final int DURATION = 1500;
+    private Button splash_skip;
+    private VideoView splash_video;
+    private boolean skipped;
 
     private AsyncTask<String, Void, Boolean> mAuthTask;
 
@@ -25,6 +30,7 @@ public class SplashActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
 
         initData();
+        initEvent();
     }
 
     @Override
@@ -34,7 +40,13 @@ public class SplashActivity extends BaseActivity {
 
     @Override
     protected void initView() {
+        splash_video = findViewById(R.id.splash_video);
+        splash_skip = findViewById(R.id.splash_skip);
 
+        String videoPath = "android.resource://" + getPackageName() + "/" + R.raw.exo_terra_animation;
+        splash_video.setVideoPath(videoPath);
+        splash_video.requestFocus();
+        splash_video.start();
     }
 
     @Override
@@ -48,8 +60,8 @@ public class SplashActivity extends BaseActivity {
         mAuthTask = new AsyncTask<String, Void, Boolean>() {
             @Override
             protected Boolean doInBackground(String... params) {
+                while (!splash_video.isPlaying());
                 boolean result = false;
-                final long time = System.currentTimeMillis();
                 if (params != null && params.length == 5) {
                     final String email = params[0];
                     final String password = params[1];
@@ -63,8 +75,20 @@ public class SplashActivity extends BaseActivity {
                         result = login(email, password);
                     }
                 }
-                while (System.currentTimeMillis() - time < DURATION);
+                publishProgress();
+                while (splash_video.isPlaying()) {
+                    if (skipped) {
+                        splash_video.pause();
+                        break;
+                    }
+                }
                 return result;
+            }
+
+            @Override
+            protected void onProgressUpdate(Void... values) {
+                super.onProgressUpdate(values);
+                splash_skip.setVisibility(View.VISIBLE);
             }
 
             @Override
@@ -76,9 +100,6 @@ public class SplashActivity extends BaseActivity {
                     AliotServer.getInstance().init(userid, token);
                 }
                 gotoHomeActivity();
-//                } else {
-//                    gotoLoginActivity();
-//                }
             }
         };
         mAuthTask.execute(mEmail, mPassword, mUserid, mToken, mSecret);
@@ -86,7 +107,12 @@ public class SplashActivity extends BaseActivity {
 
     @Override
     protected void initEvent() {
-
+        splash_skip.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                skipped = true;
+            }
+        });
     }
 
     private boolean login(String email, String password) {

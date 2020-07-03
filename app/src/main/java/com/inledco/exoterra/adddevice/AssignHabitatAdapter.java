@@ -43,7 +43,7 @@ public class AssignHabitatAdapter extends SimpleAdapter<Group, AssignHabitatAdap
         if (selected) {
             mSelectedHolder = holder;
         }
-
+        
         holder.name.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

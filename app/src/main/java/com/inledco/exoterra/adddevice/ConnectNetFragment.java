@@ -57,6 +57,13 @@ public class ConnectNetFragment extends BaseFragment {
             if (action == null) {
                 return;
             }
+            if (!checkLocation()) {
+                connect_net_router.setText("<unknown ssid>");
+                connect_net_tl1.setError(getString(R.string.msg_turnon_gps));
+                return;
+            } else {
+                connect_net_tl1.setError(null);
+            }
             WifiManager wifiManager = (WifiManager) getActivity().getApplicationContext().getSystemService(Context.WIFI_SERVICE);
             if (wifiManager != null) {
                 WifiInfo wifiInfo = wifiManager.getConnectionInfo();
@@ -131,7 +138,11 @@ public class ConnectNetFragment extends BaseFragment {
         connect_net_router.setDrawableRightClickListener(new AdvancedTextInputEditText.DrawableRightClickListener() {
             @Override
             public void onDrawableRightClick() {
-                gotoSystemWifiSettings();
+                if (!checkLocation()) {
+                    gotoLoactionSettings();
+                } else {
+                    gotoSystemWifiSettings();
+                }
             }
         });
 
@@ -234,9 +245,11 @@ public class ConnectNetFragment extends BaseFragment {
 
     private void onWiFiChanged(WifiInfo wifiInfo, DhcpInfo dhcpInfo) {
         if (wifiInfo == null || wifiInfo.getNetworkId() == -1) {
+            connect_net_router.setText("<unknown ssid>");
+            connect_net_tl1.setError(getString(R.string.please_connect_router));
             return;
         }
-        WifiManager wifiManager = (WifiManager) getActivity().getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+        WifiManager wifiManager = (WifiManager) getContext().getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         for (WifiConfiguration cfg : wifiManager.getConfiguredNetworks()) {
             if (cfg.networkId == wifiInfo.getNetworkId()) {
                 mOpen = cfg.allowedKeyManagement.get(WifiConfiguration.KeyMgmt.NONE);
@@ -259,7 +272,7 @@ public class ConnectNetFragment extends BaseFragment {
                 connect_net_password.requestFocus();
             }
         } else {
-            connect_net_tl1.setError("Please connect router.");
+            connect_net_tl1.setError(getString(R.string.please_connect_router));
         }
         connect_net_smartconfig.setEnabled(connected);
         connect_net_apconfig.setEnabled(connected);
@@ -284,5 +297,21 @@ public class ConnectNetFragment extends BaseFragment {
         Intent intent = new Intent(Settings.ACTION_WIFI_SETTINGS);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
+    }
+
+    private void gotoLoactionSettings() {
+        Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+        startActivity(intent);
+    }
+
+    private boolean checkLocation() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            LocationManager manager = (LocationManager) getContext().getSystemService(Context.LOCATION_SERVICE);
+            if (manager.isLocationEnabled()) {
+                return true;
+            }
+            return false;
+        }
+        return true;
     }
 }

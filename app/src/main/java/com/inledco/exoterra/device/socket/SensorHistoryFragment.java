@@ -156,7 +156,6 @@ public class SensorHistoryFragment extends BaseFragment {
         sensor_history_chart.getLegend().setTextColor(Color.WHITE);
         sensor_history_chart.getLegend().setHorizontalAlignment(Legend.LegendHorizontalAlignment.LEFT);
 
-//        sensor_history_chart.setMarker(new MyMarkerView(getContext(), R.layout.custom_marker_view));
         sensor_history_chart.setOnChartValueSelectedListener(new OnChartValueSelectedListener() {
             @Override
             public void onValueSelected(Entry e, Highlight h) {
