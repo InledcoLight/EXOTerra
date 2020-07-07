@@ -4,6 +4,7 @@ import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomSheetDialog;
@@ -16,6 +17,7 @@ import android.widget.NumberPicker;
 import android.widget.TextView;
 
 import com.inledco.exoterra.R;
+import com.inledco.exoterra.aliot.AliotClient;
 import com.inledco.exoterra.aliot.ExoMonsoon;
 import com.inledco.exoterra.aliot.MonsoonViewModel;
 import com.inledco.exoterra.base.BaseFragment;
@@ -23,6 +25,7 @@ import com.inledco.exoterra.base.BaseFragment;
 import java.util.List;
 
 public class MonsoonControlFragment extends BaseFragment {
+    private Button monsoon_ctrl_power;
     private Button[] monsoon_ctrl_custom = new Button[8];
     private TextView monsoon_key;
 
@@ -31,6 +34,8 @@ public class MonsoonControlFragment extends BaseFragment {
 
     private MonsoonViewModel mMonsoonViewModel;
     private ExoMonsoon mMonsoon;
+
+    private CountDownTimer mTimer;
 
     @Nullable
     @Override
@@ -49,6 +54,7 @@ public class MonsoonControlFragment extends BaseFragment {
 
     @Override
     protected void initView(View view) {
+        monsoon_ctrl_power = view.findViewById(R.id.monsoon_ctrl_power);
         monsoon_ctrl_custom[0] = view.findViewById(R.id.monsoon_ctrl_custom1);
         monsoon_ctrl_custom[1] = view.findViewById(R.id.monsoon_ctrl_custom2);
         monsoon_ctrl_custom[2] = view.findViewById(R.id.monsoon_ctrl_custom3);
@@ -91,17 +97,63 @@ public class MonsoonControlFragment extends BaseFragment {
                 showKeyActionDialog();
             }
         });
+
+        monsoon_ctrl_power.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int power = mMonsoon.getPower();
+                if (power == 0) {
+                    mMonsoonViewModel.setPower(ExoMonsoon.SPRAY_MAX);
+                } else {
+                    mMonsoonViewModel.setPower(ExoMonsoon.SPRAY_OFF);
+                }
+            }
+        });
     }
 
     private void refreshData() {
         if (mMonsoon != null) {
+            int power = mMonsoon.getPower();
+            if (power == 0) {
+                monsoon_ctrl_power.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_power_red_40dp, 0, 0);
+                monsoon_ctrl_power.setText(null);
+                if (mTimer != null) {
+                    mTimer.cancel();
+                    mTimer = null;
+                }
+            } else {
+                monsoon_ctrl_power.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_power_green_40dp, 0, 0);
+                if (mTimer == null) {
+                    long currTime = System.currentTimeMillis() + AliotClient.getInstance().getTimeOffset();
+                    long time = mMonsoon.getPowerTime();
+                    if (time > currTime) {
+                        time = currTime;
+                    }
+                    long total = power*1000 + time - currTime;
+                    monsoon_ctrl_power.setText("" + total/1000 + "s");
+                    mTimer = new CountDownTimer(total + 100, 1000) {
+                        @Override
+                        public void onTick(long millisUntilFinished) {
+                            monsoon_ctrl_power.setText("" + millisUntilFinished/1000 + "s");
+                        }
+
+                        @Override
+                        public void onFinish() {
+                            monsoon_ctrl_power.setText(null);
+                            mTimer = null;
+                        }
+                    };
+                    mTimer.start();
+                }
+            }
+            
             final List<Integer> actions = mMonsoon.getCustomActions();
             int addIdx = 0;
             if (actions != null) {
                 addIdx = actions.size();
             }
             for (int i = 0; i < addIdx && i < monsoon_ctrl_custom.length; i++) {
-                monsoon_ctrl_custom[i].setCompoundDrawablesWithIntrinsicBounds(0, R.mipmap.ic_monsoon_pulse_64, 0, 0);
+                monsoon_ctrl_custom[i].setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_power_red_40dp, 0, 0);
                 monsoon_ctrl_custom[i].setVisibility(View.VISIBLE);
                 monsoon_ctrl_custom[i].setText((actions.get(i) <= 0 || actions.get(i) > 120) ? "" : mPeriods[actions.get(i)-1]);
                 final int idx = i;
@@ -161,7 +213,7 @@ public class MonsoonControlFragment extends BaseFragment {
         np.setValue(mMonsoon.getKeyAction());
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         builder.setView(view);
-        builder.setTitle(R.string.device_key_action);
+        builder.setTitle(R.string.operation_button);
         builder.setNegativeButton(R.string.cancel, null);
         builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
             @Override

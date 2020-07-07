@@ -293,7 +293,7 @@
     <string name="end">End</string>
     <string name="use_habitat_daytime">Use Habitat Daytime</string>
     <string name="time">Time</string>
-    <string name="device_key_action">Device Key Action</string>
+    <string name="operation_button">Operation Button</string>
     <string name="device_timezone">Device timezone</string>
     <string name="technical_details">Technical details</string>
     <string name="back">Back</string>

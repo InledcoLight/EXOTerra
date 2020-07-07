@@ -5,37 +5,30 @@
                                              android:layout_width="match_parent"
                                              android:layout_height="match_parent">
 
-    <android.support.v7.widget.Toolbar
-        android:id="@+id/foundback_toolbar"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:minHeight="?attr/actionBarSize"
-        android:theme="?attr/actionBarTheme"
-        app:navigationIcon="@drawable/ic_arrow_back_white_32dp"
-        app:title="@string/reset_password"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
+<!--    <android.support.v7.widget.Toolbar-->
+<!--        android:id="@+id/foundback_toolbar"-->
+<!--        android:layout_width="0dp"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:minHeight="?attr/actionBarSize"-->
+<!--        android:theme="?attr/actionBarTheme"-->
+<!--        app:navigationIcon="@drawable/ic_arrow_back_white_32dp"-->
+<!--        app:title="@string/reset_password"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintTop_toTopOf="parent"/>-->
 
     <ImageView
         android:id="@+id/imageView8"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="32dp"
-        android:layout_marginTop="48dp"
-        android:layout_marginEnd="32dp"
+        android:layout_height="64dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
         android:layout_weight="1"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@mipmap/ic_microtope" />
-
-    <android.support.constraint.Guideline
-        android:id="@+id/foundback_gl1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.25" />
+        app:srcCompat="@drawable/ic_myexoterra" />
 
     <android.support.design.widget.TextInputLayout
         android:id="@+id/foundback_til_email"
@@ -43,23 +36,23 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="32dp"
         android:layout_marginEnd="16dp"
         android:hint="@string/hint_email"
         app:errorEnabled="true"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/foundback_gl1">
+        app:layout_constraintTop_toBottomOf="@+id/imageView8">
 
         <com.inledco.exoterra.view.AdvancedTextInputEditText
             android:id="@+id/foundback_et_email"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center_vertical"
             android:drawablePadding="8dp"
+            android:gravity="center_vertical"
             android:inputType="textEmailAddress"
             android:maxLength="@integer/email_text_length_max"
-            android:maxLines="1"/>
+            android:maxLines="1" />
 
     </android.support.design.widget.TextInputLayout>
 
@@ -142,6 +135,26 @@
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/foundback_til_password" />
+
+    <com.inledco.exoterra.view.GradientCornerButton
+        android:id="@+id/foundback_btn_back"
+        style="?attr/buttonStyle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:background="?attr/selectableItemBackground"
+        android:text="@string/back"
+        app:direction="horizontal"
+        app:gradientEnd="@color/gradientGreen"
+        app:gradientStart="@color/gradientYellow"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/foundback_btn_found"
+        app:radius="@dimen/cornerRadius"
+        app:semiCircle="true"
+        app:strokeWidth="@dimen/strokeWidth" />
 
     <ImageView
         android:id="@+id/imageView4"

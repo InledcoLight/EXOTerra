@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.view.View;
-import android.widget.Button;
 import android.widget.VideoView;
 
 import com.inledco.exoterra.R;
@@ -19,7 +18,6 @@ import com.inledco.exoterra.manager.UserPref;
 
 public class SplashActivity extends BaseActivity {
 
-    private Button splash_skip;
     private VideoView splash_video;
     private boolean skipped;
 
@@ -41,7 +39,6 @@ public class SplashActivity extends BaseActivity {
     @Override
     protected void initView() {
         splash_video = findViewById(R.id.splash_video);
-        splash_skip = findViewById(R.id.splash_skip);
 
         String videoPath = "android.resource://" + getPackageName() + "/" + R.raw.exo_terra_animation;
         splash_video.setVideoPath(videoPath);
@@ -74,8 +71,8 @@ public class SplashActivity extends BaseActivity {
                     if (!result && !TextUtils.isEmpty(email) && !TextUtils.isEmpty(password)) {
                         result = login(email, password);
                     }
+                    skipped = false;
                 }
-                publishProgress();
                 while (splash_video.isPlaying()) {
                     if (skipped) {
                         splash_video.pause();
@@ -83,12 +80,6 @@ public class SplashActivity extends BaseActivity {
                     }
                 }
                 return result;
-            }
-
-            @Override
-            protected void onProgressUpdate(Void... values) {
-                super.onProgressUpdate(values);
-                splash_skip.setVisibility(View.VISIBLE);
             }
 
             @Override
@@ -107,7 +98,7 @@ public class SplashActivity extends BaseActivity {
 
     @Override
     protected void initEvent() {
-        splash_skip.setOnClickListener(new View.OnClickListener() {
+        splash_video.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 skipped = true;

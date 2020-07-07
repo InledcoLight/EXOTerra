@@ -15,19 +15,19 @@
         android:layout_alignParentRight="true"
         android:layout_alignParentBottom="true"/>
 
-    <Button
-        android:id="@+id/splash_skip"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:layout_marginRight="16dp"
-        android:layout_gravity="right"
-        android:visibility="visible"
-        android:layout_alignParentRight="true"
-        android:background="?attr/selectableItemBackground"
-        android:textSize="@dimen/textSizePrimary"
-        android:textColor="@color/textColorPrimary"
-        android:text="@string/skip"/>
+<!--    <Button-->
+<!--        android:id="@+id/splash_skip"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_marginTop="16dp"-->
+<!--        android:layout_marginRight="16dp"-->
+<!--        android:layout_gravity="right"-->
+<!--        android:visibility="visible"-->
+<!--        android:layout_alignParentRight="true"-->
+<!--        android:background="?attr/selectableItemBackground"-->
+<!--        android:textSize="@dimen/textSizePrimary"-->
+<!--        android:textColor="@color/textColorPrimary"-->
+<!--        android:text="@string/skip"/>-->
 
 <!--    <ImageView-->
 <!--        android:id="@+id/imageView7"-->

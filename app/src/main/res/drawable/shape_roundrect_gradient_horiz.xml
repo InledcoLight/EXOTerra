@@ -4,8 +4,8 @@
     <gradient android:startColor="#D7CC05"
         android:endColor="#61A33E"
         android:angle="0"/>
-    <padding android:left="8dp"
-        android:top="8dp"
-        android:right="8dp"
-        android:bottom="8dp"/>
+<!--    <padding android:left="8dp"-->
+<!--        android:top="8dp"-->
+<!--        android:right="8dp"-->
+<!--        android:bottom="8dp"/>-->
 </shape>

@@ -38,7 +38,6 @@ public class EXOTerraApplication extends MultiDexApplication {
     @Override
     public void onCreate() {
         super.onCreate();
-
         registerActivityLifecycleCallbacks(new ActivityLifecycleCallbacks() {
             @Override
             public void onActivityCreated(Activity activity, Bundle savedInstanceState) {

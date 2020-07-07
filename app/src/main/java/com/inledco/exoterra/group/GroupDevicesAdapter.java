@@ -16,10 +16,11 @@ import com.inledco.exoterra.aliot.bean.Group;
 import com.inledco.exoterra.bean.ExoProduct;
 import com.inledco.exoterra.common.SimpleAdapter;
 import com.inledco.exoterra.manager.DeviceManager;
+import com.inledco.exoterra.util.DeviceIconUtil;
 
 import java.util.List;
 
-public class GroupDevicesAdapter extends SimpleAdapter<Group.Device, GroupDevicesAdapter.HomeDevicesViewHolder> {
+public class GroupDevicesAdapter extends SimpleAdapter<Group.Device, GroupDevicesAdapter.GroupDevicesViewHolder> {
     public GroupDevicesAdapter(@NonNull Context context, List<Group.Device> data) {
         super(context, data);
     }
@@ -31,26 +32,31 @@ public class GroupDevicesAdapter extends SimpleAdapter<Group.Device, GroupDevice
 
     @NonNull
     @Override
-    public HomeDevicesViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
-        return new HomeDevicesViewHolder(createView(viewGroup));
+    public GroupDevicesViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
+        return new GroupDevicesViewHolder(createView(viewGroup));
     }
 
     @Override
-    public void onBindViewHolder(@NonNull HomeDevicesViewHolder holder, int i) {
+    public void onBindViewHolder(@NonNull GroupDevicesViewHolder holder, int i) {
         final int position = holder.getAdapterPosition();
         Group.Device device = mData.get(position);
         String pkey = device.product_key;
         String name = device.name;
         ExoProduct product = ExoProduct.getExoProduct(pkey);
+        Device dev = DeviceManager.getInstance().getDevice(pkey + "_" + device.device_name);
         if (product != null) {
             if (TextUtils.isEmpty(name)) {
                 name = product.getDefaultName();
             }
-            holder.iv_icon.setImageResource(product.getIconSmall());
+            int iconRes = product.getIcon();
+            if (dev != null) {
+                iconRes = DeviceIconUtil.getDeviceIconRes(mContext, dev.getRemark2(), iconRes);
+            }
+            holder.iv_icon.setImageResource(iconRes);
         }
         holder.tv_name.setText(name);
+        holder.ctv_habitat.setCompoundDrawablesRelativeWithIntrinsicBounds(0 , 0, 0, 0);
         boolean state = false;
-        Device dev = DeviceManager.getInstance().getDevice(pkey + "_" + device.device_name);
         if (dev != null) {
             state = dev.isOnline();
         }
@@ -75,17 +81,17 @@ public class GroupDevicesAdapter extends SimpleAdapter<Group.Device, GroupDevice
         });
     }
 
-    class HomeDevicesViewHolder extends RecyclerView.ViewHolder {
+    class GroupDevicesViewHolder extends RecyclerView.ViewHolder {
         private ImageView iv_icon;
         private TextView tv_name;
         private CheckedTextView ctv_state;
-//        private TextView ctv_habitat;
-        public HomeDevicesViewHolder(@NonNull View itemView) {
+        private TextView ctv_habitat;
+        public GroupDevicesViewHolder(@NonNull View itemView) {
             super(itemView);
             iv_icon = itemView.findViewById(R.id.item_device_icon);
             tv_name = itemView.findViewById(R.id.item_device_name);
             ctv_state = itemView.findViewById(R.id.item_device_state);
-//            ctv_habitat = itemView.findViewById(R.id.item_device_desc);
+            ctv_habitat = itemView.findViewById(R.id.item_device_habitat);
         }
     }
 }

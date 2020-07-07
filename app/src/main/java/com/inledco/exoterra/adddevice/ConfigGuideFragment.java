@@ -228,18 +228,7 @@ public class ConfigGuideFragment extends BaseFragment {
                 default:
                     return;
             }
-//            if (TextUtils.equals(AliotConsts.PRODUCT_KEY_EXOLED, mConnectNetBean.getProductKey())) {
-//                ssid = AliotConsts.EXOLED_AP_SSID;
-//                ssb.append(getString(R.string.apconfig_guide_strip, ssid));
-//            } else if (TextUtils.equals(AliotConsts.PRODUCT_KEY_EXOSOCKET, mConnectNetBean.getProductKey())) {
-//                ssid = AliotConsts.EXOSOCKET_AP_SSID;
-//                ssb.append(getString(R.string.apconfig_guide_default, ssid));
-//            } else if (TextUtils.equals(AliotConsts.PRODUCT_KEY_EXOMONSOON, mConnectNetBean.getProductKey())) {
-//                ssid = AliotConsts.EXOMONSOON_AP_SSID;
-//                ssb.append(getString(R.string.apconfig_guide_default, ssid));
-//            } else {
-//                return;
-//            }
+
             ClickableSpan clickableText = new ClickableSpan() {
                 @Override
                 public void onClick(@NonNull View widget) {

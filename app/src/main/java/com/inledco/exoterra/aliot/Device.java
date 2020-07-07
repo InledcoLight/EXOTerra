@@ -31,6 +31,7 @@ public class Device extends ADevice {
     private int port;
 
     //  cloud
+    /* remark1 用作 iotid */
     private String remark1;
     private String remark2;
     private String remark3;

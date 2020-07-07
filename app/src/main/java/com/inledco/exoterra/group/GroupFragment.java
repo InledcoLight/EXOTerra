@@ -276,6 +276,7 @@ public class GroupFragment extends BaseFragment {
 
     private void refreshData() {
         group_icon.setImageResource(GroupUtil.getGroupIcon(mGroup.remark2));
+        group_title.setText(mGroup.name);
         refreshTime();
         group_sunrise.setText(TimeFormatUtil.formatMinutesTime(mTimeFormat, mGroup.getSunrise()));
         group_sunset.setText(TimeFormatUtil.formatMinutesTime(mTimeFormat, mGroup.getSunset()));

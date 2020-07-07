@@ -6,7 +6,10 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputEditText;
 import android.support.design.widget.TextInputLayout;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,6 +23,8 @@ import com.inledco.exoterra.aliot.UserApi;
 import com.inledco.exoterra.aliot.bean.Group;
 import com.inledco.exoterra.base.BaseFragment;
 import com.inledco.exoterra.bean.ExoProduct;
+import com.inledco.exoterra.common.OnItemClickListener;
+import com.inledco.exoterra.device.DeviceIconAdapter;
 import com.inledco.exoterra.event.DeviceChangedEvent;
 import com.inledco.exoterra.event.GroupDeviceChangedEvent;
 import com.inledco.exoterra.manager.DeviceManager;
@@ -35,10 +40,14 @@ public class ConfigDeviceFragment extends BaseFragment {
     private ImageView config_device_prdt;
     private TextInputLayout config_device_til;
     private TextInputEditText config_device_name;
+    private RecyclerView config_device_rv;
     private GradientCornerButton config_device_save;
 
     private ConnectNetViewModel mConnectNetViewModel;
     private ConnectNetBean mConnectNetBean;
+
+    private DeviceIconAdapter mAdapter;
+    private int mIconRes;
 
     @Nullable
     @Override
@@ -60,7 +69,10 @@ public class ConfigDeviceFragment extends BaseFragment {
         config_device_prdt = view.findViewById(R.id.config_device_prdt);
         config_device_til = view.findViewById(R.id.config_device_til);
         config_device_name = view.findViewById(R.id.config_device_name);
+        config_device_rv = view.findViewById(R.id.config_device_rv);
         config_device_save = view.findViewById(R.id.config_device_save);
+
+        config_device_rv.setLayoutManager(new GridLayoutManager(getContext(), 5));
     }
 
     @Override
@@ -72,8 +84,21 @@ public class ConfigDeviceFragment extends BaseFragment {
         }
         ExoProduct product = ExoProduct.getExoProduct(mConnectNetBean.getProductKey());
         if (product != null) {
-            config_device_prdt.setImageResource(product.getIcon());
+            mIconRes = product.getIcon();
+            config_device_prdt.setImageResource(mIconRes);
+
+            config_device_name.setCompoundDrawablesRelativeWithIntrinsicBounds(mIconRes, 0, 0, 0);
             config_device_name.setText(product.getDefaultName());
+
+            mAdapter = new DeviceIconAdapter(getContext(), mIconRes);
+            mAdapter.setOnItemClickListener(new OnItemClickListener() {
+                @Override
+                public void onItemClick(int position) {
+                    mIconRes = mAdapter.getSelected();
+                    config_device_name.setCompoundDrawablesRelativeWithIntrinsicBounds(mIconRes, 0, 0, 0);
+                }
+            });
+            config_device_rv.setAdapter(mAdapter);
         }
         config_device_name.requestFocus();
     }
@@ -86,13 +111,25 @@ public class ConfigDeviceFragment extends BaseFragment {
                 final String pkey = mConnectNetBean.getProductKey();
                 final String dname = mConnectNetBean.getDeviceName();
                 final String name = config_device_name.getText().toString();
+                String icon = null;
+                try {
+                    icon = getContext().getResources().getResourceEntryName(mIconRes);
+                    Log.e(TAG, "onClick: " + icon);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
                 if (TextUtils.isEmpty(name)) {
                     config_device_til.setError(getString(R.string.error_empty));
                     return;
                 }
                 boolean authorized = UserManager.getInstance().isAuthorized();
                 if (authorized) {
-                    AliotServer.getInstance().modifyDeviceName(pkey, dname, name, new HttpCallback<UserApi.Response>() {
+                    final UserApi.ModifyDeviceInfoRequest request = new UserApi.ModifyDeviceInfoRequest();
+                    request.name = name;
+                    if (icon != null) {
+                        request.remark2 = icon;
+                    }
+                    AliotServer.getInstance().modifyDeviceInfo(pkey, dname, request, new HttpCallback<UserApi.Response>() {
                         @Override
                         public void onError(String error) {
                             dismissLoadDialog();
@@ -106,6 +143,7 @@ public class ConfigDeviceFragment extends BaseFragment {
                             Device device = DeviceManager.getInstance().getDevice(pkey + "_" + dname);
                             if (device != null) {
                                 device.setName(name);
+                                device.setRemark2(request.remark2);
                                 EventBus.getDefault().post(new DeviceChangedEvent(pkey, dname));
                             }
                             mConnectNetBean.setName(name);

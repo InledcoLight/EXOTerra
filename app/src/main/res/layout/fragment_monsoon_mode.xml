@@ -32,19 +32,19 @@
         android:layout_height="wrap_content"
         android:layout_weight="1"/>
 
-    <CheckedTextView
-        android:id="@+id/monsoon_mode_power"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:gravity="center"
-        android:padding="4dp"
-        android:layout_marginRight="8dp"
-        android:background="?attr/selectableItemBackground"
-        android:drawableTop="@drawable/selector_power_32dp"
-        android:textAllCaps="false"
-        android:textAlignment="center"
-        android:textSize="10sp"
-        android:textColor="@color/textColorPrimary"/>
+<!--    <CheckedTextView-->
+<!--        android:id="@+id/monsoon_mode_power"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_centerInParent="true"-->
+<!--        android:gravity="center"-->
+<!--        android:padding="4dp"-->
+<!--        android:layout_marginRight="8dp"-->
+<!--        android:background="?attr/selectableItemBackground"-->
+<!--        android:drawableTop="@drawable/selector_power_32dp"-->
+<!--        android:textAllCaps="false"-->
+<!--        android:textAlignment="center"-->
+<!--        android:textSize="10sp"-->
+<!--        android:textColor="@color/textColorPrimary"/>-->
 
 </LinearLayout>

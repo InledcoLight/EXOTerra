@@ -36,10 +36,10 @@
 
             <ImageView
                 android:id="@+id/netconfig_prdt"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:layout_marginBottom="8dp" />
+                android:layout_width="@dimen/titleHeight"
+                android:layout_height="@dimen/titleHeight"
+                android:scaleType="fitCenter"
+                android:padding="8dp" />
 
             <TextView
                 android:layout_width="match_parent"

@@ -11,12 +11,16 @@ import android.support.annotation.StringRes;
 import android.support.design.widget.TextInputEditText;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -34,12 +38,14 @@ import com.inledco.exoterra.aliot.UserApi;
 import com.inledco.exoterra.aliot.bean.Group;
 import com.inledco.exoterra.base.BaseFragment;
 import com.inledco.exoterra.bean.ExoProduct;
+import com.inledco.exoterra.device.DeviceIconAdapter;
 import com.inledco.exoterra.event.DeviceChangedEvent;
 import com.inledco.exoterra.event.DevicesRefreshedEvent;
 import com.inledco.exoterra.event.GroupDeviceChangedEvent;
 import com.inledco.exoterra.event.SimpleEvent;
 import com.inledco.exoterra.manager.DeviceManager;
 import com.inledco.exoterra.manager.GroupManager;
+import com.inledco.exoterra.util.DeviceIconUtil;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -86,6 +92,7 @@ public class DeviceDetailFragment extends BaseFragment {
     private Device mDevice;
     private String mProductKey;
     private String mDeviceName;
+    private int mIconRes;
 
     @Nullable
     @Override
@@ -167,7 +174,8 @@ public class DeviceDetailFragment extends BaseFragment {
                 if (TextUtils.isEmpty(name)) {
                     name = product.getDefaultName();
                 }
-                device_detail_icon.setImageResource(product.getIconSmall());
+                mIconRes = DeviceIconUtil.getDeviceIconRes(getContext(), mDevice.getRemark2(), product.getIcon());
+                device_detail_icon.setImageResource(mIconRes);
             }
             Group group = GroupManager.getInstance().getDeviceGroup(mProductKey, mDeviceName);
             if (group != null) {
@@ -199,6 +207,12 @@ public class DeviceDetailFragment extends BaseFragment {
 
     @Override
     protected void initEvent() {
+        device_detail_icon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showDeviceIconDialog();
+            }
+        });
         device_detail_name.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -500,9 +514,7 @@ public class DeviceDetailFragment extends BaseFragment {
                     et_name.setError(getString(R.string.input_empty));
                     return;
                 }
-                final String pkey = mDevice.getProductKey();
-                final String dname = mDevice.getDeviceName();
-                AliotServer.getInstance().modifyDeviceName(pkey, dname, name, new HttpCallback<UserApi.Response>() {
+                AliotServer.getInstance().modifyDeviceName(mProductKey, mDeviceName, name, new HttpCallback<UserApi.Response>() {
                     @Override
                     public void onError(String error) {
                         dismissLoadDialog();
@@ -512,7 +524,7 @@ public class DeviceDetailFragment extends BaseFragment {
                     @Override
                     public void onSuccess(UserApi.Response result) {
                         mDevice.setName(name);
-                        EventBus.getDefault().post(new DeviceChangedEvent(pkey, dname));
+                        EventBus.getDefault().post(new DeviceChangedEvent(mProductKey, mDeviceName));
                         dismissLoadDialog();
                         runOnUiThread(new Runnable() {
                             @Override
@@ -591,5 +603,61 @@ public class DeviceDetailFragment extends BaseFragment {
                 btn.setVisibility(View.VISIBLE);
             }
         }
+    }
+
+    private void showDeviceIconDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        final AlertDialog dialog = builder.create();
+        View view = LayoutInflater.from(getContext()).inflate(R.layout.dialog_device_icons, null, false);
+        final RecyclerView recyclerView = view.findViewById(R.id.dialog_devicon_rv);
+        Button btn_cancel = view.findViewById(R.id.dialog_devicon_cancel);
+        Button btn_ok = view.findViewById(R.id.dialog_devicon_ok);
+        recyclerView.setLayoutManager(new GridLayoutManager(getContext(), 5));
+        final DeviceIconAdapter adapter = new DeviceIconAdapter(getContext(), mIconRes);
+        recyclerView.setAdapter(adapter);
+        recyclerView.scrollToPosition(adapter.getSelectedPostion());
+        btn_cancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
+        btn_ok.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final int iconRes = adapter.getSelected();
+                final UserApi.ModifyDeviceInfoRequest request = new UserApi.ModifyDeviceInfoRequest();
+                request.remark2 = getContext().getResources().getResourceEntryName(iconRes);
+                AliotServer.getInstance().modifyDeviceInfo(mProductKey, mDeviceName, request, new HttpCallback<UserApi.Response>() {
+                    @Override
+                    public void onError(String error) {
+                        showToast(error);
+                    }
+
+                    @Override
+                    public void onSuccess(UserApi.Response result) {
+                        mIconRes = iconRes;
+                        mDevice.setRemark2(request.remark2);
+                        getActivity().runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                device_detail_icon.setImageResource(mIconRes);
+                            }
+                        });
+                        EventBus.getDefault().post(new DeviceChangedEvent(mProductKey, mDeviceName));
+                        dialog.dismiss();
+                    }
+                });
+            }
+        });
+        dialog.setView(view);
+        dialog.setCancelable(false);
+        dialog.show();
+        int screenHeight = getResources().getDisplayMetrics().heightPixels;
+        WindowManager.LayoutParams lp = dialog.getWindow().getAttributes();
+        lp.gravity = Gravity.BOTTOM;
+        lp.width = ViewGroup.LayoutParams.MATCH_PARENT;
+        lp.height = screenHeight*2/3;
+        dialog.getWindow().setAttributes(lp);
     }
 }

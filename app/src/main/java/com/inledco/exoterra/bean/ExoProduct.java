@@ -7,9 +7,9 @@ import android.text.TextUtils;
 import com.inledco.exoterra.R;
 
 public enum ExoProduct {
-    ExoLed("a3NZmGVkTVI", R.drawable.ic_strip, R.drawable.ic_strip_48dp),
-    ExoSocket("a3pXBGXhUbn", R.drawable.ic_socket, R.drawable.ic_socket_48dp),
-    ExoMonsoon("a3MsurD3c9T", R.drawable.ic_monsoon, R.drawable.ic_monsoon_48dp);
+    ExoLed("a3NZmGVkTVI", R.drawable.devicon_strip),
+    ExoSocket("a3pXBGXhUbn", R.drawable.devicon_socket),
+    ExoMonsoon("a3MsurD3c9T", R.drawable.devicon_monsoon);
 
 //    private final String PRODUCT_KEY_EXOLED         = "a3NZmGVkTVI";
 //    private final String PRODUCT_KEY_EXOSOCKET      = "a3pXBGXhUbn";
@@ -17,12 +17,10 @@ public enum ExoProduct {
 
     private final String productKey;
     private final @DrawableRes int icon;
-    private final @DrawableRes int iconSmall;
 
-    ExoProduct(String productKey, int icon, int iconSmall) {
+    ExoProduct(String productKey, int icon) {
         this.productKey = productKey;
         this.icon = icon;
-        this.iconSmall = iconSmall;
     }
 
     public String getProductKey() {
@@ -31,10 +29,6 @@ public enum ExoProduct {
 
     public int getIcon() {
         return icon;
-    }
-
-    public int getIconSmall() {
-        return iconSmall;
     }
 
     public String getProductName() {

@@ -65,6 +65,7 @@ public class MainActivity extends BaseActivity {
         Log.e(TAG, "onActivityResult: " + requestCode + " " + resultCode);
         if (requestCode == 1 && resultCode == 1) {
             mAuthStatus.setAuthorized(UserManager.getInstance().isAuthorized());
+            mMainViewModel.postValue();
             if (mAuthStatus.isAuthorized()) {
                 GroupManager.getInstance().getAllGroups();
                 DeviceManager.getInstance().getAllDevices();

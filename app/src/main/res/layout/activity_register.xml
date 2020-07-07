@@ -6,36 +6,29 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <android.support.v7.widget.Toolbar
-        android:id="@+id/register_toolbar"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:minHeight="?attr/actionBarSize"
-        android:theme="?attr/actionBarTheme"
-        app:navigationIcon="@drawable/ic_arrow_back_white_32dp"
-        app:title="@string/signup"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
+<!--    <android.support.v7.widget.Toolbar-->
+<!--        android:id="@+id/register_toolbar"-->
+<!--        android:layout_width="0dp"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:minHeight="?attr/actionBarSize"-->
+<!--        android:theme="?attr/actionBarTheme"-->
+<!--        app:navigationIcon="@drawable/ic_arrow_back_white_32dp"-->
+<!--        app:title="@string/signup"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintTop_toTopOf="parent"/>-->
 
     <ImageView
         android:id="@+id/imageView9"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="32dp"
-        android:layout_marginTop="48dp"
-        android:layout_marginEnd="32dp"
+        android:layout_height="64dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@mipmap/ic_microtope" />
-
-    <android.support.constraint.Guideline
-        android:id="@+id/register_gl1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.25" />
+        app:srcCompat="@drawable/ic_myexoterra" />
 
     <android.support.design.widget.TextInputLayout
         android:id="@+id/register_til_nickname"
@@ -43,13 +36,13 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="32dp"
         android:layout_marginEnd="16dp"
         android:hint="@string/hint_nickname"
         app:errorEnabled="true"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/register_gl1">
+        app:layout_constraintTop_toBottomOf="@+id/imageView9">
 
         <com.inledco.exoterra.view.AdvancedTextInputEditText
             android:id="@+id/register_et_nickname"
@@ -150,6 +143,26 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/register_til_password" />
+
+    <com.inledco.exoterra.view.GradientCornerButton
+        android:id="@+id/register_btn_back"
+        style="?attr/buttonStyle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:background="?attr/selectableItemBackground"
+        android:text="@string/back"
+        app:direction="horizontal"
+        app:gradientEnd="@color/gradientGreen"
+        app:gradientStart="@color/gradientYellow"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/register_btn_signup"
+        app:radius="@dimen/cornerRadius"
+        app:semiCircle="true"
+        app:strokeWidth="@dimen/strokeWidth" />
 
     <ImageView
         android:id="@+id/imageView"

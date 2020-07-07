@@ -66,8 +66,7 @@
         android:layout_height="0dp"
         android:layout_weight="1"
         android:layout_marginLeft="16dp"
-        android:layout_marginRight="16dp"
-        app:layoutManager="android.support.v7.widget.LinearLayoutManager"/>
+        android:layout_marginRight="16dp"/>
 
     <com.inledco.exoterra.view.GradientCornerButton
         android:id="@+id/products_exit"
@@ -85,41 +84,3 @@
     </com.inledco.exoterra.view.GradientCornerButton>
 
 </LinearLayout>
-<!--<android.support.constraint.ConstraintLayout-->
-<!--    xmlns:android="http://schemas.android.com/apk/res/android"-->
-<!--    xmlns:app="http://schemas.android.com/apk/res-auto"-->
-<!--    xmlns:tools="http://schemas.android.com/tools"-->
-<!--    android:clickable="true"-->
-<!--    android:background="@mipmap/ic_background"-->
-<!--    android:layout_width="match_parent"-->
-<!--    android:layout_height="match_parent">-->
-
-<!--    <TextView-->
-<!--        android:id="@+id/products_title"-->
-<!--        android:layout_width="0dp"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:layout_marginStart="8dp"-->
-<!--        android:layout_marginTop="8dp"-->
-<!--        android:layout_marginEnd="8dp"-->
-<!--        android:padding="8dp"-->
-<!--        android:text="@string/choose_product"-->
-<!--        android:textSize="24sp"-->
-<!--        app:layout_constraintEnd_toEndOf="parent"-->
-<!--        app:layout_constraintStart_toStartOf="parent"-->
-<!--        app:layout_constraintTop_toTopOf="parent"/>-->
-
-<!--    <android.support.v7.widget.RecyclerView-->
-<!--        android:id="@+id/products_rv"-->
-<!--        android:layout_width="0dp"-->
-<!--        android:layout_height="0dp"-->
-<!--        android:layout_marginStart="8dp"-->
-<!--        android:layout_marginTop="8dp"-->
-<!--        android:layout_marginEnd="8dp"-->
-<!--        android:layout_marginBottom="8dp"-->
-<!--        app:layoutManager="android.support.v7.widget.GridLayoutManager"-->
-<!--        app:spanCount="3"-->
-<!--        app:layout_constraintBottom_toBottomOf="parent"-->
-<!--        app:layout_constraintEnd_toEndOf="parent"-->
-<!--        app:layout_constraintStart_toStartOf="parent"-->
-<!--        app:layout_constraintTop_toBottomOf="@+id/products_title"/>-->
-<!--</android.support.constraint.ConstraintLayout>-->

@@ -13,6 +13,7 @@ import com.inledco.exoterra.bean.ExoProduct;
 import com.inledco.exoterra.common.DeviceViewHolder;
 import com.inledco.exoterra.common.SimpleAdapter;
 import com.inledco.exoterra.manager.GroupManager;
+import com.inledco.exoterra.util.DeviceIconUtil;
 
 import java.util.List;
 
@@ -45,7 +46,8 @@ public class DevicesAdapter extends SimpleAdapter<Device, DeviceViewHolder> {
             if (TextUtils.isEmpty(name)) {
                 name = product.getDefaultName();
             }
-            holder.iv_icon.setImageResource(product.getIcon());
+            int iconRes = DeviceIconUtil.getDeviceIconRes(mContext, device.getRemark2(), product.getIcon());
+            holder.iv_icon.setImageResource(iconRes);
         }
         holder.tv_name.setText(name);
         Group group = GroupManager.getInstance().getDeviceGroup(pkey, dname);

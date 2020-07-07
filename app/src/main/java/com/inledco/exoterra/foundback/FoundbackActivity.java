@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -26,7 +25,7 @@ import com.inledco.exoterra.view.PasswordEditText;
 
 public class FoundbackActivity extends BaseActivity {
 
-    private Toolbar foundback_toolbar;
+//    private Toolbar foundback_toolbar;
     private TextInputLayout foundback_til_email;
     private AdvancedTextInputEditText foundback_et_email;
     private TextInputLayout foundback_til_password;
@@ -34,6 +33,7 @@ public class FoundbackActivity extends BaseActivity {
     private TextInputLayout foundback_til_verifycode;
     private AdvancedTextInputEditText foundback_et_verifycode;
     private Button foundback_btn_found;
+    private Button foundback_btn_back;
 
     private HttpCallback<UserApi.Response> mVerifycodeCallback;
     private HttpCallback<UserApi.Response> mFoundbackPasswordCallback;
@@ -55,7 +55,7 @@ public class FoundbackActivity extends BaseActivity {
 
     @Override
     protected void initView() {
-        foundback_toolbar = findViewById(R.id.foundback_toolbar);
+//        foundback_toolbar = findViewById(R.id.foundback_toolbar);
         foundback_til_email = findViewById(R.id.foundback_til_email);
         foundback_et_email = findViewById(R.id.foundback_et_email);
         foundback_til_password = findViewById(R.id.foundback_til_password);
@@ -63,8 +63,9 @@ public class FoundbackActivity extends BaseActivity {
         foundback_til_verifycode = findViewById(R.id.foundback_til_verifycode);
         foundback_et_verifycode = findViewById(R.id.foundback_et_verifycode);
         foundback_btn_found = findViewById(R.id.foundback_btn_found);
+        foundback_btn_back = findViewById(R.id.foundback_btn_back);
 
-        setSupportActionBar(foundback_toolbar);
+//        setSupportActionBar(foundback_toolbar);
         foundback_et_email.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_email_white_24dp, 0, 0, 0);
         foundback_et_verifycode.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_verify_white_24dp, 0, R.drawable.ic_send_white_24dp, 0);
         foundback_et_password.setIcon(R.drawable.ic_lock_white_24dp, R.drawable.design_ic_visibility, R.drawable.design_ic_visibility_off);
@@ -130,10 +131,17 @@ public class FoundbackActivity extends BaseActivity {
 
     @Override
     protected void initEvent() {
-        foundback_toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+//        foundback_toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                onBackPressed();
+//            }
+//        });
+
+        foundback_btn_back.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                onBackPressed();
+                finish();
             }
         });
 

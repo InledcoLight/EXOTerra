@@ -47,6 +47,7 @@ import com.inledco.exoterra.manager.GroupManager;
 import com.inledco.exoterra.manager.UserManager;
 import com.inledco.exoterra.scan.LocalClient;
 import com.inledco.exoterra.udptcp.UdpClient;
+import com.inledco.exoterra.util.DeviceIconUtil;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -190,7 +191,8 @@ public class DeviceActivity extends BaseActivity {
         if (TextUtils.isEmpty(name)) {
             name = mProduct.getDefaultName();
         }
-        device_icon.setImageResource(mProduct.getIcon());
+        int iconRes = DeviceIconUtil.getDeviceIconRes(this, mDevice.getRemark2(), mProduct.getIcon());
+        device_icon.setImageResource(iconRes);
         device_name.setText(name);
         final Group group = GroupManager.getInstance().getDeviceGroup(productKey, mDevice.getDeviceName());
         if (group != null) {
@@ -316,6 +318,9 @@ public class DeviceActivity extends BaseActivity {
                 name = mProduct.getDefaultName();
             }
             device_name.setText(name);
+
+            int iconRes = DeviceIconUtil.getDeviceIconRes(this, mDevice.getRemark2(), mProduct.getIcon());
+            device_icon.setImageResource(iconRes);
         }
     }
 

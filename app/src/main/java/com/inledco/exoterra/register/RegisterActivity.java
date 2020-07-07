@@ -4,7 +4,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
@@ -22,7 +21,7 @@ import com.inledco.exoterra.view.MessageDialog;
 import com.inledco.exoterra.view.PasswordEditText;
 
 public class RegisterActivity extends BaseActivity {
-    private Toolbar register_toolbar;
+//    private Toolbar register_toolbar;
     private TextInputLayout register_til_email;
     private AdvancedTextInputEditText register_et_email;
     private TextInputLayout register_til_verifycode;
@@ -32,6 +31,7 @@ public class RegisterActivity extends BaseActivity {
     private TextInputLayout register_til_password;
     private PasswordEditText register_et_password;
     private Button register_btn_signup;
+    private Button register_btn_back;
 
     private VerifycodeManager mVerifycodeManager;
 
@@ -53,7 +53,7 @@ public class RegisterActivity extends BaseActivity {
 
     @Override
     protected void initView() {
-        register_toolbar = findViewById(R.id.register_toolbar);
+//        register_toolbar = findViewById(R.id.register_toolbar);
         register_til_nickname = findViewById(R.id.register_til_nickname);
         register_et_nickname = findViewById(R.id.register_et_nickname);
         register_til_email = findViewById(R.id.register_til_email);
@@ -63,8 +63,9 @@ public class RegisterActivity extends BaseActivity {
         register_til_password = findViewById(R.id.register_til_password);
         register_et_password = findViewById(R.id.register_et_password);
         register_btn_signup = findViewById(R.id.register_btn_signup);
+        register_btn_back = findViewById(R.id.register_btn_back);
 
-        setSupportActionBar(register_toolbar);
+//        setSupportActionBar(register_toolbar);
         register_et_nickname.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_person_white_24dp, 0, 0, 0);
         register_et_email.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_email_white_24dp, 0, 0, 0);
         register_et_verifycode.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_verify_white_24dp, 0, R.drawable.ic_send_white_24dp, 0);
@@ -106,12 +107,17 @@ public class RegisterActivity extends BaseActivity {
 
         mRegisterCallback = new HttpCallback<UserApi.Response>() {
             @Override
-            public void onError(String error) {
+            public void onError(final String error) {
                 dismissLoadDialog();
-                new MessageDialog(RegisterActivity.this).setTitle(R.string.signup_failed)
-                                                        .setMessage(error)
-                                                        .setButton(getString(R.string.ok), null)
-                                                        .show();
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        new MessageDialog(RegisterActivity.this).setTitle(R.string.signup_failed)
+                                                                .setMessage(error)
+                                                                .setButton(getString(R.string.ok), null)
+                                                                .show();
+                    }
+                });
             }
 
             @Override
@@ -124,10 +130,10 @@ public class RegisterActivity extends BaseActivity {
 
     @Override
     protected void initEvent() {
-        register_toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+        register_btn_back.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                onBackPressed();
+                finish();
             }
         });
 

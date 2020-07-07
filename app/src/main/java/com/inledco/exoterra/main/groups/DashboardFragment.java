@@ -1,5 +1,6 @@
 package com.inledco.exoterra.main.groups;
 
+import android.graphics.Rect;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -22,6 +23,7 @@ import com.inledco.exoterra.group.GroupFragment;
 import com.inledco.exoterra.manager.GroupManager;
 import com.inledco.exoterra.manager.OnErrorCallback;
 import com.inledco.exoterra.util.FavouriteUtil;
+import com.inledco.exoterra.util.SizeUtil;
 import com.scwang.smartrefresh.layout.SmartRefreshLayout;
 import com.scwang.smartrefresh.layout.api.RefreshLayout;
 import com.scwang.smartrefresh.layout.header.ClassicsHeader;
@@ -132,7 +134,23 @@ public class DashboardFragment extends BaseFragment {
         groups_ib_add = view.findViewById(R.id.groups_ib_add);
 
         warning_tv_msg.setText(R.string.no_habitat_warning);
-        groups_rv.setLayoutManager(new GridLayoutManager(getContext(), 4));
+        groups_rv.setLayoutManager(new GridLayoutManager(getContext(), 3));
+        groups_rv.addItemDecoration(new RecyclerView.ItemDecoration() {
+            @Override
+            public void getItemOffsets(@NonNull Rect outRect, @NonNull View view, @NonNull RecyclerView parent, @NonNull RecyclerView.State state) {
+                super.getItemOffsets(outRect, view, parent, state);
+                int spanCount = 3;
+                int space = SizeUtil.dp2px(8);
+                int position = parent.getChildAdapterPosition(view);
+                int col = position%spanCount;
+
+                outRect.left = space*col/spanCount;
+                outRect.right = space*(spanCount-col-1)/spanCount;
+                if (position >= spanCount) {
+                    outRect.top = space;
+                }
+            }
+        });
         initHeader();
         ClassicsHeader header = new ClassicsHeader(getContext());
         groups_refresh.setRefreshHeader(header);

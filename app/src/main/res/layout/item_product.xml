@@ -10,9 +10,10 @@
 
     <ImageView
         android:id="@+id/item_product_icon"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:srcCompat="@drawable/ic_device_default_white_64dp"/>
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:padding="8dp"
+        android:scaleType="fitCenter"/>
     <TextView
         android:id="@+id/item_product_type"
         android:layout_width="wrap_content"
