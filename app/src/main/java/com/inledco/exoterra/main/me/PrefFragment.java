@@ -127,6 +127,10 @@ public class PrefFragment extends BaseFragment {
                 pref_title_user.setChecked(checked);
                 pref_title_user.setCompoundDrawablesWithIntrinsicBounds(0, 0, res, 0);
                 pref_usr_detail.setVisibility(checked ? View.VISIBLE : View.GONE);
+                if (checked) {
+                    pref_nickname.setText(UserManager.getInstance().getNickname());
+                    pref_email.setText(UserManager.getInstance().getEmail());
+                }
             }
         });
         pref_nickname.setOnClickListener(new View.OnClickListener() {
@@ -200,7 +204,6 @@ public class PrefFragment extends BaseFragment {
         View view = LayoutInflater.from(getContext()).inflate(R.layout.dialog_rename, null, false);
         final TextInputLayout til = view.findViewById(R.id.dialog_rename_til);
         final AdvancedTextInputEditText et = view.findViewById(R.id.dialog_rename_et);
-        et.bindTextInputLayout(til);
         til.setHint(getString(R.string.hint_nickname));
         et.setText(UserManager.getInstance().getNickname());
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
@@ -249,12 +252,13 @@ public class PrefFragment extends BaseFragment {
         View view = LayoutInflater.from(getContext()).inflate(R.layout.dialog_modify_password, null, false);
         final TextInputLayout til1 = view.findViewById(R.id.modify_psw_til1);
         final TextInputLayout til2 = view.findViewById(R.id.modify_psw_til2);
+        final TextInputLayout til3 = view.findViewById(R.id.modify_psw_til3);
         final PasswordEditText et_old = view.findViewById(R.id.modify_psw_old);
         final PasswordEditText et_new = view.findViewById(R.id.modify_psw_new);
-        et_old.bindTextInputLayout(til1);
-        et_new.bindTextInputLayout(til2);
+        final PasswordEditText et_confirm = view.findViewById(R.id.modify_psw_confirm);
         et_old.setIcon(R.drawable.ic_lock_white_24dp, R.drawable.design_ic_visibility, R.drawable.design_ic_visibility_off);
         et_new.setIcon(R.drawable.ic_lock_white_24dp, R.drawable.design_ic_visibility, R.drawable.design_ic_visibility_off);
+        et_confirm.setIcon(R.drawable.ic_lock_white_24dp, R.drawable.design_ic_visibility, R.drawable.design_ic_visibility_off);
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         builder.setTitle(R.string.modify_password);
         builder.setView(view);
@@ -276,6 +280,12 @@ public class PrefFragment extends BaseFragment {
                 if (TextUtils.isEmpty(newpsw) || newpsw.length() < getResources().getInteger(R.integer.password_text_length_min)) {
                     til2.setError(getString(R.string.error_password));
                     et_new.requestFocus();
+                    return;
+                }
+                final String confirm = et_confirm.getText().toString();
+                if (TextUtils.equals(newpsw, confirm) == false) {
+                    til3.setError(getString(R.string.password_inconsistent));
+                    et_confirm.requestFocus();
                     return;
                 }
                 AliotServer.getInstance().modifyPassword(oldpsw, newpsw, new HttpCallback<UserApi.Response>() {

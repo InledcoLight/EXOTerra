@@ -81,9 +81,6 @@ public class LoginActivity extends BaseActivity {
 
         login_et_email.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_email_white_24dp, 0, 0, 0);
         login_et_password.setIcon(R.drawable.ic_lock_white_24dp, R.drawable.design_ic_visibility, R.drawable.design_ic_visibility_off);
-        login_et_email.bindTextInputLayout(login_til_email);
-        login_et_password.bindTextInputLayout(login_til_password);
-
     }
 
     @Override

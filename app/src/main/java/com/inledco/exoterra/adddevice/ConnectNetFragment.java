@@ -17,8 +17,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputLayout;
 import android.text.TextUtils;
-import android.text.method.HideReturnsTransformationMethod;
-import android.text.method.PasswordTransformationMethod;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,6 +29,7 @@ import com.inledco.exoterra.bean.ExoProduct;
 import com.inledco.exoterra.helper.WifiHelper;
 import com.inledco.exoterra.util.RouterUtil;
 import com.inledco.exoterra.view.AdvancedTextInputEditText;
+import com.inledco.exoterra.view.PasswordEditText;
 
 public class ConnectNetFragment extends BaseFragment {
 
@@ -38,7 +37,7 @@ public class ConnectNetFragment extends BaseFragment {
     private TextInputLayout connect_net_tl1;
     private AdvancedTextInputEditText connect_net_router;
     private TextInputLayout connect_net_tl2;
-    private AdvancedTextInputEditText connect_net_password;
+    private PasswordEditText connect_net_password;
     private Button connect_net_smartconfig;
     private Button connect_net_apconfig;
     private Button connect_net_back;
@@ -48,7 +47,6 @@ public class ConnectNetFragment extends BaseFragment {
 
     private boolean mRegistered;
     private boolean mOpen;                          //是否开放式热点
-    private boolean showPassword;
 
     private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
         @Override
@@ -60,6 +58,8 @@ public class ConnectNetFragment extends BaseFragment {
             if (!checkLocation()) {
                 connect_net_router.setText("<unknown ssid>");
                 connect_net_tl1.setError(getString(R.string.msg_turnon_gps));
+                connect_net_smartconfig.setEnabled(false);
+                connect_net_apconfig.setEnabled(false);
                 return;
             } else {
                 connect_net_tl1.setError(null);
@@ -115,9 +115,7 @@ public class ConnectNetFragment extends BaseFragment {
         connect_net_back = view.findViewById(R.id.connect_net_back);
 
         connect_net_router.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_router_white_24dp, 0, R.drawable.ic_search_white_24dp, 0);
-        connect_net_password.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_lock_white_24dp, 0, R.drawable.design_ic_visibility_off, 0);
-        connect_net_router.bindTextInputLayout(connect_net_tl1);
-        connect_net_password.bindTextInputLayout(connect_net_tl2);
+        connect_net_password.setIcon(R.drawable.ic_lock_white_24dp, R.drawable.design_ic_visibility, R.drawable.design_ic_visibility_off);
     }
 
     @Override
@@ -142,20 +140,6 @@ public class ConnectNetFragment extends BaseFragment {
                     gotoLoactionSettings();
                 } else {
                     gotoSystemWifiSettings();
-                }
-            }
-        });
-
-        connect_net_password.setDrawableRightClickListener(new AdvancedTextInputEditText.DrawableRightClickListener() {
-            @Override
-            public void onDrawableRightClick() {
-                showPassword = !showPassword;
-                if (showPassword) {
-                    connect_net_password.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_lock_white_24dp, 0, R.drawable.design_ic_visibility, 0);
-                    connect_net_password.setTransformationMethod(HideReturnsTransformationMethod.getInstance());
-                } else {
-                    connect_net_password.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_lock_white_24dp, 0, R.drawable.design_ic_visibility_off, 0);
-                    connect_net_password.setTransformationMethod(PasswordTransformationMethod.getInstance());
                 }
             }
         });
@@ -247,6 +231,8 @@ public class ConnectNetFragment extends BaseFragment {
         if (wifiInfo == null || wifiInfo.getNetworkId() == -1) {
             connect_net_router.setText("<unknown ssid>");
             connect_net_tl1.setError(getString(R.string.please_connect_router));
+            connect_net_smartconfig.setEnabled(false);
+            connect_net_apconfig.setEnabled(false);
             return;
         }
         WifiManager wifiManager = (WifiManager) getContext().getApplicationContext().getSystemService(Context.WIFI_SERVICE);

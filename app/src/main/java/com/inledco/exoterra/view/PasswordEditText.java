@@ -3,7 +3,6 @@ package com.inledco.exoterra.view;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.DrawableRes;
-import android.support.annotation.NonNull;
 import android.support.design.widget.TextInputEditText;
 import android.support.design.widget.TextInputLayout;
 import android.text.Editable;
@@ -12,10 +11,10 @@ import android.text.method.HideReturnsTransformationMethod;
 import android.text.method.PasswordTransformationMethod;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
+import android.view.ViewParent;
 
 public class PasswordEditText extends TextInputEditText {
-    private boolean mBind;
-    private TextInputLayout mParentTextInputLayout;
+    private static final String TAG = "PasswordEditText";
 
     private boolean showPassword;
     private int leftIcon;
@@ -35,9 +34,15 @@ public class PasswordEditText extends TextInputEditText {
 
         @Override
         public void afterTextChanged(Editable s) {
-            if (mParentTextInputLayout != null) {
-                mParentTextInputLayout.setError(null);
+            ViewParent parent = getParent();
+            while (parent != null) {
+                if (parent instanceof TextInputLayout) {
+                    ((TextInputLayout) parent).setError(null);
+                    break;
+                }
+                parent = parent.getParent();
             }
+            setError(null);
         }
     };
 
@@ -57,13 +62,6 @@ public class PasswordEditText extends TextInputEditText {
         super(context, attrs, defStyleAttr);
 
         addTextChangedListener(mTextWatcher);
-    }
-
-    public void bindTextInputLayout(@NonNull final TextInputLayout textInputLayout) {
-        if (!mBind) {
-            mParentTextInputLayout = textInputLayout;
-            mBind = true;
-        }
     }
 
     public void setIcon(@DrawableRes int left, @DrawableRes int visible, @DrawableRes int visibleOff) {

@@ -373,4 +373,6 @@
     <string name="turnon_gps">Turnon GPS</string>
     <string name="msg_turnon_gps">Need to turnon GPS after Android 9.0.</string>
     <string name="please_connect_router">Please connect router</string>
+    <string name="confirm_password">Confirm password</string>
+    <string name="password_inconsistent">Passwords are inconsistent.</string>
 </resources>

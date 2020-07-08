@@ -210,6 +210,9 @@ public class DeviceDetailFragment extends BaseFragment {
         device_detail_icon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (mDevice == null || !mDeviceAdmin) {
+                    return;
+                }
                 showDeviceIconDialog();
             }
         });

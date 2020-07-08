@@ -2,11 +2,16 @@ package com.inledco.exoterra.register;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.TypedArray;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
+import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.Toast;
 
 import com.inledco.exoterra.R;
@@ -16,12 +21,12 @@ import com.inledco.exoterra.aliot.UserApi;
 import com.inledco.exoterra.base.BaseActivity;
 import com.inledco.exoterra.manager.VerifycodeManager;
 import com.inledco.exoterra.util.RegexUtil;
+import com.inledco.exoterra.util.SizeUtil;
 import com.inledco.exoterra.view.AdvancedTextInputEditText;
 import com.inledco.exoterra.view.MessageDialog;
 import com.inledco.exoterra.view.PasswordEditText;
 
 public class RegisterActivity extends BaseActivity {
-//    private Toolbar register_toolbar;
     private TextInputLayout register_til_email;
     private AdvancedTextInputEditText register_et_email;
     private TextInputLayout register_til_verifycode;
@@ -30,6 +35,9 @@ public class RegisterActivity extends BaseActivity {
     private AdvancedTextInputEditText register_et_nickname;
     private TextInputLayout register_til_password;
     private PasswordEditText register_et_password;
+    private TextInputLayout register_til_confirm;
+    private PasswordEditText register_et_confirm;
+    private Button register_btn_send;
     private Button register_btn_signup;
     private Button register_btn_back;
 
@@ -53,26 +61,44 @@ public class RegisterActivity extends BaseActivity {
 
     @Override
     protected void initView() {
-//        register_toolbar = findViewById(R.id.register_toolbar);
-        register_til_nickname = findViewById(R.id.register_til_nickname);
-        register_et_nickname = findViewById(R.id.register_et_nickname);
+//        register_til_nickname = findViewById(R.id.register_til_nickname);
+//        register_et_nickname = findViewById(R.id.register_et_nickname);
         register_til_email = findViewById(R.id.register_til_email);
         register_et_email = findViewById(R.id.register_et_email);
         register_til_verifycode = findViewById(R.id.register_til_verifycode);
         register_et_verifycode = findViewById(R.id.register_et_verifycode);
         register_til_password = findViewById(R.id.register_til_password);
         register_et_password = findViewById(R.id.register_et_password);
+        register_til_confirm = findViewById(R.id.register_til_confirm);
+        register_et_confirm = findViewById(R.id.register_et_confirm);
+//        register_btn_send = findViewById(R.id.register_btn_send);
         register_btn_signup = findViewById(R.id.register_btn_signup);
         register_btn_back = findViewById(R.id.register_btn_back);
 
-//        setSupportActionBar(register_toolbar);
-        register_et_nickname.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_person_white_24dp, 0, 0, 0);
+//        register_et_nickname.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_person_white_24dp, 0, 0, 0);
         register_et_email.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_email_white_24dp, 0, 0, 0);
-        register_et_verifycode.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_verify_white_24dp, 0, R.drawable.ic_send_white_24dp, 0);
+        register_et_verifycode.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_verify_white_24dp, 0, 0, 0);
         register_et_password.setIcon(R.drawable.ic_lock_white_24dp, R.drawable.design_ic_visibility, R.drawable.design_ic_visibility_off);
-        register_et_email.bindTextInputLayout(register_til_email);
-        register_et_verifycode.bindTextInputLayout(register_til_verifycode);
-        register_et_password.bindTextInputLayout(register_til_password);
+        register_et_confirm.setIcon(R.drawable.ic_lock_white_24dp, R.drawable.design_ic_visibility, R.drawable.design_ic_visibility_off);
+
+        register_btn_send = new Button(this);
+        register_btn_send.setText(R.string.send_verifycode);
+        register_btn_send.setTextColor(getResources().getColor(R.color.colorAccent));
+        register_btn_send.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
+        int[] attrs = new int[] {android.R.attr.selectableItemBackground};
+        TypedArray ta = obtainStyledAttributes(attrs);
+        register_btn_send.setBackground(ta.getDrawable(0));
+        ta.recycle();
+        View view = register_til_verifycode.getChildAt(0);
+        if (view != null && view instanceof FrameLayout) {
+            FrameLayout fl = (FrameLayout) view;
+            fl.addView(register_btn_send);
+            FrameLayout.LayoutParams lp = (FrameLayout.LayoutParams) register_btn_send.getLayoutParams();
+            lp.width = ViewGroup.LayoutParams.WRAP_CONTENT;
+            lp.height = ViewGroup.LayoutParams.WRAP_CONTENT;
+            lp.rightMargin = SizeUtil.dp2px(8);
+            lp.gravity = Gravity.RIGHT|Gravity.CENTER_VERTICAL;
+        }
     }
 
     @Override
@@ -137,9 +163,9 @@ public class RegisterActivity extends BaseActivity {
             }
         });
 
-        register_et_verifycode.setDrawableRightClickListener(new AdvancedTextInputEditText.DrawableRightClickListener() {
+        register_btn_send.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onDrawableRightClick() {
+            public void onClick(View v) {
                 String email = getEmailText();
                 if (!RegexUtil.isEmail(email)) {
                     register_til_email.setError(getString(R.string.error_email));
@@ -164,12 +190,13 @@ public class RegisterActivity extends BaseActivity {
         register_btn_signup.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String nickname = getNicknameText();
-                if (TextUtils.isEmpty(nickname)) {
-                    register_til_nickname.setError(getString(R.string.error_empty));
-                    register_et_nickname.requestFocus();
-                    return;
-                }
+                String nickname = "";
+//                String nickname = getNicknameText();
+//                if (TextUtils.isEmpty(nickname)) {
+//                    register_til_nickname.setError(getString(R.string.error_empty));
+//                    register_et_nickname.requestFocus();
+//                    return;
+//                }
                 String email = getEmailText();
                 if (!RegexUtil.isEmail(email)) {
                     register_til_email.setError(getString(R.string.error_email));
@@ -186,6 +213,12 @@ public class RegisterActivity extends BaseActivity {
                 if (TextUtils.isEmpty(password) || password.length() < getResources().getInteger(R.integer.password_text_length_min)) {
                     register_til_password.setError(getString(R.string.error_password));
                     register_et_password.requestFocus();
+                    return;
+                }
+                String confirm = getConfirmPasswordText();
+                if (TextUtils.equals(password, confirm) == false) {
+                    register_til_confirm.setError(getString(R.string.password_inconsistent));
+                    register_et_confirm.requestFocus();
                     return;
                 }
                 AliotServer.getInstance().register(email, password, verifycode, nickname, mRegisterCallback);
@@ -210,14 +243,17 @@ public class RegisterActivity extends BaseActivity {
         return register_et_password.getText().toString();
     }
 
+    private String getConfirmPasswordText() {
+        return register_et_confirm.getText().toString();
+    }
+
     private void showRegisterSuccessDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle(R.string.title_register_success)
-               .setMessage(R.string.msg_active_account)
                .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                    @Override
                    public void onClick(DialogInterface dialog, int which) {
-                       backtoLoginActivity(true);
+                       backtoLoginActivity(false);
                    }
                })
                .setCancelable(false)

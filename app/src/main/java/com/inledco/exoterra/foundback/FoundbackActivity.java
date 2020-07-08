@@ -1,15 +1,21 @@
 package com.inledco.exoterra.foundback;
 
+import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.TypedArray;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
 import android.util.Log;
+import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.Toast;
 
 import com.alibaba.fastjson.JSON;
@@ -20,18 +26,20 @@ import com.inledco.exoterra.aliot.UserApi;
 import com.inledco.exoterra.base.BaseActivity;
 import com.inledco.exoterra.manager.VerifycodeManager;
 import com.inledco.exoterra.util.RegexUtil;
+import com.inledco.exoterra.util.SizeUtil;
 import com.inledco.exoterra.view.AdvancedTextInputEditText;
 import com.inledco.exoterra.view.PasswordEditText;
 
 public class FoundbackActivity extends BaseActivity {
-
-//    private Toolbar foundback_toolbar;
     private TextInputLayout foundback_til_email;
     private AdvancedTextInputEditText foundback_et_email;
-    private TextInputLayout foundback_til_password;
-    private PasswordEditText foundback_et_password;
     private TextInputLayout foundback_til_verifycode;
     private AdvancedTextInputEditText foundback_et_verifycode;
+    private TextInputLayout foundback_til_password;
+    private PasswordEditText foundback_et_password;
+    private TextInputLayout foundback_til_confirm;
+    private PasswordEditText foundback_et_confirm;
+    private Button foundback_btn_send;
     private Button foundback_btn_found;
     private Button foundback_btn_back;
 
@@ -53,25 +61,44 @@ public class FoundbackActivity extends BaseActivity {
         return R.layout.activity_foundback;
     }
 
+    @SuppressLint ("ResourceAsColor")
     @Override
     protected void initView() {
-//        foundback_toolbar = findViewById(R.id.foundback_toolbar);
         foundback_til_email = findViewById(R.id.foundback_til_email);
         foundback_et_email = findViewById(R.id.foundback_et_email);
-        foundback_til_password = findViewById(R.id.foundback_til_password);
-        foundback_et_password = findViewById(R.id.foundback_et_password);
         foundback_til_verifycode = findViewById(R.id.foundback_til_verifycode);
         foundback_et_verifycode = findViewById(R.id.foundback_et_verifycode);
+        foundback_til_password = findViewById(R.id.foundback_til_password);
+        foundback_et_password = findViewById(R.id.foundback_et_password);
+        foundback_til_confirm = findViewById(R.id.foundback_til_confirm);
+        foundback_et_confirm = findViewById(R.id.foundback_et_confirm);
+//        foundback_btn_send = findViewById(R.id.foundback_btn_send);
         foundback_btn_found = findViewById(R.id.foundback_btn_found);
         foundback_btn_back = findViewById(R.id.foundback_btn_back);
 
-//        setSupportActionBar(foundback_toolbar);
         foundback_et_email.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_email_white_24dp, 0, 0, 0);
-        foundback_et_verifycode.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_verify_white_24dp, 0, R.drawable.ic_send_white_24dp, 0);
+        foundback_et_verifycode.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_verify_white_24dp, 0, 0, 0);
         foundback_et_password.setIcon(R.drawable.ic_lock_white_24dp, R.drawable.design_ic_visibility, R.drawable.design_ic_visibility_off);
-        foundback_et_email.bindTextInputLayout(foundback_til_email);
-        foundback_et_verifycode.bindTextInputLayout(foundback_til_verifycode);
-        foundback_et_password.bindTextInputLayout(foundback_til_password);
+        foundback_et_confirm.setIcon(R.drawable.ic_lock_white_24dp, R.drawable.design_ic_visibility, R.drawable.design_ic_visibility_off);
+
+        foundback_btn_send = new Button(this);
+        foundback_btn_send.setText(R.string.send_verifycode);
+        foundback_btn_send.setTextColor(getResources().getColor(R.color.colorAccent));
+        foundback_btn_send.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
+        int[] attrs = new int[] {android.R.attr.selectableItemBackground};
+        TypedArray ta = obtainStyledAttributes(attrs);
+        foundback_btn_send.setBackground(ta.getDrawable(0));
+        ta.recycle();
+        View view = foundback_til_verifycode.getChildAt(0);
+        if (view != null && view instanceof FrameLayout) {
+            FrameLayout fl = (FrameLayout) view;
+            fl.addView(foundback_btn_send);
+            FrameLayout.LayoutParams lp = (FrameLayout.LayoutParams) foundback_btn_send.getLayoutParams();
+            lp.width = ViewGroup.LayoutParams.WRAP_CONTENT;
+            lp.height = ViewGroup.LayoutParams.WRAP_CONTENT;
+            lp.rightMargin = SizeUtil.dp2px(8);
+            lp.gravity = Gravity.RIGHT | Gravity.CENTER_VERTICAL;
+        }
     }
 
     @Override
@@ -131,13 +158,6 @@ public class FoundbackActivity extends BaseActivity {
 
     @Override
     protected void initEvent() {
-//        foundback_toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                onBackPressed();
-//            }
-//        });
-
         foundback_btn_back.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -145,9 +165,9 @@ public class FoundbackActivity extends BaseActivity {
             }
         });
 
-        foundback_et_verifycode.setDrawableRightClickListener(new AdvancedTextInputEditText.DrawableRightClickListener() {
+        foundback_btn_send.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onDrawableRightClick() {
+            public void onClick(View v) {
                 String email = getEmailText();
                 if (!RegexUtil.isEmail(email)) {
                     foundback_til_email.setError(getString(R.string.error_email));
@@ -173,21 +193,27 @@ public class FoundbackActivity extends BaseActivity {
             @Override
             public void onClick(View v) {
                 String email = getEmailText();
-                String password = getPasswordText();
-                String verifycode = getVerifycodeText();
                 if (!RegexUtil.isEmail(email)) {
                     foundback_til_email.setError(getString(R.string.error_email));
                     foundback_et_email.requestFocus();
                     return;
                 }
+                String verifycode = getVerifycodeText();
+                if (TextUtils.isEmpty(verifycode) || verifycode.length() != getResources().getInteger(R.integer.verifycode_text_length_max)) {
+                    foundback_til_verifycode.setError(getString(R.string.error_verifycode));
+                    foundback_et_verifycode.requestFocus();
+                    return;
+                }
+                String password = getPasswordText();
                 if (TextUtils.isEmpty(password) || password.length() < getResources().getInteger(R.integer.password_text_length_min)) {
                     foundback_til_password.setError(getString(R.string.error_password));
                     foundback_et_password.requestFocus();
                     return;
                 }
-                if (TextUtils.isEmpty(verifycode) || verifycode.length() != getResources().getInteger(R.integer.verifycode_text_length_max)) {
-                    foundback_til_verifycode.setError(getString(R.string.error_verifycode));
-                    foundback_et_verifycode.requestFocus();
+                String confirm = getConfirmPasswordText();
+                if (TextUtils.equals(password, confirm) == false) {
+                    foundback_til_confirm.setError(getString(R.string.password_inconsistent));
+                    foundback_et_confirm.requestFocus();
                     return;
                 }
                 AliotServer.getInstance().resetPassword(email, verifycode, password, mFoundbackPasswordCallback);
@@ -202,6 +228,10 @@ public class FoundbackActivity extends BaseActivity {
 
     private String getPasswordText() {
         return foundback_et_password.getText().toString();
+    }
+
+    private String getConfirmPasswordText() {
+        return foundback_et_confirm.getText().toString();
     }
 
     private String getVerifycodeText() {
@@ -228,7 +258,7 @@ public class FoundbackActivity extends BaseActivity {
         Intent intent = new Intent();
         intent.putExtra("email", email);
         intent.putExtra("password", password);
-        intent.putExtra("login", true);
+        intent.putExtra("login", false);
         setResult(1, intent);
         finish();
     }

@@ -6,18 +6,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-<!--    <android.support.v7.widget.Toolbar-->
-<!--        android:id="@+id/register_toolbar"-->
-<!--        android:layout_width="0dp"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:minHeight="?attr/actionBarSize"-->
-<!--        android:theme="?attr/actionBarTheme"-->
-<!--        app:navigationIcon="@drawable/ic_arrow_back_white_32dp"-->
-<!--        app:title="@string/signup"-->
-<!--        app:layout_constraintEnd_toEndOf="parent"-->
-<!--        app:layout_constraintStart_toStartOf="parent"-->
-<!--        app:layout_constraintTop_toTopOf="parent"/>-->
-
     <ImageView
         android:id="@+id/imageView9"
         android:layout_width="0dp"
@@ -30,30 +18,31 @@
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/ic_myexoterra" />
 
-    <android.support.design.widget.TextInputLayout
-        android:id="@+id/register_til_nickname"
-        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="32dp"
-        android:layout_marginEnd="16dp"
-        android:hint="@string/hint_nickname"
-        app:errorEnabled="true"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/imageView9">
+<!--    <android.support.design.widget.TextInputLayout-->
+<!--        android:id="@+id/register_til_nickname"-->
+<!--        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"-->
+<!--        android:layout_width="0dp"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_marginStart="16dp"-->
+<!--        android:layout_marginTop="16dp"-->
+<!--        android:layout_marginEnd="16dp"-->
+<!--        android:hint="@string/hint_nickname"-->
+<!--        app:errorEnabled="true"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintTop_toBottomOf="@+id/imageView9">-->
 
-        <com.inledco.exoterra.view.AdvancedTextInputEditText
-            android:id="@+id/register_et_nickname"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:drawablePadding="8dp"
-            android:inputType="text"
-            android:maxLength="@integer/nickname_text_length_max"
-            android:maxLines="1" />
-
-    </android.support.design.widget.TextInputLayout>
+<!--        <com.inledco.exoterra.view.AdvancedTextInputEditText-->
+<!--            android:id="@+id/register_et_nickname"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:drawablePadding="8dp"-->
+<!--            android:imeOptions="actionNext"-->
+<!--            android:inputType="text"-->
+<!--            android:maxLength="@integer/nickname_text_length_max"-->
+<!--            android:lines="1"-->
+<!--            android:maxLines="1" />-->
+<!--    </android.support.design.widget.TextInputLayout>-->
 
     <android.support.design.widget.TextInputLayout
         android:id="@+id/register_til_email"
@@ -62,21 +51,23 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
+        android:layout_marginTop="16dp"
         android:hint="@string/hint_email"
         app:errorEnabled="true"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/register_til_nickname">
+        app:layout_constraintTop_toBottomOf="@+id/imageView9">
 
         <com.inledco.exoterra.view.AdvancedTextInputEditText
             android:id="@+id/register_et_email"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:drawablePadding="8dp"
+            android:imeOptions="actionNext"
             android:inputType="textEmailAddress"
             android:maxLength="@integer/email_text_length_max"
+            android:lines="1"
             android:maxLines="1" />
-
     </android.support.design.widget.TextInputLayout>
 
     <android.support.design.widget.TextInputLayout
@@ -99,10 +90,24 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:drawablePadding="8dp"
+            android:imeOptions="actionNext"
             android:inputType="number"
+            android:lines="1"
             android:maxLength="@integer/verifycode_text_length_max"
             android:maxLines="1" />
     </android.support.design.widget.TextInputLayout>
+
+<!--    <Button-->
+<!--        android:id="@+id/register_btn_send"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_marginTop="6dp"-->
+<!--        android:layout_marginEnd="16dp"-->
+<!--        android:background="?attr/selectableItemBackground"-->
+<!--        android:text="@string/send_verifycode"-->
+<!--        android:textSize="@dimen/textSizeTiny"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintTop_toTopOf="@+id/register_til_verifycode" />-->
 
     <android.support.design.widget.TextInputLayout
         android:id="@+id/register_til_password"
@@ -122,10 +127,36 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:drawablePadding="8dp"
+            android:imeOptions="actionNext"
             android:inputType="textPassword"
             android:maxLength="@integer/password_text_length_max"
             android:maxLines="1"
-            android:singleLine="true" />
+            android:lines="1" />
+    </android.support.design.widget.TextInputLayout>
+
+    <android.support.design.widget.TextInputLayout
+        android:id="@+id/register_til_confirm"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:hint="@string/confirm_password"
+        app:errorEnabled="true"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/register_til_password">
+
+        <com.inledco.exoterra.view.PasswordEditText
+            android:id="@+id/register_et_confirm"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:drawablePadding="8dp"
+            android:imeOptions="actionDone"
+            android:inputType="textPassword"
+            android:maxLength="@integer/password_text_length_max"
+            android:maxLines="1"
+            android:lines="1" />
     </android.support.design.widget.TextInputLayout>
 
     <com.inledco.exoterra.view.GradientSemiCircleButton
@@ -134,15 +165,15 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
+        android:layout_marginTop="8dp"
         android:background="?attr/selectableItemBackground"
         android:text="@string/signup"
         app:colorEnd="@color/gradientGreen"
         app:colorStart="@color/gradientYellow"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/register_til_password" />
+        app:layout_constraintTop_toBottomOf="@+id/register_til_confirm" />
 
     <com.inledco.exoterra.view.GradientCornerButton
         android:id="@+id/register_btn_back"
@@ -170,7 +201,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
-        android:layout_marginBottom="32dp"
+        android:layout_marginBottom="24dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

@@ -71,5 +71,14 @@
     <style name="TextInputLayoutTheme" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense">
 <!--        <item name="passwordToggleDrawable"></item>-->
     </style>
-    
+
+    <style name="TextErrorAppearance" parent="TextAppearance.AppCompat">
+        <item name="android:textSize">10sp</item>
+        <item name="android:textColor">@color/colorRed</item>
+    </style>
+
+    <style name="RippleStyle" parent="Widget.AppCompat.Button">
+        <item name="background">?attr/selectableItemBackground</item>
+    </style>
+
 </resources>

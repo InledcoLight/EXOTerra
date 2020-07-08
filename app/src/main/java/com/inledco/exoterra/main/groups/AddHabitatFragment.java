@@ -113,7 +113,6 @@ public class AddHabitatFragment extends BaseFragment {
         add_habitat_save = view.findViewById(R.id.add_habitat_save);
 
         add_habitat_name.requestFocus();
-        add_habitat_name.bindTextInputLayout(add_habitat_til);
         add_habitat_name.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_type_1, 0, R.drawable.ic_edit_white_24dp, 0);
         add_habitat_time.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_edit_white_24dp, 0);
         add_habitat_sunrise.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_edit_white_24dp, 0);

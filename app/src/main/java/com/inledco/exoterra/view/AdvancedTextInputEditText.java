@@ -2,19 +2,16 @@ package com.inledco.exoterra.view;
 
 import android.content.Context;
 import android.graphics.drawable.Drawable;
-import android.support.annotation.NonNull;
 import android.support.design.widget.TextInputEditText;
 import android.support.design.widget.TextInputLayout;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
+import android.view.ViewParent;
 
 public class AdvancedTextInputEditText extends TextInputEditText {
     private final String TAG = "AdvancedTextInputEditTe";
-
-    private boolean mBind;
-    private TextInputLayout mParentTextInputLayout;
 
     private DrawableRightClickListener mDrawableRightClickListener;
 
@@ -31,9 +28,15 @@ public class AdvancedTextInputEditText extends TextInputEditText {
 
         @Override
         public void afterTextChanged(Editable s) {
-            if (mParentTextInputLayout != null) {
-                mParentTextInputLayout.setError(null);
+            ViewParent parent = getParent();
+            while (parent != null) {
+                if (parent instanceof TextInputLayout) {
+                    ((TextInputLayout) parent).setError(null);
+                    break;
+                }
+                parent = parent.getParent();
             }
+            setError(null);
         }
     };
 
@@ -50,13 +53,6 @@ public class AdvancedTextInputEditText extends TextInputEditText {
     public AdvancedTextInputEditText(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         addTextChangedListener(mTextWatcher);
-    }
-
-    public void bindTextInputLayout(@NonNull final TextInputLayout textInputLayout) {
-        if (!mBind) {
-            mParentTextInputLayout = textInputLayout;
-            mBind = true;
-        }
     }
 
     public void setDrawableRightClickListener(DrawableRightClickListener listener) {
