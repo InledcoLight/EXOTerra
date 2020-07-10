@@ -10,16 +10,23 @@
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat.NoActionBar">
         <!-- Customize your theme here. -->
-        <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-        <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:colorPrimary" tools:targetApi="lollipop">@color/colorPrimary</item>
+        <item name="colorPrimary" tools:targetApi="lollipop">@color/colorPrimary</item>
+        <item name="android:colorPrimaryDark" tools:targetApi="lollipop">@color/colorPrimaryDark</item>
+        <item name="colorPrimaryDark" tools:targetApi="lollipop">@color/colorPrimaryDark</item>
+        <item name="android:colorAccent" tools:targetApi="lollipop">@color/colorAccent</item>
+        <item name="colorAccent" tools:targetApi="lollipop">@color/colorAccent</item>
+
+        <item name="android:fontFamily">@font/eurostileltstd</item>
 
         <item name="android:textColor">@color/textColorPrimary</item>
         <item name="android:textColorPrimary">@color/textColorPrimary</item>
         <item name="android:textColorSecondary">@color/textColorSencondary</item>
         <item name="android:textColorHint">@color/colorGray</item>
         <item name="android:textColorLink">@color/colorAccent</item>
+        <item name="android:colorError" tools:targetApi="o">@color/colorRed</item>
         <item name="colorError">@color/colorRed</item>
+        <item name="android:colorButtonNormal" tools:targetApi="lollipop">@color/selector_button</item>
         <item name="colorButtonNormal">@color/selector_button</item>
 
         <item name="android:statusBarColor" tools:targetApi="lollipop">@color/colorTransparent</item>
@@ -28,6 +35,8 @@
         <item name="alertDialogTheme">@style/DialogCornerTheme</item>
 
         <item name="android:windowAnimationStyle">@style/ActivityAnimation</item>
+
+        <item name="textInputStyle">@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox</item>
     </style>
 
     <style name="SwitchStyle" parent="Widget.AppCompat.CompoundButton.Switch">
@@ -47,7 +56,7 @@
         <item name="android:activityCloseEnterAnimation">@android:anim/fade_in</item>
     </style>
 
-    <style name="BottomDialogTheme" parent="Theme.AppCompat.Dialog.Alert">
+    <style name="BottomDialogTheme" parent="Theme.MaterialComponents.BottomSheetDialog">
         <item name="android:windowFrame">@null</item>
         <item name="android:windowNoTitle">true</item>
         <item name="android:windowIsTranslucent">true</item>
@@ -57,19 +66,20 @@
     </style>
 
     <style name="DialogCornerTheme" parent="Theme.AppCompat.Dialog.Alert">
-        <item name="android:windowBackground">@drawable/dialog_background_corner</item>
+        <item name="android:windowBackground">@drawable/shape_roundrect_gradient</item>
     </style>
 
     <style name="DialogTheme" parent="Theme.AppCompat.Dialog.Alert">
-        <item name="android:windowBackground">@drawable/dialog_background</item>
+        <item name="android:windowBackground">@drawable/shape_roundrect_gradient</item>
     </style>
 
     <style name="DangerButtonTheme" parent="AppTheme">
         <item name="colorButtonNormal">@color/selector_button_danger</item>
     </style>
 
-    <style name="TextInputLayoutTheme" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense">
-<!--        <item name="passwordToggleDrawable"></item>-->
+    <style name="GlobalTextApperance" parent="TextAppearance.AppCompat">
+        <item name="android:fontFamily">@font/eurostileltstd</item>
+        <item name="fontFamily">@font/eurostileltstd</item>
     </style>
 
     <style name="TextErrorAppearance" parent="TextAppearance.AppCompat">
@@ -77,8 +87,23 @@
         <item name="android:textColor">@color/colorRed</item>
     </style>
 
+    <style name="BottomNavigationTextAppearanceInactive" parent="TextAppearance.AppCompat">
+        <item name="android:textSize">6sp</item>
+        <item name="android:textAllCaps">true</item>
+    </style>
+
+    <style name="BottomNavigationTextAppearanceActive" parent="TextAppearance.AppCompat">
+        <item name="android:textSize">6sp</item>
+        <item name="android:textAllCaps">true</item>
+    </style>
+
+    <style name="AlertDialogTitleTextAppearance" parent="TextAppearance.AppCompat">
+        <item name="android:textSize">@dimen/textSizeTitle</item>
+        <item name="centerTextSize">@dimen/textSizeTitle</item>
+    </style>
+
     <style name="RippleStyle" parent="Widget.AppCompat.Button">
-        <item name="background">?attr/selectableItemBackground</item>
+        <item name="android:background">?attr/selectableItemBackground</item>
     </style>
 
 </resources>

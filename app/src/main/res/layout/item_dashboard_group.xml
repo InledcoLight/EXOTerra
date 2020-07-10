@@ -13,7 +13,7 @@
         android:layout_height="wrap_content"
         android:minHeight="72dp"
         android:padding="8dp"
-        android:background="@drawable/shape_roundrect_gradient_horiz"
+        android:background="@drawable/shape_roundrect_gradient"
         android:scaleType="fitCenter"/>
     <TextView
         android:id="@+id/item_dashgroup_name"

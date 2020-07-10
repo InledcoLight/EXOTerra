@@ -130,7 +130,6 @@
 
     <android.support.design.widget.TextInputLayout
         android:id="@+id/connect_net_tl1"
-        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
@@ -138,7 +137,7 @@
         android:layout_marginEnd="16dp"
         android:hint="@string/router"
         app:errorEnabled="true"
-        app:layout_constraintEnd_toStartOf="@+id/connect_net_search"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/gradientCornerLinearLayout8">
 
@@ -156,13 +155,12 @@
 
     <android.support.design.widget.TextInputLayout
         android:id="@+id/connect_net_tl2"
-        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
         android:hint="@string/password"
-        app:layout_constraintEnd_toStartOf="@+id/connect_net_showpsw"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/connect_net_tl1"
         app:passwordToggleDrawable="@drawable/ic_search_white_24dp"
@@ -175,31 +173,8 @@
             android:drawablePadding="8dp"
             android:gravity="center_vertical"
             android:imeOptions="actionDone"
-            android:inputType="textPassword"
             android:lines="1"
             android:maxLines="1" />
     </android.support.design.widget.TextInputLayout>
-
-    <ImageButton
-        android:id="@+id/connect_net_search"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="16dp"
-        android:background="?attr/selectableItemBackground"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="@+id/connect_net_tl1"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/connect_net_tl1" />
-
-    <ImageButton
-        android:id="@+id/connect_net_showpsw"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="16dp"
-        android:background="?attr/selectableItemBackground"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="@+id/connect_net_tl2"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/connect_net_tl2"/>
 
 </android.support.constraint.ConstraintLayout>

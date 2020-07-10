@@ -2,7 +2,6 @@ package com.inledco.exoterra.view;
 
 import android.content.Context;
 import android.graphics.drawable.Drawable;
-import android.support.annotation.DrawableRes;
 import android.support.design.widget.TextInputEditText;
 import android.support.design.widget.TextInputLayout;
 import android.text.Editable;
@@ -48,23 +47,20 @@ public class PasswordEditText extends TextInputEditText {
 
     public PasswordEditText(Context context) {
         super(context);
-
         addTextChangedListener(mTextWatcher);
     }
 
     public PasswordEditText(Context context, AttributeSet attrs) {
         super(context, attrs);
-
         addTextChangedListener(mTextWatcher);
     }
 
     public PasswordEditText(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-
         addTextChangedListener(mTextWatcher);
     }
 
-    public void setIcon(@DrawableRes int left, @DrawableRes int visible, @DrawableRes int visibleOff) {
+    public void setIcon(int left, int visible, int visibleOff) {
         leftIcon = left;
         visibleIcon = visible;
         visibleOffIcon = visibleOff;

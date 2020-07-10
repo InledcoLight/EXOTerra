@@ -3,6 +3,7 @@ package com.inledco.exoterra.adddevice;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckedTextView;
@@ -10,6 +11,7 @@ import android.widget.CheckedTextView;
 import com.inledco.exoterra.R;
 import com.inledco.exoterra.aliot.bean.Group;
 import com.inledco.exoterra.common.SimpleAdapter;
+import com.inledco.exoterra.manager.UserManager;
 
 import java.util.List;
 
@@ -38,6 +40,7 @@ public class AssignHabitatAdapter extends SimpleAdapter<Group, AssignHabitatAdap
         final int position = holder.getAdapterPosition();
         final Group group = mData.get(position);
         boolean selected = (mSelectedGroup == group);
+        holder.name.setEnabled(TextUtils.equals(group.creator, UserManager.getInstance().getUserid()));
         holder.name.setText(group.name);
         holder.name.setChecked(selected);
         if (selected) {

@@ -48,6 +48,7 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
 import java.text.DateFormat;
+import java.util.SimpleTimeZone;
 import java.util.TimeZone;
 
 public class GroupFragment extends BaseFragment {
@@ -198,6 +199,10 @@ public class GroupFragment extends BaseFragment {
                 refreshData();
                 group_connected_devices.setText(getString(R.string.habitat_devcnt, mGroup.getDeviceCount()));
             }
+
+            if (TextUtils.equals(UserManager.getInstance().getUserid(), mGroupid)) {
+                group_add.setVisibility(View.VISIBLE);
+            }
         }
 
         IntentFilter filter = new IntentFilter(Intent.ACTION_TIME_TICK);
@@ -230,7 +235,8 @@ public class GroupFragment extends BaseFragment {
 
     private void refreshTime() {
         int zone = mGroup.getZone();
-        long time = System.currentTimeMillis() + (zone-defaultZone)*60000;
+        long time = System.currentTimeMillis();
+        mDateFormat.setTimeZone(new SimpleTimeZone(zone*60000, ""));
         group_time.setText(mDateFormat.format(time));
     }
 

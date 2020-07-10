@@ -28,6 +28,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:menu="@menu/menu_main_bnv"
+            app:itemIconSize="32dp"
+            app:itemTextAppearanceActive="@style/BottomNavigationTextAppearanceActive"
+            app:itemTextAppearanceInactive="@style/BottomNavigationTextAppearanceInactive"
             app:labelVisibilityMode="labeled"
             app:itemTextColor="@color/selector_bnv"
             app:itemIconTint="@color/selector_bnv"/>

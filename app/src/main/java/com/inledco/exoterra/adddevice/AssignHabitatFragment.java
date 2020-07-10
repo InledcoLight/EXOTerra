@@ -32,6 +32,8 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 public class AssignHabitatFragment extends BaseFragment {
@@ -45,7 +47,7 @@ public class AssignHabitatFragment extends BaseFragment {
     private ConnectNetViewModel mConnectNetViewModel;
     private ConnectNetBean mConnectNetBean;
 
-    private List<Group> mGroups = new ArrayList<>();
+    private final List<Group> mGroups = new ArrayList<>();
     private AssignHabitatAdapter mAdapter;
 
     @Nullable
@@ -95,11 +97,29 @@ public class AssignHabitatFragment extends BaseFragment {
         if (product != null) {
             assign_habitat_prdt.setImageResource(product.getIcon());
         }
-        for (Group group : GroupManager.getInstance().getAllGroups()) {
-            if (TextUtils.equals(group.creator, UserManager.getInstance().getUserid())) {
-                mGroups.add(group);
+//        for (Group group : GroupManager.getInstance().getAllGroups()) {
+//            if (TextUtils.equals(group.creator, UserManager.getInstance().getUserid())) {
+//                mGroups.add(group);
+//            }
+//        }
+
+        mGroups.addAll(GroupManager.getInstance().getAllGroups());
+        Collections.sort(mGroups, new Comparator<Group>() {
+            @Override
+            public int compare(Group o1, Group o2) {
+                String userid = UserManager.getInstance().getUserid();
+                if (TextUtils.equals(o1.creator, o2.creator)) {
+                    return 0;
+                }
+                if (TextUtils.equals(userid, o1.creator)) {
+                    return -1;
+                }
+                if (TextUtils.equals(userid, o2.creator)) {
+                    return 1;
+                }
+                return 0;
             }
-        }
+        });
         mAdapter = new AssignHabitatAdapter(getContext(), mGroups);
         assign_habitat_rv.setAdapter(mAdapter);
     }
@@ -149,12 +169,31 @@ public class AssignHabitatFragment extends BaseFragment {
 
     @Subscribe (threadMode = ThreadMode.MAIN)
     public void onGroupsRefreshedEvent(GroupsRefreshedEvent event) {
+//        mGroups.clear();
+//        for (Group group : GroupManager.getInstance().getAllGroups()) {
+//            if (TextUtils.equals(group.creator, UserManager.getInstance().getUserid())) {
+//                mGroups.add(group);
+//            }
+//        }
+
         mGroups.clear();
-        for (Group group : GroupManager.getInstance().getAllGroups()) {
-            if (TextUtils.equals(group.creator, UserManager.getInstance().getUserid())) {
-                mGroups.add(group);
+        mGroups.addAll(GroupManager.getInstance().getAllGroups());
+        Collections.sort(mGroups, new Comparator<Group>() {
+            @Override
+            public int compare(Group o1, Group o2) {
+                String userid = UserManager.getInstance().getUserid();
+                if (TextUtils.equals(o1.creator, o2.creator)) {
+                    return 0;
+                }
+                if (TextUtils.equals(userid, o1.creator)) {
+                    return -1;
+                }
+                if (TextUtils.equals(userid, o2.creator)) {
+                    return 1;
+                }
+                return 0;
             }
-        }
+        });
         assign_habitat_warning.setVisibility(mGroups.size() == 0 ? View.VISIBLE : View.GONE);
         mAdapter.notifyDataSetChanged();
     }

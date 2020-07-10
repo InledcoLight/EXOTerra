@@ -16,9 +16,10 @@
 
     <color name="colorTransparent">@android:color/transparent</color>
     <color name="colorGreen">#00C853</color>
-    <color name="colorGray">#9E9E9E</color>
+    <color name="colorGray">#BDBDBD</color>
     <color name="colorWhite">#FFFFFF</color>
     <color name="colorRed">#D50000</color>
+    <color name="colorDisabled">#BDBDBD</color>
 
     <color name="textColorPrimary">#FFFFFFFF</color>
     <color name="textColorSencondary">#FFC0C0C0</color>

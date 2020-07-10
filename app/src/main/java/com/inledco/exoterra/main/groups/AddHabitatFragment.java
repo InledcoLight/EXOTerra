@@ -1,5 +1,6 @@
 package com.inledco.exoterra.main.groups;
 
+import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -15,6 +16,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.TimePicker;
@@ -33,8 +35,10 @@ import com.inledco.exoterra.util.TimeFormatUtil;
 import com.inledco.exoterra.view.AdvancedTextInputEditText;
 
 import java.text.DateFormat;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.SimpleTimeZone;
 import java.util.TimeZone;
 
 public class AddHabitatFragment extends BaseFragment {
@@ -65,7 +69,7 @@ public class AddHabitatFragment extends BaseFragment {
     private DateFormat mDateFormat;
     private DateFormat mTimeFormat;
 
-    private int mZone = TimeZone.getDefault().getRawOffset()/60000;
+    private int mZone = mOffset;
     private int mSunrise = 360;
     private int mSunset = 1080;
 
@@ -147,23 +151,7 @@ public class AddHabitatFragment extends BaseFragment {
         add_habitat_time.setDrawableRightClickListener(new AdvancedTextInputEditText.DrawableRightClickListener() {
             @Override
             public void onDrawableRightClick() {
-                long time = System.currentTimeMillis();
-                int habitatTime = (int) ((time / 60000 + mZone) % 1440);
-                showTimePickerDialog(habitatTime, new TimePickerDialog.OnTimeSetListener() {
-                    @Override
-                    public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-                        int currTime = (int) ((System.currentTimeMillis() / 60000) % 1440);
-                        int setTime = hourOfDay*60 + minute;
-                        int zone = setTime - currTime;
-                        if (zone < -720) {
-                            zone += 1440;
-                        } else if (zone > 720) {
-                            zone -= 1440;
-                        }
-                        mZone = zone;
-                        refreshTime();
-                    }
-                });
+                showDateTimePickerDialog();
             }
         });
 
@@ -216,19 +204,53 @@ public class AddHabitatFragment extends BaseFragment {
     }
 
     private void refreshTime() {
-        long current = System.currentTimeMillis();
-        long time = current + (mZone - mOffset) * 60000;
-        add_habitat_systime.setText(mDateFormat.format(current));
+        long time = System.currentTimeMillis();
+        mDateFormat.setTimeZone(new SimpleTimeZone(mOffset*60000, ""));
+        add_habitat_systime.setText(mDateFormat.format(time));
+
+        mDateFormat.setTimeZone(new SimpleTimeZone(mZone*60000, ""));
         add_habitat_time.setText(mDateFormat.format(time));
     }
 
+    private void showDateTimePickerDialog() {
+        long time = System.currentTimeMillis() + (mZone - mOffset) * 60000;
+        final Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(time);
+        final int yr = calendar.get(Calendar.YEAR);
+        final int mon = calendar.get(Calendar.MONTH);
+        final int day = calendar.get(Calendar.DAY_OF_MONTH);
+        final int hour = calendar.get(Calendar.HOUR_OF_DAY);
+        final int min = calendar.get(Calendar.MINUTE);
+        DatePickerDialog dateDialog = new DatePickerDialog(getContext(), new DatePickerDialog.OnDateSetListener() {
+            @Override
+            public void onDateSet(DatePicker view, final int year, final int month, final int dayOfMonth) {
+                TimePickerDialog timeDialog = new TimePickerDialog(getContext(), new TimePickerDialog.OnTimeSetListener() {
+                    @Override
+                    public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+                        calendar.set(Calendar.YEAR, year);
+                        calendar.set(Calendar.MONTH, month);
+                        calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+                        calendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
+                        calendar.set(Calendar.MINUTE, minute);
+                        mZone = (int) (calendar.getTimeInMillis() / 60000 - System.currentTimeMillis() / 60000 + mOffset);
+                        refreshTime();
+                    }
+                }, hour, min, GlobalSettings.is24HourFormat());
+                timeDialog.setCancelable(false);
+                timeDialog.show();
+            }
+        }, yr, mon, day);
+        dateDialog.setCancelable(false);
+        dateDialog.show();
+    }
+
     private void showTimePickerDialog(int time, final TimePickerDialog.OnTimeSetListener listener) {
-        TimePickerDialog  dialog = new TimePickerDialog(getContext(), listener, time/60, time%60, GlobalSettings.is24HourFormat());
-        dialog.show();
+        TimePickerDialog timeDialog = new TimePickerDialog(getContext(), listener, time/60, time%60, GlobalSettings.is24HourFormat());
+        timeDialog.show();
     }
 
     private void createHome(final String name, final String iconName, final int zone, final int sunrise, final int sunset) {
-        Map<String, Integer> map = new HashMap<>();
+        Map<String, Object> map = new HashMap<>();
         map.put("zone", zone);
         map.put("sunrise", sunrise);
         map.put("sunset", sunset);

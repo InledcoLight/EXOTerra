@@ -65,6 +65,9 @@
                     android:background="?attr/selectableItemBackground"
                     android:drawablePadding="8dp"
                     android:gravity="center_vertical"
+                    android:lines="1"
+                    android:maxLines="1"
+                    android:ellipsize="end"
                     android:text=""
                     android:textColor="@color/textColorSencondary"
                     android:textSize="@dimen/textSizeSecondary" />
@@ -268,6 +271,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/router"
+                    android:textSize="@dimen/textSizeSecondary"
                     android:textColor="@color/textColorSencondary" />
 
                 <Space
@@ -279,6 +283,7 @@
                     android:id="@+id/device_detail_router"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:textSize="@dimen/textSizeTiny"
                     android:textColor="@color/textColorSencondary" />
             </LinearLayout>
 
@@ -293,6 +298,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/ipaddress"
+                    android:textSize="@dimen/textSizeSecondary"
                     android:textColor="@color/textColorSencondary" />
 
                 <Space
@@ -304,6 +310,7 @@
                     android:id="@+id/device_detail_ipaddress"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:textSize="@dimen/textSizeTiny"
                     android:textColor="@color/textColorSencondary" />
             </LinearLayout>
 
@@ -318,6 +325,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/rssi"
+                    android:textSize="@dimen/textSizeSecondary"
                     android:textColor="@color/textColorSencondary" />
 
                 <Space
@@ -329,6 +337,7 @@
                     android:id="@+id/device_detail_rssi"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:textSize="@dimen/textSizeTiny"
                     android:textColor="@color/textColorSencondary" />
             </LinearLayout>
 
@@ -343,6 +352,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/macaddress"
+                    android:textSize="@dimen/textSizeSecondary"
                     android:textColor="@color/textColorSencondary" />
 
                 <Space
@@ -354,6 +364,7 @@
                     android:id="@+id/device_detail_mac"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:textSize="@dimen/textSizeTiny"
                     android:textColor="@color/textColorSencondary" />
             </LinearLayout>
 
@@ -368,6 +379,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/firmware_version"
+                    android:textSize="@dimen/textSizeSecondary"
                     android:textColor="@color/textColorSencondary" />
 
                 <Space
@@ -379,6 +391,7 @@
                     android:id="@+id/device_detail_fwversion"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:textSize="@dimen/textSizeTiny"
                     android:textColor="@color/textColorSencondary" />
             </LinearLayout>
         </LinearLayout>

@@ -109,7 +109,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:gravity="center_vertical">
+        android:gravity="center">
         <Space
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -118,9 +118,10 @@
             android:id="@+id/dialog_socket_sun"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:padding="8dp"
+            android:padding="4dp"
             android:button="@null"
             android:textColor="@color/selector_week"
+            android:textSize="@dimen/textSizeSecondary"
             android:text="@string/week_sun"/>
         <Space
             android:layout_width="0dp"
@@ -130,9 +131,10 @@
             android:id="@+id/dialog_socket_mon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:padding="8dp"
+            android:padding="4dp"
             android:button="@null"
             android:textColor="@color/selector_week"
+            android:textSize="@dimen/textSizeSecondary"
             android:text="@string/week_mon"/>
         <Space
             android:layout_width="0dp"
@@ -142,9 +144,10 @@
             android:id="@+id/dialog_socket_tue"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:padding="8dp"
+            android:padding="4dp"
             android:button="@null"
             android:textColor="@color/selector_week"
+            android:textSize="@dimen/textSizeSecondary"
             android:text="@string/week_tue"/>
         <Space
             android:layout_width="0dp"
@@ -154,9 +157,10 @@
             android:id="@+id/dialog_socket_wed"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:padding="8dp"
+            android:padding="4dp"
             android:button="@null"
             android:textColor="@color/selector_week"
+            android:textSize="@dimen/textSizeSecondary"
             android:text="@string/week_wed"/>
         <Space
             android:layout_width="0dp"
@@ -166,9 +170,10 @@
             android:id="@+id/dialog_socket_thu"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:padding="8dp"
+            android:padding="4dp"
             android:button="@null"
             android:textColor="@color/selector_week"
+            android:textSize="@dimen/textSizeSecondary"
             android:text="@string/week_thu"/>
         <Space
             android:layout_width="0dp"
@@ -178,9 +183,10 @@
             android:id="@+id/dialog_socket_fri"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:padding="8dp"
+            android:padding="4dp"
             android:button="@null"
             android:textColor="@color/selector_week"
+            android:textSize="@dimen/textSizeSecondary"
             android:text="@string/week_fri"/>
         <Space
             android:layout_width="0dp"
@@ -190,9 +196,10 @@
             android:id="@+id/dialog_socket_sat"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:padding="8dp"
+            android:padding="4dp"
             android:button="@null"
             android:textColor="@color/selector_week"
+            android:textSize="@dimen/textSizeSecondary"
             android:text="@string/week_sat"/>
         <Space
             android:layout_width="0dp"
@@ -206,6 +213,7 @@
         android:layout_height="wrap_content"
         android:gravity="right"
         android:textColor="@color/textColorPrimary"
+        android:textSize="@dimen/textSizeSecondary"
         android:text="@string/execute_once"/>
 
     <View

@@ -32,7 +32,6 @@
 
     <android.support.design.widget.TextInputLayout
         android:id="@+id/login_til_email"
-        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
@@ -59,7 +58,6 @@
 
     <android.support.design.widget.TextInputLayout
         android:id="@+id/login_til_password"
-        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
@@ -76,7 +74,6 @@
             android:layout_height="wrap_content"
             android:drawablePadding="8dp"
             android:imeOptions="actionDone"
-            android:inputType="textPassword"
             android:maxLength="@integer/password_text_length_max"
             android:maxLines="1" />
     </android.support.design.widget.TextInputLayout>

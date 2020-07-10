@@ -24,6 +24,8 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
+            android:paddingTop="4dp"
+            android:paddingBottom="4dp"
             android:gravity="center_vertical"
             android:orientation="vertical">
 
@@ -45,6 +47,8 @@
                 android:drawablePadding="8dp"
                 android:visibility="invisible"
                 android:drawableLeft="@drawable/selector_habitat"
+                android:lines="1"
+                android:ellipsize="end"
                 android:text=""
                 android:textSize="@dimen/textSizeSecondary" />
 

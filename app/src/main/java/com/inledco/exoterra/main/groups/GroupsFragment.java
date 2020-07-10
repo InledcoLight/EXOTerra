@@ -122,6 +122,7 @@ public class GroupsFragment extends BaseFragment {
         for (int i = 0; i < mGroups.size(); i++) {
             if (TextUtils.equals(event.getGroupid(), mGroups.get(i).groupid)) {
                 mAdapter.updateData(i);
+                break;
             }
         }
     }

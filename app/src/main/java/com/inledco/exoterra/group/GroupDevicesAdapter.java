@@ -4,6 +4,7 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
+import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckedTextView;
@@ -56,6 +57,7 @@ public class GroupDevicesAdapter extends SimpleAdapter<Group.Device, GroupDevice
         }
         holder.tv_name.setText(name);
         holder.ctv_habitat.setCompoundDrawablesRelativeWithIntrinsicBounds(0 , 0, 0, 0);
+        holder.ctv_habitat.setTextSize(TypedValue.COMPLEX_UNIT_SP, 6);
         boolean state = false;
         if (dev != null) {
             state = dev.isOnline();

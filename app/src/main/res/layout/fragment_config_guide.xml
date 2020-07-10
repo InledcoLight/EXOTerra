@@ -119,6 +119,7 @@
         android:layout_marginBottom="16dp"
         android:background="?attr/selectableItemBackground"
         android:enabled="false"
+        android:textColor="@color/selector_enable"
         android:text="@string/next"
         app:direction="horizontal"
         app:gradientEnd="@color/gradientWhite"

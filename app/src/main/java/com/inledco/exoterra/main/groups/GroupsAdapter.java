@@ -26,6 +26,7 @@ import com.inledco.exoterra.util.TimeFormatUtil;
 
 import java.text.DateFormat;
 import java.util.List;
+import java.util.SimpleTimeZone;
 import java.util.TimeZone;
 
 public class GroupsAdapter extends SimpleAdapter<Group, GroupsAdapter.GroupViewHolder> {
@@ -71,6 +72,7 @@ public class GroupsAdapter extends SimpleAdapter<Group, GroupsAdapter.GroupViewH
             holder.set.setVisibility(View.VISIBLE);
             holder.more.setVisibility(View.VISIBLE);
         } else {
+            holder.title.setBackgroundResource(group.getDeviceCount() == 0 ? R.drawable.shape_roundrect_red : R.drawable.shape_roundrect_gradient);
             holder.set.setVisibility(View.INVISIBLE);
             holder.more.setVisibility(View.GONE);
         }
@@ -113,6 +115,7 @@ public class GroupsAdapter extends SimpleAdapter<Group, GroupsAdapter.GroupViewH
         if (group == null) {
             return;
         }
+        holder.title.setBackgroundResource(group.getDeviceCount() == 0 ? R.drawable.shape_roundrect_red : R.drawable.shape_roundrect_gradient);
         final int zone = group.getZone();
         final int sunrise = group.getSunrise();
         final int sunset = group.getSunset();
@@ -155,7 +158,8 @@ public class GroupsAdapter extends SimpleAdapter<Group, GroupsAdapter.GroupViewH
             }
         }
 
-        long time = System.currentTimeMillis() + zone*60000 - mOffset;
+        long time = System.currentTimeMillis();
+        mDateFormat.setTimeZone(new SimpleTimeZone(zone*60000, ""));
         mSelectedHolder.time.setText(mDateFormat.format(time));
         String daynight = mContext.getString(R.string.nighttime);
         int minutes = (int) ((time / 60000 + 1440 + zone) % 1440);
@@ -219,7 +223,8 @@ public class GroupsAdapter extends SimpleAdapter<Group, GroupsAdapter.GroupViewH
         if (mSelectedHolder != null) {
             int position = mSelectedHolder.getAdapterPosition();
             int zone = mData.get(position).getZone();
-            long time = System.currentTimeMillis() + zone*60000 - mOffset;
+            long time = System.currentTimeMillis();
+            mDateFormat.setTimeZone(new SimpleTimeZone(zone*60000, ""));
             mSelectedHolder.time.setText(mDateFormat.format(time));
         }
     }

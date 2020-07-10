@@ -36,8 +36,9 @@ public class DashboardAdapter extends SimpleAdapter<Group, DashboardAdapter.Grou
     public void onBindViewHolder(@NonNull final GroupViewHolder holder, int i) {
         final int positon = holder.getAdapterPosition();
         final Group group = mData.get(positon);
-        holder.name.setText(group.name);
+        holder.icon.setBackgroundResource(group.getDeviceCount() == 0 ? R.drawable.shape_roundrect_red : R.drawable.shape_roundrect_gradient);
         holder.icon.setImageResource(GroupUtil.getGroupIcon(group.remark2));
+        holder.name.setText(group.name);
 
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override

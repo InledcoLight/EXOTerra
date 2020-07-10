@@ -109,7 +109,7 @@ public class FoundbackActivity extends BaseActivity {
             String email = intent.getStringExtra("email");
             if (!TextUtils.isEmpty(email)) {
                 foundback_et_email.setText(email);
-                foundback_et_password.requestFocus();
+                foundback_et_verifycode.requestFocus();
             }
         }
         mVerifycodeCallback = new HttpCallback<UserApi.Response>() {

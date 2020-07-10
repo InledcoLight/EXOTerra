@@ -19,12 +19,19 @@ import com.inledco.exoterra.aliot.UserApi;
 import com.inledco.exoterra.aliot.bean.Group;
 import com.inledco.exoterra.base.BaseFragment;
 import com.inledco.exoterra.event.GroupDeviceChangedEvent;
+import com.inledco.exoterra.event.GroupsRefreshedEvent;
 import com.inledco.exoterra.main.groups.AddHabitatFragment;
 import com.inledco.exoterra.manager.GroupManager;
+import com.inledco.exoterra.manager.UserManager;
 import com.inledco.exoterra.view.GradientCornerButton;
 
 import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 public class SetHabitatFragment extends BaseFragment {
@@ -36,7 +43,7 @@ public class SetHabitatFragment extends BaseFragment {
     private GradientCornerButton set_habitat_back;
     private GradientCornerButton set_habitat_save;
 
-    private List<Group> mGroups = GroupManager.getInstance().getAllGroups();
+    private final List<Group> mGroups = new ArrayList<>();
     private AssignHabitatAdapter mAdapter;
 
     private String mProductKey;
@@ -58,9 +65,18 @@ public class SetHabitatFragment extends BaseFragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = super.onCreateView(inflater, container, savedInstanceState);
 
+        EventBus.getDefault().register(this);
         initData();
         initEvent();
         return view;
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        if (EventBus.getDefault().isRegistered(this)) {
+            EventBus.getDefault().unregister(this);
+        }
     }
 
     @Override
@@ -89,6 +105,28 @@ public class SetHabitatFragment extends BaseFragment {
             mName = args.getString("name");
         }
 
+//        for (Group group : GroupManager.getInstance().getAllGroups()) {
+//            if (TextUtils.equals(group.creator, UserManager.getInstance().getUserid())) {
+//                mGroups.add(group);
+//            }
+//        }
+        mGroups.addAll(GroupManager.getInstance().getAllGroups());
+        Collections.sort(mGroups, new Comparator<Group>() {
+            @Override
+            public int compare(Group o1, Group o2) {
+                String userid = UserManager.getInstance().getUserid();
+                if (TextUtils.equals(o1.creator, o2.creator)) {
+                    return 0;
+                }
+                if (TextUtils.equals(userid, o1.creator)) {
+                    return -1;
+                }
+                if (TextUtils.equals(userid, o2.creator)) {
+                    return 1;
+                }
+                return 0;
+            }
+        });
         mAdapter = new AssignHabitatAdapter(getContext(), mGroups);
         set_habitat_rv.setAdapter(mAdapter);
     }
@@ -139,5 +177,35 @@ public class SetHabitatFragment extends BaseFragment {
                 showLoadDialog();
             }
         });
+    }
+
+    @Subscribe (threadMode = ThreadMode.MAIN)
+    public void onGroupsRefreshedEvent(GroupsRefreshedEvent event) {
+//        mGroups.clear();
+//        for (Group group : GroupManager.getInstance().getAllGroups()) {
+//            if (TextUtils.equals(group.creator, UserManager.getInstance().getUserid())) {
+//                mGroups.add(group);
+//            }
+//        }
+        mGroups.clear();
+        mGroups.addAll(GroupManager.getInstance().getAllGroups());
+        Collections.sort(mGroups, new Comparator<Group>() {
+            @Override
+            public int compare(Group o1, Group o2) {
+                String userid = UserManager.getInstance().getUserid();
+                if (TextUtils.equals(o1.creator, o2.creator)) {
+                    return 0;
+                }
+                if (TextUtils.equals(userid, o1.creator)) {
+                    return -1;
+                }
+                if (TextUtils.equals(userid, o2.creator)) {
+                    return 1;
+                }
+                return 0;
+            }
+        });
+        set_habitat_warning.setVisibility(mGroups.size() == 0 ? View.VISIBLE : View.GONE);
+        mAdapter.notifyDataSetChanged();
     }
 }

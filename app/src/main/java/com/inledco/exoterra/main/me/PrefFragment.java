@@ -90,13 +90,15 @@ public class PrefFragment extends BaseFragment {
         pref_title_invite_msg = view.findViewById(R.id.pref_title_invite_msg);
         pref_logout = view.findViewById(R.id.pref_logout);
 
-        pref_title_user.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_add_white_24dp, 0);
-        pref_title_unit.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_add_white_24dp, 0);
+        pref_title_user.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.selector_add, 0);
+        pref_title_unit.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.selector_add, 0);
         pref_title_invite_msg.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_add_white_24dp, 0);
         pref_nickname.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_edit_white_24dp, 0);
         pref_mod_psw.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_edit_white_24dp, 0);
         pref_usr_detail.setVisibility(View.GONE);
         pref_unit_detail.setVisibility(View.GONE);
+
+        Log.e(TAG, "initView: " + Integer.toHexString(pref_nickname.getCurrentHintTextColor()));
     }
 
     @Override
@@ -123,9 +125,7 @@ public class PrefFragment extends BaseFragment {
                     return;
                 }
                 boolean checked = !pref_title_user.isChecked();
-                int res = checked ? 0 : R.drawable.ic_add_white_24dp;
                 pref_title_user.setChecked(checked);
-                pref_title_user.setCompoundDrawablesWithIntrinsicBounds(0, 0, res, 0);
                 pref_usr_detail.setVisibility(checked ? View.VISIBLE : View.GONE);
                 if (checked) {
                     pref_nickname.setText(UserManager.getInstance().getNickname());
@@ -149,9 +149,7 @@ public class PrefFragment extends BaseFragment {
             @Override
             public void onClick(View v) {
                 boolean checked = !pref_title_unit.isChecked();
-                int res = checked ? 0 : R.drawable.ic_add_white_24dp;
                 pref_title_unit.setChecked(checked);
-                pref_title_unit.setCompoundDrawablesWithIntrinsicBounds(0, 0, res, 0);
                 pref_unit_detail.setVisibility(checked ? View.VISIBLE : View.GONE);
             }
         });
@@ -198,6 +196,9 @@ public class PrefFragment extends BaseFragment {
             pref_nickname.setText(null);
             pref_email.setText(null);
         }
+
+        pref_timeformat.setChecked(!GlobalSettings.is24HourFormat());
+        pref_tempunit.setChecked(!GlobalSettings.isCelsius());
     }
 
     private void showModifyNicknameDialog() {
@@ -332,7 +333,6 @@ public class PrefFragment extends BaseFragment {
         UserManager.getInstance().deinit();
 
         pref_title_user.setChecked(false);
-        pref_title_user.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_add_white_24dp, 0);
         pref_usr_detail.setVisibility(View.GONE);
         pref_logout.setText(R.string.signin);
 

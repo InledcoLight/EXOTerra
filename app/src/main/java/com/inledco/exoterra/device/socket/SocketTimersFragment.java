@@ -293,9 +293,10 @@ public class SocketTimersFragment extends BaseFragment {
                 end_second = timer.getEndSecond();
             } else {
                 action = 2;
-                hour = (byte) Calendar.getInstance().get(Calendar.HOUR_OF_DAY);
-                minute = (byte) Calendar.getInstance().get(Calendar.MINUTE);
-                second = (byte) Calendar.getInstance().get(Calendar.SECOND);
+                Calendar calendar = Calendar.getInstance();
+                hour = (byte) calendar.get(Calendar.HOUR_OF_DAY);
+                minute = (byte) calendar.get(Calendar.MINUTE);
+                second = (byte) calendar.get(Calendar.SECOND);
                 end_hour = (hour + 1)%24;
                 end_minute = minute;
                 end_second = second;

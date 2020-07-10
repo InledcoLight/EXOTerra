@@ -1,11 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <dimen name="textSizePrimary">18sp</dimen>
-    <dimen name="textSizeSecondary">14sp</dimen>
-    <dimen name="textSizeTiny">12sp</dimen>
-    <dimen name="textSizeMicro">10sp</dimen>
-    <dimen name="textSizeTitle">24sp</dimen>
-    <dimen name="textSizeSubTitle">20sp</dimen>
+<!--    <dimen name="textSizePrimary">18sp</dimen>-->
+<!--    <dimen name="textSizeSecondary">14sp</dimen>-->
+<!--    <dimen name="textSizeTiny">12sp</dimen>-->
+<!--    <dimen name="textSizeMicro">10sp</dimen>-->
+<!--    <dimen name="textSizeTitle">24sp</dimen>-->
+<!--    <dimen name="textSizeSubTitle">20sp</dimen>-->
+
+    <dimen name="textSizePrimary">14sp</dimen>
+    <dimen name="textSizeSecondary">12sp</dimen>
+    <dimen name="textSizeTiny">10sp</dimen>
+    <dimen name="textSizeMicro">8sp</dimen>
+    <dimen name="textSizeTitle">20sp</dimen>
+    <dimen name="textSizeSubTitle">16sp</dimen>
 
     <dimen name="titleHeight">56dp</dimen>
     <dimen name="strokeWidth">2dp</dimen>
