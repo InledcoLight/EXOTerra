@@ -84,7 +84,7 @@ public class FoundbackActivity extends BaseActivity {
         foundback_btn_send = new Button(this);
         foundback_btn_send.setText(R.string.send_verifycode);
         foundback_btn_send.setTextColor(getResources().getColor(R.color.colorAccent));
-        foundback_btn_send.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
+        foundback_btn_send.setTextSize(TypedValue.COMPLEX_UNIT_SP, 10);
         int[] attrs = new int[] {android.R.attr.selectableItemBackground};
         TypedArray ta = obtainStyledAttributes(attrs);
         foundback_btn_send.setBackground(ta.getDrawable(0));

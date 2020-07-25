@@ -16,7 +16,7 @@ import com.inledco.exoterra.manager.UserManager;
 import java.util.List;
 
 public class AssignHabitatAdapter extends SimpleAdapter<Group, AssignHabitatAdapter.ChooseHabitatViewHolder> {
-//    private String mSelectedGroupid;
+    private String mSelectedGroupid;
     private Group mSelectedGroup;
     private ChooseHabitatViewHolder mSelectedHolder;
 
@@ -39,11 +39,12 @@ public class AssignHabitatAdapter extends SimpleAdapter<Group, AssignHabitatAdap
     public void onBindViewHolder(@NonNull final ChooseHabitatViewHolder holder, int i) {
         final int position = holder.getAdapterPosition();
         final Group group = mData.get(position);
-        boolean selected = (mSelectedGroup == group);
+        boolean selected = TextUtils.equals(mSelectedGroupid, group.groupid);
         holder.name.setEnabled(TextUtils.equals(group.creator, UserManager.getInstance().getUserid()));
         holder.name.setText(group.name);
         holder.name.setChecked(selected);
         if (selected) {
+            mSelectedGroup = group;
             mSelectedHolder = holder;
         }
         
@@ -54,6 +55,7 @@ public class AssignHabitatAdapter extends SimpleAdapter<Group, AssignHabitatAdap
                     if (mSelectedHolder != null) {
                         mSelectedHolder.name.setChecked(false);
                     }
+                    mSelectedGroupid = group.groupid;
                     mSelectedGroup = group;
                     mSelectedHolder = holder;
                     holder.name.setChecked(true);

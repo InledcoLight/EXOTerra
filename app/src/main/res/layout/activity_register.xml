@@ -147,10 +147,32 @@
             android:layout_height="wrap_content"
             android:drawablePadding="8dp"
             android:imeOptions="actionDone"
+            android:lines="1"
             android:maxLength="@integer/password_text_length_max"
-            android:maxLines="1"
-            android:lines="1" />
+            android:maxLines="1" />
+
     </android.support.design.widget.TextInputLayout>
+
+    <CheckBox
+        android:id="@+id/register_cb"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:textSize="@dimen/textSizeSecondary"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/register_til_confirm" />
+
+    <TextView
+        android:id="@+id/register_tv_agree"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="16dp"
+        android:textSize="@dimen/textSizeSecondary"
+        app:layout_constraintBottom_toBottomOf="@+id/register_cb"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/register_cb"
+        app:layout_constraintTop_toTopOf="@+id/register_cb" />
 
     <com.inledco.exoterra.view.GradientSemiCircleButton
         android:id="@+id/register_btn_signup"
@@ -158,15 +180,15 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
         android:layout_marginTop="8dp"
+        android:layout_marginEnd="16dp"
         android:background="?attr/selectableItemBackground"
         android:text="@string/signup"
         app:colorEnd="@color/gradientGreen"
         app:colorStart="@color/gradientYellow"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/register_til_confirm" />
+        app:layout_constraintTop_toBottomOf="@+id/register_cb" />
 
     <com.inledco.exoterra.view.GradientCornerButton
         android:id="@+id/register_btn_back"

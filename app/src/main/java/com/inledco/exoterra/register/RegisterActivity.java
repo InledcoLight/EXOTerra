@@ -3,15 +3,24 @@ package com.inledco.exoterra.register;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.TypedArray;
+import android.support.annotation.NonNull;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AlertDialog;
+import android.text.SpannableString;
+import android.text.Spanned;
 import android.text.TextUtils;
+import android.text.method.LinkMovementMethod;
+import android.text.style.ClickableSpan;
+import android.text.style.ForegroundColorSpan;
+import android.text.style.UnderlineSpan;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.FrameLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.inledco.exoterra.R;
@@ -37,6 +46,8 @@ public class RegisterActivity extends BaseActivity {
     private PasswordEditText register_et_password;
     private TextInputLayout register_til_confirm;
     private PasswordEditText register_et_confirm;
+    private CheckBox register_cb;
+    private TextView register_tv_agree;
     private Button register_btn_send;
     private Button register_btn_signup;
     private Button register_btn_back;
@@ -71,7 +82,8 @@ public class RegisterActivity extends BaseActivity {
         register_et_password = findViewById(R.id.register_et_password);
         register_til_confirm = findViewById(R.id.register_til_confirm);
         register_et_confirm = findViewById(R.id.register_et_confirm);
-//        register_btn_send = findViewById(R.id.register_btn_send);
+        register_cb = findViewById(R.id.register_cb);
+        register_tv_agree = findViewById(R.id.register_tv_agree);
         register_btn_signup = findViewById(R.id.register_btn_signup);
         register_btn_back = findViewById(R.id.register_btn_back);
 
@@ -81,10 +93,27 @@ public class RegisterActivity extends BaseActivity {
         register_et_password.setIcon(R.drawable.ic_lock_white_24dp, R.drawable.design_ic_visibility, R.drawable.design_ic_visibility_off);
         register_et_confirm.setIcon(R.drawable.ic_lock_white_24dp, R.drawable.design_ic_visibility, R.drawable.design_ic_visibility_off);
 
+
+        String text = "Have read and accept User Agreement";
+        SpannableString ss = new SpannableString(text);
+        int start = text.indexOf("User Agreement");
+        int end = start + "User Agreement".length();
+        final ClickableSpan cs1 = new ClickableSpan() {
+            @Override
+            public void onClick(@NonNull View widget) {
+
+            }
+        };
+        ss.setSpan(cs1, start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        ss.setSpan(new UnderlineSpan(), start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        ss.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.colorAccent)), start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        register_tv_agree.setText(ss);
+        register_tv_agree.setMovementMethod(LinkMovementMethod.getInstance());
+
         register_btn_send = new Button(this);
         register_btn_send.setText(R.string.send_verifycode);
         register_btn_send.setTextColor(getResources().getColor(R.color.colorAccent));
-        register_btn_send.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
+        register_btn_send.setTextSize(TypedValue.COMPLEX_UNIT_SP, 10);
         int[] attrs = new int[] {android.R.attr.selectableItemBackground};
         TypedArray ta = obtainStyledAttributes(attrs);
         register_btn_send.setBackground(ta.getDrawable(0));

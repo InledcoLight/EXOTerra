@@ -41,13 +41,13 @@ import com.inledco.exoterra.manager.GroupManager;
 import com.inledco.exoterra.manager.UserManager;
 import com.inledco.exoterra.util.GroupUtil;
 import com.inledco.exoterra.util.SensorUtil;
-import com.inledco.exoterra.util.TimeFormatUtil;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
 import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.SimpleTimeZone;
 import java.util.TimeZone;
 
@@ -56,6 +56,7 @@ public class GroupFragment extends BaseFragment {
     private TextView group_title;
     private ImageButton group_detail;
     private TextView group_time;
+    private TextView group_date;
     private TextView group_sunrise;
     private TextView group_sunset;
     private TextView group_sensor1;
@@ -153,6 +154,7 @@ public class GroupFragment extends BaseFragment {
         group_title = view.findViewById(R.id.group_title);
         group_detail = view.findViewById(R.id.group_detail);
         group_time = view.findViewById(R.id.group_time);
+        group_date = view.findViewById(R.id.group_date);
         group_sunrise = view.findViewById(R.id.group_sunrise);
         group_sunset = view.findViewById(R.id.group_sunset);
         group_sensor1 = view.findViewById(R.id.group_sensor1);
@@ -165,7 +167,7 @@ public class GroupFragment extends BaseFragment {
 
     @Override
     protected void initData() {
-        mDateFormat = GlobalSettings.getDateTimeFormat();
+        mDateFormat = new SimpleDateFormat("MMM d");
         mTimeFormat = GlobalSettings.getTimeFormat();
         Bundle args = getArguments();
         if (args != null) {
@@ -174,6 +176,7 @@ public class GroupFragment extends BaseFragment {
             mGroup = GroupManager.getInstance().getGroup(mGroupid);
             if (mGroup != null) {
                 mGroupAdmin = TextUtils.equals(UserManager.getInstance().getUserid(), mGroup.creator);
+                group_add.setVisibility(mGroupAdmin ? View.VISIBLE : View.INVISIBLE);
                 mAdapter = new GroupDevicesAdapter(getContext(), mGroup.devices);
                 mAdapter.setOnItemClickListener(new OnItemClickListener() {
                     @Override
@@ -198,10 +201,6 @@ public class GroupFragment extends BaseFragment {
                 group_title.setText(name);
                 refreshData();
                 group_connected_devices.setText(getString(R.string.habitat_devcnt, mGroup.getDeviceCount()));
-            }
-
-            if (TextUtils.equals(UserManager.getInstance().getUserid(), mGroupid)) {
-                group_add.setVisibility(View.VISIBLE);
             }
         }
 
@@ -236,8 +235,11 @@ public class GroupFragment extends BaseFragment {
     private void refreshTime() {
         int zone = mGroup.getZone();
         long time = System.currentTimeMillis();
-        mDateFormat.setTimeZone(new SimpleTimeZone(zone*60000, ""));
-        group_time.setText(mDateFormat.format(time));
+        TimeZone tz = new SimpleTimeZone(zone*60000, "");
+        mDateFormat.setTimeZone(tz);
+        mTimeFormat.setTimeZone(tz);
+        group_time.setText(mTimeFormat.format(time));
+        group_date.setText(mDateFormat.format(time));
     }
 
     private void refreshSensor() {
@@ -284,8 +286,10 @@ public class GroupFragment extends BaseFragment {
         group_icon.setImageResource(GroupUtil.getGroupIcon(mGroup.remark2));
         group_title.setText(mGroup.name);
         refreshTime();
-        group_sunrise.setText(TimeFormatUtil.formatMinutesTime(mTimeFormat, mGroup.getSunrise()));
-        group_sunset.setText(TimeFormatUtil.formatMinutesTime(mTimeFormat, mGroup.getSunset()));
+
+        mTimeFormat.setTimeZone(new SimpleTimeZone(0, ""));
+        group_sunrise.setText(mTimeFormat.format(mGroup.getSunrise()*60000));
+        group_sunset.setText(mTimeFormat.format(mGroup.getSunset()*60000));
         refreshSensor();
     }
 

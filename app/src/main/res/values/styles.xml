@@ -31,12 +31,21 @@
 
         <item name="android:statusBarColor" tools:targetApi="lollipop">@color/colorTransparent</item>
 
-        <item name="android:windowBackground">@mipmap/ic_background</item>
+        <item name="android:windowBackground">@drawable/ic_background</item>
+<!--        <item name="android:windowBackground">@mipmap/ic_background</item>-->
         <item name="alertDialogTheme">@style/DialogCornerTheme</item>
 
         <item name="android:windowAnimationStyle">@style/ActivityAnimation</item>
 
+        <item name="android:editTextStyle">@style/EditTextStyle</item>
+        <item name="editTextStyle">@style/EditTextStyle</item>
         <item name="textInputStyle">@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox</item>
+
+    </style>
+
+    <style name="EditTextStyle" parent="Widget.AppCompat.EditText">
+        <item name="hintSize">12sp</item>
+        <item name="android:textSize">12sp</item>
     </style>
 
     <style name="SwitchStyle" parent="Widget.AppCompat.CompoundButton.Switch">
@@ -73,8 +82,9 @@
         <item name="android:windowBackground">@drawable/shape_roundrect_gradient</item>
     </style>
 
-    <style name="DangerButtonTheme" parent="AppTheme">
+    <style name="DangerButtonTheme" parent="Widget.AppCompat.Button">
         <item name="colorButtonNormal">@color/selector_button_danger</item>
+        <item name="android:colorButtonNormal" tools:targetApi="lollipop">@color/selector_button_danger</item>
     </style>
 
     <style name="GlobalTextApperance" parent="TextAppearance.AppCompat">

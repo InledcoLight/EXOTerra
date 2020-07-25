@@ -31,10 +31,11 @@ public class ProductAdapter extends SimpleAdapter<ExoProduct, ProductAdapter.Pro
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ProductViewHolder holder, final int position) {
+    public void onBindViewHolder(@NonNull ProductViewHolder holder, final int i) {
+        final int position = holder.getAdapterPosition();
         final ExoProduct product = mData.get(position);
         holder.iv_icon.setImageResource(product.getIcon());
-        holder.tv_type.setText(product.getProductName());
+        holder.tv_type.setText(product.getName());
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

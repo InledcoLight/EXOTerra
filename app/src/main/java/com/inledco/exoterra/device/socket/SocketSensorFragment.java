@@ -21,9 +21,9 @@ import com.inledco.exoterra.R;
 import com.inledco.exoterra.aliot.ExoSocket;
 import com.inledco.exoterra.aliot.SocketViewModel;
 import com.inledco.exoterra.base.BaseFragment;
-import com.inledco.exoterra.util.TimeFormatUtil;
 
 import java.text.DateFormat;
+import java.util.SimpleTimeZone;
 
 public class SocketSensorFragment extends BaseFragment {
 
@@ -79,6 +79,7 @@ public class SocketSensorFragment extends BaseFragment {
     @Override
     protected void initData() {
         mTimeFormat = GlobalSettings.getTimeFormat();
+        mTimeFormat.setTimeZone(new SimpleTimeZone(0, ""));
         mSocketViewModel = ViewModelProviders.of(getActivity()).get(SocketViewModel.class);
         mSocket = mSocketViewModel.getData();
         mSocketViewModel.observe(this, new Observer<ExoSocket>() {
@@ -116,7 +117,7 @@ public class SocketSensorFragment extends BaseFragment {
     }
 
     private String getTimeText(int time) {
-        return TimeFormatUtil.formatMinutesTime(mTimeFormat, time);
+        return mTimeFormat.format(time*60000);
     }
 
     private void refreshData() {

@@ -47,7 +47,6 @@ import com.inledco.exoterra.manager.UserManager;
 import com.inledco.exoterra.util.FavouriteUtil;
 import com.inledco.exoterra.util.GroupUtil;
 import com.inledco.exoterra.util.RegexUtil;
-import com.inledco.exoterra.util.TimeFormatUtil;
 import com.inledco.exoterra.view.GradientCornerButton;
 
 import org.greenrobot.eventbus.EventBus;
@@ -73,6 +72,7 @@ public class HabitatDetailFragment extends BaseFragment {
     private TextView habitat_detail_sunset;
     private Switch habitat_detail_favourite;
     private ImageButton habitat_detail_share;
+    private TextView habitat_detail_exit;
     private ImageButton habitat_detail_delete;
     private RecyclerView habitat_detail_rv;
     private GradientCornerButton habitat_detail_back;
@@ -148,6 +148,7 @@ public class HabitatDetailFragment extends BaseFragment {
         habitat_detail_sunset = view.findViewById(R.id.habitat_detail_sunset);
         habitat_detail_favourite = view.findViewById(R.id.habitat_detail_favourite);
         habitat_detail_share = view.findViewById(R.id.habitat_detail_share);
+        habitat_detail_exit = view.findViewById(R.id.habitat_detail_exit);
         habitat_detail_delete = view.findViewById(R.id.habitat_detail_delete);
         habitat_detail_rv = view.findViewById(R.id.habitat_detail_rv);
         habitat_detail_back = view.findViewById(R.id.habitat_detail_back);
@@ -159,6 +160,7 @@ public class HabitatDetailFragment extends BaseFragment {
     protected void initData() {
         mDateFormat = GlobalSettings.getDateTimeFormat();
         mTimeFormat = GlobalSettings.getTimeFormat();
+        mTimeFormat.setTimeZone(new SimpleTimeZone(0, ""));
         Bundle args = getArguments();
         if (args != null) {
             mGroupid = args.getString(KEY_GROUPID);
@@ -178,6 +180,8 @@ public class HabitatDetailFragment extends BaseFragment {
                     habitat_detail_datetime.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_edit_white_24dp, 0);
                     habitat_detail_sunrise.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_edit_white_24dp, 0);
                     habitat_detail_sunset.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_edit_white_24dp, 0);
+                } else {
+                    habitat_detail_exit.setText(R.string.exit_habitat);
                 }
                 habitat_detail_name.setEnabled(mGroupAdmin);
                 habitat_detail_datetime.setEnabled(mGroupAdmin);
@@ -252,7 +256,7 @@ public class HabitatDetailFragment extends BaseFragment {
         habitat_detail_sunrise.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showTimePickerDialog(mSunrise, new TimePickerDialog.OnTimeSetListener() {
+                showTimePickerDialog(mSunrise/60, mSunrise%60, new TimePickerDialog.OnTimeSetListener() {
                     @Override
                     public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
                         int sunrise = hourOfDay*60 + minute;
@@ -265,7 +269,7 @@ public class HabitatDetailFragment extends BaseFragment {
         habitat_detail_sunset.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showTimePickerDialog(mSunset, new TimePickerDialog.OnTimeSetListener() {
+                showTimePickerDialog(mSunset/60, mSunset%60, new TimePickerDialog.OnTimeSetListener() {
                     @Override
                     public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
                         int sunset = hourOfDay*60 + minute;
@@ -349,7 +353,7 @@ public class HabitatDetailFragment extends BaseFragment {
     }
 
     private String getTimeText(int time) {
-        return TimeFormatUtil.formatMinutesTime(mTimeFormat, time);
+        return mTimeFormat.format(time*60000);
     }
 
     private void refreshData() {
@@ -403,32 +407,90 @@ public class HabitatDetailFragment extends BaseFragment {
         final int day = calendar.get(Calendar.DAY_OF_MONTH);
         final int hour = calendar.get(Calendar.HOUR_OF_DAY);
         final int min = calendar.get(Calendar.MINUTE);
-        DatePickerDialog dateDialog = new DatePickerDialog(getContext(), new DatePickerDialog.OnDateSetListener() {
+        showTimePickerDialog(hour, min, new TimePickerDialog.OnTimeSetListener() {
             @Override
-            public void onDateSet(DatePicker view, final int year, final int month, final int dayOfMonth) {
-                TimePickerDialog timeDialog = new TimePickerDialog(getContext(), new TimePickerDialog.OnTimeSetListener() {
+            public void onTimeSet(TimePicker view, final int hourOfDay, final int minute) {
+                calendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
+                calendar.set(Calendar.MINUTE, minute);
+                showDatePickerDialog(yr, mon, day, new DatePickerDialog.OnDateSetListener() {
                     @Override
-                    public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+                    public void onDateSet(DatePicker view, final int year, final int month, final int dayOfMonth) {
                         calendar.set(Calendar.YEAR, year);
                         calendar.set(Calendar.MONTH, month);
                         calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
-                        calendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
-                        calendar.set(Calendar.MINUTE, minute);
                         int zone = (int) (calendar.getTimeInMillis() / 60000 - System.currentTimeMillis() / 60000 + mOffset);
                         setGroupRemark1(zone, mSunrise, mSunset);
                     }
-                }, hour, min, GlobalSettings.is24HourFormat());
-                timeDialog.setCancelable(false);
-                timeDialog.show();
+                });
             }
-        }, yr, mon, day);
-        dateDialog.setCancelable(false);
-        dateDialog.show();
+        });
+//        DatePickerDialog dateDialog = new DatePickerDialog(getContext(), new DatePickerDialog.OnDateSetListener() {
+//            @Override
+//            public void onDateSet(DatePicker view, final int year, final int month, final int dayOfMonth) {
+//                TimePickerDialog timeDialog = new TimePickerDialog(getContext(), new TimePickerDialog.OnTimeSetListener() {
+//                    @Override
+//                    public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+//                        calendar.set(Calendar.YEAR, year);
+//                        calendar.set(Calendar.MONTH, month);
+//                        calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+//                        calendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
+//                        calendar.set(Calendar.MINUTE, minute);
+//                        int zone = (int) (calendar.getTimeInMillis() / 60000 - System.currentTimeMillis() / 60000 + mOffset);
+//                        setGroupRemark1(zone, mSunrise, mSunset);
+//                    }
+//                }, hour, min, GlobalSettings.is24HourFormat());
+//                timeDialog.setCancelable(false);
+//                timeDialog.show();
+//            }
+//        }, yr, mon, day);
+//        dateDialog.setCancelable(false);
+//        dateDialog.show();
     }
 
-    private void showTimePickerDialog(int time, final TimePickerDialog.OnTimeSetListener listener) {
-        TimePickerDialog  dialog = new TimePickerDialog(getContext(), listener, time/60, time%60, GlobalSettings.is24HourFormat());
-        dialog.show();
+    private void showTimePickerDialog(int hour, int min, final TimePickerDialog.OnTimeSetListener listener) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        View view = LayoutInflater.from(getContext()).inflate(R.layout.dialog_time_picker, null, false);
+        final TimePicker tp = view.findViewById(R.id.dialog_time_picker);
+        tp.setCurrentHour(hour);
+        tp.setCurrentMinute(min);
+        tp.setIs24HourView(GlobalSettings.is24HourFormat());
+        final AlertDialog dialog = builder.setView(view)
+                                          .setNegativeButton(R.string.cancel, null)
+                                          .setPositiveButton(R.string.ok, null)
+                                          .setCancelable(false)
+                                          .show();
+        Button btn_ok = dialog.getButton(DialogInterface.BUTTON_POSITIVE);
+        btn_ok.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (listener != null) {
+                    listener.onTimeSet(tp, tp.getCurrentHour(), tp.getCurrentMinute());
+                }
+                dialog.dismiss();
+            }
+        });
+    }
+
+    private void showDatePickerDialog(int year, int month, int day, final DatePickerDialog.OnDateSetListener listener) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        View view = LayoutInflater.from(getContext()).inflate(R.layout.dialog_date_picker, null, false);
+        final DatePicker dp = view.findViewById(R.id.dialog_date_picker);
+        dp.init(year, month, day, null);
+        final AlertDialog dialog = builder.setView(view)
+                                          .setNegativeButton(R.string.cancel, null)
+                                          .setPositiveButton(R.string.ok, null)
+                                          .setCancelable(false)
+                                          .show();
+        Button btn_ok = dialog.getButton(DialogInterface.BUTTON_POSITIVE);
+        btn_ok.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (listener != null) {
+                    listener.onDateSet(dp, dp.getYear(), dp.getMonth(), dp.getDayOfMonth());
+                }
+                dialog.dismiss();
+            }
+        });
     }
 
     private void showRenameDialog() {
@@ -521,8 +583,10 @@ public class HabitatDetailFragment extends BaseFragment {
 
     private void showDeleteHabitatDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-        builder.setTitle(R.string.delete_habitat)
-               .setMessage(getString(R.string.msg_delete, mGroup.name))
+        String title = mGroupAdmin ? getString(R.string.delete_habitat) : getString(R.string.exit_habitat);
+        String msg = mGroupAdmin ? getString(R.string.msg_delete_habitat, mGroup.name) : getString(R.string.msg_exit_habitat, mGroup.name);
+        builder.setTitle(title)
+               .setMessage(msg)
                .setNegativeButton(R.string.cancel, null)
                .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                    @Override

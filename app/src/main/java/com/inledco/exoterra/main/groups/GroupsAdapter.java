@@ -1,7 +1,6 @@
 package com.inledco.exoterra.main.groups;
 
 import android.content.Context;
-import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
@@ -22,9 +21,9 @@ import com.inledco.exoterra.common.SimpleAdapter;
 import com.inledco.exoterra.manager.DeviceManager;
 import com.inledco.exoterra.util.GroupUtil;
 import com.inledco.exoterra.util.SensorUtil;
-import com.inledco.exoterra.util.TimeFormatUtil;
 
 import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.SimpleTimeZone;
 import java.util.TimeZone;
@@ -42,7 +41,7 @@ public class GroupsAdapter extends SimpleAdapter<Group, GroupsAdapter.GroupViewH
     public GroupsAdapter(@NonNull Context context, List<Group> data) {
         super(context, data);
         mOffset = TimeZone.getDefault().getRawOffset();
-        mDateFormat = GlobalSettings.getDateTimeFormat();
+        mDateFormat = new SimpleDateFormat("MMM d");
         mTimeFormat = GlobalSettings.getTimeFormat();
     }
 
@@ -159,26 +158,28 @@ public class GroupsAdapter extends SimpleAdapter<Group, GroupsAdapter.GroupViewH
         }
 
         long time = System.currentTimeMillis();
-        mDateFormat.setTimeZone(new SimpleTimeZone(zone*60000, ""));
-        mSelectedHolder.time.setText(mDateFormat.format(time));
-        String daynight = mContext.getString(R.string.nighttime);
-        int minutes = (int) ((time / 60000 + 1440 + zone) % 1440);
-        @DrawableRes int icon = R.drawable.ic_moon;
-        if (sunrise <= sunset) {
-            if (minutes >= sunrise && minutes < sunset) {
-                daynight = mContext.getString(R.string.daytime);
-                icon = R.drawable.ic_sun;
-            }
-        } else {
-            if (minutes >= sunrise || minutes < sunset) {
-                daynight = mContext.getString(R.string.daytime);
-                icon = R.drawable.ic_sun;
-            }
-        }
-        mSelectedHolder.daynight.setText(daynight);
-        mSelectedHolder.daynight.setCompoundDrawablesWithIntrinsicBounds(icon, 0, 0, 0);
-        holder.sunrise.setText(TimeFormatUtil.formatMinutesTime(mTimeFormat, sunrise));
-        holder.sunset.setText(TimeFormatUtil.formatMinutesTime(mTimeFormat, sunset));
+        TimeZone tz = new SimpleTimeZone(zone*60000, "");
+        mTimeFormat.setTimeZone(tz);
+        mDateFormat.setTimeZone(tz);
+        mSelectedHolder.time.setText(mTimeFormat.format(time));
+        mSelectedHolder.date.setText(mDateFormat.format(time));
+//        String daynight = mContext.getString(R.string.nighttime);
+//        int minutes = (int) ((time / 60000 + 1440 + zone) % 1440);
+//        @DrawableRes int icon = R.drawable.ic_moon;
+//        if (sunrise <= sunset) {
+//            if (minutes >= sunrise && minutes < sunset) {
+//                daynight = mContext.getString(R.string.daytime);
+//                icon = R.drawable.ic_sun;
+//            }
+//        } else {
+//            if (minutes >= sunrise || minutes < sunset) {
+//                daynight = mContext.getString(R.string.daytime);
+//                icon = R.drawable.ic_sun;
+//            }
+//        }
+        mTimeFormat.setTimeZone(new SimpleTimeZone(0, ""));
+        holder.sunrise.setText(mTimeFormat.format(sunrise*60000));
+        holder.sunset.setText(mTimeFormat.format(sunset*60000));
         holder.devcnt.setText(mContext.getString(R.string.habitat_devcnt, group.getDeviceCount()));
     }
 
@@ -224,8 +225,11 @@ public class GroupsAdapter extends SimpleAdapter<Group, GroupsAdapter.GroupViewH
             int position = mSelectedHolder.getAdapterPosition();
             int zone = mData.get(position).getZone();
             long time = System.currentTimeMillis();
-            mDateFormat.setTimeZone(new SimpleTimeZone(zone*60000, ""));
-            mSelectedHolder.time.setText(mDateFormat.format(time));
+            TimeZone tz = new SimpleTimeZone(zone*60000, "");
+            mDateFormat.setTimeZone(tz);
+            mTimeFormat.setTimeZone(tz);
+            mSelectedHolder.time.setText(mTimeFormat.format(time));
+            mSelectedHolder.date.setText(mDateFormat.format(time));
         }
     }
 
@@ -238,7 +242,7 @@ public class GroupsAdapter extends SimpleAdapter<Group, GroupsAdapter.GroupViewH
         private TextView sensor1;
         private TextView sensor2;
         private TextView time;
-        private TextView daynight;
+        private TextView date;
         private TextView sunrise;
         private TextView sunset;
         private TextView devcnt;
@@ -253,7 +257,7 @@ public class GroupsAdapter extends SimpleAdapter<Group, GroupsAdapter.GroupViewH
             sensor1 = itemView.findViewById(R.id.item_habitat_sensor1);
             sensor2 = itemView.findViewById(R.id.item_habitat_sensor2);
             time = itemView.findViewById(R.id.item_habitat_time);
-            daynight = itemView.findViewById(R.id.item_habitat_daynight);
+            date = itemView.findViewById(R.id.item_habitat_date);
             sunrise = itemView.findViewById(R.id.item_habitat_sunrise);
             sunset = itemView.findViewById(R.id.item_habitat_sunset);
             devcnt = itemView.findViewById(R.id.item_habitat_devcnt);

@@ -38,12 +38,12 @@ import com.inledco.exoterra.base.BaseFragment;
 import com.inledco.exoterra.bean.LightSpectrum;
 import com.inledco.exoterra.util.LightUtil;
 import com.inledco.exoterra.util.SpectrumUtil;
-import com.inledco.exoterra.util.TimeFormatUtil;
 
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.SimpleTimeZone;
 
 public class LightAutoFragment extends BaseFragment {
     private ConstraintLayout light_auto_root;
@@ -152,6 +152,7 @@ public class LightAutoFragment extends BaseFragment {
     @Override
     protected void initData() {
         mTimeFormat = GlobalSettings.getTimeFormat();
+        mTimeFormat.setTimeZone(new SimpleTimeZone(0, ""));
         mLightViewModel = ViewModelProviders.of(getActivity()).get(LightViewModel.class);
         mLight = mLightViewModel.getData();
         mLightViewModel.observe(this, new Observer<ExoLed>() {
@@ -370,7 +371,7 @@ public class LightAutoFragment extends BaseFragment {
     }
 
     private String getTimeText(int time) {
-        return TimeFormatUtil.formatMinutesTime(mTimeFormat, time);
+        return mTimeFormat.format(time*60000);
     }
 
     private void refreshData() {

@@ -16,9 +16,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckedTextView;
-import android.widget.CompoundButton;
 import android.widget.LinearLayout;
-import android.widget.Switch;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 
 import com.alibaba.fastjson.JSON;
@@ -47,8 +46,14 @@ public class PrefFragment extends BaseFragment {
     private TextView pref_mod_psw;
     private CheckedTextView pref_title_unit;
     private LinearLayout pref_unit_detail;
-    private Switch pref_timeformat;
-    private Switch pref_tempunit;
+    private RadioGroup pref_unit_time;
+    private RadioGroup pref_unit_temperature;
+//    private Switch pref_timeformat;
+//    private Switch pref_tempunit;
+    private CheckedTextView pref_title_notify;
+    private LinearLayout pref_notify_detail;
+    private LinearLayout pref_news_detail;
+    private CheckedTextView pref_title_news;
     private CheckedTextView pref_title_invite_msg;
     private Button pref_logout;
 
@@ -66,12 +71,6 @@ public class PrefFragment extends BaseFragment {
     }
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        Log.e(TAG, "onActivityResult: " + requestCode + " " + resultCode);
-    }
-
-    @Override
     protected int getLayoutRes() {
         return R.layout.fragment_pref;
     }
@@ -85,20 +84,28 @@ public class PrefFragment extends BaseFragment {
         pref_mod_psw = view.findViewById(R.id.pref_mod_psw);
         pref_title_unit = view.findViewById(R.id.pref_title_unit);
         pref_unit_detail = view.findViewById(R.id.pref_unit_detail);
-        pref_timeformat = view.findViewById(R.id.pref_timeformat);
-        pref_tempunit = view.findViewById(R.id.pref_tempunit);
+        pref_unit_time = view.findViewById(R.id.pref_unit_time);
+        pref_unit_temperature = view.findViewById(R.id.pref_unit_temperature);
+//        pref_timeformat = view.findViewById(R.id.pref_timeformat);
+//        pref_tempunit = view.findViewById(R.id.pref_tempunit);
+        pref_title_notify = view.findViewById(R.id.pref_title_notify);
+        pref_notify_detail = view.findViewById(R.id.pref_notify_detail);
+        pref_title_news = view.findViewById(R.id.pref_title_news);
+        pref_news_detail = view.findViewById(R.id.pref_news_detail);
         pref_title_invite_msg = view.findViewById(R.id.pref_title_invite_msg);
         pref_logout = view.findViewById(R.id.pref_logout);
 
         pref_title_user.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.selector_add, 0);
         pref_title_unit.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.selector_add, 0);
+        pref_title_notify.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.selector_add, 0);
+        pref_title_news.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.selector_add, 0);
         pref_title_invite_msg.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_add_white_24dp, 0);
         pref_nickname.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_edit_white_24dp, 0);
         pref_mod_psw.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_edit_white_24dp, 0);
         pref_usr_detail.setVisibility(View.GONE);
         pref_unit_detail.setVisibility(View.GONE);
-
-        Log.e(TAG, "initView: " + Integer.toHexString(pref_nickname.getCurrentHintTextColor()));
+        pref_notify_detail.setVisibility(View.GONE);
+        pref_news_detail.setVisibility(View.GONE);
     }
 
     @Override
@@ -153,16 +160,58 @@ public class PrefFragment extends BaseFragment {
                 pref_unit_detail.setVisibility(checked ? View.VISIBLE : View.GONE);
             }
         });
-        pref_timeformat.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+        pref_unit_time.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                GlobalSettings.setIs24HourFormat(getContext(), !isChecked);
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                switch (checkedId) {
+                    case R.id.pref_unit_24h:
+                        GlobalSettings.setIs24HourFormat(getContext(), true);
+                        break;
+                    case R.id.pref_unit_ampm:
+                        GlobalSettings.setIs24HourFormat(getContext(), false);
+                        break;
+                }
             }
         });
-        pref_tempunit.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+        pref_unit_temperature.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                GlobalSettings.setIsCelsius(getContext(), !isChecked);
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                switch (checkedId) {
+                    case R.id.pref_unit_celsius:
+                        GlobalSettings.setIsCelsius(getContext(), true);
+                        break;
+                    case R.id.pref_unit_fahrenheit:
+                        GlobalSettings.setIsCelsius(getContext(), false);
+                        break;
+                }
+            }
+        });
+//        pref_timeformat.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+//            @Override
+//            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+//                GlobalSettings.setIs24HourFormat(getContext(), !isChecked);
+//            }
+//        });
+//        pref_tempunit.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+//            @Override
+//            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+//                GlobalSettings.setIsCelsius(getContext(), !isChecked);
+//            }
+//        });
+        pref_title_notify.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                boolean checked = !pref_title_notify.isChecked();
+                pref_title_notify.setChecked(checked);
+                pref_notify_detail.setVisibility(checked ? View.VISIBLE : View.GONE);
+            }
+        });
+        pref_title_news.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                boolean checked = !pref_title_news.isChecked();
+                pref_title_news.setChecked(checked);
+                pref_news_detail.setVisibility(checked ? View.VISIBLE : View.GONE);
             }
         });
         pref_title_invite_msg.setOnClickListener(new View.OnClickListener() {
@@ -197,8 +246,10 @@ public class PrefFragment extends BaseFragment {
             pref_email.setText(null);
         }
 
-        pref_timeformat.setChecked(!GlobalSettings.is24HourFormat());
-        pref_tempunit.setChecked(!GlobalSettings.isCelsius());
+        pref_unit_time.check(GlobalSettings.is24HourFormat() ? R.id.pref_unit_24h : R.id.pref_unit_ampm);
+        pref_unit_temperature.check(GlobalSettings.isCelsius() ? R.id.pref_unit_celsius : R.id.pref_unit_fahrenheit);
+//        pref_timeformat.setChecked(!GlobalSettings.is24HourFormat());
+//        pref_tempunit.setChecked(!GlobalSettings.isCelsius());
     }
 
     private void showModifyNicknameDialog() {

@@ -122,6 +122,7 @@ public class AssignHabitatFragment extends BaseFragment {
         });
         mAdapter = new AssignHabitatAdapter(getContext(), mGroups);
         assign_habitat_rv.setAdapter(mAdapter);
+        assign_habitat_warning.setVisibility(mGroups.size() == 0 ? View.VISIBLE : View.GONE);
     }
 
     @Override

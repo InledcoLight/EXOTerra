@@ -156,21 +156,21 @@
     <string name="device_zone">Device zone</string>
 
     <string name="smartconfig_guide_default">
-        1.  Press and hold the device key until the green led flashes once every second\n
+        1.  Hold the Button on your device until the green led flashes once every second\n
     </string>
     <string name="smartconfig_guide_strip">
-        1.  Press the touch key to change the led to green\n
-        2.  Press and hold the touch key until the green led flashes once every second\n
+        1.  Press the Touch Button on your device to change the led to green\n
+        2.  Hold the Touch Button until the green led flashes once every second\n
     </string>
     <string name="apconfig_guide_default">
-        1.  Press and hold the device key until the green led flashes once every second\n
-        2.  Again press and hold the device key until the green led flashes once every three seconds\n
+        1.  Hold the Button on your device until the green led flashes once every second\n
+        2.  Again hold the button until the green led flashes once every three seconds\n
         3.  Connect your phone to %1$s\n
     </string>
     <string name="apconfig_guide_strip">
-        1.  Press the touch key to change the led to green\n
-        2.  Press and hold the touch key until the green led flashes once every second\n
-        3.  Again press and hold the touch key until the green led flashes once every three second\n
+        1.  Press the Touch Button on your device to change the led to green\n
+        2.  Hold the Touch Button until the green led flashes once every second\n
+        3.  Again hold the Touch Button until the green led flashes once every three second\n
         4.  Connect your phone to %1$s\n
     </string>
     <string name="config_guide">Config guide</string>
@@ -186,7 +186,7 @@
     <string name="create_group">Create group</string>
     <string name="sync_func_enabled">Synchro function is enabled</string>
     <string name="sync_func_disabled">Synchro function is disabled</string>
-    <string name="msg_get_verifycode">Verifycode has been sent to the email.</string>
+    <string name="msg_get_verifycode">Verification code has been sent to the email. If you do not receive the verification code, please check the spam.</string>
     <string name="title_verifycode_sent">Verifycode sent success</string>
     <string name="title_verifycode_sent_failed">Verifycode sent failed</string>
     <string name="rename_group">Rename group</string>
@@ -238,7 +238,7 @@
     <string name="habitats">Habitats</string>
     <string name="rename_habitat">Rename habitat</string>
     <string name="delete_device">Delete device</string>
-    <string name="msg_delete">Confirm delete %1$s?</string>
+    <string name="msg_delete_habitat">Confirm delete habitat \'%1$s\'?</string>
     <string name="home">Home</string>
     <string name="add_home">Add group</string>
     <string name="members">Members</string>
@@ -257,8 +257,8 @@
     <string name="local_offline">Local offline</string>
     <string name="local_online">Local online</string>
     <string name="connect_to_router">Connect to WIFI 2.4G network</string>
-    <string name="set_device_smartconfig_mode">Set device to SmartConfig mode</string>
-    <string name="set_device_compatiblemode">Set device to Compatible mode</string>
+    <string name="set_device_smartconfig_mode">Connecting your device using SmartConfig mode</string>
+    <string name="set_device_compatiblemode">Connecting your device using Compatible mode</string>
     <string name="config_device">Configure the device</string>
     <string name="local_mode">Local Mode</string>
     <string name="habitat_devcnt">Connected devices: %1$d</string>
@@ -375,4 +375,10 @@
     <string name="please_connect_router">Please connect router</string>
     <string name="confirm_password">Confirm password</string>
     <string name="password_inconsistent">Passwords are inconsistent.</string>
+    <string name="exit_habitat">Exit Habitat</string>
+    <string name="msg_exit_habitat">Confirm exit habitat \'%1$s\'?</string>
+    <string name="ampm">AM/PM</string>
+    <string name="receive_notifications">Receive Notifications?</string>
+    <string name="exoterra">ExoTerra</string>
+    <string name="receive_news">Receive News/Updates?</string>
 </resources>
