@@ -112,18 +112,24 @@ public abstract class BaseActivity extends AppCompatActivity {
     }
 
     protected void showLoadDialog() {
-        if (mLoadDialog == null) {
-            mLoadDialog = new LoadDialog(this);
-            mLoadDialog.setCancelable(true);
-            mLoadDialog.setCanceledOnTouchOutside(false);
-        }
+
         boolean isMainThread = Looper.getMainLooper().getThread().getId() == Thread.currentThread().getId();
         if (isMainThread) {
+            if (mLoadDialog == null) {
+                mLoadDialog = new LoadDialog(this);
+                mLoadDialog.setCancelable(true);
+                mLoadDialog.setCanceledOnTouchOutside(false);
+            }
             mLoadDialog.show();
         } else {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
+                    if (mLoadDialog == null) {
+                        mLoadDialog = new LoadDialog(BaseActivity.this);
+                        mLoadDialog.setCancelable(true);
+                        mLoadDialog.setCanceledOnTouchOutside(false);
+                    }
                     mLoadDialog.show();
                 }
             });
@@ -135,13 +141,11 @@ public abstract class BaseActivity extends AppCompatActivity {
             boolean isMainThread = Looper.getMainLooper().getThread().getId() == Thread.currentThread().getId();
             if (isMainThread) {
                 mLoadDialog.dismiss();
-                mLoadDialog = null;
             } else {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         mLoadDialog.dismiss();
-                        mLoadDialog = null;
                     }
                 });
             }

@@ -46,6 +46,7 @@
                 android:gravity="center"
                 android:text="@string/add_device"
                 android:textColor="@color/textColorPrimary"
+                android:textAllCaps="true"
                 android:textSize="@dimen/textSizeTitle"
                 android:textStyle="bold" />
         </FrameLayout>
@@ -67,11 +68,19 @@
                 android:textStyle="bold" />
 
             <TextView
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:text="@string/connect_to_router"
                 android:textColor="@color/textColorPrimary"
                 android:textSize="@dimen/textSizeSecondary" />
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="8dp"
+                android:scaleType="fitCenter"
+                app:srcCompat="@drawable/ic_baseline_error_outline_24"/>
         </LinearLayout>
     </com.inledco.exoterra.view.GradientCornerLinearLayout>
 

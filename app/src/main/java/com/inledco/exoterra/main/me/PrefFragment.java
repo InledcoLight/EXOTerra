@@ -376,7 +376,7 @@ public class PrefFragment extends BaseFragment {
 
             }
         });
-        AliotClient.getInstance().deinit();
+        AliotClient.getInstance().stop();
         mAuthStatus.setAuthorized(false);
         UserPref.clearAuthorization(getContext());
         DeviceManager.getInstance().clear();

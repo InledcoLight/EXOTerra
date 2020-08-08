@@ -12,3 +12,11 @@ apiServer           = http://47.89.235.158:8086
 
 #   服务器文件URL
 fileUrl             = http://47.89.235.158:8086/imgs/
+
+animals             =   [\
+                            {"name":"Leopard Gecko"},
+                        ]
+
+snake               = {\
+                        "len10cm":{"a","b"}\
+                        }

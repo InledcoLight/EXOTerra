@@ -37,17 +37,17 @@ public class ScanAdapter extends SimpleAdapter<Device, DeviceViewHolder> {
         final int postion = holder.getAdapterPosition();
         Device device = mData.get(postion);
         final String pkey = device.getProductKey();
+        final String dname = device.getDeviceName();
         String name = device.getName();
         ExoProduct product = ExoProduct.getExoProduct(pkey);
         if (product != null) {
             if (TextUtils.isEmpty(name)) {
                 name = product.getDefaultName();
-                holder.iv_icon.setImageResource(product.getIcon());
             }
+            holder.iv_icon.setImageResource(product.getIcon());
         }
         holder.tv_name.setText(name);
-        holder.ctv_state.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
-        holder.ctv_state.setText(device.getDeviceName());
+        holder.ctv_habitat.setText(dname);
 
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override

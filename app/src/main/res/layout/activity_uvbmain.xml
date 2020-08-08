@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/uvbmain_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <include
+            layout="@layout/layout_uvb_title"/>
+
+        <FrameLayout
+            android:id="@+id/uvbmain_fl"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"/>
+        <android.support.design.widget.BottomNavigationView
+            android:id="@+id/uvbmain_bnv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#23364F"
+            app:menu="@menu/menu_uvbmain_bnv"
+            app:itemIconSize="32dp"
+            app:itemTextAppearanceActive="@style/BottomNavigationTextAppearanceActive"
+            app:itemTextAppearanceInactive="@style/BottomNavigationTextAppearanceInactive"
+            app:labelVisibilityMode="auto"
+            app:itemTextColor="@color/selector_bnv"
+            app:itemIconTint="@color/selector_bnv"/>
+    </LinearLayout>
+</FrameLayout>

@@ -43,7 +43,7 @@ public class CompatibleModeFragment extends BaseFragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = super.onCreateView(inflater, container, savedInstanceState);
 
-        AliotClient.getInstance().deinit();
+        AliotClient.getInstance().stop();
         initData();
         initEvent();
         return view;
@@ -55,7 +55,7 @@ public class CompatibleModeFragment extends BaseFragment {
         if (UserManager.getInstance().isAuthorized()) {
             String userid = UserManager.getInstance().getUserid();
             String secret = UserManager.getInstance().getSecret();
-            AliotClient.getInstance().init(getContext().getApplicationContext(), userid, secret, null);
+            AliotClient.getInstance().start(getContext().getApplicationContext(), userid, secret, null);
         }
         if (mAPConfigLinker != null) {
             mAPConfigLinker.stopTask();
@@ -88,7 +88,7 @@ public class CompatibleModeFragment extends BaseFragment {
         if (product != null) {
             netconfig_prdt.setImageResource(product.getIcon());
         }
-        netconfig_title.setText(R.string.compatible_mode);
+        netconfig_title.setText(R.string.compatible_mode_msg);
 
         mConnectNetBean.setRunning(true);
         mConnectNetViewModel.postValue();

@@ -43,6 +43,7 @@
                 android:gravity="center"
                 android:textStyle="bold"
                 android:text="@string/add_device"
+                android:textAllCaps="true"
                 android:textColor="@color/textColorPrimary"
                 android:textSize="@dimen/textSizeTitle" />
         </FrameLayout>

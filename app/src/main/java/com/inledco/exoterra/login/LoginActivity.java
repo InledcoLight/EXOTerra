@@ -9,11 +9,11 @@ import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 
-import com.aliyun.alink.linkkit.api.ILinkKitConnectListener;
 import com.aliyun.alink.linksdk.tools.AError;
 import com.inledco.exoterra.R;
 import com.inledco.exoterra.aliot.AliotClient;
 import com.inledco.exoterra.aliot.AliotServer;
+import com.inledco.exoterra.aliot.ILinkListener;
 import com.inledco.exoterra.base.BaseActivity;
 import com.inledco.exoterra.foundback.FoundbackActivity;
 import com.inledco.exoterra.home.HomeActivity;
@@ -168,14 +168,19 @@ public class LoginActivity extends BaseActivity {
                     String token = UserManager.getInstance().getToken();
                     String secret = UserManager.getInstance().getSecret();
                     AliotServer.getInstance().init(userid, token);
-                    AliotClient.getInstance().init(getApplicationContext(), userid, secret, new ILinkKitConnectListener() {
+                    AliotClient.getInstance().start(getApplicationContext(), userid, secret, new ILinkListener() {
                         @Override
-                        public void onError(AError aError) {
+                        public void onStart() {
 
                         }
 
                         @Override
-                        public void onInitDone(Object o) {
+                        public void onInitError(AError aError) {
+
+                        }
+
+                        @Override
+                        public void onInitDone() {
 
                         }
                     });

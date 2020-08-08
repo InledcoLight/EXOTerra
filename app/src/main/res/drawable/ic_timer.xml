@@ -1,0 +1,27 @@
+<vector android:autoMirrored="true" android:height="32dp"
+    android:viewportHeight="8.466666" android:viewportWidth="8.466666"
+    android:width="32dp" xmlns:android="http://schemas.android.com/apk/res/android">
+    <group>
+        <clip-path android:pathData="M-160.56107,-3330.06372L4891.83203,-3330.06372L4891.83203,1755.15723L-160.56107,1755.15723Z"/>
+        <path android:fillColor="#00000000"
+            android:pathData="m7.75471,4.23326c0,-2.11866 -1.70644,-3.83583 -3.81142,-3.83583 -2.10498,-0 -3.81142,1.71717 -3.81142,3.83583 0,2.11866 1.70644,3.83619 3.81142,3.83619 0.64058,-0 1.2441,-0.15894 1.77382,-0.43988"
+            android:strokeColor="#ffffff" android:strokeLineCap="butt"
+            android:strokeLineJoin="miter" android:strokeWidth="0.3"/>
+        <path android:fillColor="#00000000"
+            android:pathData="m6.48424,4.23326c0,-1.41256 -1.13751,-2.55746 -2.54095,-2.55746 -1.40344,-0 -2.54095,1.1449 -2.54095,2.55746 0,1.41256 1.13751,2.55746 2.54095,2.55746C5.34673,6.79072 6.48424,5.64582 6.48424,4.23326Z"
+            android:strokeColor="#ffffff" android:strokeLineCap="butt"
+            android:strokeLineJoin="miter" android:strokeWidth="0.3"/>
+        <path android:fillColor="#00000000"
+            android:pathData="M7.06183,3.4407 L7.75446,4.23327 8.36082,3.41056"
+            android:strokeColor="#ffffff" android:strokeLineCap="butt"
+            android:strokeLineJoin="miter" android:strokeWidth="0.3"/>
+        <path android:fillColor="#00000000"
+            android:pathData="M5.71717,7.62951C5.89825,7.53335 6.07115,7.4232 6.23334,7.30014 6.8561,6.82833 7.33057,6.16851 7.57368,5.40465 7.61468,5.27584 7.64926,5.14417 7.67671,5.00962"
+            android:strokeColor="#ffffff" android:strokeLineCap="butt"
+            android:strokeLineJoin="miter" android:strokeWidth="0.3"/>
+        <path android:fillColor="#00000000"
+            android:pathData="M3.94332,2.58927L3.94332,4.23325L5.03235,5.32936"
+            android:strokeColor="#ffffff" android:strokeLineCap="butt"
+            android:strokeLineJoin="miter" android:strokeWidth="0.3"/>
+    </group>
+</vector>

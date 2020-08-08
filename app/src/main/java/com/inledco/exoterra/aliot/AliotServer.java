@@ -676,6 +676,22 @@ public class AliotServer {
         queryDeviceHistoryProperties(mToken, pkey, dname, request, callback);
     }
 
+    public UserApi.GetDevicePropertiesResponse getDeviceProperties(final String token, final String pkey, final String dname) {
+        String url = API_SERVER + String.format(GET_DEVICE_PROPERTIES, pkey, dname);
+        Headers headers = new Headers.Builder().add(KEY_CONTENT_TYPE, CONTENT_TYPE_JSON)
+                                               .add(KEY_AUTH, AUTH_TYPE + token)
+                                               .build();
+        return OKHttpManager.getInstance().blockGet(url, headers, UserApi.GetDevicePropertiesResponse.class);
+    }
+
+    public UserApi.GetDevicePropertiesResponse getDeviceProperties(final String pkey, final String dname) {
+        String url = API_SERVER + String.format(GET_DEVICE_PROPERTIES, pkey, dname);
+        Headers headers = new Headers.Builder().add(KEY_CONTENT_TYPE, CONTENT_TYPE_JSON)
+                                               .add(KEY_AUTH, AUTH_TYPE + mToken)
+                                               .build();
+        return OKHttpManager.getInstance().blockGet(url, headers, UserApi.GetDevicePropertiesResponse.class);
+    }
+
     public void getDeviceProperties(final String token, final String pkey, final String dname, final HttpCallback<UserApi.GetDevicePropertiesResponse> callback) {
         String url = API_SERVER + String.format(GET_DEVICE_PROPERTIES, pkey, dname);
         Headers headers = new Headers.Builder().add(KEY_CONTENT_TYPE, CONTENT_TYPE_JSON)

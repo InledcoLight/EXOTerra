@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/uvbmain_bnv_home"
+        android:icon="@drawable/ic_reptile"
+        android:title="@string/home"/>
+    <item
+        android:id="@+id/uvbmain_bnv_dashboard"
+        android:icon="@drawable/ic_dashboard"
+        android:title="@string/dashboard"/>
+    <item
+        android:id="@+id/uvbmain_bnv_pref"
+        android:icon="@drawable/ic_prefs_white"
+        android:title="@string/prefs"/>
+</menu>

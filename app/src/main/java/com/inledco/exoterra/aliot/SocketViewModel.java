@@ -1,5 +1,9 @@
 package com.inledco.exoterra.aliot;
 
+import android.util.Log;
+
+import com.alibaba.fastjson.JSON;
+
 import java.util.List;
 
 public class SocketViewModel extends DeviceViewModel<ExoSocket> {
@@ -25,6 +29,8 @@ public class SocketViewModel extends DeviceViewModel<ExoSocket> {
 
     public void setSensorConfig(ExoSocket.SensorConfig[] configs) {
         KeyValue attrSensorConfig = getData().setSensorConfig(configs);
+        Log.e(TAG, "setSensorConfig: " + JSON.toJSONString(configs));
+        Log.e(TAG, "setSensorConfig: " + JSON.toJSONString(attrSensorConfig));
         setProperty(attrSensorConfig);
     }
 }

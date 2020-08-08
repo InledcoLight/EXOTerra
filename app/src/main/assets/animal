@@ -1,0 +1,46 @@
+Leopard Gecko,Eublepharis macularius
+Crested Gecko,Correlophus ciliatus
+Ball Python,Python regius
+Boa Constrictor,Boa constrictor
+PacMan Frog,Ceratophrys spec
+
+snake:
+Corn Snake,Pantherophis guttatus,1,snake
+Milk Snake,Lampropeltis triangulum,1,snake
+
+frog:
+White’s Treefrogs,Litoria caerulea,1,frog
+Monkey Tree Frogs,Phyllomedusa sauvagii,1,frog
+Poison Dart Frogs,Dendrobatidae,1,frog
+
+slider:
+Red-eared Slider,Trachemys scripta elegans,2,slider
+Yellow Bellied Slider,Trachemys scripta scripta,2,slider
+Painted Turtle,Chrysemys picta,2,slider
+
+toads:
+Fire Belly Toads,Bombina orientalis,2,toads
+
+chameleon:
+Green Iguana,Iguana iguana,3,chameleon
+Veiled Chameleon,Chamaeleo calyptratus,3,chameleon
+Panther Chameleon,Furcifer pardalis,3,chameleon
+Chinese Water Dragon,Physignathus cocincinus,3,chameleon
+Green Anole,Anolis carolinensis,3,chameleon
+Gold Dust Day Gecko,Phelsuma laticauda,3,chameleon
+Long-tailed Lizard,Takydromus sexlineatus,3,chameleon
+
+lizard:
+Eastern Collard Lizard,Crotaphytus collaris,4,lizard
+Steppe Runner,Eremias arguta,4,lizard
+Northern Curly-tailed Lizard,Leiocephalus personatus,4,lizard
+Russian Tortoise,Agrionemys horsfieldii,4,lizard
+Greek Tortoise,Testudo Graeca,4,lizard
+Hermann’s Tortoise,Testudo hermanni,4,lizard
+
+dragon:
+Bearded Dragon,Pogona vitticeps,5,dragon
+
+tortoise:
+African Spurred Tortoise,Geochelone sulcata,5,tortoise
+Ornate Spiny-tailed Lizard,Uromastyx ornatus,5,tortoise

@@ -102,26 +102,22 @@
                 android:gravity="center_vertical"
                 android:text="@string/habitat"
                 android:textColor="@color/textColorPrimary" />
-
-            <Space
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1" />
-
-            <TextView
-                android:id="@+id/device_detail_habitat"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="?attr/selectableItemBackground"
-                android:textColor="@color/textColorSencondary"
-                android:textSize="@dimen/textSizeSecondary" />
         </LinearLayout>
-
+        <TextView
+            android:id="@+id/device_detail_habitat"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right"
+            android:layout_marginRight="8dp"
+            android:background="?attr/selectableItemBackground"
+            android:textColor="@color/textColorSencondary"
+            android:textSize="@dimen/textSizeSecondary" />
         <View
             android:layout_width="match_parent"
             android:layout_height="@dimen/dividerWidth"
             android:layout_marginLeft="8dp"
             android:layout_marginRight="8dp"
+            android:layout_marginTop="8dp"
             android:background="@drawable/shape_rect_gradient" />
 
         <LinearLayout
@@ -136,45 +132,81 @@
                 android:layout_height="wrap_content"
                 android:background="@color/colorTransparent"
                 app:srcCompat="@drawable/ic_time_white_24dp" />
-
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="8dp"
                 android:text="@string/device_datetime"
                 android:textColor="@color/textColorPrimary" />
-
-            <Space
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1" />
-
-            <TextView
-                android:id="@+id/device_detail_datetime"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text=""
-                android:textColor="@color/textColorSencondary"
-                android:textSize="@dimen/textSizeSecondary" />
         </LinearLayout>
-
+<!--        <TextView-->
+<!--            android:id="@+id/device_detail_datetime"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:text=""-->
+<!--            android:textColor="@color/textColorSencondary"-->
+<!--            android:textSize="@dimen/textSizeSecondary" />-->
         <TextView
-            android:id="@+id/device_detail_zone"
+            android:id="@+id/device_detail_datetime"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:gravity="right"
             android:layout_gravity="right"
             android:layout_marginLeft="8dp"
             android:layout_marginRight="8dp"
-            android:paddingBottom="8dp"
+            android:lines="1"
+            android:maxLines="1"
             android:text=""
             android:textColor="@color/textColorSencondary"
-            android:textSize="@dimen/textSizeSecondary" />
-
+            android:textSize="@dimen/textSizeTiny" />
         <View
             android:layout_width="match_parent"
             android:layout_height="@dimen/dividerWidth"
             android:layout_marginLeft="8dp"
             android:layout_marginRight="8dp"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/shape_rect_gradient" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:padding="8dp">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@color/colorTransparent"
+                app:srcCompat="@drawable/ic_daytime" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="8dp"
+                android:text="@string/daytime"
+                android:textColor="@color/textColorPrimary" />
+        </LinearLayout>
+        <TextView
+            android:id="@+id/device_detail_daytime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="right|center_vertical"
+            android:background="?attr/selectableItemBackground"
+            android:layout_gravity="right"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:drawablePadding="8dp"
+            android:lines="1"
+            android:maxLines="1"
+            android:text=""
+            android:textColor="@color/textColorSencondary"
+            android:textSize="@dimen/textSizeSecondary" />
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/dividerWidth"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginTop="8dp"
             android:background="@drawable/shape_rect_gradient" />
 
         <LinearLayout

@@ -37,21 +37,6 @@ public class AppConstants {
     public static final String  TIME_FORMAT_24HOUR      = "HH:mm";
     public static final String  TIME_FORMAT_12HOUR      = "hh:mm a";
 
-    //通知
-    public static final String  NOTIFY_CHANNEL_SHARE            = "share";
-    public static final String  NOTIFY_CHANNEL_SHARE_RECEIPT    = "share_receipt";
-    public static final String  NOTIFY_CHANNEL_INVITE           = "invite";
-    public static final String  NOTIFY_CHANNEL_HOME_MEMBER_CHANGED    = "home_member_changed";
-    public static final String  NOTIFY_CHANNEL_DELETE_HOME      = "delete_home";
-    public static final String  NOTIFY_CHANNEL_ALARM            = "alarm";
-
-    //云平台访问access_token (访问平台接口通过access_key_secret生成, 有效期十年)
-    public static final String  XCP_ACCESS_TOKEN_ADMIN          = "QUM3NUNGRTcxMEM1NzY5MzQ0MDBENTY1OTcxQUZGRDExQkUyMEJGN0ZDMUE5RTlFNjJCRkZFMjE4MzIxODRBRA==";
-
-    //云平台查询设备列表接口
-    public static final String  XCP_QUERY_DEVICE_URL            = "https://api2.xlink.cn/v2/product/%1$s/devices";
-    public static final String  XCP_IMPORT_DEVICE_URL            = "https://api2.xlink.cn/v2/product/%1$s/device_import_batch_2";
-
     public static final String  KEY_TIMEFORMAT = "timeformat";
     public static final String  KEY_TEMPUNIT = "tempunit";
 

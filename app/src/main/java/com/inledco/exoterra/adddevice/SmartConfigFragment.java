@@ -116,7 +116,7 @@ public class SmartConfigFragment extends BaseFragment {
         if (product != null) {
             netconfig_prdt.setImageResource(product.getIcon());
         }
-        netconfig_title.setText(R.string.smartconfig);
+        netconfig_title.setText(R.string.smartconfig_msg);
 
         mSubscribe = UserManager.getInstance().isAuthorized();
         String pid = bean.getProductKey();

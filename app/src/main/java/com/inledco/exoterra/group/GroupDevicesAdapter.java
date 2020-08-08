@@ -7,12 +7,12 @@ import android.text.TextUtils;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CheckedTextView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.inledco.exoterra.R;
 import com.inledco.exoterra.aliot.Device;
+import com.inledco.exoterra.aliot.ExoSocket;
 import com.inledco.exoterra.aliot.bean.Group;
 import com.inledco.exoterra.bean.ExoProduct;
 import com.inledco.exoterra.common.SimpleAdapter;
@@ -62,8 +62,14 @@ public class GroupDevicesAdapter extends SimpleAdapter<Group.Device, GroupDevice
         if (dev != null) {
             state = dev.isOnline();
         }
-        holder.ctv_state.setChecked(state);
-        holder.ctv_state.setText(state ? R.string.cloud_online : R.string.cloud_offline);
+        holder.iv_state.setImageResource(state ? R.drawable.ic_cloud_green_16dp : R.drawable.ic_cloud_grey_16dp);
+        if (dev instanceof ExoSocket) {
+            ExoSocket socket = (ExoSocket) dev;
+            holder.iv_sensor.setImageResource((state & socket.getSensorAvailable()) ? R.drawable.ic_sensor_on : R.drawable.ic_sensor);
+            holder.iv_sensor.setVisibility(View.VISIBLE);
+        } else {
+            holder.iv_sensor.setVisibility(View.GONE);
+        }
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -86,14 +92,16 @@ public class GroupDevicesAdapter extends SimpleAdapter<Group.Device, GroupDevice
     class GroupDevicesViewHolder extends RecyclerView.ViewHolder {
         private ImageView iv_icon;
         private TextView tv_name;
-        private CheckedTextView ctv_state;
         private TextView ctv_habitat;
+        private ImageView iv_state;
+        private ImageView iv_sensor;
         public GroupDevicesViewHolder(@NonNull View itemView) {
             super(itemView);
             iv_icon = itemView.findViewById(R.id.item_device_icon);
             tv_name = itemView.findViewById(R.id.item_device_name);
-            ctv_state = itemView.findViewById(R.id.item_device_state);
             ctv_habitat = itemView.findViewById(R.id.item_device_habitat);
+            iv_state = itemView.findViewById(R.id.item_device_state);
+            iv_sensor = itemView.findViewById(R.id.item_device_sensor);
         }
     }
 }

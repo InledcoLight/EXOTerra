@@ -198,60 +198,50 @@ public class DeviceManager {
     }
 
     public void getExoSocketSensors() {
-        final Set<Device> devices = new HashSet<>();
-        for (Device device : mDevices) {
-            if (TextUtils.equals(device.getProductKey(), AliotConsts.PRODUCT_KEY_EXOSOCKET)
-                && device.isOnline()) {
-                devices.add(device);
-            }
-        }
-        if (devices.size() == 0) {
-            return;
-        }
+//        final Set<Device> devices = new HashSet<>();
+//        for (Device device : mDevices) {
+//            if (TextUtils.equals(device.getProductKey(), AliotConsts.PRODUCT_KEY_EXOSOCKET)
+//                && device.isOnline()) {
+//            devices.add(device);
+//            }
+//        }
+//        if (devices.size() == 0) {
+//            return;
+//        }
         if (mAsyncTask != null) {
             mAsyncTask.cancel(true);
         }
         mAsyncTask = new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... voids) {
-//                HttpCallback<UserApi.PublishTopicResponse> callback = new HttpCallback<UserApi.PublishTopicResponse>() {
-//                    @Override
-//                    public void onError(String error) {
-//
-//                    }
-//
-//                    @Override
-//                    public void onSuccess(UserApi.PublishTopicResponse result) {
-//
-//                    }
-//                };
-                HttpCallback<UserApi.GetDevicePropertiesResponse> callback = new HttpCallback<UserApi.GetDevicePropertiesResponse>() {
-                    @Override
-                    public void onError(String error) {
-
-                    }
-
-                    @Override
-                    public void onSuccess(UserApi.GetDevicePropertiesResponse result) {
-
-                    }
-                };
+                Device[] devices = mDevices.toArray(new Device[mDevices.size()]);
                 for (final Device device : devices) {
-                    AliotServer.getInstance().getDeviceProperties(device.getProductKey(),
-                                                                  device.getDeviceName(),
-                                                                  new HttpCallback<UserApi.GetDevicePropertiesResponse>() {
-                                                                      @Override
-                                                                      public void onError(String error) {
-
-                                                                      }
-
-                                                                      @Override
-                                                                      public void onSuccess(UserApi.GetDevicePropertiesResponse result) {
-                                                                          device.updateProperties(result.data);
-                                                                          ADevice adev = new ADevice(device.getProductKey(), device.getDeviceName());
-                                                                          EventBus.getDefault().post(adev);
-                                                                      }
-                                                                  });
+                    if (AliotConsts.PRODUCT_KEY_EXOMONSOON.equals(device.getProductKey())) {
+                        continue;
+                    }
+                    final String pkey = device.getProductKey();
+                    final String dname = device.getDeviceName();
+                    UserApi.GetDevicePropertiesResponse response = AliotServer.getInstance().getDeviceProperties(pkey, dname);
+                    if (response != null) {
+                        device.updateProperties(response.data);
+                        ADevice adev = new ADevice(pkey, dname);
+                        EventBus.getDefault().post(adev);
+                    }
+//                    AliotServer.getInstance().getDeviceProperties(device.getProductKey(),
+//                                                                  device.getDeviceName(),
+//                                                                  new HttpCallback<UserApi.GetDevicePropertiesResponse>() {
+//                                                                      @Override
+//                                                                      public void onError(String error) {
+//
+//                                                                      }
+//
+//                                                                      @Override
+//                                                                      public void onSuccess(UserApi.GetDevicePropertiesResponse result) {
+//                                                                          device.updateProperties(result.data);
+//                                                                          ADevice adev = new ADevice(device.getProductKey(), device.getDeviceName());
+//                                                                          EventBus.getDefault().post(adev);
+//                                                                      }
+//                                                                  });
 //                    AliotServer.getInstance()
 //                               .getDeviceProperties(AliotConsts.PRODUCT_KEY_EXOSOCKET,
 //                                                    dname,

@@ -2,6 +2,7 @@ package com.inledco.exoterra.aliot;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONException;
+import com.alibaba.fastjson.annotation.JSONField;
 import com.inledco.exoterra.aliot.bean.XDevice;
 
 import java.util.ArrayList;
@@ -460,59 +461,65 @@ public class ExoSocket extends Device {
     }
 
     public static class SensorConfig {
-        private int Type;
-        private int Ntfy;
-        private int Lower;
-        private int Upper;
-        private int Day;
-        private int Night;
+        @JSONField(name = "Type")
+        private int type;
+        @JSONField(name = "Ntfy")
+        private int ntfy;
+        @JSONField(name = "Lower")
+        private int lower;
+        @JSONField(name = "Upper")
+        private int upper;
+        @JSONField(name = "Day")
+        private int day;
+        @JSONField(name = "Night")
+        private int night;
 
         public int getType() {
-            return Type;
+            return type;
         }
 
         public void setType(int type) {
-            Type = type;
+            this.type = type;
         }
 
         public int getNtfy() {
-            return Ntfy;
+            return ntfy;
         }
 
         public void setNtfy(int ntfy) {
-            Ntfy = ntfy;
+            this.ntfy = ntfy;
         }
 
         public int getLower() {
-            return Lower;
+            return lower;
         }
 
         public void setLower(int lower) {
-            Lower = lower;
+            this.lower = lower;
         }
 
         public int getUpper() {
-            return Upper;
+            return upper;
         }
 
         public void setUpper(int upper) {
-            Upper = upper;
+            this.upper = upper;
         }
 
         public int getDay() {
-            return Day;
+            return day;
         }
 
         public void setDay(int day) {
-            Day = day;
+            this.day = day;
         }
 
         public int getNight() {
-            return Night;
+            return night;
         }
 
         public void setNight(int night) {
-            Night = night;
+            this.night = night;
         }
     }
 }

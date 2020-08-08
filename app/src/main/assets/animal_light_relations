@@ -1,0 +1,144 @@
+#start
+[Leopard Gecko]Eublepharis macularius
+[Crested Gecko]Correlophus ciliatus
+[Ball Python]Python regius
+[Boa Constrictor]Boa constrictor
+[PacMan Frog]Ceratophrys spec
+#end
+
+#start
+[Corn Snake]Pantherophis guttatus,1
+[Milk Snake]Lampropeltis triangulum,1
+
+<10cm>(*)Reptile UVB100 - 13W,(*)Reptile UVB150 - 13W
+<20cm>(*)Reptile UVB100 - 13W,(*)Reptile UVB100 - 26W,(*)Reptile UVB150 - 13W
+<30cm>(*)Reptile UVB100 - 13W,(*)Reptile UVB100 - 26W,(*)Reptile UVB150 - 13W
+<40cm>(*)Reptile UVB150 - 26W,(*)Reptile UVB100 - 26W,(*)Reptile UVB150 - 13W
+<50cm>(*)Reptile UVB150 - 26W,(*)SunRay 35W,Reptile UVB150 - 26W
+<60cm>(*)Reptile UVB150 - 26W,(*)SunRay 35W,SunRay 50W
+<70cm>(*)SunRay 50W,SunRay 70W,Solar Glo 125W
+<80cm>SunRay 50W,SunRay 70W,(*)Solar Glo 125W
+<90cm>SunRay 70W,SunRay 50W,Solar Glo 125W
+<100cm>SunRay 70W,SunRay 50W,Solar Glo 125W
+#end
+
+#start
+[White’s Treefrogs]Litoria caerulea,1
+[Monkey Tree Frogs]Phyllomedusa sauvagii,1
+[Poison Dart Frogs]Dendrobatidae,1
+
+<10cm>(*)Reptile UVB100 - 13W,(*)Reptile UVB150 - 13W
+<20cm>(*)Reptile UVB100 - 13W,(*)Reptile UVB100 - 26W,(*)Reptile UVB150 - 13W
+<30cm>(*)Reptile UVB100 - 13W,(*)Reptile UVB100 - 26W,(*)Reptile UVB150 - 13W
+<40cm>(*)Reptile UVB150 - 26W,(*)Reptile UVB100 - 26W,(*)Reptile UVB150 - 13W
+<50cm>(*)Reptile UVB150 - 26W,(*)SunRay 35W,Reptile UVB150 - 26W
+<60cm>(*)Reptile UVB150 - 26W,(*)SunRay 35W,SunRay 50W
+<70cm>(*)SunRay 50W,SunRay 70W,Solar Glo 125W
+<80cm>SunRay 50W,SunRay 70W,(*)Solar Glo 125W
+<90cm>SunRay 70W,SunRay 50W,Solar Glo 125W
+<100cm>SunRay 70W,SunRay 50W,Solar Glo 125W
+#end
+
+#start
+[Red-eared Slider]Trachemys scripta elegans,2
+[Yellow Bellied Slider]Trachemys scripta scripta,2
+[Painted Turtle]Chrysemys picta,2
+
+<10cm>(*)Turtle UVB,(*)Reptile UVB 100 - 13W,(*)Reptile UVB 100 - 26W
+<20cm>(*)Turtle UVB,(*)Reptile UVB 100 - 26W,(*)Reptile UVB150 - 13W
+<30cm>(*)Turtle UVB,(*)Reptile UVB150 - 26W,SunRay 35W
+<40cm>(*)Reptile UVB150 - 26W,SunRay 35W,SunRay 50W
+<50cm>(*)Reptile UVB200 - 26W,SunRay 50W,Solar Glo 125W
+<60cm>SunRay 50W,SunRay 70W,Solar Glo 125W
+<70cm>SunRay 50W,SunRay 70W,Solar Glo 125W
+<80cm>SunRay 50W,SunRay 70W,Solar Glo 125W
+<90cm>SunRay 50W,SunRay 70W,Solar Glo 125W
+<100cm>SunRay 50W,SunRay 70W,Solar Glo 125W
+#end
+
+#start
+[Fire Belly Toads]Bombina orientalis,2
+
+<10cm>(*)Reptile UVB100 - 13W,(*)Reptile UVB150 - 13W
+<20cm>(*)Reptile UVB100 - 13W,(*)Reptile UVB100 - 26W,(*)Reptile UVB150 - 13W
+<30cm>(*)Reptile UVB100 - 13W,(*)Reptile UVB100 - 26W,(*)Reptile UVB150 - 13W
+<40cm>(*)Reptile UVB150 - 26W,SunRay 35W,(*)Reptile UVB150 - 13W
+<50cm>(*)Reptile UVB150 - 26W,SunRay 35W,(*)Reptile UVB150 - 26W
+<60cm>(*)Reptile UVB150 - 26W,SunRay 35W,SunRay 50W
+<70cm>SunRay 50W,SunRay 70W,Solar Glo 125W
+<80cm>SunRay 50W,SunRay 70W,Solar Glo 125W
+<90cm>SunRay 70W,SunRay 50W,Solar Glo 125W
+<100cm>SunRay 70W,SunRay 50W,Solar Glo 125W
+#end
+
+#start
+[Green Iguana]Iguana iguana,3
+[Veiled Chameleon]Chamaeleo calyptratus,3
+[Panther Chameleon]Furcifer pardalis,3
+[Chinese Water Dragon]Physignathus cocincinus,3
+[Green Anole]Anolis carolinensis,3
+[Gold Dust Day Gecko]Phelsuma laticauda,3
+[Long-tailed Lizard]Takydromus sexlineatus,3
+
+<10cm>(*)Reptile UVB150 - 13W,(*)Reptile UVB100 - 26W ,(*)Reptile UVB100 - 13W
+<20cm>(*)Reptile UVB150 - 26W,(*)Reptile UVB100 - 26W ,(*)Reptile UVB150 - 13W
+<30cm>(*)Reptile UVB150 - 26W ,(*)Reptile UVB200 - 13W,SunRay 35W
+<40cm>SunRay 35W,SunRay 50W,(*)Reptile UVB200 - 26W
+<50cm>SunRay 50W,SunRay 70W,Solar Glo 125W
+<60cm>SunRay 50W,SunRay 70W,Solar Glo 125W
+<70cm>SunRay 70W,SunRay 50W,Solar Glo 160W
+<80cm>SunRay 70W,SunRay 50W,Solar Glo 160W
+<90cm>SunRay 70W,SunRay 50W,Solar Glo 160W
+<100cm>SunRay 70W,SunRay 50W,Solar Glo 160W
+#end
+
+#start
+[Eastern Collard Lizard]Crotaphytus collaris,4
+[Steppe Runner]Eremias arguta,4
+[Northern Curly-tailed Lizard]Leiocephalus personatus,4
+[Russian Tortoise]Agrionemys horsfieldii,4
+[Greek Tortoise]Testudo Graeca,4
+[Hermann’s Tortoise]Testudo hermanni,4
+
+<10cm>(*)Reptile UVB200 - 26W,(*)Reptile UVB150 - 26W,(*)Reptile UVB200 - 13W
+<20cm>(*)Reptile UVB200 - 26W,SunRay 35W,(*)Reptile UVB200 - 13W
+<30cm>SunRay 50W,Solar Glo 125W,SunRay 35W
+<40cm>SunRay 50W,SunRay 70W,Solar Glo 125W
+<50cm>SunRay 70W,Solar Glo 125W,SunRay 50W
+<60cm>SunRay 70W,Solar Glo 125W,Solar Glo 160W
+<70cm>SunRay 70W,Solar Glo 160W,Solar Glo 125W
+<80cm>SunRay 70W,Solar Glo 160W
+<90cm>SunRay 70W,Solar Glo 160W
+<100cm>SunRay 70W,Solar Glo 160W
+#end
+
+#start
+[Bearded Dragon]Pogona vitticeps,5
+
+<10cm>(*)Reptile UVB200 - 26W,(*)Reptile UVB150 - 26W,(*)Reptile UVB200 - 13W
+<20cm>(*)Reptile UVB200 - 26W,SunRay 35W,(*)Reptile UVB200 - 13W
+<30cm>SunRay 50W,Solar Glo 125W,SunRay 35W
+<40cm>SunRay 50W,SunRay 70W,Solar Glo 125W
+<50cm>SunRay 70W,Solar Glo 125W,SunRay 50W
+<60cm>SunRay 70W,Solar Glo 125W,Solar Glo 160W
+<70cm>SunRay 70W,Solar Glo 160W,Solar Glo 125W
+<80cm>SunRay 70W,Solar Glo 160W
+<90cm>SunRay 70W,Solar Glo 160W
+<100cm>SunRay 70W,Solar Glo 160W
+#end
+
+#start
+[African Spurred Tortoise]Geochelone sulcata,5
+[Ornate Spiny-tailed Lizard]Uromastyx ornatus,5
+
+<10cm>(*)Reptile UVB200 - 26W
+<20cm>(*)Reptile UVB200 - 26W,SunRay 50W,Solar Glo 125W
+<30cm>SunRay 70W,Solar Glo 125W,SunRay 50W
+<40cm>SunRay 70W,Solar Glo 125W,SunRay 50W
+<50cm>SunRay 70W,Solar Glo 125W,Solar Glo 160W
+<60cm>SunRay 70W,Solar Glo 160W,Solar Glo 125W
+<70cm>SunRay 70W,Solar Glo 160W,Solar Glo 125W
+<80cm>SunRay 70W,Solar Glo 160W
+<90cm>SunRay 70W,Solar Glo 160W
+<100cm>SunRay 70W,Solar Glo 160W
+#end

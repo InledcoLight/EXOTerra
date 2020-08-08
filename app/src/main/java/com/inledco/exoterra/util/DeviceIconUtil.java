@@ -48,12 +48,13 @@ public class DeviceIconUtil {
         mDeviceIcons.add(R.drawable.devicon_ceramic_heater);
         mDeviceIcons.add(R.drawable.devicon_solarglo);
         mDeviceIcons.add(R.drawable.devicon_sunray);
+        mDeviceIcons.add(R.drawable.devicon_solarray);
         mDeviceIcons.add(R.drawable.devicon_moonlight);
         mDeviceIcons.add(R.drawable.devicon_reptile_dome);
         mDeviceIcons.add(R.drawable.devicon_light_dome);
         mDeviceIcons.add(R.drawable.devicon_compact_top);
         mDeviceIcons.add(R.drawable.devicon_linear_top);
-        mDeviceIcons.add(R.drawable.devicon_solarray);
+        mDeviceIcons.add(R.drawable.devicon_solarray2);
         mDeviceIcons.add(R.drawable.devicon_turtle_uvb2);
         mDeviceIcons.add(R.drawable.devicon_light_unit);
         mDeviceIcons.add(R.drawable.devicon_heat_mat);

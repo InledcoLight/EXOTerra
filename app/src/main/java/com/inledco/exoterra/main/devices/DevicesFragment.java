@@ -143,15 +143,16 @@ public class DevicesFragment extends BaseFragment {
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onDevicePropertyChangedEvent(@NonNull ADevice event) {
-//        if (event == null) {
-//            return;
-//        }
-//        for (int i = 0; i < mDevices.size(); i++) {
-//            Device device = mDevices.get(i);
-//            if (TextUtils.equals(device.getTag(), event.getTag())) {
-//                mAdapter.notifyItemChanged(i);
-//            }
-//        }
+        if (event == null) {
+            return;
+        }
+        for (int i = 0; i < mDevices.size(); i++) {
+            Device device = mDevices.get(i);
+            if (TextUtils.equals(device.getTag(), event.getTag())) {
+                mAdapter.notifyItemChanged(i);
+                break;
+            }
+        }
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)

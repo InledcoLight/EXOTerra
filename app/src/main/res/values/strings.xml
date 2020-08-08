@@ -95,8 +95,8 @@
     <string name="poweron">Turn on</string>
     <string name="poweroff">Turn off</string>
     <string name="timer_count_over">Timers count max 24.</string>
-    <string name="add_device">Add Device</string>
-    <string name="choose_product">Choose Device Type</string>
+    <string name="add_device">Add A Device</string>
+    <string name="choose_product">Choose your device</string>
     <string name="connect_net">Connect to net</string>
     <string name="next">Next</string>
     <string name="compatible_mode">Compatible Mode</string>
@@ -303,12 +303,17 @@
     <string name="system_time">System Time:</string>
     <string name="warning">Warning</string>
     <string name="no_habitat_warning">
-        You haven\'t add any habitats!\n
+        You haven\'t added any habitats!\n
         \n
         Add your first habitat.
     </string>
     <string name="no_device_warning">
-        You haven\'t add any devices!\n
+        You haven\'t added any devices!\n
+        \n
+        Add your first device.
+    </string>
+    <string name="no_habitat_device_warning">
+        You haven\'t add any devices to this habitat!\n
         \n
         Add your first device.
     </string>
@@ -381,4 +386,33 @@
     <string name="receive_notifications">Receive Notifications?</string>
     <string name="exoterra">ExoTerra</string>
     <string name="receive_news">Receive News/Updates?</string>
+
+    <string name="exoterra_tv">http://www.exo-terra.com/nl/exo_terra_tv/index.php</string>
+    <string name="exoterra_facebook">https://www.facebook.com/exoterra</string>
+    <string name="exoterra_twitter">https://twitter.com/ExoTerra</string>
+    <string name="exoterra_instagram">https://www.instagram.com/exoterra/</string>
+    <string name="exoterra_youtube">https://www.youtube.com/user/exoterratv</string>
+    <string name="exoterra_email">webmaster@exo-terra.com</string>
+    <string name="msg_find_uvb">Find the perfect UVB bulb for your  habitat in three simple steps!</string>
+    <string name="choose_your_animal">1. Choose your animal</string>
+    <string name="choose_uvb_distance">2. Average animal distance</string>
+    <string name="choose_uvb_light">3. Choose your bulb type</string>
+    <string name="uvb_rating">UVB Rating</string>
+    <string name="msg_choose_distance">Please choose distance.</string>
+    <string name="warn_choose_light">Please note that the choice of fixure will influence the UVB output.</string>
+    <string name="reptile_uvb">Reptile UVB</string>
+    <string name="linear_uvb">Linear UVB</string>
+    <string name="solar_glo">Solar Glo</string>
+    <string name="sunray">SunRay</string>
+    <string name="solar_ray">Solar Ray</string>
+    <string name="turtle_uvb">Turtle UVB</string>
+    <string name="msg_choose_light">Please choose light.</string>
+    <string name="donot_need_uvb">Does not require UVB.</string>
+    <string name="result">Result</string>
+    <string name="msg_uvb_result">The perfect Exo Terra UVB Bulb for your  animal!</string>
+    <string name="tip_uvb_result">When using Linear or Compact Fluores- cent Bulbs, you might need an additional  heat source.</string>
+    <string name="buy_now">Buy Now</string>
+    <string name="smartconfig_msg">Connecting your device using Smart Config</string>
+    <string name="compatible_mode_msg">Connecting your device using Compatible Mode</string>
+    <string name="please_wait">Please wait.</string>
 </resources>

@@ -1,200 +1,204 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.inledco.exoterra.view.GradientCornerLinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:layout_marginBottom="8dp"
-    app:strokeWidth="@dimen/strokeWidth"
-    app:radius="@dimen/cornerRadius"
-    app:direction="horizontal"
-    app:gradientStart="@color/gradientYellow"
-    app:gradientEnd="@color/gradientGreen">
+    android:layout_marginBottom="8dp">
 
-    <LinearLayout
-        android:id="@+id/item_habitat_title"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="8dp"
-        android:background="@drawable/shape_roundrect_gradient"
-        android:orientation="horizontal"
-        android:gravity="center_vertical">
-
-        <ImageView
-            android:id="@+id/item_habitat_icon"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:scaleType="fitCenter" />
-        <TextView
-            android:id="@+id/item_habitat_name"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="8dp"
-            android:textColor="@color/textColorPrimary"
-            android:textSize="@dimen/textSizeSubTitle"
-            android:text="@string/habitat_name"/>
-        <Space
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"/>
-        <ImageButton
-            android:id="@+id/item_habitat_set"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="8dp"
-            android:background="?attr/selectableItemBackground"
-            app:srcCompat="@drawable/ic_tune_white_32dp"/>
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/item_habitat_more"
+    <com.inledco.exoterra.view.GradientCornerLinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="8dp"
-        android:gravity="center_horizontal">
-
+        app:strokeWidth="@dimen/strokeWidth"
+        app:radius="@dimen/cornerRadius"
+        app:direction="horizontal"
+        app:gradientStart="@color/gradientYellow"
+        app:gradientEnd="@color/gradientGreen">
         <LinearLayout
+            android:id="@+id/item_habitat_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:padding="8dp"
+            android:background="@drawable/shape_roundrect_gradient"
             android:orientation="horizontal"
             android:gravity="center_vertical">
 
             <ImageView
-                android:id="@+id/item_habitat_s1icon"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@color/colorTransparent"
-                app:srcCompat="@drawable/ic_temperature_color_64dp"/>
+                android:id="@+id/item_habitat_icon"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:scaleType="fitCenter" />
             <TextView
-                android:id="@+id/item_habitat_sensor1"
+                android:id="@+id/item_habitat_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="8dp"
-                android:textAlignment="textEnd"
-                android:textColor="#F7931D"
-                android:textSize="@dimen/textSizeSubTitle"/>
+                android:textColor="@color/textColorPrimary"
+                android:textSize="@dimen/textSizeSubTitle"
+                android:text="@string/habitat_name"/>
             <Space
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"/>
-            <View
-                android:layout_width="@dimen/dividerWidth"
-                android:layout_height="match_parent"
-                android:background="@color/colorDivider"
+            <ImageButton
+                android:id="@+id/item_habitat_set"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="8dp"
+                android:background="?attr/selectableItemBackground"
+                app:srcCompat="@drawable/ic_tune_white_32dp"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/item_habitat_more"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="8dp"
+            android:gravity="center_horizontal">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+                <ImageView
+                    android:layout_width="64dp"
+                    android:layout_height="wrap_content"
+                    android:scaleType="centerInside"
+                    app:srcCompat="@drawable/ic_time_white_24dp" />
+                <TextView
+                    android:id="@+id/item_habitat_time"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:textColor="@color/textColorPrimary"
+                    android:textSize="@dimen/textSizeSecondary"/>
+                <ImageView
+                    android:layout_width="64dp"
+                    android:layout_height="wrap_content"
+                    android:scaleType="centerInside"
+                    app:srcCompat="@drawable/ic_date_white_24dp" />
+                <TextView
+                    android:id="@+id/item_habitat_date"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center_vertical"
+                    android:textColor="@color/textColorPrimary"
+                    android:textSize="@dimen/textSizeSecondary"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <ImageView
+                    android:layout_width="64dp"
+                    android:layout_height="wrap_content"
+                    android:scaleType="centerInside"
+                    app:srcCompat="@drawable/ic_sunrise" />
+                <TextView
+                    android:id="@+id/item_habitat_sunrise"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:textColor="@color/textColorPrimary"
+                    android:textSize="@dimen/textSizeSecondary"/>
+                <ImageView
+                    android:layout_width="64dp"
+                    android:layout_height="wrap_content"
+                    android:scaleType="centerInside"
+                    app:srcCompat="@drawable/ic_sunset" />
+                <TextView
+                    android:id="@+id/item_habitat_sunset"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:textColor="@color/textColorPrimary"
+                    android:textSize="@dimen/textSizeSecondary"/>
+            </LinearLayout>
+
+<!--            <View-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="@dimen/dividerWidth"-->
+<!--                android:layout_marginTop="4dp"-->
+<!--                android:layout_marginBottom="4dp"-->
+<!--                android:background="@color/colorDivider"/>-->
+
+            <LinearLayout
+                android:id="@+id/item_habitat_ll"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="visible"
                 android:layout_marginTop="8dp"
-                android:layout_marginBottom="8dp"/>
-            <ImageView
-                android:id="@+id/item_habitat_s2icon"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@color/colorTransparent"
-                app:srcCompat="@drawable/ic_humidity_color_64dp"/>
-            <TextView
-                android:id="@+id/item_habitat_sensor2"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="8dp"
-                android:textAlignment="textEnd"
-                android:textColor="#00AEEF"
-                android:textSize="@dimen/textSizeSubTitle"/>
-            <Space
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"/>
-        </LinearLayout>
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/dividerWidth"
-            android:layout_marginTop="4dp"
-            android:layout_marginBottom="4dp"
-            android:background="@color/colorDivider"/>
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical">
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="8dp"
-                app:srcCompat="@drawable/ic_time_white_24dp" />
-            <TextView
-                android:id="@+id/item_habitat_time"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:layout_marginLeft="8dp"
-                android:textColor="@color/textColorPrimary"
-                android:textSize="@dimen/textSizeSecondary"/>
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="8dp"
-                app:srcCompat="@drawable/ic_date_white_24dp" />
-            <TextView
-                android:id="@+id/item_habitat_date"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:layout_marginLeft="8dp"
-                android:gravity="center_vertical"
-                android:textColor="@color/textColorPrimary"
-                android:textSize="@dimen/textSizeSecondary"/>
-        </LinearLayout>
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/dividerWidth"
-            android:layout_marginTop="4dp"
-            android:layout_marginBottom="4dp"
-            android:background="@color/colorDivider"/>
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical">
-
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="8dp"
-                app:srcCompat="@drawable/ic_sunrise" />
+                <ImageView
+                    android:id="@+id/item_habitat_s1icon"
+                    android:layout_width="64dp"
+                    android:layout_height="64dp"
+                    android:background="@color/colorTransparent"
+                    android:scaleType="centerInside"
+                    app:srcCompat="@drawable/ic_temperature_color_64dp"/>
+                <TextView
+                    android:id="@+id/item_habitat_sensor1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAlignment="textEnd"
+                    android:textColor="#F7931D"
+                    android:textSize="@dimen/textSizeSubTitle"/>
+                <Space
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"/>
+<!--                <View-->
+<!--                    android:layout_width="@dimen/dividerWidth"-->
+<!--                    android:layout_height="match_parent"-->
+<!--                    android:background="@color/colorDivider"-->
+<!--                    android:layout_marginTop="8dp"-->
+<!--                    android:layout_marginBottom="8dp"/>-->
+                <ImageView
+                    android:id="@+id/item_habitat_s2icon"
+                    android:layout_width="64dp"
+                    android:layout_height="64dp"
+                    android:background="@color/colorTransparent"
+                    android:scaleType="centerInside"
+                    app:srcCompat="@drawable/ic_humidity_color_64dp"/>
+                <TextView
+                    android:id="@+id/item_habitat_sensor2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAlignment="textEnd"
+                    android:textColor="#00AEEF"
+                    android:textSize="@dimen/textSizeSubTitle"/>
+                <Space
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"/>
+            </LinearLayout>
             <TextView
-                android:id="@+id/item_habitat_sunrise"
-                android:layout_width="0dp"
+                android:id="@+id/item_habitat_devcnt"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:layout_marginLeft="8dp"
+                android:layout_marginTop="8dp"
+                android:visibility="gone"
+                android:gravity="center"
                 android:textColor="@color/textColorPrimary"
-                android:textSize="@dimen/textSizeSecondary"/>
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="8dp"
-                app:srcCompat="@drawable/ic_sunset" />
-            <TextView
-                android:id="@+id/item_habitat_sunset"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:layout_marginLeft="8dp"
-                android:textColor="@color/textColorPrimary"
-                android:textSize="@dimen/textSizeSecondary"/>
+                android:textSize="@dimen/textSizeSecondary"
+                android:text="@string/habitat_devcnt"/>
         </LinearLayout>
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/dividerWidth"
-            android:layout_marginTop="4dp"
-            android:layout_marginBottom="4dp"
-            android:background="@color/colorDivider"/>
-        <TextView
-            android:id="@+id/item_habitat_devcnt"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:textColor="@color/textColorPrimary"
-            android:textSize="@dimen/textSizeSecondary"
-            android:text="@string/habitat_devcnt"/>
-    </LinearLayout>
-</com.inledco.exoterra.view.GradientCornerLinearLayout>
+    </com.inledco.exoterra.view.GradientCornerLinearLayout>
+
+    <include
+        android:id="@+id/item_habitat_warning"
+        layout="@layout/layout_warning"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:visibility="gone" />
+</LinearLayout>

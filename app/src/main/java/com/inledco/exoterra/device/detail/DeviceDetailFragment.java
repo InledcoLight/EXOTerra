@@ -22,11 +22,17 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TextView;
+import android.widget.TimePicker;
 
 import com.alibaba.fastjson.JSON;
+import com.inledco.exoterra.GlobalSettings;
 import com.inledco.exoterra.R;
 import com.inledco.exoterra.aliot.AliotServer;
 import com.inledco.exoterra.aliot.BaseProperty;
@@ -55,6 +61,7 @@ import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.SimpleTimeZone;
 import java.util.TimeZone;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -67,8 +74,9 @@ public class DeviceDetailFragment extends BaseFragment {
     private Toolbar device_detail_toolbar;
     private ImageView device_detail_icon;
     private TextView device_detail_name;
-    private TextView device_detail_zone;
+//    private TextView device_detail_zone;
     private TextView device_detail_datetime;
+    private TextView device_detail_daytime;
     private TextView device_detail_user_list;
     private TextView device_detail_habitat;
     private TextView device_detail_upgrade;
@@ -93,6 +101,11 @@ public class DeviceDetailFragment extends BaseFragment {
     private String mProductKey;
     private String mDeviceName;
     private int mIconRes;
+
+    private DateFormat mTimeFormat;
+
+    private int mSunrise;
+    private int mSunset;
 
     @Nullable
     @Override
@@ -136,8 +149,9 @@ public class DeviceDetailFragment extends BaseFragment {
         device_detail_icon = view.findViewById(R.id.device_detail_icon);
         device_detail_name = view.findViewById(R.id.device_detail_name);
         device_detail_habitat = view.findViewById(R.id.device_detail_habitat);
-        device_detail_zone = view.findViewById(R.id.device_detail_zone);
+//        device_detail_zone = view.findViewById(R.id.device_detail_zone);
         device_detail_datetime = view.findViewById(R.id.device_detail_datetime);
+        device_detail_daytime = view.findViewById(R.id.device_detail_daytime);
         device_detail_user_list = view.findViewById(R.id.device_detail_user_list);
         device_detail_upgrade = view.findViewById(R.id.device_detail_upgrade);
         device_detail_delete = view.findViewById(R.id.device_detail_delete);
@@ -161,8 +175,12 @@ public class DeviceDetailFragment extends BaseFragment {
             @Override
             public void onChanged(@Nullable Object o) {
                 checkDeviceDatetime();
+                device_detail_daytime.setText(getTimeText(mDevice.getSunrise()) + " - " + getTimeText(mDevice.getSunset()));
             }
         });
+
+        mTimeFormat = GlobalSettings.getTimeFormat();
+        mTimeFormat.setTimeZone(new SimpleTimeZone(0, ""));
 
         if (mDevice != null) {
             mDeviceAdmin = TextUtils.equals("管理员", mDevice.getRole());
@@ -183,11 +201,14 @@ public class DeviceDetailFragment extends BaseFragment {
             } else {
                 device_detail_habitat.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_edit_white_24dp, 0);
             }
+            device_detail_daytime.setCompoundDrawablesRelativeWithIntrinsicBounds(0, 0, R.drawable.ic_edit_white_24dp, 0);
+            device_detail_daytime.setText(getTimeText(mDevice.getSunrise()) + " - " + getTimeText(mDevice.getSunset()));
             device_detail_delete.setEnabled(TextUtils.equals(mDevice.getRole(), "管理员"));
             getDeviceDatetime();
 
             device_detail_name.setText(name);
-            device_detail_zone.setText(getTimezoneDesc(mDevice.getZone()));
+//            device_detail_zone.setText(getTimezoneDesc(mDevice.getZone()));
+
             String mac = mDevice.getMac();
             device_detail_mac.setText(mac);
             DeviceInfo devInfo = mDevice.getDeviceInfo();
@@ -246,6 +267,12 @@ public class DeviceDetailFragment extends BaseFragment {
 //                addFragmentToStack(R.id.device_root, UserListFragment.newInstance(mDevice.getXDevice().getDeviceId()));
 //            }
 //        });
+        device_detail_daytime.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showDaytimeDialog();
+            }
+        });
         device_detail_upgrade.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -270,6 +297,91 @@ public class DeviceDetailFragment extends BaseFragment {
                 getActivity().getSupportFragmentManager().popBackStack();
             }
         });
+    }
+
+    private void showDaytimeDialog() {
+        final Group group = GroupManager.getInstance().getDeviceGroup(mDevice.getProductKey(), mDevice.getDeviceName());
+        mSunrise = mDevice.getSunrise();
+        mSunset = mDevice.getSunset();
+        View view = LayoutInflater.from(getContext()).inflate(R.layout.dialog_daytime, null, false);
+        CheckBox cb = view.findViewById(R.id.dialog_daytime_cb);
+        final RadioGroup rg = view.findViewById(R.id.dialog_daytime_rg);
+        final RadioButton start = view.findViewById(R.id.dialog_daytime_start);
+        final RadioButton end = view.findViewById(R.id.dialog_daytime_end);
+        final TimePicker tp = view.findViewById(R.id.dialog_daytime_tp);
+        cb.setVisibility(group != null ? View.VISIBLE : View.GONE);
+        rg.check(R.id.dialog_daytime_start);
+        start.setText(getTimeText(mSunrise));
+        end.setText(getTimeText(mSunset));
+        tp.setIs24HourView(GlobalSettings.is24HourFormat());
+        tp.setCurrentHour(mSunrise / 60);
+        tp.setCurrentMinute(mSunrise % 60);
+        final TimePicker.OnTimeChangedListener listener = new TimePicker.OnTimeChangedListener() {
+            @Override
+            public void onTimeChanged(TimePicker view, int hourOfDay, int minute) {
+                int value = hourOfDay*60+minute;
+                if (start.isChecked()) {
+                    mSunrise = value;
+                    start.setText(getTimeText(mSunrise));
+                } else if (end.isChecked()) {
+                    mSunset = value;
+                    start.setText(getTimeText(mSunset));
+                }
+            }
+        };
+        cb.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (group != null) {
+                    if (isChecked) {
+                        mSunrise = group.getSunrise();
+                        mSunset = group.getSunset();
+                        rg.clearCheck();
+                    } else {
+                        mSunrise = mDevice.getSunrise();
+                        mSunset = mDevice.getSunset();
+                        rg.check(R.id.dialog_daytime_start);
+                    }
+                    start.setEnabled(!isChecked);
+                    end.setEnabled(!isChecked);
+                    start.setText(getTimeText(mSunrise));
+                    end.setText(getTimeText(mSunset));
+                    tp.setVisibility(isChecked ? View.GONE : View.VISIBLE);
+                }
+            }
+        });
+        rg.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                switch (checkedId) {
+                    case R.id.dialog_daytime_start:
+                        tp.setOnTimeChangedListener(null);
+                        tp.setCurrentHour(mSunrise / 60);
+                        tp.setCurrentMinute(mSunrise % 60);
+                        tp.setOnTimeChangedListener(listener);
+                        break;
+                    case R.id.dialog_daytime_end:
+                        tp.setOnTimeChangedListener(null);
+                        tp.setCurrentHour(mSunset / 60);
+                        tp.setCurrentMinute(mSunset % 60);
+                        tp.setOnTimeChangedListener(listener);
+                        break;
+                }
+            }
+        });
+        tp.setOnTimeChangedListener(listener);
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        builder.setTitle(R.string.daytime);
+        builder.setView(view);
+        builder.setNegativeButton(R.string.cancel, null);
+        builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                Log.e(TAG, "onClick: " + mSunrise + " " + mSunset);
+                mDeviceViewModel.setDaytime(mSunrise, mSunset);
+            }
+        });
+        builder.show();
     }
 
     private void checkDeviceDatetime() {
@@ -306,6 +418,10 @@ public class DeviceDetailFragment extends BaseFragment {
                 }
             }
         }
+    }
+
+    private String getTimeText(int time) {
+        return mTimeFormat.format(time*60000);
     }
 
     @Subscribe (threadMode = ThreadMode.MAIN)
@@ -366,7 +482,7 @@ public class DeviceDetailFragment extends BaseFragment {
     public void updateDatetime(SimpleEvent event) {
         final Date date = new Date(mCurrentTime);
         final DateFormat df = new SimpleDateFormat(DEVICE_DATE_FORMAT);
-        device_detail_datetime.setText(df.format(date));
+        device_detail_datetime.setText(df.format(date) + " " + getTimezoneDesc(mDevice.getZone()));
     }
 
     private String getTimezoneDesc(int zone) {

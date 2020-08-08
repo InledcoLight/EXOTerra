@@ -3,21 +3,21 @@ package com.inledco.exoterra.home;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.aliyun.alink.linkkit.api.ILinkKitConnectListener;
 import com.aliyun.alink.linksdk.tools.AError;
 import com.inledco.exoterra.R;
 import com.inledco.exoterra.aliot.AliotClient;
+import com.inledco.exoterra.aliot.ILinkListener;
 import com.inledco.exoterra.base.BaseActivity;
 import com.inledco.exoterra.main.MainActivity;
 import com.inledco.exoterra.manager.UserManager;
-import com.inledco.exoterra.push.FCMMessageService;
-import com.inledco.exoterra.push.FCMTokenListener;
+import com.inledco.exoterra.util.RegexUtil;
+import com.inledco.exoterra.uvbbuddy.UvbMainActivity;
+import com.inledco.exoterra.web.WebActivity;
 
 public class HomeActivity extends BaseActivity implements View.OnClickListener {
 
@@ -46,7 +46,7 @@ public class HomeActivity extends BaseActivity implements View.OnClickListener {
     public void onBackPressed() {
         super.onBackPressed();
         dismissLoadDialog();
-        AliotClient.getInstance().deinit();
+        AliotClient.getInstance().stop();
     }
 
     @Override
@@ -77,12 +77,12 @@ public class HomeActivity extends BaseActivity implements View.OnClickListener {
 
     @Override
     protected void initData() {
-        FCMMessageService.syncToken(new FCMTokenListener() {
-            @Override
-            public void onTokenResult(String token) {
-                Log.e(TAG, "onTokenResult: " + token);
-            }
-        });
+//        FCMMessageService.syncToken(new FCMTokenListener() {
+//            @Override
+//            public void onTokenResult(String token) {
+//                Log.e(TAG, "onTokenResult: " + token);
+//            }
+//        });
     }
 
     @Override
@@ -109,28 +109,30 @@ public class HomeActivity extends BaseActivity implements View.OnClickListener {
                 if (authorized) {
                     String userid = UserManager.getInstance().getUserid();
                     String secret = UserManager.getInstance().getSecret();
-                    boolean result = AliotClient.getInstance().init(getApplicationContext(), userid, secret, new ILinkKitConnectListener() {
+                    AliotClient.getInstance().start(getApplicationContext(), userid, secret, new ILinkListener() {
                         @Override
-                        public void onError(AError aError) {
+                        public void onStart() {
+                            showLoadDialog();
+                        }
+
+                        @Override
+                        public void onInitError(AError aError) {
                             dismissLoadDialog();
                             showToast(aError.getMsg());
                         }
 
                         @Override
-                        public void onInitDone(Object o) {
+                        public void onInitDone() {
                             dismissLoadDialog();
                             startMainActivity();
                         }
                     });
-                    if (result) {
-                        showLoadDialog();
-                    }
                 } else {
                     startMainActivity();
                 }
                 break;
             case R.id.home_ll_uvb:
-
+                startUvbMainActivity();
                 break;
             case R.id.home_ll_restore:
 
@@ -145,38 +147,42 @@ public class HomeActivity extends BaseActivity implements View.OnClickListener {
 
                 break;
             case R.id.home_tv_exotv:
-
+                startWebActivity(getString(R.string.exoterra_tv));
                 break;
             case R.id.home_ib_facebook:
-
+                startWebActivity(getString(R.string.exoterra_facebook));
                 break;
             case R.id.home_ib_twitter:
-
+                startWebActivity(getString(R.string.exoterra_twitter));
                 break;
             case R.id.home_ib_instagram:
-
+                startWebActivity(getString(R.string.exoterra_instagram));
                 break;
             case R.id.home_ib_youtube:
-
+                startWebActivity(getString(R.string.exoterra_youtube));
                 break;
             case R.id.home_ib_email:
-//                OKHttpManager.getInstance().get(CloudApi.test(), null, new Callback() {
-//                    @Override
-//                    public void onFailure(Call call, IOException e) {
-//                        Log.e(TAG, "onFailure: " + e.getMessage());
-//                    }
-//
-//                    @Override
-//                    public void onResponse(Call call, Response response) throws IOException {
-//                        Log.e(TAG, "onResponse: " + response.body().string());
-//                    }
-//                });
+
                 break;
         }
     }
 
     private void startMainActivity() {
         Intent intent = new Intent(this, MainActivity.class);
+        startActivity(intent);
+    }
+
+    private void startUvbMainActivity() {
+        Intent intent = new Intent(this, UvbMainActivity.class);
+        startActivity(intent);
+    }
+
+    private void startWebActivity(String url) {
+        if (RegexUtil.isURL(url) == false) {
+            return;
+        }
+        Intent intent = new Intent(this, WebActivity.class);
+        intent.putExtra("url", url);
         startActivity(intent);
     }
 }

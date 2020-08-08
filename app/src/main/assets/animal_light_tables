@@ -1,0 +1,78 @@
+{
+  "category_noneed":{
+    "animals":[
+      {
+        "name":"Leopard Gecko",
+        "latin_name":"Eublepharis macularius",
+        "icon":""
+      },
+      {
+        "name":"Crested Gecko",
+        "latin_name":"Correlophus ciliatus",
+        "icon":""
+      },
+      {
+        "name":"Ball Python",
+        "latin_name":"Python regius",
+        "icon":""
+      },
+      {
+        "name":"Boa Constrictor",
+        "latin_name":"Boa constrictor",
+        "icon":""
+      },
+      {
+        "name":"PacMan Frog",
+        "latin_name":"Ceratophrys spec",
+        "icon":""
+      }
+    ]
+  },
+  "category_snake":{
+    "animals":[
+      {
+        "name":"Corn Snake",
+        "latin_name":"Pantherophis guttatus",
+        "icon":"",
+        "rate":1
+      },
+      {
+        "name":"Milk Snake",
+        "latin_name":"Lampropeltis triangulum",
+        "icon":"",
+        "rate":1
+      }
+    ],
+    "table":{
+      "10cm":[
+        "Reptile UVB100 - 13W",
+        "Reptile UVB150 - 13W"
+      ],
+      "20cm":[
+        "Reptile UVB100 - 13W",
+        "Reptile UVB100 - 26W",
+        "Reptile UVB150 - 13W"
+      ],
+      "30cm":[
+        "Reptile UVB100 - 13W",
+        "Reptile UVB100 - 26W",
+        "Reptile UVB150 - 13W"
+      ],
+      "40cm": [
+        "Reptile UVB150 - 26W",
+        "Reptile UVB100 - 26W",
+        "Reptile UVB150 - 13W"
+      ],
+      "50cm":[
+        "Reptile UVB150 - 26W",
+        "SunRay 35W",
+        "Reptile UVB150 - 26W"
+      ],
+      "60cm":[
+        "Reptile UVB150 - 26W",
+        "SunRay 35W",
+        "SunRay 50W"
+      ]
+    }
+  }
+}

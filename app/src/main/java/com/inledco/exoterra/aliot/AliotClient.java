@@ -7,6 +7,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.v4.app.NotificationCompat;
 import android.text.TextUtils;
@@ -119,6 +120,7 @@ public class AliotClient {
     /**
      * subscribe {APP_KEY, userid(deviceName)}
      */
+    private final String customFormat = "/%1$s/%2$s/user/*";
 
     private final String propertyResponseFormat = "/%1$s/%2$s/user/property/response";
 
@@ -133,16 +135,31 @@ public class AliotClient {
 
 //    private final String SERVER_FILE_PATH = "http://47.89.235.158:8086/imgs/";
 
+    private static final int IDLE = 0;
+    private static final int INITING = 1;
+    private static final int INITED = 2;
+    private static final int DEINITING = 3;
+    @IntDef({IDLE, INITING, INITED, DEINITING})
+    public @interface STATE {}
+
     private WeakReference<Context> mWeakContext;
 
     private final ExecutorService mExecutorService;
+    private final byte[] lock;
 
     private int msgid;
 
     private String mUserid;
 
-    private boolean initing;
-    private boolean inited;
+    @STATE
+    private volatile int state;
+
+    private volatile boolean subscribing;
+    private volatile boolean unsubscribing;
+
+    private volatile boolean synchronizedTime;
+
+    private boolean registered;
 
     private boolean connected;
 
@@ -237,6 +254,7 @@ public class AliotClient {
                 long serverRecvTime = Long.parseLong(result.serverRecvTime);
                 long serverSendTime = Long.parseLong(result.serverSendTime);
                 mTimeOffset = (serverSendTime + serverRecvTime - deviceRecvTime - deviceSendTime) / 2;
+                synchronizedTime = true;
                 Log.e(TAG, "onParse: timeoffset- " + mTimeOffset);
             } catch (Exception e) {
                 e.printStackTrace();
@@ -275,7 +293,6 @@ public class AliotClient {
         @Override
         public boolean shouldHandle(String connectId, String topic) {
             Log.e(TAG, "shouldHandle: " + connectId + " " + topic);
-//            return subTopics.contains(topic);
             return true;
         }
 
@@ -284,14 +301,8 @@ public class AliotClient {
             Log.e(TAG, "onConnectStateChange: " + connectId + " " + connectState);
             connected = (connectState == ConnectState.CONNECTED);
             if (connected) {
-                    //                subscribeTopic(String.format(customTopicFormat, APP_KEY, userid));
-                subscribeTopic(String.format(propertyResponseFormat, APP_KEY, mUserid));
-                subscribeTopic(String.format(deviceStatusFormat, APP_KEY, mUserid));
-                subscribeTopic(String.format(fotaProgressFormat, APP_KEY, mUserid));
-                subscribeTopic(String.format(inviteListenFormat, APP_KEY, mUserid));
-                if (!inited) {
-                    inited = true;
-
+                subscribeAllTopics();
+                if (!synchronizedTime) {
                     syncTime();
                 }
             }
@@ -310,7 +321,11 @@ public class AliotClient {
         }
     };
 
-    private AliotClient() {
+    public static AliotClient getInstance() {
+        return LazyHolder.INSTANCE;
+    }
+
+    private AliotClient () {
         REGION = AppConfig.getString("region");
         APP_KEY = AppConfig.getString("appKey");
         APP_SECRET = AppConfig.getString("appSecret");
@@ -319,18 +334,24 @@ public class AliotClient {
         IOTH2_ENDPOINT = String.format(IOTH2_EDNPOINT_FMT, APP_KEY, REGION);
         MQTT_DOMAIN = String.format(MQTT_DOMAIN_FMT, APP_KEY, REGION);
 
+        state = IDLE;
         mExecutorService = Executors.newCachedThreadPool();
+        lock = new byte[0];
+
+        ALog.setLevel(ALog.LEVEL_DEBUG);
     }
 
-    public static AliotClient getInstance() {
-        return LazyHolder.INSTANCE;
-    }
-
-    public boolean init(@NonNull final Context context, final String userid, final String secret, final ILinkKitConnectListener calback) {
-        if (initing || inited) {
-            deinit();
-            return false;
+    private void delay(long time) {
+        try {
+            Thread.sleep(time);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
+    }
+
+    public void init(@NonNull final Context context, final String userid, final String secret, final ILinkListener calback) {
+        Log.e(TAG, "INIT: " + state);
+        state = INITING;
         DeviceInfo devInfo = new DeviceInfo();
         devInfo.productKey = APP_KEY;
         devInfo.productSecret = APP_SECRET;
@@ -347,18 +368,18 @@ public class AliotClient {
         IoTApiClientConfig connectConfig = new IoTApiClientConfig();
         connectConfig.domain = IOT_DOMAIN;
 
-//        Map<String, ValueWrapper> propertyValues = new HashMap<>();
-//
-//        IoTH2Config ioTH2Config = new IoTH2Config();
-//        ioTH2Config.clientId = userid;
-//        ioTH2Config.endPoint = IOTH2_ENDPOINT;
+        //        Map<String, ValueWrapper> propertyValues = new HashMap<>();
+        //
+        //        IoTH2Config ioTH2Config = new IoTH2Config();
+        //        ioTH2Config.clientId = userid;
+        //        ioTH2Config.endPoint = IOTH2_ENDPOINT;
 
         LinkKitInitParams params = new LinkKitInitParams();
         params.deviceInfo = devInfo;
         params.mqttClientConfig = clientConfig;
         params.connectConfig = connectConfig;
-//        params.propertyValues = propertyValues;
-//        params.iotH2InitParams = ioTH2Config;
+        //        params.propertyValues = propertyValues;
+        //        params.iotH2InitParams = ioTH2Config;
 
         Log.e(TAG, "init: LinkKit SDK Version - " + LinkKit.getInstance().getSDKVersion());
         Log.e(TAG, "init: " + JSON.toJSONString(params));
@@ -366,65 +387,101 @@ public class AliotClient {
         LinkKit.getInstance().init(context, params, new ILinkKitConnectListener() {
             @Override
             public void onError(AError error) {
-                Log.e(TAG, "onError: " + JSONObject.toJSONString(error));
-                initing = false;
+                Log.e(TAG, "INIT onError: " + JSONObject.toJSONString(error));
                 if (calback != null) {
-                    calback.onError(error);
+                    calback.onInitError(error);
                 }
+                state = IDLE;
             }
 
             @Override
             public void onInitDone(final Object o) {
-                Log.e(TAG, "onInitDone: " + (System.currentTimeMillis() - time));
+                Log.e(TAG, "INIT onInitDone: " + (System.currentTimeMillis() - time));
 
                 mWeakContext = new WeakReference<>(context);
                 IntentFilter filter = new IntentFilter(AppConstants.GROUP_INVITE);
                 mWeakContext.get().registerReceiver(mGroupInviteReceiver, filter);
-
-//                subscribeTopic(String.format(customTopicFormat, APP_KEY, userid));
-//                subscribeTopic(String.format(propertyResponseFormat, APP_KEY, userid));
-//                subscribeTopic(String.format(deviceStatusFormat, APP_KEY, userid));
-//                subscribeTopic(String.format(fotaProgressFormat, APP_KEY, userid));
-//                subscribeTopic(String.format(inviteListenFormat, APP_KEY, userid));
-//                syncTime();
+                registered = true;
 
                 mUserid = userid;
-                initing = false;
-//                inited = true;
 
                 if (calback != null) {
-                    calback.onInitDone(o);
+                    calback.onInitDone();
                 }
+                state = INITED;
             }
         });
         LinkKit.getInstance().registerOnPushListener(mNotifyListener);
-        initing = true;
-        ALog.setLevel(ALog.LEVEL_DEBUG);
-        return true;
+        while (state == INITING);
+        if (state == IDLE) {
+            delay(50);
+            deinit();
+        }
     }
 
-    public void deinit() {
+    public void start(@NonNull final Context context, final String userid, final String secret, final ILinkListener calback) {
+        Log.e(TAG, "start: " + state);
+        if (calback != null) {
+            calback.onStart();
+        }
+        if (state == INITING) {
+            return;
+        }
         mExecutorService.execute(new Runnable() {
             @Override
             public void run() {
-                unsubscribeAllTopics();
-                LinkKit.getInstance().unRegisterOnPushListener(mNotifyListener);
-                LinkKit.getInstance().deinit();
-                if (mWeakContext != null && mWeakContext.get() != null) {
-                    mWeakContext.get().unregisterReceiver(mGroupInviteReceiver);
-                    mWeakContext.clear();
-                    mWeakContext = null;
+                synchronized (lock) {
+                    if (state == DEINITING) {
+                        while (state != IDLE)
+                            ;
+                    } else if (state == INITED) {
+                        deinit();
+                    }
+                    init(context, userid, secret, calback);
                 }
-                connected = false;
-                inited = false;
-                initing = false;
-                mUserid = null;
+            }
+        });
+    }
+
+    private void deinit() {
+        Log.e(TAG, "INIT deinit: " + state);
+        state = DEINITING;
+//        unsubscribeAllTopics();
+        LinkKit.getInstance().unRegisterOnPushListener(mNotifyListener);
+        LinkKit.getInstance().deinit();
+        if (mWeakContext != null) {
+            if (mWeakContext.get() != null && registered) {
+                mWeakContext.get().unregisterReceiver(mGroupInviteReceiver);
+                registered = false;
+            }
+            mWeakContext.clear();
+            mWeakContext = null;
+        }
+        connected = false;
+        mUserid = null;
+        synchronizedTime = false;
+        delay(100);
+        state = IDLE;
+        Log.e(TAG, "INIT: deinit done");
+    }
+
+    public void stop() {
+        Log.e(TAG, "stop: " + state);
+        if (state != INITED) {
+            return;
+        }
+        mExecutorService.execute(new Runnable() {
+            @Override
+            public void run() {
+                synchronized (lock) {
+                    deinit();
+                }
             }
         });
     }
 
     public boolean isInited() {
-        return inited;
+        return (state == INITED);
     }
 
     public boolean isConnected() {
@@ -435,51 +492,60 @@ public class AliotClient {
         return mTimeOffset;
     }
 
-    private void subscribeTopic(final String topic) {
-        final MqttSubscribeRequest request = new MqttSubscribeRequest();
-        request.topic = topic;
-        request.isSubscribe = true;
-        request.qos = 1;
-        LinkKit.getInstance().subscribe(request, new IConnectSubscribeListener() {
-            @Override
-            public void onSuccess() {
-                Log.e(TAG, "onSuccess: subscribe " + topic);
-                subTopics.add(request.topic);
-            }
-
-            @Override
-            public void onFailure(AError aError) {
-                Log.e(TAG, "onFailure: subscribe " + topic + " " + JSON.toJSONString(aError));
-            }
-        });
-    }
-
     private void subscribeTopic(final String topic, final IConnectSubscribeListener callback) {
         final MqttSubscribeRequest request = new MqttSubscribeRequest();
         request.topic = topic;
         request.isSubscribe = true;
-        request.qos = 1;
+        request.qos = 0;
+        LinkKit.getInstance().subscribe(request, callback);
+    }
+
+    private void subscribeTopic(final String topic) {
+//        subscribing = true;
+        final MqttSubscribeRequest request = new MqttSubscribeRequest();
+        request.topic = topic;
+        request.isSubscribe = true;
+        request.qos = 0;
         LinkKit.getInstance().subscribe(request, new IConnectSubscribeListener() {
             @Override
             public void onSuccess() {
                 Log.e(TAG, "onSuccess: subscribe " + topic);
                 subTopics.add(request.topic);
-                if (callback != null) {
-                    callback.onSuccess();
-                }
+                subscribing = false;
             }
 
             @Override
             public void onFailure(AError aError) {
                 Log.e(TAG, "onFailure: subscribe " + topic + " " + JSON.toJSONString(aError));
-                if (callback != null) {
-                    callback.onFailure(aError);
-                }
+                subscribing = false;
             }
         });
+//        while (subscribing);
+    }
+
+    private void subscribeAllTopics() {
+        subscribeTopic(String.format(propertyResponseFormat, APP_KEY, mUserid));
+        subscribeTopic(String.format(deviceStatusFormat, APP_KEY, mUserid));
+        subscribeTopic(String.format(fotaProgressFormat, APP_KEY, mUserid));
+        subscribeTopic(String.format(inviteListenFormat, APP_KEY, mUserid));
+//        subThread = new Thread(new Runnable() {
+//            @Override
+//            public void run() {
+//                delay(200);
+//                subscribeTopic(String.format(propertyResponseFormat, APP_KEY, mUserid));
+//                delay(20);
+//                subscribeTopic(String.format(deviceStatusFormat, APP_KEY, mUserid));
+//                delay(20);
+//                subscribeTopic(String.format(fotaProgressFormat, APP_KEY, mUserid));
+//                delay(20);
+//                subscribeTopic(String.format(inviteListenFormat, APP_KEY, mUserid));
+//            }
+//        });
+//        subThread.start();
     }
 
     private void unsubscribeTopic(String topic) {
+        unsubscribing = true;
         MqttSubscribeRequest request = new MqttSubscribeRequest();
         request.topic = topic;
         request.isSubscribe = false;
@@ -488,35 +554,30 @@ public class AliotClient {
             @Override
             public void onSuccess() {
                 Log.e(TAG, "onSuccess: unsub ");
+                unsubscribing = false;
             }
 
             @Override
             public void onFailure(AError aError) {
                 Log.e(TAG, "onFailure: unsub " + JSON.toJSONString(aError));
+                unsubscribing = false;
             }
         });
+        while (unsubscribing);
     }
 
     private void unsubscribeAllTopics() {
+        while (subscribing);
         Set<String> topics = new HashSet<>(subTopics);
         for (final String topic : topics) {
-            MqttSubscribeRequest request = new MqttSubscribeRequest();
-            request.topic = topic;
-            request.isSubscribe = false;
-            request.qos = 0;
-            LinkKit.getInstance().unsubscribe(request, new IConnectUnscribeListener() {
-                @Override
-                public void onSuccess() {
-                    Log.e(TAG, "onSuccess: unsubscribe " + topic);
-                    subTopics.remove(topic);
-                }
-
-                @Override
-                public void onFailure(AError aError) {
-                    Log.e(TAG, "onFailure: unsubscribe " + topic + " " + JSON.toJSONString(aError));
-                }
-            });
+            unsubscribeTopic(topic);
+            subTopics.remove(topic);
         }
+
+//        unsubscribeTopic(String.format(propertyResponseFormat, APP_KEY, mUserid));
+//        unsubscribeTopic(String.format(deviceStatusFormat, APP_KEY, mUserid));
+//        unsubscribeTopic(String.format(fotaProgressFormat, APP_KEY, mUserid));
+//        unsubscribeTopic(String.format(inviteListenFormat, APP_KEY, mUserid));
     }
 
     private void publish(@NonNull final String topic, int qos, @NonNull final String payload) {
@@ -533,7 +594,7 @@ public class AliotClient {
     }
 
     public void updateLabel(DeviceLabel... labels) {
-        if (!inited || labels == null || labels.length == 0) {
+        if (!isInited() || labels == null || labels.length == 0) {
             return;
         }
         msgid++;
@@ -555,7 +616,7 @@ public class AliotClient {
     }
 
     public void deleteLabel(AttrKey... attrKeys) {
-        if (!inited || attrKeys == null || attrKeys.length == 0) {
+        if (!isInited() || attrKeys == null || attrKeys.length == 0) {
             return;
         }
         msgid++;
@@ -577,7 +638,7 @@ public class AliotClient {
     }
 
     public void getCotaConfig() {
-        if (!inited) {
+        if (!isInited()) {
             return;
         }
         msgid++;

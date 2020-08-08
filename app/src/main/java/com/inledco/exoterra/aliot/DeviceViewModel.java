@@ -8,6 +8,8 @@ import com.alibaba.fastjson.JSON;
 import com.inledco.exoterra.base.BaseViewModel;
 import com.inledco.exoterra.scan.LocalClient;
 
+import org.greenrobot.eventbus.EventBus;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,8 +36,8 @@ public class DeviceViewModel<T extends Device> extends BaseViewModel<T> {
                 return;
             }
             Log.e(TAG, "onFinish: 1");
-            String pkey = getData().getProductKey();
-            String dname = getData().getDeviceName();
+            final String pkey = getData().getProductKey();
+            final String dname = getData().getDeviceName();
             AliotServer.getInstance().getDeviceProperties(pkey, dname, new HttpCallback<UserApi.GetDevicePropertiesResponse>() {
                 @Override
                 public void onError(String error) {
@@ -48,6 +50,7 @@ public class DeviceViewModel<T extends Device> extends BaseViewModel<T> {
                         Log.e(TAG, "onSuccess: x");
                         getData().updateProperties(result.data);
                         postValue();
+                        EventBus.getDefault().post(new ADevice(pkey, dname));
                     }
                 }
             });
@@ -99,6 +102,7 @@ public class DeviceViewModel<T extends Device> extends BaseViewModel<T> {
                 params.put(attr.getAttrKey(), attr.getAttrValue());
             }
             String items = JSON.toJSONString(params);
+            Log.e(TAG, "setProperty: " + items);
             setTimer.cancel();
             AliotServer.getInstance().setDeviceProperties(pkey, dname, items, new HttpCallback<UserApi.SetDevicePropertiesResponse>() {
                 @Override
@@ -241,12 +245,12 @@ public class DeviceViewModel<T extends Device> extends BaseViewModel<T> {
     }
 
     public void setSunset(int sunset) {
-        KeyValue attrSunset = getData().setSunrise(sunset);
+        KeyValue attrSunset = getData().setSunset(sunset);
         setProperty(attrSunset);
     }
     public void setDaytime(int sunrise, int sunset) {
         KeyValue attrSunrise = getData().setSunrise(sunrise);
-        KeyValue attrSunset = getData().setSunrise(sunset);
+        KeyValue attrSunset = getData().setSunset(sunset);
         setProperty(attrSunrise, attrSunset);
     }
 

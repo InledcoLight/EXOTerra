@@ -11,10 +11,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
-import com.aliyun.alink.linkkit.api.ILinkKitConnectListener;
 import com.aliyun.alink.linksdk.tools.AError;
 import com.inledco.exoterra.R;
 import com.inledco.exoterra.aliot.AliotClient;
+import com.inledco.exoterra.aliot.ILinkListener;
 import com.inledco.exoterra.base.BaseFragment;
 import com.inledco.exoterra.common.SimpleAdapter;
 import com.inledco.exoterra.main.MainActivity;
@@ -96,22 +96,25 @@ public class NewProductsFragment extends BaseFragment implements View.OnClickLis
                 if (UserManager.getInstance().isAuthorized()) {
                     String userid = UserManager.getInstance().getUserid();
                     String secret = UserManager.getInstance().getSecret();
-                    boolean result = AliotClient.getInstance().init(getContext().getApplicationContext(), userid, secret, new ILinkKitConnectListener() {
+                    AliotClient.getInstance().start(getContext().getApplicationContext(), userid, secret, new ILinkListener() {
+
                         @Override
-                        public void onError(AError aError) {
+                        public void onStart() {
+                            showLoadDialog();
+                        }
+
+                        @Override
+                        public void onInitError(AError aError) {
                             dismissLoadDialog();
                             showToast(aError.getMsg());
                         }
 
                         @Override
-                        public void onInitDone(Object o) {
+                        public void onInitDone() {
                             dismissLoadDialog();
                             startMainActivity();
                         }
                     });
-                    if (result) {
-                        showLoadDialog();
-                    }
                 } else {
                     startMainActivity();
                 }

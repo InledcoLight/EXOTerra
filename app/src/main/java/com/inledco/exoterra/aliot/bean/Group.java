@@ -19,6 +19,7 @@ public class Group {
     public String remark2;
     public String remark3;
     public String creator;
+    public boolean isDefault;
     public long create_time;
     public long update_time;
     public List<User> users;

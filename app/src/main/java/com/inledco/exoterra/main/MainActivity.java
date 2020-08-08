@@ -54,7 +54,7 @@ public class MainActivity extends BaseActivity {
         if (EventBus.getDefault().isRegistered(this)) {
             EventBus.getDefault().unregister(this);
         }
-        AliotClient.getInstance().deinit();
+        AliotClient.getInstance().stop();
         DeviceManager.getInstance().clear();
         GroupManager.getInstance().clear();
     }
@@ -118,6 +118,12 @@ public class MainActivity extends BaseActivity {
 
     @Override
     protected void initEvent() {
+        main_bnv.setOnNavigationItemReselectedListener(new BottomNavigationView.OnNavigationItemReselectedListener() {
+            @Override
+            public void onNavigationItemReselected(@NonNull MenuItem menuItem) {
+                /* 如果省略 点击已选中item会再次触发选中事件 */
+            }
+        });
         main_bnv.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {

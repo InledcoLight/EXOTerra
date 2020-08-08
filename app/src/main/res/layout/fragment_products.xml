@@ -35,6 +35,7 @@
                 android:textStyle="bold"
                 android:textSize="@dimen/textSizeTitle"
                 android:textColor="@color/textColorPrimary"
+                android:textAllCaps="true"
                 android:text="@string/add_device"/>
         </FrameLayout>
         <LinearLayout

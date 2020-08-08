@@ -58,8 +58,7 @@ public class DeviceActivity extends BaseActivity {
     private TextView device_name;
     private ImageButton device_detail;
     private TextView device_habitat_name;
-    private ImageView device_status_local;
-    private ImageView device_status_cloud;
+    private ImageView device_status_state;
     private ImageView device_status_sensor;
     private Button device_btn_back;
     private LinearLayout device_ll_show;
@@ -78,9 +77,6 @@ public class DeviceActivity extends BaseActivity {
     private Fragment mDeviceFragment;
 
     private boolean authorized;
-
-    private boolean localValid;
-    private int localIp;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -116,8 +112,7 @@ public class DeviceActivity extends BaseActivity {
         device_name = findViewById(R.id.device_name);
         device_detail = findViewById(R.id.device_detail);
         device_habitat_name = findViewById(R.id.device_habitat_name);
-        device_status_local = findViewById(R.id.device_status_local);
-        device_status_cloud = findViewById(R.id.device_status_cloud);
+        device_status_state = findViewById(R.id.device_status_state);
         device_status_sensor = findViewById(R.id.device_status_sensor);
         device_btn_back = findViewById(R.id.device_btn_back);
         device_ll_show = findViewById(R.id.device_ll_show);
@@ -198,9 +193,9 @@ public class DeviceActivity extends BaseActivity {
         if (group != null) {
             device_habitat_name.setText(group.name);
         }
-        device_status_local.setVisibility(authorized ? View.GONE : View.VISIBLE);
-        device_status_local.setImageResource(authorized ? R.drawable.ic_wifi : R.drawable.ic_wifi_on);
-        device_status_cloud.setImageResource(mDevice.isOnline() ? R.drawable.ic_cloud_green_16dp : R.drawable.ic_cloud_grey_16dp);
+        if (authorized) {
+            device_status_state.setImageResource(mDevice.isOnline() ? R.drawable.ic_cloud_green_16dp : R.drawable.ic_cloud_grey_16dp);
+        }
 
         mDeviceBaseViewModel = ViewModelProviders.of(this).get(DeviceViewModel.class);
         mDeviceBaseViewModel.setData(mDevice);
@@ -295,8 +290,9 @@ public class DeviceActivity extends BaseActivity {
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onDeviceStatusChangedEvent(DeviceStatusChangedEvent event) {
         if (event != null && mDevice != null
-            && TextUtils.equals(event.getTag(), mDevice.getTag())) {
-            device_status_cloud.setImageResource(mDevice.isOnline() ? R.drawable.ic_cloud_green_16dp : R.drawable.ic_cloud_grey_16dp);
+            && TextUtils.equals(event.getTag(), mDevice.getTag())
+            && authorized) {
+            device_status_state.setImageResource(mDevice.isOnline() ? R.drawable.ic_cloud_green_16dp : R.drawable.ic_cloud_grey_16dp);
         }
     }
 

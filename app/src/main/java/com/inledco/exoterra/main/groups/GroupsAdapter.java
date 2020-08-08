@@ -74,6 +74,7 @@ public class GroupsAdapter extends SimpleAdapter<Group, GroupsAdapter.GroupViewH
             holder.title.setBackgroundResource(group.getDeviceCount() == 0 ? R.drawable.shape_roundrect_red : R.drawable.shape_roundrect_gradient);
             holder.set.setVisibility(View.INVISIBLE);
             holder.more.setVisibility(View.GONE);
+            holder.warn.setVisibility(View.GONE);
         }
 
         holder.title.setOnClickListener(new View.OnClickListener() {
@@ -84,10 +85,12 @@ public class GroupsAdapter extends SimpleAdapter<Group, GroupsAdapter.GroupViewH
                     mSelectedHolder = null;
                     holder.set.setVisibility(View.INVISIBLE);
                     holder.more.setVisibility(View.GONE);
+                    holder.warn.setVisibility(View.GONE);
                 } else {
                     if (mSelectedHolder != null) {
                         mSelectedHolder.set.setVisibility(View.INVISIBLE);
                         mSelectedHolder.more.setVisibility(View.GONE);
+                        mSelectedHolder.warn.setVisibility(View.GONE);
                     }
                     mSelectedGroupid = groupid;
                     mSelectedHolder = holder;
@@ -119,6 +122,43 @@ public class GroupsAdapter extends SimpleAdapter<Group, GroupsAdapter.GroupViewH
         final int sunrise = group.getSunrise();
         final int sunset = group.getSunset();
 
+        long time = System.currentTimeMillis();
+        TimeZone tz = new SimpleTimeZone(zone*60000, "");
+        mTimeFormat.setTimeZone(tz);
+        mDateFormat.setTimeZone(tz);
+        mSelectedHolder.time.setText(mTimeFormat.format(time));
+        mSelectedHolder.date.setText(mDateFormat.format(time));
+        //        String daynight = mContext.getString(R.string.nighttime);
+        //        int minutes = (int) ((time / 60000 + 1440 + zone) % 1440);
+        //        @DrawableRes int icon = R.drawable.ic_moon;
+        //        if (sunrise <= sunset) {
+        //            if (minutes >= sunrise && minutes < sunset) {
+        //                daynight = mContext.getString(R.string.daytime);
+        //                icon = R.drawable.ic_sun;
+        //            }
+        //        } else {
+        //            if (minutes >= sunrise || minutes < sunset) {
+        //                daynight = mContext.getString(R.string.daytime);
+        //                icon = R.drawable.ic_sun;
+        //            }
+        //        }
+        mTimeFormat.setTimeZone(new SimpleTimeZone(0, ""));
+        holder.sunrise.setText(mTimeFormat.format(sunrise*60000));
+        holder.sunset.setText(mTimeFormat.format(sunset*60000));
+
+        if (group.getDeviceCount() == 0) {
+            holder.devcnt.setVisibility(View.GONE);
+            holder.sensor1.setText(null);
+            holder.sensor2.setText(null);
+            holder.sen_container.setVisibility(View.GONE);
+            holder.warn.setVisibility(View.VISIBLE);
+            holder.warn_msg.setText(R.string.no_habitat_device_warning);
+            return;
+        }
+        holder.devcnt.setText(mContext.getString(R.string.habitat_devcnt, group.getDeviceCount()));
+        holder.devcnt.setVisibility(View.VISIBLE);
+        holder.warn.setVisibility(View.GONE);
+
         for (Group.Device dev : group.devices) {
             if (TextUtils.equals(dev.product_key, AliotConsts.PRODUCT_KEY_EXOSOCKET)) {
                 String key = dev.product_key + "_" + dev.device_name;
@@ -137,7 +177,7 @@ public class GroupsAdapter extends SimpleAdapter<Group, GroupsAdapter.GroupViewH
                             ExoSocket.Sensor sensor1 = sensors[0];
                             int value1 = sensor1.getValue();
                             int type1 = sensor1.getType();
-                            String s1text = SensorUtil.getSensorValueText(value1, type1) + SensorUtil.getSensorUnit(type1);
+                            String s1text = SensorUtil.getSensorValueText(value1, type1) + "\n" + SensorUtil.getSensorUnit(type1);
                             holder.sensor1.setText(s1text);
                             res = true;
                         }
@@ -145,42 +185,21 @@ public class GroupsAdapter extends SimpleAdapter<Group, GroupsAdapter.GroupViewH
                             ExoSocket.Sensor sensor2 = sensors[1];
                             int value2 = sensor2.getValue();
                             int type2 = sensor2.getType();
-                            String s2text = SensorUtil.getSensorValueText(value2, type2) + SensorUtil.getSensorUnit(type2);
+                            String s2text = SensorUtil.getSensorValueText(value2, type2) + "\n" + SensorUtil.getSensorUnit(type2);
                             holder.sensor2.setText(s2text);
                             res = true;
                         }
                     }
                     if (res) {
-                        break;
+                        holder.sen_container.setVisibility(View.VISIBLE);
+                        return;
                     }
                 }
             }
         }
-
-        long time = System.currentTimeMillis();
-        TimeZone tz = new SimpleTimeZone(zone*60000, "");
-        mTimeFormat.setTimeZone(tz);
-        mDateFormat.setTimeZone(tz);
-        mSelectedHolder.time.setText(mTimeFormat.format(time));
-        mSelectedHolder.date.setText(mDateFormat.format(time));
-//        String daynight = mContext.getString(R.string.nighttime);
-//        int minutes = (int) ((time / 60000 + 1440 + zone) % 1440);
-//        @DrawableRes int icon = R.drawable.ic_moon;
-//        if (sunrise <= sunset) {
-//            if (minutes >= sunrise && minutes < sunset) {
-//                daynight = mContext.getString(R.string.daytime);
-//                icon = R.drawable.ic_sun;
-//            }
-//        } else {
-//            if (minutes >= sunrise || minutes < sunset) {
-//                daynight = mContext.getString(R.string.daytime);
-//                icon = R.drawable.ic_sun;
-//            }
-//        }
-        mTimeFormat.setTimeZone(new SimpleTimeZone(0, ""));
-        holder.sunrise.setText(mTimeFormat.format(sunrise*60000));
-        holder.sunset.setText(mTimeFormat.format(sunset*60000));
-        holder.devcnt.setText(mContext.getString(R.string.habitat_devcnt, group.getDeviceCount()));
+        holder.sensor1.setText(null);
+        holder.sensor2.setText(null);
+        holder.sen_container.setVisibility(View.GONE);
     }
 
     public void removeData(final int position) {
@@ -246,6 +265,9 @@ public class GroupsAdapter extends SimpleAdapter<Group, GroupsAdapter.GroupViewH
         private TextView sunrise;
         private TextView sunset;
         private TextView devcnt;
+        private LinearLayout sen_container;
+        private View warn;
+        private TextView warn_msg;
 
         public GroupViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -261,6 +283,9 @@ public class GroupsAdapter extends SimpleAdapter<Group, GroupsAdapter.GroupViewH
             sunrise = itemView.findViewById(R.id.item_habitat_sunrise);
             sunset = itemView.findViewById(R.id.item_habitat_sunset);
             devcnt = itemView.findViewById(R.id.item_habitat_devcnt);
+            sen_container = itemView.findViewById(R.id.item_habitat_ll);
+            warn = itemView.findViewById(R.id.item_habitat_warning);
+            warn_msg = warn.findViewById(R.id.warning_tv_msg);
         }
     }
 }

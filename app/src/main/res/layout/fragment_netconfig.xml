@@ -49,6 +49,7 @@
                 android:text="@string/add_device"
                 android:textColor="@color/textColorPrimary"
                 android:textSize="@dimen/textSizeTitle"
+                android:textAllCaps="true"
                 android:textStyle="bold" />
         </FrameLayout>
 

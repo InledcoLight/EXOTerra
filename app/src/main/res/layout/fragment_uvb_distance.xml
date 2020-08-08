@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@drawable/ic_background"
+    android:clickable="true">
+
+    <include
+        layout="@layout/layout_uvb_title"/>
+
+    <com.inledco.exoterra.view.GradientCornerLinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:gravity="center_horizontal"
+        android:padding="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        app:strokeWidth="@dimen/strokeWidth"
+        app:radius="@dimen/cornerRadius"
+        app:direction="horizontal"
+        app:gradientStart="@color/gradientYellow"
+        app:gradientEnd="@color/gradientGreen">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/textColorPrimary"
+            android:textSize="@dimen/textSizePrimary"
+            android:textAllCaps="true"
+            android:text="@string/choose_uvb_distance"/>
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:scaleType="center"
+            app:srcCompat="@mipmap/ic_uvb"/>
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:scaleType="center"
+            app:srcCompat="@drawable/ic_arrow"/>
+        <ImageView
+            android:id="@+id/uvb_distance_animal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:scaleType="center"/>
+        <ImageView
+            android:id="@+id/uvb_distance_rate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:scaleType="center"
+            app:srcCompat="@drawable/ic_ratestar_0"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/textSizeSecondary"
+            android:textColor="@color/textColorPrimary"
+            android:text="@string/uvb_rating"/>
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/uvb_distance_rv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:orientation="vertical"/>
+    </com.inledco.exoterra.view.GradientCornerLinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginBottom="16dp">
+        <com.inledco.exoterra.view.GradientCornerButton
+            android:id="@+id/uvb_distance_back"
+            style="?attr/buttonStyle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginRight="8dp"
+            android:background="?attr/selectableItemBackground"
+            android:text="@string/back"
+            app:direction="horizontal"
+            app:gradientEnd="@color/gradientWhite"
+            app:gradientStart="@color/gradientYellow"
+            app:radius="@dimen/cornerRadius"
+            app:strokeWidth="@dimen/strokeWidth" />
+        <com.inledco.exoterra.view.GradientCornerButton
+            android:id="@+id/uvb_distance_next"
+            style="?attr/buttonStyle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginLeft="8dp"
+            android:background="?attr/selectableItemBackground"
+            android:text="@string/next"
+            app:direction="horizontal"
+            app:gradientEnd="@color/gradientGreen"
+            app:gradientStart="@color/gradientYellow"
+            app:radius="@dimen/cornerRadius"
+            app:strokeWidth="@dimen/strokeWidth" />
+    </LinearLayout>
+
+</LinearLayout>
