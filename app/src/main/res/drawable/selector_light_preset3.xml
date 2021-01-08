@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:state_checked="false" android:drawable="@drawable/ic_light_preset3"/>
-    <item android:state_checked="true" android:drawable="@drawable/ic_light_preset3_on"/>
-</selector>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:drawable="@drawable/selector_icon_bg"/>
+    <item android:drawable="@drawable/ic_light_preset3"/>
+</layer-list>

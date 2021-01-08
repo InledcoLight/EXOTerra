@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/colorBottomDialog"
+    android:orientation="vertical">
+
+    <Button
+        android:id="@+id/dialog_action_turnon"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/selectableItemBackground"
+        android:textColor="@color/textColorPrimary"
+        android:text="@string/turnon"/>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dividerWidth"
+        android:background="@color/colorDivider"/>
+
+    <Button
+        android:id="@+id/dialog_action_turnoff"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/selectableItemBackground"
+        android:textColor="@color/textColorPrimary"
+        android:text="@string/turnoff"/>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dividerWidth"
+        android:background="@color/colorDivider"/>
+
+    <Button
+        android:id="@+id/dialog_action_period"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/selectableItemBackground"
+        android:textColor="@color/textColorPrimary"
+        android:text="@string/time_period"/>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dividerWidth"
+        android:background="@color/colorDivider"/>
+
+    <Button
+        android:id="@+id/dialog_action_cancel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/selectableItemBackground"
+        android:textColor="@color/textColorSencondary"
+        android:text="@string/cancel"/>
+
+</LinearLayout>

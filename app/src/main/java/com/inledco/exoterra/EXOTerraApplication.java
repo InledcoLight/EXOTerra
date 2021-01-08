@@ -8,13 +8,17 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.support.annotation.RequiresApi;
+import android.util.DisplayMetrics;
 
 import com.inledco.exoterra.aliot.AliotClient;
 import com.inledco.exoterra.event.DisconnectIotEvent;
+import com.tencent.bugly.crashreport.CrashReport;
 
 import org.greenrobot.eventbus.EventBus;
 
 import androidx.multidex.MultiDexApplication;
+import me.jessyan.autosize.AutoSize;
+import me.jessyan.autosize.AutoSizeConfig;
 
 public class EXOTerraApplication extends MultiDexApplication {
     private static final String TAG = "EXOTerraApplication";
@@ -83,6 +87,15 @@ public class EXOTerraApplication extends MultiDexApplication {
             }
         });
 
+        DisplayMetrics dm = getResources().getDisplayMetrics();
+        if (((float) dm.widthPixels)/((float) dm.heightPixels) > 9/16 ) {
+            AutoSizeConfig.getInstance().setBaseOnWidth(false);
+        } else {
+            AutoSizeConfig.getInstance().setBaseOnWidth(true);
+        }
+        AutoSizeConfig.getInstance().setExcludeFontScale(true);
+        AutoSize.checkAndInit(this);
+
         AppConfig.load(this, "AppConfig");
         GlobalSettings.init(this);
 
@@ -92,6 +105,22 @@ public class EXOTerraApplication extends MultiDexApplication {
             createNotificationChannel(getString(R.string.notify_chnid_delete_home), getString(R.string.notify_chn_delete_home), NotificationManager.IMPORTANCE_HIGH);
             createNotificationChannel(getString(R.string.notify_chnid_alarm), getString(R.string.notify_chn_alarm), NotificationManager.IMPORTANCE_HIGH);
         }
+
+//        CrashReport.UserStrategy strategy = new CrashReport.UserStrategy(getApplicationContext());
+//        strategy.setCrashHandleCallback(new CrashReport.CrashHandleCallback() {
+//            @Override
+//            public synchronized Map<String, String> onCrashHandleStart(int i, String s, String s1, String s2) {
+//                LinkedHashMap<String, String> map = new LinkedHashMap<>();
+//                return map;
+//            }
+//
+//            @Override
+//            public synchronized byte[] onCrashHandleStart2GetExtraDatas(int i, String s, String s1, String s2) {
+//                return super.onCrashHandleStart2GetExtraDatas(i, s, s1, s2);
+//            }
+//        });
+        CrashReport.setIsDevelopmentDevice(getApplicationContext(), BuildConfig.DEBUG);
+        CrashReport.initCrashReport(getApplicationContext());
     }
 
     private NotificationManager getNotificationManager() {

@@ -2,17 +2,18 @@ package com.inledco.exoterra.main;
 
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
 import android.util.Log;
-import android.view.MenuItem;
 
+import com.inledco.exoterra.AppConstants;
 import com.inledco.exoterra.R;
 import com.inledco.exoterra.aliot.AliotClient;
+import com.inledco.exoterra.aliot.GroupInviteReceiver;
 import com.inledco.exoterra.aliot.bean.InviteAction;
 import com.inledco.exoterra.aliot.bean.InviteMessage;
 import com.inledco.exoterra.base.BaseActivity;
@@ -39,10 +40,15 @@ public class MainActivity extends BaseActivity {
     private MainViewModel mMainViewModel;
     private AuthStatus mAuthStatus;
 
+    private GroupInviteReceiver mGroupInviteReceiver;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        mGroupInviteReceiver = new GroupInviteReceiver();
+        IntentFilter filter = new IntentFilter(AppConstants.GROUP_INVITE);
+        registerReceiver(mGroupInviteReceiver, filter);
         EventBus.getDefault().register(this);
         initData();
         initEvent();
@@ -51,12 +57,14 @@ public class MainActivity extends BaseActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        unregisterReceiver(mGroupInviteReceiver);
         if (EventBus.getDefault().isRegistered(this)) {
             EventBus.getDefault().unregister(this);
         }
         AliotClient.getInstance().stop();
         DeviceManager.getInstance().clear();
         GroupManager.getInstance().clear();
+        UserManager.getInstance().deinit();
     }
 
     @Override
@@ -106,6 +114,9 @@ public class MainActivity extends BaseActivity {
         mMainViewModel.setData(mAuthStatus);
 
         if (mAuthStatus.isAuthorized()) {
+            String userid = UserManager.getInstance().getUserid();
+            String secret = UserManager.getInstance().getSecret();
+            AliotClient.getInstance().start(this, userid, secret);
             DeviceManager.getInstance().getSubscribedDevices();
             GroupManager.getInstance().getGroups();
         } else {
@@ -118,38 +129,32 @@ public class MainActivity extends BaseActivity {
 
     @Override
     protected void initEvent() {
-        main_bnv.setOnNavigationItemReselectedListener(new BottomNavigationView.OnNavigationItemReselectedListener() {
-            @Override
-            public void onNavigationItemReselected(@NonNull MenuItem menuItem) {
-                /* 如果省略 点击已选中item会再次触发选中事件 */
-            }
+        main_bnv.setOnNavigationItemReselectedListener(menuItem -> {
+            /* 如果省略 点击已选中item会再次触发选中事件 */
         });
-        main_bnv.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
-                Fragment fragment = null;
-                switch (menuItem.getItemId()) {
-                    case R.id.main_bnv_home:
-                        finish();
-                        break;
-                    case R.id.main_bnv_dashboard:
-                        fragment = mAuthStatus.isAuthorized() ? new DashboardFragment() : new GroupsLoginFragment();
-                        break;
-                    case R.id.main_bnv_habitat:
-                        fragment = mAuthStatus.isAuthorized() ? new GroupsFragment() : new GroupsLoginFragment();
-                        break;
-                    case R.id.main_bnv_devices:
-                        fragment = mAuthStatus.isAuthorized() ? new DevicesFragment() : new LocalDevicesFragment();
-                        break;
-                    case R.id.main_bnv_pref:
-                        fragment = new PrefFragment();
-                        break;
-                }
-                if (fragment != null) {
-                    replaceFragment(R.id.main_fl_show, fragment);
-                }
-                return true;
+        main_bnv.setOnNavigationItemSelectedListener(menuItem -> {
+            Fragment fragment = null;
+            switch (menuItem.getItemId()) {
+                case R.id.main_bnv_home:
+                    finish();
+                    break;
+                case R.id.main_bnv_dashboard:
+                    fragment = mAuthStatus.isAuthorized() ? new DashboardFragment() : new GroupsLoginFragment();
+                    break;
+                case R.id.main_bnv_habitat:
+                    fragment = mAuthStatus.isAuthorized() ? new GroupsFragment() : new GroupsLoginFragment();
+                    break;
+                case R.id.main_bnv_devices:
+                    fragment = mAuthStatus.isAuthorized() ? new DevicesFragment() : new LocalDevicesFragment();
+                    break;
+                case R.id.main_bnv_pref:
+                    fragment = new PrefFragment();
+                    break;
             }
+            if (fragment != null) {
+                replaceFragment(R.id.main_fl_show, fragment);
+            }
+            return true;
         });
         main_bnv.setSelectedItemId(mAuthStatus.isAuthorized() ? R.id.main_bnv_dashboard : R.id.main_bnv_devices);
     }

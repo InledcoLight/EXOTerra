@@ -9,6 +9,7 @@ import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.widget.LinearLayout;
 
@@ -101,20 +102,26 @@ public class TurningWheel extends LinearLayout {
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+        setMeasuredDimension(MeasureSpec.getSize(widthMeasureSpec), MeasureSpec.getSize(heightMeasureSpec));
+        Log.e(TAG, "onMeasure: " + MeasureSpec.getSize(widthMeasureSpec) + " " + MeasureSpec.getSize(heightMeasureSpec));
+//        int paddingLeft = getPaddin+gLeft();
+//        int paddingRight = getPaddingRight();
+//        int paddingTop = getPaddingTop();
+//        int paddingBottom = getPaddingBottom();
+//        int width = MeasureSpec.getSize(widthMeasureSpec);
+//        int height = MeasureSpec.getSize(widthMeasureSpec);
+
 //        int width = getMeasuredWidth();
 //        int height = getMeasuredHeight();
-        int paddingLeft = getPaddingLeft();
-        int paddingRight = getPaddingRight();
-        int paddingTop = getPaddingTop();
-        int paddingBottom = getPaddingBottom();
+
 //        int w = width - paddingLeft - paddingRight;
 //        int h = height - paddingTop - paddingBottom;
 //        int min = Math.min(w, h);
 //        setMeasuredDimension(min+paddingLeft+paddingRight, min+paddingTop+paddingBottom);
 
-        int max = (int) Math.max(mUnreachedWidth, mProgressWidth);
-        int min = Math.min(mWheelDrawable.getIntrinsicWidth(), mWheelDrawable.getIntrinsicHeight());
-        setMeasuredDimension(min+max+paddingLeft+paddingRight, min+max+paddingTop+paddingBottom);
+//        int max = (int) Math.max(mUnreachedWidth, mProgressWidth);
+//        int min = Math.min(mWheelDrawable.getIntrinsicWidth(), mWheelDrawable.getIntrinsicHeight());
+//        setMeasuredDimension(min+max+paddingLeft+paddingRight, min+max+paddingTop+paddingBottom);
     }
 
     @Override
@@ -127,6 +134,8 @@ public class TurningWheel extends LinearLayout {
         float radius = (min-max)/2;
         mCenterX = getPaddingLeft() + w/2;
         mCenterY = getPaddingTop() + h/2;
+
+        Log.e(TAG, "onDraw: " + w + " " + h + " " + max + " " + radius);
 
         float left = mCenterX - radius;
         float top = mCenterY - radius;
@@ -159,7 +168,8 @@ public class TurningWheel extends LinearLayout {
 
         float thumbRadius = radius - max/2 - 16 - th/2;
         mPointerX = (float) (mCenterX + sin * thumbRadius);
-        mPointerY = (float) (mCenterX - cos * thumbRadius);
+        mPointerY = (float) (mCenterY - cos * thumbRadius);
+        Log.e(TAG, "onDraw: " + mPointerX + " " + mPointerY + " " + tw + " " + th);
     }
 
     @Override

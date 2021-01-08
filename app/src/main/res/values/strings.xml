@@ -415,4 +415,11 @@
     <string name="smartconfig_msg">Connecting your device using Smart Config</string>
     <string name="compatible_mode_msg">Connecting your device using Compatible Mode</string>
     <string name="please_wait">Please wait.</string>
+    <string name="repeat">Repeat</string>
+    <string name="turnon_time">Turnon Time</string>
+    <string name="turnoff_time">Turnoff Time</string>
+    <string name="tomorrow">Tomorrow</string>
+    <string name="next_day">Next Day</string>
+    <string name="custom">Custom</string>
+    <string name="time_period">Time Period</string>
 </resources>

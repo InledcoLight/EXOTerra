@@ -5,7 +5,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
-import android.view.View;
+import android.widget.FrameLayout;
 import android.widget.VideoView;
 
 import com.inledco.exoterra.R;
@@ -19,6 +19,7 @@ import com.inledco.exoterra.manager.UserPref;
 public class SplashActivity extends BaseActivity {
 
     private VideoView splash_video;
+    private FrameLayout splash_show;
     private boolean skipped;
 
     private AsyncTask<String, Void, Boolean> mAuthTask;
@@ -39,6 +40,7 @@ public class SplashActivity extends BaseActivity {
     @Override
     protected void initView() {
         splash_video = findViewById(R.id.splash_video);
+        splash_show = findViewById(R.id.splash_show);
 
         String videoPath = "android.resource://" + getPackageName() + "/" + R.raw.exo_terra_animation;
         splash_video.setVideoPath(videoPath);
@@ -98,11 +100,8 @@ public class SplashActivity extends BaseActivity {
 
     @Override
     protected void initEvent() {
-        splash_video.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                skipped = true;
-            }
+        splash_show.setOnClickListener(v -> {
+            skipped = true;
         });
     }
 

@@ -329,7 +329,11 @@ public class SensorHistoryFragment extends BaseFragment {
         xAxis.setAxisMinimum(start);
         xAxis.setAxisMaximum(end);
         sensor_history_chart.getLegend().setEntries(legendEntries);
-        sensor_history_chart.invalidate();
+        if (isMainThread()) {
+            sensor_history_chart.invalidate();
+        } else {
+            runOnUiThread(() -> sensor_history_chart.invalidate());
+        }
     }
 
     private void getSensorHistory(final long period) {

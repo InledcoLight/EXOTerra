@@ -175,6 +175,27 @@ public class UserApi {
 
     }
 
+    public static class InvokeDeviceServiceRequest {
+        public String params;
+    }
+
+    public static class ServiceResult {
+        public String id;
+        public Object result;
+    }
+
+    public static class InvokeDeviceServiceResponse extends ApiResponse<ServiceResult> {
+
+    }
+
+    public static class GetDeviceTimeResult {
+        public String device_datetime;
+    }
+
+    public static class GetDeviceTimeResponse extends ApiResponse<GetDeviceTimeResult> {
+
+    }
+
     public static class PublishTopicRequest {
         public String topic;
         public String message;

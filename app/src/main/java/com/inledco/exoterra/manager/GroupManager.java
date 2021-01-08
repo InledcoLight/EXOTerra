@@ -190,10 +190,9 @@ public class GroupManager {
             return;
         }
         final Group group = getGroup(groupid);
-        String token = UserManager.getInstance().getToken();
         final UserApi.GroupRequest request = new UserApi.GroupRequest();
         request.remark1 = getRemark1Text(zone, sunrise, sunset);
-        AliotServer.getInstance().modifyGroupInfo(token, groupid, request, new HttpCallback<UserApi.GroupResponse>() {
+        AliotServer.getInstance().modifyGroupInfo(groupid, request, new HttpCallback<UserApi.GroupResponse>() {
             @Override
             public void onError(String error) {
                 if (callback != null) {
@@ -250,7 +249,7 @@ public class GroupManager {
         String token = UserManager.getInstance().getToken();
         UserApi.GroupRequest request = new UserApi.GroupRequest();
         request.remark1 = JSON.toJSONString(map);
-        AliotServer.getInstance().modifyGroupInfo(token, groupid, request, callback);
+        AliotServer.getInstance().modifyGroupInfo(groupid, request, callback);
     }
 
     public void setZone(final String groupid, final int zone, HttpCallback<UserApi.GroupResponse> callback) {

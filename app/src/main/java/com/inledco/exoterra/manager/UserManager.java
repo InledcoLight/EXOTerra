@@ -153,7 +153,7 @@ public class UserManager {
         if (mUser == null || TextUtils.isEmpty(mToken) || TextUtils.isEmpty(nickname)) {
             return;
         }
-        AliotServer.getInstance().modifyUserNickname(mUser.userid, mToken, nickname, new HttpCallback<UserApi.Response>() {
+        AliotServer.getInstance().modifyUserNickname(nickname, new HttpCallback<UserApi.Response>() {
             @Override
             public void onError(String error) {
                 if (callback != null) {
@@ -175,7 +175,7 @@ public class UserManager {
         if (mUser == null || TextUtils.isEmpty(mToken) || request == null) {
             return;
         }
-        AliotServer.getInstance().modifyUserInfo(mUser.userid, mToken, request, new HttpCallback<UserApi.Response>() {
+        AliotServer.getInstance().modifyUserInfo(request, new HttpCallback<UserApi.Response>() {
             @Override
             public void onError(String error) {
                 if (callback != null) {
@@ -211,7 +211,7 @@ public class UserManager {
         if (mUser == null || TextUtils.isEmpty(mToken)) {
             return;
         }
-        AliotServer.getInstance().modifyPassword(mToken, old_psw, new_psw, new HttpCallback<UserApi.Response>() {
+        AliotServer.getInstance().modifyPassword(old_psw, new_psw, new HttpCallback<UserApi.Response>() {
             @Override
             public void onError(String error) {
                 if (callback != null) {
@@ -232,7 +232,7 @@ public class UserManager {
         if (TextUtils.isEmpty(mToken)) {
             return;
         }
-        AliotServer.getInstance().logout(mToken, new HttpCallback<UserApi.Response>() {
+        AliotServer.getInstance().logout(new HttpCallback<UserApi.Response>() {
             @Override
             public void onError(String error) {
                 if (callback != null) {

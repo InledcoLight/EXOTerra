@@ -15,7 +15,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.inledco.exoterra.R;
-import com.inledco.exoterra.aliot.AliotClient;
 import com.inledco.exoterra.base.BaseFragment;
 import com.inledco.exoterra.bean.ExoProduct;
 import com.inledco.exoterra.manager.DeviceManager;
@@ -43,7 +42,6 @@ public class CompatibleModeFragment extends BaseFragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = super.onCreateView(inflater, container, savedInstanceState);
 
-        AliotClient.getInstance().stop();
         initData();
         initEvent();
         return view;
@@ -52,11 +50,6 @@ public class CompatibleModeFragment extends BaseFragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        if (UserManager.getInstance().isAuthorized()) {
-            String userid = UserManager.getInstance().getUserid();
-            String secret = UserManager.getInstance().getSecret();
-            AliotClient.getInstance().start(getContext().getApplicationContext(), userid, secret, null);
-        }
         if (mAPConfigLinker != null) {
             mAPConfigLinker.stopTask();
             mConnectNetViewModel.getData().setRunning(false);

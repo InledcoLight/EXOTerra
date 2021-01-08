@@ -1,6 +1,5 @@
 package com.inledco.exoterra.base;
 
-import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.os.Looper;
 import android.support.annotation.IdRes;
@@ -25,8 +24,22 @@ public abstract class BaseFragment extends Fragment {
 
     protected final String TAG = this.getClass().getSimpleName();
 
+//    protected Context mContext;
+
     private LoadDialog mLoadDialog;
-    private ProgressDialog mProgressDialog;
+//    private ProgressDialog mProgressDialog;
+
+//    @Override
+//    public void onAttach(Context context) {
+//        super.onAttach(context);
+//        mContext = context;
+//    }
+//
+//    @Override
+//    public void onDetach() {
+//        super.onDetach();
+//        mContext = null;
+//    }
 
     @Nullable
     @Override
@@ -61,6 +74,10 @@ public abstract class BaseFragment extends Fragment {
         return super.onCreateAnimation(transit, enter, nextAnim);
     }
 
+    protected boolean isMainThread() {
+        return Looper.getMainLooper().getThread().getId() == Thread.currentThread().getId();
+    }
+
     protected void replaceFragment(@IdRes int layout, @NonNull final Fragment fragment) {
         getActivity().getSupportFragmentManager().beginTransaction()
                      .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
@@ -86,8 +103,7 @@ public abstract class BaseFragment extends Fragment {
     }
 
     protected void showToast(final String msg) {
-        boolean isMainThread = Looper.getMainLooper().getThread().getId() == Thread.currentThread().getId();
-        if (isMainThread) {
+        if (isMainThread()) {
             Toast.makeText(getContext(), msg, Toast.LENGTH_SHORT)
                  .show();
             Log.e(TAG, "showToast: " + msg);
@@ -95,13 +111,10 @@ public abstract class BaseFragment extends Fragment {
             if (getActivity() == null) {
                 return;
             }
-            getActivity().runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    Toast.makeText(getContext(), msg, Toast.LENGTH_LONG)
-                         .show();
-                    Log.e(TAG, "showToast: " + msg);
-                }
+            getActivity().runOnUiThread(() -> {
+                Toast.makeText(getContext(), msg, Toast.LENGTH_LONG)
+                     .show();
+                Log.e(TAG, "showToast: " + msg);
             });
         }
     }
@@ -115,23 +128,16 @@ public abstract class BaseFragment extends Fragment {
             mLoadDialog = new LoadDialog(getContext());
             mLoadDialog.setCancelable(false);
         }
-        boolean isMainThread = Looper.getMainLooper().getThread().getId() == Thread.currentThread().getId();
-        if (isMainThread) {
+        if (isMainThread()) {
             mLoadDialog.show();
         } else {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    mLoadDialog.show();
-                }
-            });
+            runOnUiThread(() -> mLoadDialog.show());
         }
     }
 
     protected void dismissLoadDialog() {
         if (mLoadDialog != null) {
-            boolean isMainThread = Looper.getMainLooper().getThread().getId() == Thread.currentThread().getId();
-            if (isMainThread) {
+            if (isMainThread()) {
                 mLoadDialog.dismiss();
                 mLoadDialog = null;
             } else {

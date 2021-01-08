@@ -19,6 +19,9 @@
 
         <item name="android:fontFamily">@font/eurostileltstd</item>
 
+<!--        <item name="android:lines">1</item>-->
+<!--        <item name="android:ellipsize">end</item>-->
+        <item name="android:textSize">@dimen/textSizeSecondary</item>
         <item name="android:textColor">@color/textColorPrimary</item>
         <item name="android:textColorPrimary">@color/textColorPrimary</item>
         <item name="android:textColorSecondary">@color/textColorSencondary</item>
@@ -32,8 +35,11 @@
         <item name="android:statusBarColor" tools:targetApi="lollipop">@color/colorTransparent</item>
 
         <item name="android:windowBackground">@drawable/ic_background</item>
-<!--        <item name="android:windowBackground">@mipmap/ic_background</item>-->
+
+        <!--    dialog    -->
         <item name="alertDialogTheme">@style/DialogCornerTheme</item>
+        <item name="android:alertDialogTheme">@style/DialogCornerTheme</item>
+<!--        <item name="bottomSheetDialogTheme">@style/BottomDialogTheme</item>-->
 
         <item name="android:windowAnimationStyle">@style/ActivityAnimation</item>
 
@@ -41,11 +47,26 @@
         <item name="editTextStyle">@style/EditTextStyle</item>
         <item name="textInputStyle">@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox</item>
 
+        <item name="android:spinnerItemStyle">@style/SpinnerItemStyle</item>
+        <item name="android:spinnerDropDownItemStyle">@style/SpinnerDropDownStyle</item>
+        <item name="spinnerDropDownItemStyle">@style/SpinnerDropDownStyle</item>
     </style>
+
+    <style name="SpinnerItemStyle" parent="Widget.AppCompat.TextView.SpinnerItem">
+        <item name="android:textSize">@dimen/textSizeSecondary</item>
+    </style>
+
+    <style name="SpinnerDropDownStyle" parent="TextAppearance.AppCompat.Widget.DropDownItem">
+        <item name="android:textSize">@dimen/textSizeSecondary</item>
+        <item name="android:gravity">center_vertical</item>
+    </style>
+
 
     <style name="EditTextStyle" parent="Widget.AppCompat.EditText">
         <item name="hintSize">12sp</item>
         <item name="android:textSize">12sp</item>
+        <item name="android:paddingLeft">@dimen/marginUnit</item>
+        <item name="android:paddingRight">@dimen/marginUnit</item>
     </style>
 
     <style name="SwitchStyle" parent="Widget.AppCompat.CompoundButton.Switch">
@@ -65,17 +86,23 @@
         <item name="android:activityCloseEnterAnimation">@android:anim/fade_in</item>
     </style>
 
-    <style name="BottomDialogTheme" parent="Theme.MaterialComponents.BottomSheetDialog">
-        <item name="android:windowFrame">@null</item>
-        <item name="android:windowNoTitle">true</item>
-        <item name="android:windowIsTranslucent">true</item>
-        <item name="android:windowBackground">@android:color/transparent</item>
-        <item name="android:windowIsFloating">true</item>
-        <item name="android:backgroundDimEnabled">true</item>
+    <style name="BottomDialogTheme" parent="Theme.Design.BottomSheetDialog">
+<!--        <item name="android:windowFrame">@null</item>-->
+<!--        <item name="android:windowNoTitle">true</item>-->
+<!--        <item name="android:windowIsTranslucent">true</item>-->
+        <item name="android:windowBackground">@color/colorBottomDialog</item>
+<!--        <item name="android:windowIsFloating">true</item>-->
+<!--        <item name="android:backgroundDimEnabled">true</item>-->
     </style>
 
     <style name="DialogCornerTheme" parent="Theme.AppCompat.Dialog.Alert">
         <item name="android:windowBackground">@drawable/shape_roundrect_gradient</item>
+        <item name="android:windowMinWidthMinor">80%</item>
+        <item name="windowMinWidthMinor">80%</item>
+        <item name="android:windowMinWidthMajor">80%</item>
+        <item name="windowMinWidthMajor">80%</item>
+        <item name="windowFixedWidthMinor">80%</item>
+        <item name="windowFixedWidthMajor">80%</item>
     </style>
 
     <style name="DialogTheme" parent="Theme.AppCompat.Dialog.Alert">

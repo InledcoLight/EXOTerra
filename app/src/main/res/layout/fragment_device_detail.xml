@@ -18,8 +18,8 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginRight="8dp"
+        android:layout_marginLeft="@dimen/marginUnit"
+        android:layout_marginRight="@dimen/marginUnit"
         android:layout_weight="1"
         android:orientation="vertical">
 
@@ -28,7 +28,7 @@
             android:layout_height="wrap_content"
             android:gravity="center_vertical"
             android:orientation="horizontal"
-            android:padding="8dp">
+            android:padding="@dimen/marginUnit">
 
             <ImageButton
                 android:id="@+id/device_detail_icon"
@@ -40,7 +40,7 @@
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_marginLeft="8dp"
+                android:layout_marginLeft="@dimen/marginUnit"
                 android:layout_weight="1"
                 android:gravity="bottom"
                 android:orientation="vertical">
@@ -63,7 +63,7 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="right"
                     android:background="?attr/selectableItemBackground"
-                    android:drawablePadding="8dp"
+                    android:drawablePadding="@dimen/drawablePadding"
                     android:gravity="center_vertical"
                     android:lines="1"
                     android:maxLines="1"
@@ -77,8 +77,8 @@
         <View
             android:layout_width="match_parent"
             android:layout_height="@dimen/dividerWidth"
-            android:layout_marginLeft="8dp"
-            android:layout_marginRight="8dp"
+            android:layout_marginLeft="@dimen/marginUnit"
+            android:layout_marginRight="@dimen/marginUnit"
             android:background="@drawable/shape_rect_gradient" />
 
         <LinearLayout
@@ -86,7 +86,7 @@
             android:layout_height="wrap_content"
             android:gravity="center_vertical"
             android:orientation="horizontal"
-            android:padding="8dp">
+            android:padding="@dimen/marginUnit">
 
             <ImageView
                 android:layout_width="wrap_content"
@@ -97,8 +97,8 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="8dp"
-                android:drawablePadding="8dp"
+                android:layout_marginLeft="@dimen/marginUnit"
+                android:drawablePadding="@dimen/marginUnit"
                 android:gravity="center_vertical"
                 android:text="@string/habitat"
                 android:textColor="@color/textColorPrimary" />
@@ -108,16 +108,16 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="right"
-            android:layout_marginRight="8dp"
+            android:layout_marginRight="@dimen/marginUnit"
             android:background="?attr/selectableItemBackground"
             android:textColor="@color/textColorSencondary"
             android:textSize="@dimen/textSizeSecondary" />
         <View
             android:layout_width="match_parent"
             android:layout_height="@dimen/dividerWidth"
-            android:layout_marginLeft="8dp"
-            android:layout_marginRight="8dp"
-            android:layout_marginTop="8dp"
+            android:layout_marginLeft="@dimen/marginUnit"
+            android:layout_marginRight="@dimen/marginUnit"
+            android:layout_marginTop="@dimen/marginUnit"
             android:background="@drawable/shape_rect_gradient" />
 
         <LinearLayout
@@ -125,7 +125,7 @@
             android:layout_height="wrap_content"
             android:gravity="center_vertical"
             android:orientation="horizontal"
-            android:padding="8dp">
+            android:padding="@dimen/marginUnit">
 
             <ImageView
                 android:layout_width="wrap_content"
@@ -135,7 +135,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="8dp"
+                android:layout_marginLeft="@dimen/marginUnit"
                 android:text="@string/device_datetime"
                 android:textColor="@color/textColorPrimary" />
         </LinearLayout>
@@ -152,8 +152,8 @@
             android:layout_height="wrap_content"
             android:gravity="right"
             android:layout_gravity="right"
-            android:layout_marginLeft="8dp"
-            android:layout_marginRight="8dp"
+            android:layout_marginLeft="@dimen/marginUnit"
+            android:layout_marginRight="@dimen/marginUnit"
             android:lines="1"
             android:maxLines="1"
             android:text=""
@@ -162,9 +162,9 @@
         <View
             android:layout_width="match_parent"
             android:layout_height="@dimen/dividerWidth"
-            android:layout_marginLeft="8dp"
-            android:layout_marginRight="8dp"
-            android:layout_marginTop="8dp"
+            android:layout_marginLeft="@dimen/marginUnit"
+            android:layout_marginRight="@dimen/marginUnit"
+            android:layout_marginTop="@dimen/marginUnit"
             android:background="@drawable/shape_rect_gradient" />
 
         <LinearLayout
@@ -172,7 +172,7 @@
             android:layout_height="wrap_content"
             android:gravity="center_vertical"
             android:orientation="horizontal"
-            android:padding="8dp">
+            android:padding="@dimen/marginUnit">
 
             <ImageView
                 android:layout_width="wrap_content"
@@ -182,7 +182,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="8dp"
+                android:layout_marginLeft="@dimen/marginUnit"
                 android:text="@string/daytime"
                 android:textColor="@color/textColorPrimary" />
         </LinearLayout>
@@ -193,9 +193,9 @@
             android:gravity="right|center_vertical"
             android:background="?attr/selectableItemBackground"
             android:layout_gravity="right"
-            android:layout_marginLeft="8dp"
-            android:layout_marginRight="8dp"
-            android:drawablePadding="8dp"
+            android:layout_marginLeft="@dimen/marginUnit"
+            android:layout_marginRight="@dimen/marginUnit"
+            android:drawablePadding="@dimen/drawablePadding"
             android:lines="1"
             android:maxLines="1"
             android:text=""
@@ -204,9 +204,9 @@
         <View
             android:layout_width="match_parent"
             android:layout_height="@dimen/dividerWidth"
-            android:layout_marginLeft="8dp"
-            android:layout_marginRight="8dp"
-            android:layout_marginTop="8dp"
+            android:layout_marginLeft="@dimen/marginUnit"
+            android:layout_marginRight="@dimen/marginUnit"
+            android:layout_marginTop="@dimen/marginUnit"
             android:background="@drawable/shape_rect_gradient" />
 
         <LinearLayout
@@ -214,7 +214,7 @@
             android:layout_height="wrap_content"
             android:gravity="center_vertical"
             android:orientation="horizontal"
-            android:padding="8dp">
+            android:padding="@dimen/marginUnit">
 
             <ImageView
                 android:layout_width="wrap_content"
@@ -226,7 +226,7 @@
                 android:id="@+id/device_detail_upgrade"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="8dp"
+                android:layout_marginLeft="@dimen/marginUnit"
                 android:background="?attr/selectableItemBackground"
                 android:gravity="center_vertical"
                 android:text="@string/upgrade"
@@ -236,8 +236,8 @@
         <View
             android:layout_width="match_parent"
             android:layout_height="@dimen/dividerWidth"
-            android:layout_marginLeft="8dp"
-            android:layout_marginRight="8dp"
+            android:layout_marginLeft="@dimen/marginUnit"
+            android:layout_marginRight="@dimen/marginUnit"
             android:background="@drawable/shape_rect_gradient" />
 
         <TextView
@@ -246,7 +246,7 @@
             android:layout_height="wrap_content"
             android:background="?attr/selectableItemBackground"
             android:gravity="center_vertical"
-            android:padding="8dp"
+            android:padding="@dimen/marginUnit"
             android:text="@string/user_list"
             android:textColor="@color/textColorPrimary"
             android:visibility="gone" />
@@ -255,16 +255,20 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:padding="8dp">
+            android:padding="@dimen/marginUnit">
+
+            <Space
+                android:layout_width="24dp"
+                android:layout_height="24dp"/>
 
             <TextView
                 android:id="@+id/device_detail_delete"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="32dp"
+                android:layout_marginLeft="@dimen/marginUnit"
                 android:background="?attr/selectableItemBackground"
                 android:drawableRight="@drawable/selector_delete"
-                android:drawablePadding="8dp"
+                android:drawablePadding="@dimen/drawablePadding"
                 android:enabled="false"
                 android:gravity="center_vertical"
                 android:text="@string/delete_device"
@@ -274,16 +278,16 @@
         <View
             android:layout_width="match_parent"
             android:layout_height="@dimen/dividerWidth"
-            android:layout_marginLeft="8dp"
-            android:layout_marginRight="8dp"
+            android:layout_marginLeft="@dimen/marginUnit"
+            android:layout_marginRight="@dimen/marginUnit"
             android:background="@drawable/shape_rect_gradient" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="@dimen/marginUnit"
             android:orientation="vertical"
-            android:padding="8dp">
+            android:padding="@dimen/marginUnit">
 
             <TextView
                 android:layout_width="wrap_content"
@@ -295,7 +299,7 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="16dp"
+                android:layout_marginLeft="@dimen/marginUnitX2"
                 android:gravity="center_vertical"
                 android:orientation="horizontal">
 
@@ -322,7 +326,7 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="16dp"
+                android:layout_marginLeft="@dimen/marginUnitX2"
                 android:gravity="center_vertical"
                 android:orientation="horizontal">
 
@@ -349,7 +353,7 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="16dp"
+                android:layout_marginLeft="@dimen/marginUnitX2"
                 android:gravity="center_vertical"
                 android:orientation="horizontal">
 
@@ -376,7 +380,7 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="16dp"
+                android:layout_marginLeft="@dimen/marginUnitX2"
                 android:gravity="center_vertical"
                 android:orientation="horizontal">
 
@@ -403,7 +407,7 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="16dp"
+                android:layout_marginLeft="@dimen/marginUnitX2"
                 android:gravity="center_vertical"
                 android:orientation="horizontal">
 
@@ -438,9 +442,9 @@
             style="?attr/buttonStyle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="8dp"
-            android:layout_marginRight="8dp"
-            android:layout_marginBottom="16dp"
+            android:layout_marginLeft="@dimen/marginUnitX2"
+            android:layout_marginRight="@dimen/marginUnitX2"
+            android:layout_marginBottom="@dimen/marginUnitX2"
             android:background="?attr/selectableItemBackground"
             android:text="@string/back"
             app:direction="horizontal"

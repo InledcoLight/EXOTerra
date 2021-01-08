@@ -301,6 +301,9 @@ public class GroupFragment extends BaseFragment {
     }
 
     private void gotoAddDeviceActivity() {
+        if (getContext() == null) {
+            return;
+        }
         Intent intent = new Intent(getContext(), AddDeviceActivity.class);
         intent.putExtra(AppConstants.HOME_ID, mGroupid);
         startActivity(intent);

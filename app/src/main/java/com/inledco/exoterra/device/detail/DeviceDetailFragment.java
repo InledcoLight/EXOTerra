@@ -1,6 +1,5 @@
 package com.inledco.exoterra.device.detail;
 
-import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -40,6 +39,9 @@ import com.inledco.exoterra.aliot.Device;
 import com.inledco.exoterra.aliot.DeviceInfo;
 import com.inledco.exoterra.aliot.DeviceViewModel;
 import com.inledco.exoterra.aliot.HttpCallback;
+import com.inledco.exoterra.aliot.LightViewModel;
+import com.inledco.exoterra.aliot.MonsoonViewModel;
+import com.inledco.exoterra.aliot.SocketViewModel;
 import com.inledco.exoterra.aliot.UserApi;
 import com.inledco.exoterra.aliot.bean.Group;
 import com.inledco.exoterra.base.BaseFragment;
@@ -107,6 +109,14 @@ public class DeviceDetailFragment extends BaseFragment {
     private int mSunrise;
     private int mSunset;
 
+    public static DeviceDetailFragment newInstance(String productKey) {
+        Bundle args = new Bundle();
+        args.putString("productKey", productKey);
+        DeviceDetailFragment fragment = new DeviceDetailFragment();
+        fragment.setArguments(args);
+        return fragment;
+    }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -169,14 +179,32 @@ public class DeviceDetailFragment extends BaseFragment {
 
     @Override
     protected void initData() {
-        mDeviceViewModel = ViewModelProviders.of(getActivity()).get(DeviceViewModel.class);
+        Bundle args = getArguments();
+        if (args == null) {
+            return;
+        }
+        mProductKey = args.getString("productKey");
+        ExoProduct product = ExoProduct.getExoProduct(mProductKey);
+        if (product == null) {
+            return;
+        }
+        switch (product) {
+            case ExoLed:
+                mDeviceViewModel = ViewModelProviders.of(getActivity()).get(LightViewModel.class);
+                break;
+            case ExoSocket:
+                mDeviceViewModel = ViewModelProviders.of(getActivity()).get(SocketViewModel.class);
+                break;
+            case ExoMonsoon:
+                mDeviceViewModel = ViewModelProviders.of(getActivity()).get(MonsoonViewModel.class);
+                break;
+            default:
+                return;
+        }
         mDevice = (Device) mDeviceViewModel.getData();
-        mDeviceViewModel.observe(this, new Observer() {
-            @Override
-            public void onChanged(@Nullable Object o) {
-                checkDeviceDatetime();
-                device_detail_daytime.setText(getTimeText(mDevice.getSunrise()) + " - " + getTimeText(mDevice.getSunset()));
-            }
+        mDeviceViewModel.observe(this, o -> {
+            checkDeviceDatetime();
+            device_detail_daytime.setText(getTimeText(mDevice.getSunrise()) + " - " + getTimeText(mDevice.getSunset()));
         });
 
         mTimeFormat = GlobalSettings.getTimeFormat();
@@ -184,23 +212,20 @@ public class DeviceDetailFragment extends BaseFragment {
 
         if (mDevice != null) {
             mDeviceAdmin = TextUtils.equals("管理员", mDevice.getRole());
-            mProductKey = mDevice.getProductKey();
             mDeviceName = mDevice.getDeviceName();
             String name = mDevice.getName();
-            ExoProduct product = ExoProduct.getExoProduct(mProductKey);
-            if (product != null) {
-                if (TextUtils.isEmpty(name)) {
-                    name = product.getDefaultName();
-                }
-                mIconRes = DeviceIconUtil.getDeviceIconRes(getContext(), mDevice.getRemark2(), product.getIcon());
-                device_detail_icon.setImageResource(mIconRes);
+            if (TextUtils.isEmpty(name)) {
+                name = product.getDefaultName();
             }
+            mIconRes = DeviceIconUtil.getDeviceIconRes(getContext(), mDevice.getRemark2(), product.getIcon());
+            device_detail_icon.setImageResource(mIconRes);
             Group group = GroupManager.getInstance().getDeviceGroup(mProductKey, mDeviceName);
             if (group != null) {
                 device_detail_habitat.setText(group.name);
             } else {
                 device_detail_habitat.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_edit_white_24dp, 0);
             }
+            device_detail_datetime.setText(getTimezoneDesc(mDevice.getZone()));
             device_detail_daytime.setCompoundDrawablesRelativeWithIntrinsicBounds(0, 0, R.drawable.ic_edit_white_24dp, 0);
             device_detail_daytime.setText(getTimeText(mDevice.getSunrise()) + " - " + getTimeText(mDevice.getSunset()));
             device_detail_delete.setEnabled(TextUtils.equals(mDevice.getRole(), "管理员"));
@@ -384,38 +409,41 @@ public class DeviceDetailFragment extends BaseFragment {
         builder.show();
     }
 
+    private void updateDeviceTime(String time) {
+        try {
+            if (mTimer != null) {
+                mTimer.cancel();
+            }
+            if (mTask != null) {
+                mTask.cancel();
+            }
+            mTimer = new Timer();
+            mTask = new TimerTask() {
+                @Override
+                public void run() {
+                    mCurrentTime += 1000;
+                    EventBus.getDefault().post(new SimpleEvent(mCurrentTime));
+                }
+            };
+
+            int offset = TimeZone.getDefault().getRawOffset();
+            int zone = mDevice.getZone();
+            long currentTime = Long.parseLong(time);
+            mCurrentTime = currentTime + zone * 60000 - offset;
+            EventBus.getDefault().post(new SimpleEvent(mCurrentTime));
+
+            mTimer.scheduleAtFixedRate(mTask, 0, 1000);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     private void checkDeviceDatetime() {
         BaseProperty prop = mDevice.getItems().get(KEY_DEVICETIME);
         if (prop != null && prop.isUpdated()) {
-            Log.e(TAG, "checkDeviceDatetime: ");
             String datetime = mDevice.getDeviceTime();
             if (!TextUtils.isEmpty(datetime)) {
-                try {
-                    if (mTimer != null) {
-                        mTimer.cancel();
-                    }
-                    if (mTask != null) {
-                        mTask.cancel();
-                    }
-                    mTimer = new Timer();
-                    mTask = new TimerTask() {
-                        @Override
-                        public void run() {
-                            mCurrentTime += 1000;
-                            EventBus.getDefault().post(new SimpleEvent(mCurrentTime));
-                        }
-                    };
-
-                    int offset = TimeZone.getDefault().getRawOffset();
-                    int zone = mDevice.getZone();
-                    long currentTime = Long.parseLong(datetime);
-                    mCurrentTime = currentTime + zone * 60000 - offset;
-                    EventBus.getDefault().post(new SimpleEvent(mCurrentTime));
-
-                    mTimer.scheduleAtFixedRate(mTask, 0, 1000);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+                updateDeviceTime(datetime);
             }
         }
     }
@@ -607,7 +635,20 @@ public class DeviceDetailFragment extends BaseFragment {
     }
 
     private void getDeviceDatetime() {
-        mDeviceViewModel.getProperty("DeviceTime");
+//        mDeviceViewModel.getProperty(KEY_DEVICETIME);
+
+        AliotServer.getInstance().getDeviceDatetime(mProductKey, mDeviceName, new HttpCallback<UserApi.GetDeviceTimeResponse>() {
+            @Override
+            public void onError(String error) {
+
+            }
+
+            @Override
+            public void onSuccess(UserApi.GetDeviceTimeResponse result) {
+                String time = result.data.device_datetime;
+                updateDeviceTime(time);
+            }
+        });
     }
 
     private void showRenameDialog() {

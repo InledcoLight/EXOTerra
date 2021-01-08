@@ -1,17 +1,9 @@
 <vector android:autoMirrored="true" android:height="48dp"
     android:viewportHeight="10.266186" android:viewportWidth="10.265832"
-    android:width="48dp" xmlns:aapt="http://schemas.android.com/aapt" xmlns:android="http://schemas.android.com/apk/res/android">
+    android:width="48dp" xmlns:android="http://schemas.android.com/apk/res/android">
     <path
-        android:pathData="m1.9992,0c-1.1045,0 -1.9992,0.8946 -1.9992,1.9992v0,6.2678c0,1.1031 0.8946,1.9992 1.9992,1.9992v0h6.2678c1.1042,0 1.9988,-0.8961 1.9988,-1.9992v0,-6.2678c0,-1.1045 -0.8946,-1.9992 -1.9988,-1.9992v0z"
-        android:strokeColor="#00000000" android:strokeWidth="0.35277775">
-        <aapt:attr name="android:fillColor">
-            <gradient android:endX="638.1518" android:endY="173.40654"
-                android:startX="634.03656" android:startY="184.71304"
-                android:tileMode="clamp" android:type="linear">
-                <item android:color="#FF732A86" android:offset="0.944882"/>
-                <item android:color="#FF732A86" android:offset="1"/>
-            </gradient>
-        </aapt:attr>
+        android:fillColor="#FF732A86"
+        android:pathData="m1.9992,0c-1.1045,0 -1.9992,0.8946 -1.9992,1.9992v0,6.2678c0,1.1031 0.8946,1.9992 1.9992,1.9992v0h6.2678c1.1042,0 1.9988,-0.8961 1.9988,-1.9992v0,-6.2678c0,-1.1045 -0.8946,-1.9992 -1.9988,-1.9992v0z">
     </path>
     <path android:fillAlpha="1" android:fillColor="#ffffff"
         android:fillType="nonZero"

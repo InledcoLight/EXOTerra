@@ -12,9 +12,9 @@
     <com.inledco.exoterra.view.GradientCornerLinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="16dp"
+        android:layout_marginTop="@dimen/marginUnit"
+        android:layout_marginStart="@dimen/marginUnitX2"
+        android:layout_marginEnd="@dimen/marginUnitX2"
         android:gravity="center"
         android:orientation="vertical"
         app:direction="horizontal"
@@ -35,7 +35,7 @@
                 android:layout_width="@dimen/titleHeight"
                 android:layout_height="@dimen/titleHeight"
                 android:scaleType="fitCenter"
-                android:padding="8dp"/>
+                android:padding="@dimen/marginUnit"/>
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
@@ -53,12 +53,12 @@
             android:layout_height="wrap_content"
             android:gravity="center_vertical"
             android:orientation="horizontal"
-            android:padding="8dp">
+            android:padding="@dimen/marginUnit">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:padding="8dp"
+                android:padding="@dimen/marginUnit"
                 android:text="6"
                 android:textStyle="bold"
                 android:textColor="@color/textColorPrimary"
@@ -77,9 +77,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_marginLeft="16dp"
-        android:layout_marginRight="16dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginLeft="@dimen/marginUnitX2"
+        android:layout_marginRight="@dimen/marginUnitX2"
+        android:layout_marginTop="@dimen/marginUnit"
         android:gravity="center_vertical">
         <TextView
             android:layout_width="0dp"
@@ -100,16 +100,16 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="@dimen/dividerWidth"
-        android:layout_marginLeft="16dp"
-        android:layout_marginRight="16dp"
+        android:layout_marginLeft="@dimen/marginUnitX2"
+        android:layout_marginRight="@dimen/marginUnitX2"
         android:layout_marginBottom="4dp"
         android:background="@drawable/shape_rect_gradient"/>
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:layout_marginLeft="16dp"
-        android:layout_marginRight="16dp">
+        android:layout_marginLeft="@dimen/marginUnitX2"
+        android:layout_marginRight="@dimen/marginUnitX2">
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/assign_habitat_rv"
@@ -131,7 +131,10 @@
         style="?attr/buttonStyle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="16dp"
+        android:layout_marginStart="@dimen/marginUnitX2"
+        android:layout_marginEnd="@dimen/marginUnitX2"
+        android:layout_marginBottom="@dimen/marginUnitX2"
+        android:layout_marginTop="@dimen/marginUnit"
         android:background="?attr/selectableItemBackground"
         android:text="@string/save"
         app:radius="@dimen/cornerRadius"

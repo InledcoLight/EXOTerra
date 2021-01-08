@@ -7,44 +7,41 @@
     android:gravity="center_horizontal"
     android:background="@drawable/ic_background"
     android:clickable="true"
-    android:paddingTop="8dp">
+    android:paddingTop="@dimen/marginUnit">
 
     <ImageView
         android:layout_width="match_parent"
         android:layout_height="48dp"
-        android:scaleType="fitXY"
-        android:layout_marginLeft="16dp"
-        android:layout_marginRight="16dp"
+        android:scaleType="fitCenter"
+        android:layout_marginLeft="@dimen/marginUnitX2"
+        android:layout_marginRight="@dimen/marginUnitX2"
         app:srcCompat="@drawable/ic_myexoterra"/>
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:layout_marginLeft="16dp"
-        android:layout_marginRight="16dp"
+        android:layout_marginTop="@dimen/marginUnit"
+        android:layout_marginLeft="@dimen/marginUnitX2"
+        android:layout_marginRight="@dimen/marginUnitX2"
         android:textSize="@dimen/textSizePrimary"
         android:text="NEW PRODUCTS"/>
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/new_products_rv"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="16dp"
-        android:layout_marginRight="16dp"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginLeft="@dimen/marginUnitX2"
+        android:layout_marginRight="@dimen/marginUnitX2"
+        android:layout_marginTop="@dimen/marginUnit"
+        android:layout_marginBottom="@dimen/marginUnit"
         android:orientation="vertical"
         app:layoutManager="android.support.v7.widget.LinearLayoutManager"/>
-
-    <Space
-        android:layout_width="wrap_content"
-        android:layout_height="0dp"
-        android:layout_weight="1"/>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="16dp"
-        android:layout_marginRight="16dp"
+        android:layout_marginBottom="4dp"
         android:orientation="horizontal"
         android:gravity="center_vertical">
         <Button
@@ -52,41 +49,76 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:textSize="8sp"
+            android:gravity="center"
+            android:layout_marginLeft="4dp"
+            android:layout_marginRight="4dp"
             android:background="?attr/selectableItemBackground"
-            android:drawableTop="@drawable/ic_reptile"/>
+            android:textSize="@dimen/textSizeMicro"
+            android:textColor="@color/textColorPrimary"
+            android:text="@string/home"
+            android:maxLines="1"
+            android:ellipsize="end"
+            android:drawablePadding="4dp"/>
         <Button
             android:id="@+id/new_products_microtope"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:textSize="8sp"
+            android:gravity="center"
+            android:layout_marginLeft="4dp"
+            android:layout_marginRight="4dp"
             android:background="?attr/selectableItemBackground"
-            android:drawableTop="@drawable/ic_microtope"/>
+            android:textSize="@dimen/textSizeMicro"
+            android:textColor="@color/textColorPrimary"
+            android:text="@string/microtope"
+            android:maxLines="1"
+            android:ellipsize="end"
+            android:drawablePadding="4dp"/>
         <Button
             android:id="@+id/new_products_uvb"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:textSize="8sp"
+            android:gravity="center"
+            android:layout_marginLeft="4dp"
+            android:layout_marginRight="4dp"
             android:background="?attr/selectableItemBackground"
-            android:drawableTop="@drawable/ic_uvb"/>
+            android:textSize="@dimen/textSizeMicro"
+            android:textColor="@color/textColorPrimary"
+            android:text="@string/uvb_buddy"
+            android:maxLines="1"
+            android:ellipsize="end"
+            android:drawablePadding="4dp"/>
         <Button
             android:id="@+id/new_products_restore"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:textSize="8sp"
+            android:gravity="center"
+            android:layout_marginLeft="4dp"
+            android:layout_marginRight="4dp"
             android:background="?attr/selectableItemBackground"
-            android:drawableTop="@drawable/ic_resore"/>
+            android:textSize="@dimen/textSizeMicro"
+            android:textColor="@color/textColorPrimary"
+            android:text="@string/restore_rays"
+            android:maxLines="1"
+            android:ellipsize="end"
+            android:drawablePadding="4dp"/>
         <Button
             android:id="@+id/new_products_pref"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:textSize="8sp"
+            android:gravity="center"
+            android:layout_marginLeft="4dp"
+            android:layout_marginRight="4dp"
             android:background="?attr/selectableItemBackground"
-            android:drawableTop="@drawable/ic_prefs_white"/>
+            android:textSize="@dimen/textSizeMicro"
+            android:textColor="@color/textColorPrimary"
+            android:text="@string/prefs"
+            android:maxLines="1"
+            android:ellipsize="end"
+            android:drawablePadding="4dp"/>
     </LinearLayout>
 
 </LinearLayout>

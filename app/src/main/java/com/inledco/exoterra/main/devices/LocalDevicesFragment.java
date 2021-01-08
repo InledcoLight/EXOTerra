@@ -34,9 +34,7 @@ import com.inledco.exoterra.login.LoginActivity;
 import com.inledco.exoterra.scan.ScanAdapter;
 import com.inledco.exoterra.scan.ScanDeviceTask;
 import com.scwang.smartrefresh.layout.SmartRefreshLayout;
-import com.scwang.smartrefresh.layout.api.RefreshLayout;
 import com.scwang.smartrefresh.layout.header.BezierRadarHeader;
-import com.scwang.smartrefresh.layout.listener.OnRefreshListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -120,30 +118,17 @@ public class LocalDevicesFragment extends BasePermissionFragment {
 
     @Override
     protected void initEvent() {
-        devices_signin.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startLoginActivity();
+        devices_signin.setOnClickListener(v -> startLoginActivity());
+
+        devices_swipe_refresh.setOnRefreshListener(refreshLayout -> {
+            if (!startScan()) {
+                devices_swipe_refresh.finishRefresh();
+            } else {
+                devices_warning.setVisibility(View.GONE);
             }
         });
 
-        devices_swipe_refresh.setOnRefreshListener(new OnRefreshListener() {
-            @Override
-            public void onRefresh(@NonNull RefreshLayout refreshLayout) {
-                if (!startScan()) {
-                    devices_swipe_refresh.finishRefresh();
-                } else {
-                    devices_warning.setVisibility(View.GONE);
-                }
-            }
-        });
-
-        devices_ib_add.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startAdddeviceActivity();
-            }
-        });
+        devices_ib_add.setOnClickListener(v -> startAdddeviceActivity());
 
         devices_swipe_refresh.autoRefresh();
     }
@@ -155,8 +140,8 @@ public class LocalDevicesFragment extends BasePermissionFragment {
 
     private boolean startScan() {
         // check location permission first, otherwise check wifi would be incorrect
-        if (!checkPermission(Manifest.permission.ACCESS_COARSE_LOCATION)) {
-            requestPermission(0, Manifest.permission.ACCESS_COARSE_LOCATION);
+        if (!checkPermission(Manifest.permission.ACCESS_FINE_LOCATION)) {
+            requestPermission(0, Manifest.permission.ACCESS_FINE_LOCATION);
             return false;
         }
         if (!checkLocation()) {
@@ -252,21 +237,21 @@ public class LocalDevicesFragment extends BasePermissionFragment {
 
     @Override
     protected void onPermissionGranted(String permission) {
-        if (TextUtils.equals(Manifest.permission.ACCESS_COARSE_LOCATION, permission)) {
+        if (TextUtils.equals(Manifest.permission.ACCESS_FINE_LOCATION, permission)) {
             devices_swipe_refresh.autoRefresh();
         }
     }
 
     @Override
     protected void onPermissionDenied(String permission) {
-        if (TextUtils.equals(Manifest.permission.ACCESS_COARSE_LOCATION, permission)) {
+        if (TextUtils.equals(Manifest.permission.ACCESS_FINE_LOCATION, permission)) {
             showToast(R.string.msg_location_permission);
         }
     }
 
     @Override
     protected void onPermissionPermanentDenied(String permission) {
-        if (TextUtils.equals(Manifest.permission.ACCESS_COARSE_LOCATION, permission)) {
+        if (TextUtils.equals(Manifest.permission.ACCESS_FINE_LOCATION, permission)) {
             showPermissionDialog(getString(R.string.title_location_permission),
                                  getString(R.string.msg_location_permission));
         }
@@ -283,12 +268,7 @@ public class LocalDevicesFragment extends BasePermissionFragment {
                .setMessage(R.string.msg_turnon_gps)
                .setCancelable(false)
                .setNegativeButton(R.string.cancel, null)
-               .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-                   @Override
-                   public void onClick(DialogInterface dialog, int which) {
-                       gotoLoactionSettings();
-                   }
-               })
+               .setPositiveButton(R.string.ok, (dialog, which) -> gotoLoactionSettings())
                .show();
     }
 

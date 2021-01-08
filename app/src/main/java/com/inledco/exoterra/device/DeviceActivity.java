@@ -1,10 +1,8 @@
 package com.inledco.exoterra.device;
 
-import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
@@ -15,8 +13,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONException;
 import com.inledco.exoterra.R;
 import com.inledco.exoterra.aliot.ADevice;
 import com.inledco.exoterra.aliot.Device;
@@ -24,12 +20,9 @@ import com.inledco.exoterra.aliot.DeviceViewModel;
 import com.inledco.exoterra.aliot.ExoLed;
 import com.inledco.exoterra.aliot.ExoMonsoon;
 import com.inledco.exoterra.aliot.ExoSocket;
-import com.inledco.exoterra.aliot.HttpCallback;
 import com.inledco.exoterra.aliot.LightViewModel;
 import com.inledco.exoterra.aliot.MonsoonViewModel;
 import com.inledco.exoterra.aliot.SocketViewModel;
-import com.inledco.exoterra.aliot.UserApi;
-import com.inledco.exoterra.aliot.bean.DeviceParams;
 import com.inledco.exoterra.aliot.bean.Group;
 import com.inledco.exoterra.base.BaseActivity;
 import com.inledco.exoterra.bean.ExoProduct;
@@ -45,8 +38,6 @@ import com.inledco.exoterra.event.GroupDeviceChangedEvent;
 import com.inledco.exoterra.manager.DeviceManager;
 import com.inledco.exoterra.manager.GroupManager;
 import com.inledco.exoterra.manager.UserManager;
-import com.inledco.exoterra.scan.LocalClient;
-import com.inledco.exoterra.udptcp.UdpClient;
 import com.inledco.exoterra.util.DeviceIconUtil;
 
 import org.greenrobot.eventbus.EventBus;
@@ -94,10 +85,7 @@ public class DeviceActivity extends BaseActivity {
             EventBus.getDefault().unregister(this);
         }
         if (mDeviceViewModel != null) {
-            mDeviceViewModel.disconnectLocal();
-        }
-        if (!authorized) {
-            LocalClient.getInstance().deinit();
+            mDeviceViewModel.deinit();
         }
     }
 
@@ -137,6 +125,9 @@ public class DeviceActivity extends BaseActivity {
         if (authorized) {
             String deviceTag = productKey + "_" + deviceName;
             mDevice = DeviceManager.getInstance().getDevice(deviceTag);
+            if (mDevice == null) {
+                return;
+            }
         } else {
             switch (mProduct) {
                 case ExoLed:
@@ -153,34 +144,32 @@ public class DeviceActivity extends BaseActivity {
             }
             mDevice.setIp(deviceIp);
             mDevice.setPort(devicePort);
-            LocalClient.getInstance().init(new UdpClient.Listener() {
-                @Override
-                public void onError(String error) {
-                    dismissLoadDialog();
-                }
-
-                @Override
-                public void onReceive(String ip, int port, byte[] bytes) {
-                    if (port == devicePort && TextUtils.equals(ip, deviceIp)) {
-                        String payload = new String(bytes);
-                        try {
-                            DeviceParams params = JSON.parseObject(payload, DeviceParams.class);
-                            if (params != null) {
-                                mDevice.updateValues(params.getParams());
-                                mDeviceViewModel.postValue();
-                                mDeviceBaseViewModel.postValue();
-                            }
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                        dismissLoadDialog();
-                    }
-                }
-            });
         }
-        if (mDevice == null) {
-            return;
-        }
+//            LocalClient.getInstance().init(new UdpClient.Listener() {
+//                @Override
+//                public void onError(String error) {
+//                    dismissLoadDialog();
+//                }
+//
+//                @Override
+//                public void onReceive(String ip, int port, byte[] bytes) {
+//                    if (port == devicePort && TextUtils.equals(ip, deviceIp)) {
+//                        String payload = new String(bytes);
+//                        try {
+//                            DeviceParams params = JSON.parseObject(payload, DeviceParams.class);
+//                            if (params != null) {
+//                                mDevice.updateValues(params.getParams());
+//                                mDeviceViewModel.postValue();
+//                                mDeviceBaseViewModel.postValue();
+//                            }
+//                        } catch (JSONException e) {
+//                            e.printStackTrace();
+//                        }
+//                        dismissLoadDialog();
+//                    }
+//                }
+//            });
+//        }
 
         String name = mDevice.getName();
         if (TextUtils.isEmpty(name)) {
@@ -199,7 +188,6 @@ public class DeviceActivity extends BaseActivity {
 
         mDeviceBaseViewModel = ViewModelProviders.of(this).get(DeviceViewModel.class);
         mDeviceBaseViewModel.setData(mDevice);
-        mDeviceBaseViewModel.setCloud(authorized);
 
         switch (mProduct) {
             case ExoLed:
@@ -211,13 +199,6 @@ public class DeviceActivity extends BaseActivity {
             case ExoSocket:
                 mDeviceViewModel = ViewModelProviders.of(DeviceActivity.this).get(SocketViewModel.class);
                 mDeviceViewModel.setData(mDevice);
-                mDeviceViewModel.observe(this, new Observer() {
-                    @Override
-                    public void onChanged(@Nullable Object o) {
-                        ExoSocket exoSocket = (ExoSocket) mDevice;
-                        device_status_sensor.setImageResource(exoSocket.getSensorAvailable() ? R.drawable.ic_sensor_on : R.drawable.ic_sensor);
-                    }
-                });
                 ExoSocket socket = (ExoSocket) mDevice;
                 device_status_sensor.setVisibility(View.VISIBLE);
                 device_status_sensor.setImageResource(socket.getSensorAvailable() ? R.drawable.ic_sensor_on : R.drawable.ic_sensor);
@@ -233,53 +214,33 @@ public class DeviceActivity extends BaseActivity {
             default:
                 return;
         }
-        mDeviceViewModel.setCloud(authorized);
+        mDeviceViewModel.observe(this, o -> {
+            mDeviceBaseViewModel.postValue();
+            dismissLoadDialog();
+            if (mDevice instanceof ExoSocket) {
+                ExoSocket socket = (ExoSocket) mDevice;
+                device_status_sensor.setImageResource(socket.getSensorAvailable() ? R.drawable.ic_sensor_on : R.drawable.ic_sensor);
+            }
+        });
 
         replaceFragment(R.id.device_fl_ext, mModeFragment);
         if (mDeviceFragment != null) {
             replaceFragment(R.id.device_fl_show, mDeviceFragment);
         }
-        if (authorized) {
-            mDeviceViewModel.setGetAllPropertiesCallback(new HttpCallback<UserApi.GetDevicePropertiesResponse>() {
-                @Override
-                public void onError(String error) {
-                    dismissLoadDialog();
-                    showToast(error);
-                }
-
-                @Override
-                public void onSuccess(UserApi.GetDevicePropertiesResponse result) {
-                    dismissLoadDialog();
-                }
-            });
-            mDeviceViewModel.getAllProperties();
-        } else {
-            new Handler().post(new Runnable() {
-                @Override
-                public void run() {
-                    while (!LocalClient.getInstance().isInited());
-                    mDeviceViewModel.getAllProperties();
-                }
-            });
-        }
+        mDeviceViewModel.getAllProperties();
         showLoadDialog();
     }
 
     @Override
     protected void initEvent() {
-        device_detail.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                addFragmentToStack(R.id.device_root, new DeviceDetailFragment());
+        device_detail.setOnClickListener(v -> {
+            if (mDevice == null) {
+                return;
             }
+            addFragmentToStack(R.id.device_root, DeviceDetailFragment.newInstance(mDevice.getProductKey()));
         });
 
-        device_btn_back.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
+        device_btn_back.setOnClickListener(v -> finish());
     }
 
     @Subscribe (threadMode = ThreadMode.MAIN)

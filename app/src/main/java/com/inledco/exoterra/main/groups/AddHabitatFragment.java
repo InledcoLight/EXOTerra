@@ -263,7 +263,7 @@ public class AddHabitatFragment extends BaseFragment {
     }
 
     private void showTimePickerDialog(int hour, int min, final TimePickerDialog.OnTimeSetListener listener) {
-//        TimePickerDialog timeDialog = new TimePickerDialog(getContext(), R.style.TimePickerDialogStyle, listener, time/60, time%60, GlobalSettings.is24HourFormat());
+//        TimePickerDialog timeDialog = new TimePickerDialog(getContext(), listener, hour, min, GlobalSettings.is24HourFormat());
 //        timeDialog.show();
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
@@ -278,14 +278,11 @@ public class AddHabitatFragment extends BaseFragment {
                                           .setCancelable(false)
                                           .show();
         Button btn_ok = dialog.getButton(DialogInterface.BUTTON_POSITIVE);
-        btn_ok.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (listener != null) {
-                    listener.onTimeSet(tp, tp.getCurrentHour(), tp.getCurrentMinute());
-                }
-                dialog.dismiss();
+        btn_ok.setOnClickListener(v -> {
+            if (listener != null) {
+                listener.onTimeSet(tp, tp.getCurrentHour(), tp.getCurrentMinute());
             }
+            dialog.dismiss();
         });
     }
 

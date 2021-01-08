@@ -13,7 +13,7 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:gravity="center"
-        android:layout_margin="16dp"
+        android:layout_margin="@dimen/marginUnitX2"
         app:strokeWidth="@dimen/strokeWidth"
         app:radius="@dimen/cornerRadius"
         app:gradientStart="@color/gradientYellow"
@@ -28,8 +28,8 @@
             android:background="@drawable/shape_topcorner_rect_gradient">
 
             <TextView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:gravity="center"
                 android:layout_gravity="center"
                 android:textStyle="bold"
@@ -43,14 +43,14 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:gravity="center_vertical"
-            android:padding="8dp">
+            android:padding="@dimen/marginUnitX2">
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textStyle="bold"
                 android:textSize="@dimen/textSizeSubTitle"
                 android:textColor="@color/textColorPrimary"
-                android:padding="8dp"
+                android:padding="@dimen/marginUnitX2"
                 android:text="1"/>
             <TextView
                 android:layout_width="match_parent"
@@ -66,8 +66,8 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:layout_marginLeft="16dp"
-        android:layout_marginRight="16dp"/>
+        android:layout_marginLeft="@dimen/marginUnitX2"
+        android:layout_marginRight="@dimen/marginUnitX2"/>
 
     <com.inledco.exoterra.view.GradientCornerButton
         android:id="@+id/products_exit"
@@ -75,7 +75,7 @@
         android:layout_height="wrap_content"
         style="?attr/buttonStyle"
         android:background="?attr/selectableItemBackground"
-        android:layout_margin="16dp"
+        android:layout_margin="@dimen/marginUnitX2"
         android:text="@string/exit"
         app:strokeWidth="@dimen/strokeWidth"
         app:radius="@dimen/cornerRadius"

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/newprdt_bnv_home"
+        android:icon="@drawable/ic_reptile"
+        android:title="@string/home"/>
+    <item
+        android:id="@+id/newprdt_bnv_microtope"
+        android:icon="@drawable/ic_microtope"
+        android:title="@string/microtope"/>
+    <item
+        android:id="@+id/newprdt_bnv_uvb"
+        android:icon="@drawable/ic_uvb"
+        android:title="@string/uvb_buddy"/>
+    <item
+        android:id="@+id/newprdt_bnv_restore"
+        android:icon="@drawable/ic_resore"
+        android:title="@string/restore_rays"/>
+    <item
+        android:id="@+id/newprdt_bnv_pref"
+        android:icon="@drawable/ic_prefs_white"
+        android:title="@string/prefs"/>
+</menu>

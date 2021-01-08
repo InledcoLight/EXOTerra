@@ -38,8 +38,8 @@
     <com.inledco.exoterra.view.GradientCornerLinearLayout
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="8dp"
+        android:layout_marginTop="@dimen/marginUnit"
+        android:layout_marginBottom="@dimen/marginUnit"
         android:orientation="vertical"
         app:direction="horizontal"
         app:gradientEnd="@color/gradientGreen"
@@ -77,21 +77,21 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_vertical"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:layout_marginTop="4dp">
 
             <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
                 android:layout_marginLeft="4dp"
                 android:layout_marginRight="4dp"
-                android:padding="4dp"
+                android:padding="2dp"
                 app:srcCompat="@drawable/ic_sunrise" />
 
             <TextView
                 android:id="@+id/light_auto_sunrise"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_margin="4dp"
                 android:layout_weight="1"
                 android:textSize="@dimen/textSizeTiny" />
 
@@ -104,10 +104,11 @@
 
             <ImageButton
                 android:id="@+id/light_auto_sunrise_edit"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
                 android:background="?attr/selectableItemBackground"
-                android:padding="4dp"
+                android:layout_marginRight="4dp"
+                android:padding="2dp"
                 app:srcCompat="@drawable/ic_edit_white_24dp" />
         </LinearLayout>
 
@@ -115,14 +116,15 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_vertical"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:layout_marginTop="4dp">
 
             <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
                 android:layout_marginLeft="4dp"
                 android:layout_marginRight="4dp"
-                android:padding="4dp"
+                android:padding="2dp"
                 app:srcCompat="@drawable/ic_sun" />
 
             <include
@@ -134,10 +136,11 @@
 
             <ImageButton
                 android:id="@+id/light_auto_daylight_edit"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
                 android:background="?attr/selectableItemBackground"
-                android:padding="4dp"
+                android:layout_marginRight="4dp"
+                android:padding="2dp"
                 app:srcCompat="@drawable/ic_edit_white_24dp" />
         </LinearLayout>
 
@@ -145,21 +148,21 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_vertical"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:layout_marginTop="4dp">
 
             <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
                 android:layout_marginLeft="4dp"
                 android:layout_marginRight="4dp"
-                android:padding="4dp"
+                android:padding="2dp"
                 app:srcCompat="@drawable/ic_sunset" />
 
             <TextView
                 android:id="@+id/light_auto_sunset"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_margin="4dp"
                 android:layout_weight="1"
                 android:textSize="@dimen/textSizeTiny" />
 
@@ -172,10 +175,11 @@
 
             <ImageButton
                 android:id="@+id/light_auto_sunset_edit"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
                 android:background="?attr/selectableItemBackground"
-                android:padding="4dp"
+                android:layout_marginRight="4dp"
+                android:padding="2dp"
                 app:srcCompat="@drawable/ic_edit_white_24dp" />
         </LinearLayout>
 
@@ -183,14 +187,15 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_vertical"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:layout_marginTop="4dp">
 
             <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
                 android:layout_marginLeft="4dp"
                 android:layout_marginRight="4dp"
-                android:padding="4dp"
+                android:padding="2dp"
                 app:srcCompat="@drawable/ic_moon" />
 
             <include
@@ -202,10 +207,11 @@
 
             <ImageButton
                 android:id="@+id/light_auto_nightlight_edit"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
                 android:background="?attr/selectableItemBackground"
-                android:padding="4dp"
+                android:layout_marginRight="4dp"
+                android:padding="2dp"
                 app:srcCompat="@drawable/ic_edit_white_24dp" />
         </LinearLayout>
 
@@ -213,30 +219,32 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_vertical"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="4dp">
 
             <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
                 android:layout_marginLeft="4dp"
                 android:layout_marginRight="4dp"
-                android:padding="4dp"
+                android:padding="2dp"
                 app:srcCompat="@drawable/ic_sleep" />
 
             <TextView
                 android:id="@+id/light_auto_turnoff"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_margin="4dp"
                 android:layout_weight="1"
                 android:textSize="@dimen/textSizeTiny" />
 
             <ImageButton
                 android:id="@+id/light_auto_turnoff_edit"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
                 android:background="?attr/selectableItemBackground"
-                android:padding="4dp"
+                android:layout_marginRight="4dp"
+                android:padding="2dp"
                 app:srcCompat="@drawable/ic_edit_white_24dp" />
         </LinearLayout>
 

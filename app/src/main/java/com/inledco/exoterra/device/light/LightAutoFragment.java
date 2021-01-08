@@ -362,12 +362,12 @@ public class LightAutoFragment extends BaseFragment {
             return "100%";
         }
         if (val >= 10) {
-            return " " + val + "%";
-        }
-        if (val >= 0) {
             return "  " + val + "%";
         }
-        return "  0%";
+        if (val >= 0) {
+            return "    " + val + "%";
+        }
+        return "    0%";
     }
 
     private String getTimeText(int time) {
@@ -488,8 +488,8 @@ public class LightAutoFragment extends BaseFragment {
             nightlight_tv[i].setBackgroundColor(color);
         }
         for (int i = chnCount; i < 6; i++) {
-            daylight_tv[i].setVisibility(View.INVISIBLE);
-            nightlight_tv[i].setVisibility(View.INVISIBLE);
+            daylight_tv[i].setVisibility(View.GONE);
+            nightlight_tv[i].setVisibility(View.GONE);
         }
         if (mLight.getTurnoffEnable()) {
             auto_turnoff.setText(getTimeText(turnoffTime));

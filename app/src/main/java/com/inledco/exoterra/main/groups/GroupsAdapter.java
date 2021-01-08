@@ -166,7 +166,7 @@ public class GroupsAdapter extends SimpleAdapter<Group, GroupsAdapter.GroupViewH
                 if (device != null && device instanceof ExoSocket) {
                     ExoSocket socket = (ExoSocket) device;
                     boolean res = false;
-                    if (socket.getSensorAvailable()) {
+                    if (socket.isOnline() && socket.getSensorAvailable()) {
                         ExoSocket.Sensor[] sensors = socket.getSensor();
                         if (sensors == null) {
                             holder.sensor1.setText(null);

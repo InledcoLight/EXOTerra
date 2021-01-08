@@ -16,9 +16,9 @@
             android:id="@+id/gradientCornerLinearLayout12"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginEnd="16dp"
+            android:layout_marginStart="@dimen/marginUnitX2"
+            android:layout_marginTop="@dimen/marginUnit"
+            android:layout_marginEnd="@dimen/marginUnitX2"
             android:gravity="center"
             android:orientation="vertical"
             app:direction="horizontal"
@@ -36,16 +36,16 @@
 
                 <ImageView
                     android:id="@+id/device_icon"
-                    android:layout_width="64dp"
-                    android:layout_height="64dp"
-                    android:padding="8dp"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:layout_margin="@dimen/marginUnit"
+                    app:srcCompat="@drawable/devicon_strip"
                     android:scaleType="fitCenter" />
 
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:layout_marginLeft="8dp"
                     android:orientation="vertical">
                     <TextView
                         android:id="@+id/device_name"
@@ -91,7 +91,7 @@
                     android:id="@+id/device_detail"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginRight="8dp"
+                    android:layout_marginRight="@dimen/marginUnit"
                     android:background="?attr/selectableItemBackground"
                     app:srcCompat="@drawable/ic_set"/>
             </LinearLayout>
@@ -100,15 +100,19 @@
                 android:id="@+id/device_fl_ext"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingTop="8dp"
-                android:paddingBottom="8dp"/>
+                android:paddingTop="@dimen/marginUnit"
+                android:paddingBottom="@dimen/marginUnit"/>
         </com.inledco.exoterra.view.GradientCornerLinearLayout>
 
         <FrameLayout
             android:id="@+id/device_fl_btm"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="1">
+            android:layout_weight="1"
+            android:layout_marginLeft="@dimen/marginUnitX2"
+            android:layout_marginRight="@dimen/marginUnitX2"
+            android:layout_marginTop="@dimen/marginUnit"
+            android:layout_marginBottom="@dimen/marginUnitX2">
 
             <LinearLayout
                 android:id="@+id/device_ll_show"
@@ -120,20 +124,14 @@
                     android:id="@+id/device_fl_show"
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
-                    android:layout_weight="1"
-                    android:layout_marginTop="8dp"
-                    android:layout_marginLeft="16dp"
-                    android:layout_marginRight="16dp"/>
+                    android:layout_weight="1"/>
 
                 <com.inledco.exoterra.view.GradientCornerButton
                     android:id="@+id/device_btn_back"
                     style="?attr/buttonStyle"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:layout_marginBottom="16dp"
-                    android:layout_marginLeft="16dp"
-                    android:layout_marginRight="16dp"
+                    android:layout_marginTop="@dimen/marginUnit"
                     android:background="?attr/selectableItemBackground"
                     android:text="@string/back"
                     app:direction="horizontal"

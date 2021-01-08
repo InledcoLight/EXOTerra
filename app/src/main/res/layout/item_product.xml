@@ -3,8 +3,7 @@
               xmlns:app="http://schemas.android.com/apk/res-auto"
               android:orientation="vertical"
               android:gravity="center_horizontal"
-              android:padding="8dp"
-              android:background="?attr/selectableItemBackground"
+              android:padding="@dimen/marginUnit"
               android:layout_width="match_parent"
               android:layout_height="wrap_content">
 
@@ -12,7 +11,7 @@
         android:id="@+id/item_product_icon"
         android:layout_width="64dp"
         android:layout_height="64dp"
-        android:padding="8dp"
+        android:padding="@dimen/marginUnit"
         android:scaleType="fitCenter"/>
     <TextView
         android:id="@+id/item_product_type"

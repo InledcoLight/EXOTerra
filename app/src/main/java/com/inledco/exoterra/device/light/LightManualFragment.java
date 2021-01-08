@@ -25,6 +25,7 @@ import com.inledco.exoterra.aliot.ExoLed;
 import com.inledco.exoterra.aliot.LightViewModel;
 import com.inledco.exoterra.base.BaseFragment;
 import com.inledco.exoterra.bean.LightSpectrum;
+import com.inledco.exoterra.device.LightPresets;
 import com.inledco.exoterra.util.LightUtil;
 import com.inledco.exoterra.util.SpectrumUtil;
 import com.inledco.exoterra.view.CircleSeekbar;
@@ -56,6 +57,17 @@ public class LightManualFragment extends BaseFragment {
     private int mSelected = -1;
 
     private LightSpectrum mLightSpectrum;
+
+    private static final int[][] mPresetBrights = new int[][] {
+        LightPresets.PRESET_EXOSTRIP_PLANT,
+        LightPresets.PRESET_EXOSTRIP_CLOUD,
+        LightPresets.PRESET_EXOSTRIP_SUNSET,
+        LightPresets.PRESET_EXOSTRIP_MOON,
+        LightPresets.PRESET_EXOSTRIP_CACTUS,
+        LightPresets.PRESET_EXOSTRIP_FROG,
+        LightPresets.PRESET_EXOSTRIP_LIZARD,
+        LightPresets.PRESET_EXOSTRIP_SNAKE
+    };
 
     @Nullable
     @Override
@@ -173,12 +185,10 @@ public class LightManualFragment extends BaseFragment {
             mPresets[pos].setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    for (int j = 0; j < mLight.getChannelCount(); j++) {
-
-                    }
                     for (int j = 0; j < 8; j++) {
                         mPresets[j].setChecked(pos == j ? true : false);
                     }
+                    mLightViewModel.setChannelBrights(mPresetBrights[pos]);
                 }
             });
         }
@@ -223,11 +233,11 @@ public class LightManualFragment extends BaseFragment {
                 if (mSelected >= 0 && mSelected < mLight.getChannelCount()) {
                     mLightViewModel.setChannelBright(mSelected, progress);
                 } else {
-                    int[] brights = new int[mLight.getChannelCount()];
-                    for (int i = 0; i < brights.length; i++) {
-                        brights[i] = progress;
-                    }
-                    mLightViewModel.setChannelBrights(brights);
+//                    int[] brights = new int[mLight.getChannelCount()];
+//                    for (int i = 0; i < brights.length; i++) {
+//                        brights[i] = progress;
+//                    }
+//                    mLightViewModel.setChannelBrights(brights);
                 }
             }
         });

@@ -7,44 +7,63 @@
 
     <CheckedTextView
         android:id="@+id/monsoon_mode_manual"
-        android:layout_width="96dp"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_weight="1"
         android:background="?attr/selectableItemBackground"
         android:drawableTop="@drawable/selector_manual"
+        android:lines="1"
+        android:ellipsize="end"
         android:text="@string/manual"
         android:textColor="@color/selector_text"
         android:textAlignment="center"
-        android:textSize="@dimen/textSizeSecondary" />
+        android:textSize="@dimen/textSizeTiny" />
 
     <CheckedTextView
         android:id="@+id/monsoon_mode_timer"
-        android:layout_width="96dp"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_weight="1"
         android:background="?attr/selectableItemBackground"
         android:drawableTop="@drawable/selector_timer"
+        android:lines="1"
+        android:ellipsize="end"
         android:text="@string/timer"
         android:textColor="@color/selector_text"
         android:textAlignment="center"
-        android:textSize="@dimen/textSizeSecondary"/>
+        android:textSize="@dimen/textSizeTiny"/>
 
-    <Space
+    <CheckedTextView
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_weight="1"/>
+        android:layout_weight="1"
+        android:background="?attr/selectableItemBackground"
+        android:visibility="invisible"
+        android:lines="1"
+        android:ellipsize="end"
+        android:text="@string/timer"
+        android:textColor="@color/selector_text"
+        android:textAlignment="center"
+        android:textSize="@dimen/textSizeTiny"/>
 
-<!--    <CheckedTextView-->
-<!--        android:id="@+id/monsoon_mode_power"-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:layout_centerInParent="true"-->
-<!--        android:gravity="center"-->
-<!--        android:padding="4dp"-->
-<!--        android:layout_marginRight="8dp"-->
-<!--        android:background="?attr/selectableItemBackground"-->
-<!--        android:drawableTop="@drawable/selector_power_32dp"-->
-<!--        android:textAllCaps="false"-->
-<!--        android:textAlignment="center"-->
-<!--        android:textSize="10sp"-->
-<!--        android:textColor="@color/textColorPrimary"/>-->
+    <Space
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:minWidth="24dp"/>
+
+    <CheckedTextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:gravity="center"
+        android:padding="4dp"
+        android:layout_marginRight="8dp"
+        android:background="?attr/selectableItemBackground"
+        android:drawableTop="@drawable/selector_power_32dp"
+        android:visibility="invisible"
+        android:textAllCaps="false"
+        android:textAlignment="center"
+        android:textSize="10sp"
+        android:textColor="@color/textColorPrimary"/>
 
 </LinearLayout>

@@ -273,9 +273,9 @@ public class ExoSocket extends Device {
     }
 
     public static class Timer {
-        public static final int ACTION_TURNOFF          = 0;
-        public static final int ACTION_TURNON           = 1;
-        public static final int ACTION_TURNON_PERIOD    = 2;
+        public static final int ACTION_TURNOFF  = 0;
+        public static final int ACTION_TURNON   = 1;
+        public static final int ACTION_PERIOD   = 2;
 
         private boolean enable;
         private int action;
@@ -288,7 +288,7 @@ public class ExoSocket extends Device {
         private int end_second;
 
         public boolean isValid() {
-            if (action < 0 || action > 2) {
+            if (action < ACTION_TURNOFF || action > ACTION_PERIOD) {
                 return false;
             }
             if (repeat < 0 || repeat > 0x7F) {
@@ -418,6 +418,18 @@ public class ExoSocket extends Device {
             if (end_second >= 0 && end_second <= 59) {
                 this.end_second = end_second;
             }
+        }
+
+        public void setTime(int hour, int minute, int second) {
+            setHour(hour);
+            setMinute(minute);
+            setSecond(second);
+        }
+
+        public void setEndTime(int end_hour, int end_minute, int end_second) {
+            setEndHour(end_hour);
+            setEndMinute(end_minute);
+            setEndSecond(end_second);
         }
     }
 

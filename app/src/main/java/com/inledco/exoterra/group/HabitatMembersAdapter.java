@@ -15,7 +15,7 @@ import com.inledco.exoterra.common.SimpleAdapter;
 
 import java.util.List;
 
-public class HabitatMembersAdapter extends SimpleAdapter<Group.User, HabitatMembersAdapter.HomeMemberViewHolder> {
+public class HabitatMembersAdapter extends SimpleAdapter<Group.User, HabitatMembersAdapter.HabitatMemberViewHolder> {
 
     private final String creator;
 
@@ -26,17 +26,18 @@ public class HabitatMembersAdapter extends SimpleAdapter<Group.User, HabitatMemb
 
     @Override
     protected int getItemLayoutResId() {
-        return R.layout.item_homember;
+        return R.layout.item_habitat_member;
     }
 
     @NonNull
     @Override
-    public HomeMemberViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
-        return new HomeMemberViewHolder(createView(viewGroup));
+    public HabitatMemberViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
+        return new HabitatMemberViewHolder(createView(viewGroup));
     }
 
     @Override
-    public void onBindViewHolder(@NonNull HomeMemberViewHolder holder, final int position) {
+    public void onBindViewHolder(@NonNull HabitatMemberViewHolder holder, int pos) {
+        final int position = holder.getAdapterPosition();
         Group.User user = mData.get(position);
         String nickname = user.nickname;
         if (TextUtils.isEmpty(nickname)) {
@@ -61,15 +62,15 @@ public class HabitatMembersAdapter extends SimpleAdapter<Group.User, HabitatMemb
         });
     }
 
-    class HomeMemberViewHolder extends RecyclerView.ViewHolder {
+    class HabitatMemberViewHolder extends RecyclerView.ViewHolder {
         private ImageView icon;
         private TextView nickname;
         private TextView role;
-        public HomeMemberViewHolder(@NonNull View itemView) {
+        public HabitatMemberViewHolder(@NonNull View itemView) {
             super(itemView);
-            icon = itemView.findViewById(R.id.item_homember_icon);
-            nickname = itemView.findViewById(R.id.item_homember_name);
-            role = itemView.findViewById(R.id.item_homember_role);
+            icon = itemView.findViewById(R.id.item_habitat_member_icon);
+            nickname = itemView.findViewById(R.id.item_habitat_member_name);
+            role = itemView.findViewById(R.id.item_habitat_member_role);
         }
     }
 }

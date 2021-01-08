@@ -37,26 +37,25 @@ public class UdpClient extends BaseClient {
         if (mListening) {
             return;
         }
-        mExecutorService.execute(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    synchronized (mLock) {
-                        mSocket = new DatagramSocket(0);
-                        mSocket.setSendBufferSize(UDP_SEND_BUFFER_SIZE);
-                        mSocket.setReceiveBufferSize(UDP_RECEIVE_BUFFER_SIZE);
+        mExecutorService.execute(() -> {
+            try {
+                synchronized (mLock) {
+                    mSocket = new DatagramSocket(0);
+                    mSocket.setSendBufferSize(UDP_SEND_BUFFER_SIZE);
+                    mSocket.setReceiveBufferSize(UDP_RECEIVE_BUFFER_SIZE);
 
-//                        Thread.sleep(100);
-                        mListening = true;
-                    }
-                    receive();
+                    Thread.sleep(100);
+                    mListening = true;
                 }
-                catch (SocketException e) {
-                    e.printStackTrace();
-                    if (mListener != null) {
-                        mListener.onError(e.getMessage());
-                    }
+                receive();
+            }
+            catch (SocketException e) {
+                e.printStackTrace();
+                if (mListener != null) {
+                    mListener.onError(e.getMessage());
                 }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
         });
     }
@@ -85,21 +84,18 @@ public class UdpClient extends BaseClient {
         if (!mListening || mSocket == null || mSocket.isClosed() || bytes.length == 0) {
             return;
         }
-        mExecutorService.execute(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    synchronized (mLock) {
-                        InetAddress address = InetAddress.getByName(ip);
-                        DatagramPacket packet = new DatagramPacket(bytes, bytes.length, address, port);
-                        mSocket.send(packet);
-                    }
+        mExecutorService.execute(() -> {
+            try {
+                synchronized (mLock) {
+                    InetAddress address = InetAddress.getByName(ip);
+                    DatagramPacket packet = new DatagramPacket(bytes, bytes.length, address, port);
+                    mSocket.send(packet);
                 }
-                catch (IOException e) {
-                    e.printStackTrace();
-                    if (mListener != null) {
-                        mListener.onError(e.getMessage());
-                    }
+            }
+            catch (IOException e) {
+                e.printStackTrace();
+                if (mListener != null) {
+                    mListener.onError(e.getMessage());
                 }
             }
         });

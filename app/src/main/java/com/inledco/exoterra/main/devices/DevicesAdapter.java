@@ -79,34 +79,27 @@ public class DevicesAdapter extends SimpleAdapter<Device, DeviceViewHolder> {
         }
         holder.tv_name.setText(name);
         Group group = GroupManager.getInstance().getDeviceGroup(pkey, dname);
-        holder.ctv_habitat.setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.selector_habitat, 0, 0, 0);
         if (group != null) {
-            holder.ctv_habitat.setChecked(true);
+            holder.ctv_habitat.setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.ic_habitats_white, 0, 0, 0);
             holder.ctv_habitat.setText(group.name);
         } else {
-            holder.ctv_habitat.setChecked(false);
+            holder.ctv_habitat.setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.ic_habitats_red, 0, 0, 0);
             holder.ctv_habitat.setText(null);
         }
 
         holder.iv_state.setImageResource(state ? R.drawable.ic_cloud_green_16dp : R.drawable.ic_cloud_grey_16dp);
         holder.iv_sensor.setVisibility(product == ExoProduct.ExoSocket ? View.VISIBLE : View.GONE);
         holder.iv_state.setImageResource(state ? R.drawable.ic_cloud_green_16dp : R.drawable.ic_cloud_grey_16dp);
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (mItemClickListener != null) {
-                    mItemClickListener.onItemClick(holder.getAdapterPosition());
-                }
+        holder.itemView.setOnClickListener(v -> {
+            if (mItemClickListener != null) {
+                mItemClickListener.onItemClick(holder.getAdapterPosition());
             }
         });
-        holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                if (mItemLongClickListener != null) {
-                    return mItemLongClickListener.onItemLongClick(holder.getAdapterPosition());
-                }
-                return false;
+        holder.itemView.setOnLongClickListener(v -> {
+            if (mItemLongClickListener != null) {
+                return mItemLongClickListener.onItemLongClick(holder.getAdapterPosition());
             }
+            return false;
         });
     }
 }

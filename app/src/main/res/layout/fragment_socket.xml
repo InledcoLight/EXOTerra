@@ -24,7 +24,7 @@
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:padding="8dp"
+            android:padding="@dimen/marginUnit"
             android:scaleType="center"
             app:srcCompat="@drawable/ic_temperature_color_64dp" />
 
@@ -32,7 +32,7 @@
             android:id="@+id/socket_sensor1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="8dp"
+            android:layout_marginLeft="@dimen/marginUnit"
             android:textAlignment="textEnd"
             android:textColor="@color/colorTemperature"
             android:textSize="@dimen/textSizeSubTitle" />
@@ -45,7 +45,7 @@
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:padding="8dp"
+            android:padding="@dimen/marginUnit"
             android:scaleType="center"
             app:srcCompat="@drawable/ic_humidity_color_64dp" />
 
@@ -53,7 +53,7 @@
             android:id="@+id/socket_sensor2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="8dp"
+            android:layout_marginLeft="@dimen/marginUnit"
             android:textAlignment="textEnd"
             android:textColor="@color/colorHumidity"
             android:textSize="@dimen/textSizeSubTitle" />

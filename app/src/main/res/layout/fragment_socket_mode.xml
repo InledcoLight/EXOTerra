@@ -9,42 +9,48 @@
         android:id="@+id/socket_mode_timer"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_weight="2"
+        android:layout_weight="1"
         android:background="?attr/selectableItemBackground"
         android:drawableTop="@drawable/selector_timer"
+        android:lines="1"
+        android:ellipsize="end"
         android:text="@string/timer"
         android:textColor="@color/selector_text"
         android:textAlignment="center"
-        android:textSize="@dimen/textSizeSecondary" />
+        android:textSize="@dimen/textSizeTiny" />
 
     <CheckedTextView
         android:id="@+id/socket_mode_thermostat"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_weight="2"
+        android:layout_weight="1"
         android:background="?attr/selectableItemBackground"
         android:drawableTop="@drawable/selector_temperature"
+        android:lines="1"
+        android:ellipsize="end"
         android:text="@string/thermostat"
         android:textColor="@color/selector_text"
         android:textAlignment="center"
-        android:textSize="@dimen/textSizeSecondary"/>
+        android:textSize="@dimen/textSizeTiny"/>
 
     <CheckedTextView
         android:id="@+id/socket_mode_hygrostat"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_weight="2"
+        android:layout_weight="1"
         android:background="?attr/selectableItemBackground"
         android:drawableTop="@drawable/selector_humidity"
+        android:lines="1"
+        android:ellipsize="end"
         android:text="@string/hygrostat"
         android:textColor="@color/selector_text"
         android:textAlignment="center"
-        android:textSize="@dimen/textSizeSecondary" />
+        android:textSize="@dimen/textSizeTiny" />
 
     <Space
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_weight="1"/>
+        android:minWidth="24dp"/>
 
     <CheckedTextView
         android:id="@+id/socket_mode_power"
@@ -56,9 +62,11 @@
         android:layout_marginRight="8dp"
         android:background="?attr/selectableItemBackground"
         android:drawableTop="@drawable/selector_power_32dp"
+        android:lines="1"
+        android:ellipsize="end"
         android:textAllCaps="false"
         android:textAlignment="center"
-        android:textSize="0sp"
+        android:textSize="@dimen/textSizeTiny"
         android:textColor="@color/textColorPrimary"/>
 
 </LinearLayout>

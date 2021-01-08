@@ -2,9 +2,9 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_marginTop="8dp"
-    android:layout_marginLeft="8dp"
-    android:layout_marginRight="8dp"
+    android:layout_marginTop="@dimen/marginUnit"
+    android:layout_marginLeft="@dimen/marginUnit"
+    android:layout_marginRight="@dimen/marginUnit"
     android:gravity="center_horizontal"
     android:orientation="vertical">
 
@@ -49,7 +49,7 @@
             android:gravity="right"
             android:button="@null"
             android:background="?attr/selectableItemBackground"
-            android:textSize="@dimen/textSizePrimary"
+            android:textSize="@dimen/textSizeSecondary"
             android:textColor="@color/selector_week"
             android:text=""/>
         <RadioButton
@@ -60,7 +60,7 @@
             android:gravity="right"
             android:button="@null"
             android:background="?attr/selectableItemBackground"
-            android:textSize="@dimen/textSizePrimary"
+            android:textSize="@dimen/textSizeSecondary"
             android:textColor="@color/selector_week"
             android:text=""/>
     </RadioGroup>
@@ -83,7 +83,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:padding="6dp"
+            android:padding="@dimen/marginUnit"
             android:text=":"/>
         <NumberPicker
             android:id="@+id/dialog_socket_minute"
@@ -92,7 +92,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:padding="6dp"
+            android:padding="@dimen/marginUnit"
             android:text=":"/>
         <NumberPicker
             android:id="@+id/dialog_socket_second"

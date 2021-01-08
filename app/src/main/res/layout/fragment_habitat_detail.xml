@@ -11,8 +11,8 @@
         android:id="@+id/imageView10"
         android:layout_width="match_parent"
         android:layout_height="@dimen/brandHeight"
-        android:layout_marginLeft="16dp"
-        android:layout_marginRight="16dp"
+        android:layout_marginLeft="@dimen/marginUnitX2"
+        android:layout_marginRight="@dimen/marginUnitX2"
         android:scaleType="fitXY"
         android:src="@mipmap/ic_microtope_title"/>
 
@@ -20,10 +20,10 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:layout_marginLeft="16dp"
-        android:layout_marginRight="16dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="16dp"
+        android:layout_marginLeft="@dimen/marginUnitX2"
+        android:layout_marginRight="@dimen/marginUnitX2"
+        android:layout_marginTop="@dimen/marginUnit"
+        android:layout_marginBottom="@dimen/marginUnitX2"
         android:orientation="vertical">
 
         <LinearLayout
@@ -44,13 +44,13 @@
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:orientation="vertical"
-                android:layout_marginLeft="8dp">
+                android:layout_marginLeft="@dimen/marginUnit">
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="top"
                     android:textColor="@color/textColorPrimary"
-                    android:textSize="@dimen/textSizeSubTitle"
+                    android:textSize="@dimen/textSizePrimary"
                     android:text="@string/habitat_name"/>
                 <Space
                     android:layout_width="0dp"
@@ -62,7 +62,7 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="right"
                     android:gravity="center_vertical"
-                    android:drawablePadding="8dp"
+                    android:drawablePadding="@dimen/marginUnit"
                     android:background="?attr/selectableItemBackground"
                     android:lines="1"
                     android:ellipsize="end"
@@ -131,7 +131,7 @@
                 android:paddingTop="4dp"
                 android:paddingBottom="4dp"
                 android:gravity="center_vertical"
-                android:drawablePadding="8dp"
+                android:drawablePadding="@dimen/marginUnit"
                 android:background="?attr/selectableItemBackground"
                 android:textColor="@color/textColorSencondary"
                 android:textSize="@dimen/textSizeTiny"/>
@@ -159,7 +159,7 @@
                 android:paddingTop="4dp"
                 android:paddingBottom="4dp"
                 android:gravity="center_vertical"
-                android:drawablePadding="8dp"
+                android:drawablePadding="@dimen/marginUnit"
                 android:background="?attr/selectableItemBackground"
                 android:textColor="@color/textColorSencondary"
                 android:textSize="@dimen/textSizeTiny"/>
@@ -187,7 +187,7 @@
                 android:paddingTop="4dp"
                 android:paddingBottom="4dp"
                 android:gravity="center_vertical"
-                android:drawablePadding="8dp"
+                android:drawablePadding="@dimen/marginUnit"
                 android:background="?attr/selectableItemBackground"
                 android:textColor="@color/textColorSencondary"
                 android:textSize="@dimen/textSizeTiny"/>
@@ -203,10 +203,11 @@
             style="@style/SwitchStyle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingTop="8dp"
-            android:paddingBottom="8dp"
+            android:paddingTop="@dimen/marginUnit"
+            android:paddingBottom="@dimen/marginUnit"
             android:showText="false"
             android:textColor="@color/textColorPrimary"
+            android:textSize="@dimen/textSizeSecondary"
             android:text="@string/favourite"/>
         <View
             android:layout_width="match_parent"
@@ -222,8 +223,8 @@
                 android:id="@+id/habitat_detail_exit"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:paddingTop="8dp"
-                android:paddingBottom="8dp"
+                android:paddingTop="@dimen/marginUnit"
+                android:paddingBottom="@dimen/marginUnit"
                 android:textColor="@color/textColorPrimary"
                 android:textSize="@dimen/textSizeSecondary"
                 android:text="@string/delete_habitat"/>
@@ -254,8 +255,8 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:paddingTop="8dp"
-                android:paddingBottom="8dp"
+                android:paddingTop="@dimen/marginUnit"
+                android:paddingBottom="@dimen/marginUnit"
                 android:textColor="@color/textColorPrimary"
                 android:textSize="@dimen/textSizeSecondary"
                 android:text="@string/members"/>
@@ -282,8 +283,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
-            android:layout_marginLeft="16dp"
-            android:layout_marginBottom="8dp"
+            android:layout_marginLeft="@dimen/marginUnitX2"
+            android:layout_marginBottom="@dimen/marginUnit"
             android:orientation="vertical"
             app:layoutManager="android.support.v7.widget.LinearLayoutManager"/>
 

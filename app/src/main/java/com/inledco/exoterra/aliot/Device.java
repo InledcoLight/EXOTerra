@@ -72,6 +72,43 @@ public class Device extends ADevice {
         }
     }
 
+    @Override
+    public String toString() {
+        return "Device{" +
+               "name='" +
+               name +
+               '\'' +
+               ", mac='" +
+               mac +
+               '\'' +
+               ", ip='" +
+               ip +
+               '\'' +
+               ", port=" +
+               port +
+               ", remark1='" +
+               remark1 +
+               '\'' +
+               ", remark2='" +
+               remark2 +
+               '\'' +
+               ", remark3='" +
+               remark3 +
+               '\'' +
+               ", role='" +
+               role +
+               '\'' +
+               ", isOnline=" +
+               isOnline +
+               ", productKey='" +
+               productKey +
+               '\'' +
+               ", deviceName='" +
+               deviceName +
+               '\'' +
+               '}';
+    }
+
     public String getName() {
         return name;
     }

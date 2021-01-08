@@ -8,13 +8,12 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.aliyun.alink.linksdk.tools.AError;
 import com.inledco.exoterra.R;
 import com.inledco.exoterra.aliot.AliotClient;
-import com.inledco.exoterra.aliot.ILinkListener;
 import com.inledco.exoterra.base.BaseActivity;
 import com.inledco.exoterra.main.MainActivity;
-import com.inledco.exoterra.manager.UserManager;
+import com.inledco.exoterra.manager.DeviceManager;
+import com.inledco.exoterra.manager.GroupManager;
 import com.inledco.exoterra.util.RegexUtil;
 import com.inledco.exoterra.uvbbuddy.UvbMainActivity;
 import com.inledco.exoterra.web.WebActivity;
@@ -43,10 +42,17 @@ public class HomeActivity extends BaseActivity implements View.OnClickListener {
     }
 
     @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        AliotClient.getInstance().stop();
+        DeviceManager.getInstance().clear();
+        GroupManager.getInstance().clear();
+    }
+
+    @Override
     public void onBackPressed() {
         super.onBackPressed();
         dismissLoadDialog();
-        AliotClient.getInstance().stop();
     }
 
     @Override
@@ -83,6 +89,10 @@ public class HomeActivity extends BaseActivity implements View.OnClickListener {
 //                Log.e(TAG, "onTokenResult: " + token);
 //            }
 //        });
+
+        AliotClient.getInstance().stop();
+        DeviceManager.getInstance().clear();
+        GroupManager.getInstance().clear();
     }
 
     @Override
@@ -103,33 +113,10 @@ public class HomeActivity extends BaseActivity implements View.OnClickListener {
 
     @Override
     public void onClick(View v) {
-        boolean authorized = UserManager.getInstance().isAuthorized();
+//        boolean authorized = UserManager.getInstance().isAuthorized();
         switch (v.getId()) {
             case R.id.home_ll_microtope:
-                if (authorized) {
-                    String userid = UserManager.getInstance().getUserid();
-                    String secret = UserManager.getInstance().getSecret();
-                    AliotClient.getInstance().start(getApplicationContext(), userid, secret, new ILinkListener() {
-                        @Override
-                        public void onStart() {
-                            showLoadDialog();
-                        }
-
-                        @Override
-                        public void onInitError(AError aError) {
-                            dismissLoadDialog();
-                            showToast(aError.getMsg());
-                        }
-
-                        @Override
-                        public void onInitDone() {
-                            dismissLoadDialog();
-                            startMainActivity();
-                        }
-                    });
-                } else {
-                    startMainActivity();
-                }
+                startMainActivity();
                 break;
             case R.id.home_ll_uvb:
                 startUvbMainActivity();

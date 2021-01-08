@@ -1,5 +1,6 @@
 package com.inledco.exoterra.scan;
 
+import android.os.CountDownTimer;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -16,8 +17,27 @@ public class LocalClient {
 
     private final UdpClient mClient;
 
+    private final int RESPONSE_TIMEOUT = 500;
+
+    private boolean wait_for_response;
+
+    private final CountDownTimer timeoutTimer;
+
     private LocalClient() {
         mClient = new UdpClient();
+        timeoutTimer = new CountDownTimer(RESPONSE_TIMEOUT, 50) {
+            @Override
+            public void onTick(long millisUntilFinished) {
+                if (!wait_for_response) {
+                    cancel();
+                }
+            }
+
+            @Override
+            public void onFinish() {
+                wait_for_response = false;
+            }
+        };
     }
 
     public static LocalClient getInstance() {
@@ -35,6 +55,7 @@ public class LocalClient {
 
             @Override
             public void onReceive(String ip, int port, byte[] bytes) {
+                wait_for_response = false;
                 if (listener != null) {
                     listener.onReceive(ip, port, bytes);
                 }
@@ -51,7 +72,7 @@ public class LocalClient {
         return mClient.isListening();
     }
 
-    public void send(String ip, int port, String payload) {
+    public synchronized void send(String ip, int port, String payload) {
         if (!isInited()) {
             return;
         }
@@ -59,6 +80,8 @@ public class LocalClient {
             return;
         }
         mClient.send(ip, port, payload);
+        wait_for_response = true;
+        timeoutTimer.start();
     }
 
     public void setProperty(String ip, int port, KeyValue... keyValues) {

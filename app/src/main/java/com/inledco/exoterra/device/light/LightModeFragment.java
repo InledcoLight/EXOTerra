@@ -124,8 +124,9 @@ public class LightModeFragment extends BaseFragment {
         if (mLight.getMode() == ExoLed.MODE_MANUAL) {
             light_mode_power.setVisibility(View.VISIBLE);
             light_mode_power.setChecked(mLight.getPower());
+            light_mode_power.setText(mLight.getPower() ? R.string.on : R.string.off);
         } else {
-            light_mode_power.setVisibility(View.GONE);
+            light_mode_power.setVisibility(View.INVISIBLE);
         }
     }
 }

@@ -3,10 +3,9 @@ package com.inledco.exoterra.aliot;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
+import android.os.CountDownTimer;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.v4.app.NotificationCompat;
@@ -14,7 +13,6 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
 import com.aliyun.alink.dm.api.DeviceInfo;
 import com.aliyun.alink.dm.api.IoTApiClientConfig;
@@ -56,7 +54,10 @@ import com.inledco.exoterra.manager.GroupManager;
 import org.greenrobot.eventbus.EventBus;
 
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -145,7 +146,9 @@ public class AliotClient {
     private WeakReference<Context> mWeakContext;
 
     private final ExecutorService mExecutorService;
-    private final byte[] lock;
+    private final byte[] startLock;
+    private final byte[] stopLock;
+    private boolean stopped;
 
     private int msgid;
 
@@ -155,19 +158,16 @@ public class AliotClient {
     private volatile int state;
 
     private volatile boolean subscribing;
-    private volatile boolean unsubscribing;
+    private volatile boolean subresult;
 
-    private volatile boolean synchronizedTime;
-
-    private boolean registered;
+    private volatile boolean timeSynced;
 
     private boolean connected;
 
     private long mTimeOffset;
 
-    private Set<String> subTopics = new HashSet<>();
-
-    private final GroupInviteReceiver mGroupInviteReceiver = new GroupInviteReceiver();
+    private final Set<String> ignoreMessages;
+    private final CountDownTimer ignoreTimer;
 
     private final SubscribeParser<ADevice> responseParser = new SubscribeParser<ADevice>(propertyResponseFormat) {
         @Override
@@ -177,6 +177,11 @@ public class AliotClient {
                 if (device.isOnline() == false) {
                     device.setOnline(true);
                     EventBus.getDefault().post(new DeviceStatusChangedEvent(result.getProductKey(), result.getDeviceName()));
+                }
+                String key = result.getProductKey() + "_" + result.getDeviceName() + "_" + result.getRequestId();
+                if (ignoreMessages.contains(key)) {
+                    ignoreMessages.remove(key);
+                    return;
                 }
                 device.setRequestId(result.getRequestId());
                 device.updateProperties(result.getItems());
@@ -254,7 +259,7 @@ public class AliotClient {
                 long serverRecvTime = Long.parseLong(result.serverRecvTime);
                 long serverSendTime = Long.parseLong(result.serverSendTime);
                 mTimeOffset = (serverSendTime + serverRecvTime - deviceRecvTime - deviceSendTime) / 2;
-                synchronizedTime = true;
+                timeSynced = true;
                 Log.e(TAG, "onParse: timeoffset- " + mTimeOffset);
             } catch (Exception e) {
                 e.printStackTrace();
@@ -301,8 +306,7 @@ public class AliotClient {
             Log.e(TAG, "onConnectStateChange: " + connectId + " " + connectState);
             connected = (connectState == ConnectState.CONNECTED);
             if (connected) {
-                subscribeAllTopics();
-                if (!synchronizedTime) {
+                if (!timeSynced) {
                     syncTime();
                 }
             }
@@ -335,8 +339,21 @@ public class AliotClient {
         MQTT_DOMAIN = String.format(MQTT_DOMAIN_FMT, APP_KEY, REGION);
 
         state = IDLE;
+        ignoreMessages = new HashSet<>();
+        ignoreTimer = new CountDownTimer(300000, 10000) {
+            @Override
+            public void onTick(long millisUntilFinished) {
+
+            }
+
+            @Override
+            public void onFinish() {
+                ignoreMessages.clear();
+            }
+        };
         mExecutorService = Executors.newCachedThreadPool();
-        lock = new byte[0];
+        startLock = new byte[0];
+        stopLock = new byte[0];
 
         ALog.setLevel(ALog.LEVEL_DEBUG);
     }
@@ -349,8 +366,7 @@ public class AliotClient {
         }
     }
 
-    public void init(@NonNull final Context context, final String userid, final String secret, final ILinkListener calback) {
-        Log.e(TAG, "INIT: " + state);
+    public void init(@NonNull final Context context, final String userid, final String secret) {
         state = INITING;
         DeviceInfo devInfo = new DeviceInfo();
         devInfo.productKey = APP_KEY;
@@ -388,94 +404,132 @@ public class AliotClient {
             @Override
             public void onError(AError error) {
                 Log.e(TAG, "INIT onError: " + JSONObject.toJSONString(error));
-                if (calback != null) {
-                    calback.onInitError(error);
-                }
                 state = IDLE;
             }
 
             @Override
             public void onInitDone(final Object o) {
-                Log.e(TAG, "INIT onInitDone: " + (System.currentTimeMillis() - time));
-
-                mWeakContext = new WeakReference<>(context);
-                IntentFilter filter = new IntentFilter(AppConstants.GROUP_INVITE);
-                mWeakContext.get().registerReceiver(mGroupInviteReceiver, filter);
-                registered = true;
+                Log.e(TAG, "onInitDone: " + (System.currentTimeMillis() - time));
 
                 mUserid = userid;
 
-                if (calback != null) {
-                    calback.onInitDone();
-                }
                 state = INITED;
             }
         });
         LinkKit.getInstance().registerOnPushListener(mNotifyListener);
         while (state == INITING);
-        if (state == IDLE) {
-            delay(50);
+        mWeakContext = new WeakReference<>(context);
+    }
+
+    private void process(Context context, String userid, String secret) {
+        if (state == DEINITING) {
+            while (state == DEINITING) {
+                if (stopped) {
+                    stopped = false;
+                    return;
+                }
+            }
+            delay(1000);
+        } else if (state == INITING) {
+            while (state == INITING) {
+                if (stopped) {
+                    stopped = false;
+                    return;
+                }
+            }
+            delay(1000);
+        }
+        int count = 0;
+        do {
+            if (stopped) {
+                stopped = false;
+                return;
+            }
+            if (count < 8) {
+                count ++;
+            }
             deinit();
+            delay(1000 * (1<<count));
+            init(context, userid, secret);
+        } while (state != INITED);
+        while (!connected) {
+            if (stopped) {
+                stopped = false;
+                return;
+            }
+        }
+        List<String> topics = new ArrayList<>();
+        topics.add(String.format(propertyResponseFormat, APP_KEY, mUserid));
+        topics.add(String.format(deviceStatusFormat, APP_KEY, mUserid));
+        topics.add(String.format(fotaProgressFormat, APP_KEY, mUserid));
+        topics.add(String.format(inviteListenFormat, APP_KEY, mUserid));
+        Iterator<String> item = topics.iterator();
+        String topic = item.next();
+        count = 0;
+        while (true) {
+            if (stopped) {
+                Log.e(TAG, "process: ");
+                stopped = false;
+                return;
+            }
+            delay(20);
+            if (subscribeTopic(topic)) {
+                if (item.hasNext()) {
+                    item.remove();
+                    topic = item.next();
+                } else {
+                    break;
+                }
+            } else {
+                if (count < 8) {
+                    count++;
+                }
+                delay(100*(1<<count));
+            }
         }
     }
 
-    public void start(@NonNull final Context context, final String userid, final String secret, final ILinkListener calback) {
-        Log.e(TAG, "start: " + state);
-        if (calback != null) {
-            calback.onStart();
-        }
-        if (state == INITING) {
-            return;
-        }
-        mExecutorService.execute(new Runnable() {
-            @Override
-            public void run() {
-                synchronized (lock) {
-                    if (state == DEINITING) {
-                        while (state != IDLE)
-                            ;
-                    } else if (state == INITED) {
-                        deinit();
-                    }
-                    init(context, userid, secret, calback);
-                }
+//    private Thread startThread;
+
+    public synchronized void start(@NonNull final Context context, final String userid, final String secret) {
+//        synchronized (startLock) {
+//            stopped = false;
+//            startThread = new Thread(() -> process(context, userid, secret));
+//            startThread.start();
+//        }
+        mExecutorService.execute(() -> {
+            synchronized (startLock) {
+                stopped = false;
+                process(context, userid, secret);
             }
         });
     }
 
     private void deinit() {
-        Log.e(TAG, "INIT deinit: " + state);
         state = DEINITING;
-//        unsubscribeAllTopics();
         LinkKit.getInstance().unRegisterOnPushListener(mNotifyListener);
         LinkKit.getInstance().deinit();
         if (mWeakContext != null) {
-            if (mWeakContext.get() != null && registered) {
-                mWeakContext.get().unregisterReceiver(mGroupInviteReceiver);
-                registered = false;
-            }
             mWeakContext.clear();
             mWeakContext = null;
         }
         connected = false;
         mUserid = null;
-        synchronizedTime = false;
+        timeSynced = false;
         delay(100);
         state = IDLE;
-        Log.e(TAG, "INIT: deinit done");
     }
 
-    public void stop() {
-        Log.e(TAG, "stop: " + state);
-        if (state != INITED) {
-            return;
-        }
-        mExecutorService.execute(new Runnable() {
-            @Override
-            public void run() {
-                synchronized (lock) {
-                    deinit();
-                }
+    public synchronized void stop() {
+        mExecutorService.execute(() -> {
+            synchronized (stopLock) {
+                stopped = true;
+//                if (startThread != null) {
+//                    startThread.interrupt();
+//                    startThread = null;
+//                    delay(1000);
+//                }
+                deinit();
             }
         });
     }
@@ -492,6 +546,12 @@ public class AliotClient {
         return mTimeOffset;
     }
 
+    public void ignoreMessage(String pkey, String dname, String msgid) {
+        ignoreTimer.cancel();
+        ignoreMessages.add(pkey + "_" + dname + "_" + msgid);
+        ignoreTimer.start();
+    }
+
     private void subscribeTopic(final String topic, final IConnectSubscribeListener callback) {
         final MqttSubscribeRequest request = new MqttSubscribeRequest();
         request.topic = topic;
@@ -500,8 +560,9 @@ public class AliotClient {
         LinkKit.getInstance().subscribe(request, callback);
     }
 
-    private void subscribeTopic(final String topic) {
-//        subscribing = true;
+    private boolean subscribeTopic(final String topic) {
+        subscribing = true;
+        subresult = false;
         final MqttSubscribeRequest request = new MqttSubscribeRequest();
         request.topic = topic;
         request.isSubscribe = true;
@@ -510,7 +571,7 @@ public class AliotClient {
             @Override
             public void onSuccess() {
                 Log.e(TAG, "onSuccess: subscribe " + topic);
-                subTopics.add(request.topic);
+                subresult = true;
                 subscribing = false;
             }
 
@@ -520,32 +581,11 @@ public class AliotClient {
                 subscribing = false;
             }
         });
-//        while (subscribing);
-    }
-
-    private void subscribeAllTopics() {
-        subscribeTopic(String.format(propertyResponseFormat, APP_KEY, mUserid));
-        subscribeTopic(String.format(deviceStatusFormat, APP_KEY, mUserid));
-        subscribeTopic(String.format(fotaProgressFormat, APP_KEY, mUserid));
-        subscribeTopic(String.format(inviteListenFormat, APP_KEY, mUserid));
-//        subThread = new Thread(new Runnable() {
-//            @Override
-//            public void run() {
-//                delay(200);
-//                subscribeTopic(String.format(propertyResponseFormat, APP_KEY, mUserid));
-//                delay(20);
-//                subscribeTopic(String.format(deviceStatusFormat, APP_KEY, mUserid));
-//                delay(20);
-//                subscribeTopic(String.format(fotaProgressFormat, APP_KEY, mUserid));
-//                delay(20);
-//                subscribeTopic(String.format(inviteListenFormat, APP_KEY, mUserid));
-//            }
-//        });
-//        subThread.start();
+        while (subscribing);
+        return subresult;
     }
 
     private void unsubscribeTopic(String topic) {
-        unsubscribing = true;
         MqttSubscribeRequest request = new MqttSubscribeRequest();
         request.topic = topic;
         request.isSubscribe = false;
@@ -554,30 +594,13 @@ public class AliotClient {
             @Override
             public void onSuccess() {
                 Log.e(TAG, "onSuccess: unsub ");
-                unsubscribing = false;
             }
 
             @Override
             public void onFailure(AError aError) {
                 Log.e(TAG, "onFailure: unsub " + JSON.toJSONString(aError));
-                unsubscribing = false;
             }
         });
-        while (unsubscribing);
-    }
-
-    private void unsubscribeAllTopics() {
-        while (subscribing);
-        Set<String> topics = new HashSet<>(subTopics);
-        for (final String topic : topics) {
-            unsubscribeTopic(topic);
-            subTopics.remove(topic);
-        }
-
-//        unsubscribeTopic(String.format(propertyResponseFormat, APP_KEY, mUserid));
-//        unsubscribeTopic(String.format(deviceStatusFormat, APP_KEY, mUserid));
-//        unsubscribeTopic(String.format(fotaProgressFormat, APP_KEY, mUserid));
-//        unsubscribeTopic(String.format(inviteListenFormat, APP_KEY, mUserid));
     }
 
     private void publish(@NonNull final String topic, int qos, @NonNull final String payload) {
@@ -947,212 +970,4 @@ public class AliotClient {
     private static class LazyHolder {
         private static final AliotClient INSTANCE = new AliotClient();
     }
-
-    public class GroupInviteReceiver extends BroadcastReceiver {
-        private static final String TAG = "GroupInviteReceiver";
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            Log.e(TAG, "onReceive: " + intent.getAction());
-            if (TextUtils.equals(intent.getAction(), AppConstants.GROUP_INVITE)) {
-                final String message = intent.getStringExtra("InviteMessage");
-                Log.e(TAG, "onReceive: " + message);
-                try {
-                    final InviteMessage inviteMessage = JSON.parseObject(message, InviteMessage.class);
-                    if (inviteMessage == null) {
-                        return;
-                    }
-                    final InviteAction action = InviteAction.getInviteAction(inviteMessage.getAction());
-                    if (action == null) {
-                        return;
-                    }
-                    final String inviter = inviteMessage.getInviter();
-                    final String inviteid = inviteMessage.getInvite_id();
-                    final String groupid = inviteMessage.getGroupid();
-                    final String groupname = inviteMessage.getGroupname();
-                    NotificationManager manager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-                    switch (action) {
-                        case ACCEPT:
-                            AliotServer.getInstance().acceptInvite(groupid, inviteid, new HttpCallback<UserApi.Response>() {
-                                @Override
-                                public void onError(String error) {
-                                    Log.e(TAG, "onError: " + error);
-                                }
-
-                                @Override
-                                public void onSuccess(UserApi.Response result) {
-                                    EventBus.getDefault().post(inviteMessage);
-                                    AliotServer.getInstance().inviteAccept(inviter, inviteid, groupid, groupname);
-                                }
-                            });
-                            manager.cancel(inviteid, 0);
-                            break;
-                        case DENY:
-                            AliotServer.getInstance().denyInvite(groupid, inviteid, new HttpCallback<UserApi.Response>() {
-                                @Override
-                                public void onError(String error) {
-                                    Log.e(TAG, "onError: " + error);
-                                }
-
-                                @Override
-                                public void onSuccess(UserApi.Response result) {
-                                    AliotServer.getInstance().inviteDeny(inviter, inviteid, groupid, groupname);
-                                }
-                            });
-                            manager.cancel(inviteid, 0);
-                            break;
-                    }
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-    }
-
-//    public void dynamicRegister(final Context context, final String userid) {
-//        final DeviceInfo devInfo = new DeviceInfo();
-//        devInfo.productKey = APP_KEY;
-//        devInfo.productSecret = APP_SECRET;
-//        devInfo.deviceName = userid;
-//
-//        LinkKitInitParams params = new LinkKitInitParams();
-//        params.deviceInfo = devInfo;
-//        HubApiRequest request = new HubApiRequest();
-//        request.domain = IOTAUTH_DOMAIN;
-//        request.path = "/auth/register/device";
-//
-//        LinkKit.getInstance().deviceRegister(context, params, request, new IConnectSendListener() {
-//            @Override
-//            public void onResponse(ARequest aRequest, AResponse aResponse) {
-//                Log.e(TAG, "onResponse: " + JSON.toJSONString(aResponse));
-//                if (aResponse == null || aResponse.data == null) {
-//                    return;
-//                }
-//                String payload = aResponse.data.toString();
-//                Type type = new TypeReference<ResponseModel<Map<String, String>>>(){}.getType();
-//                try {
-//                    ResponseModel<Map<String, String>> response = JSONObject.parseObject(payload, type);
-//                    if (CODE_SUCCESS.equals(response.code) && response.data != null && response.data.containsKey(KEY_DEVICE_SECRET)) {
-//                        String deviceSecret = response.data.get(KEY_DEVICE_SECRET);
-//                        if (!TextUtils.isEmpty(deviceSecret)) {
-//                            devInfo.deviceSecret = deviceSecret;
-//                            UserPref.setSecret(context, deviceSecret);
-//                        }
-//                    }
-//                } catch (JSONException e) {
-//                    e.printStackTrace();
-//                }
-//            }
-//
-//            @Override
-//            public void onFailure(ARequest aRequest, AError aError) {
-//                Log.e(TAG, "onFailure: " + JSON.toJSONString(aError));
-//            }
-//        });
-//    }
-
-//    public enum SubscribeEnum {
-//        TOPIC_PROPERTY_RESPONSE(propertyResponseFormat) {
-//            @Override
-//            public Type getResultType() {
-//                return ADevice.class;
-//            }
-//
-//            @Override
-//            public void parseReceive(String payload) {
-//                ADevice adev = parse(payload);
-//                if (adev != null) {
-//                    if (DeviceManager.getInstance().contains(adev.getTag())) {
-//                        Device device = DeviceManager.getInstance().getDevice(adev.getTag());
-//                        device.updateProperties(adev.getItems());
-//                        if (!device.isOnline()) {
-//                            device.setOnline(true);
-//                            EventBus.getDefault().post(new StatusReponse());
-//                        }
-//                        EventBus.getDefault().post(adev);
-//                    }
-//                }
-//            }
-//        },
-//        TOPIC_DEVICE_STATUS(deviceStatusFormat) {
-//            @Override
-//            public Type getResultType() {
-//                return StatusReponse.class;
-//            }
-//
-//            @Override
-//            public void parseReceive(String payload) {
-//                StatusReponse status = parse(payload);
-//                if (status != null) {
-//                    if (DeviceManager.getInstance().contains(status.getTag())) {
-//                        Device device = DeviceManager.getInstance().getDevice(status.getTag());
-//                        if (device.updateOnlineStatus(status)) {
-//                            EventBus.getDefault().post(new DeviceStatusChangedEvent(status.getProductKey(), status.getDeviceName()));
-//                        }
-//                    }
-//                }
-//            }
-//        },
-//        TOPIC_INVITE_LISTEN(inviteListenFormat) {
-//            @Override
-//            public Type getResultType() {
-//                return InviteMessage.class;
-//            }
-//
-//            @Override
-//            public void parseReceive(String payload) {
-//                InviteMessage msg = parse(payload);
-//                if (msg != null) {
-//                    InviteAction action = InviteAction.getInviteAction(msg);
-//                    if (action == null) {
-//                        return;
-//                    }
-//                    switch (action) {
-//                        case INVITE:
-//                            if (TextUtils.equals(mUserid, msg.getInvitee())) {
-//
-//                            }
-//                            break;
-//                        case CANCEL:
-//                            if (TextUtils.equals(mUserid, msg.getInvitee())) {
-//
-//                            }
-//                            break;
-//                        case ACCEPT:
-//                            if (TextUtils.equals(mUserid, msg.getInviter())) {
-//
-//                            }
-//                            break;
-//                        case DENY:
-//                            if (TextUtils.equals(mUserid, msg.getInviter())) {
-//
-//                            }
-//                            break;
-//                    }
-//                }
-//            }
-//        };
-//
-//        private final String topicFormat;
-//
-//        SubscribeEnum(String format) {
-//            topicFormat = format;
-//        }
-//
-//        public String getTopic(String APP_KEY, String userid) {
-//            return String.format(topicFormat, APP_KEY, userid);
-//        }
-//
-//        protected <T> T parse(String payload) {
-//            try {
-//                return JSON.parseObject(payload, getResultType());
-//            } catch (JSONException e) {
-//                e.printStackTrace();
-//            }
-//            return null;
-//        }
-//
-//        public abstract Type getResultType();
-//
-//        public abstract void parseReceive(String payload);
-//    }
 }

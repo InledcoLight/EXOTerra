@@ -36,7 +36,7 @@ public abstract class SocketTimerAdapter extends SimpleAdapter<ExoSocket.Timer, 
     public void onBindViewHolder(@NonNull final SocketTimerViewHolder holder, final int pos) {
         final int position = holder.getAdapterPosition();
         ExoSocket.Timer tmr = mData.get(position);
-        final int repeat = tmr.getRepeat()&0x7F;
+        final int repeat = tmr.getRepeat();
         switch (tmr.getAction()) {
             case ExoSocket.Timer.ACTION_TURNOFF:
                 holder.tv_ontime.setVisibility(View.INVISIBLE);
@@ -48,7 +48,7 @@ public abstract class SocketTimerAdapter extends SimpleAdapter<ExoSocket.Timer, 
                 holder.tv_offtime.setVisibility(View.INVISIBLE);
                 holder.tv_ontime.setText(getTimeText(tmr.getHour(), tmr.getMinute(), tmr.getSecond()));
                 break;
-            case ExoSocket.Timer.ACTION_TURNON_PERIOD:
+            case ExoSocket.Timer.ACTION_PERIOD:
                 holder.tv_ontime.setVisibility(View.VISIBLE);
                 holder.tv_offtime.setVisibility(View.VISIBLE);
                 holder.tv_ontime.setText(getTimeText(tmr.getHour(), tmr.getMinute(), tmr.getSecond()));

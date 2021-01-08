@@ -11,7 +11,7 @@
     <dimen name="textSizeSecondary">12sp</dimen>
     <dimen name="textSizeTiny">10sp</dimen>
     <dimen name="textSizeMicro">8sp</dimen>
-    <dimen name="textSizeTitle">20sp</dimen>
+    <dimen name="textSizeTitle">18sp</dimen>
     <dimen name="textSizeSubTitle">16sp</dimen>
 
     <dimen name="titleHeight">56dp</dimen>
@@ -21,6 +21,15 @@
     <dimen name="dividerWidth">1dp</dimen>
 
     <dimen name="brandHeight">40dp</dimen>
+
+    <dimen name="drawablePadding">6dp</dimen>
+    
+    <dimen name="marginUnit">6dp</dimen>
+    <dimen name="marginUnitX2">12dp</dimen>
+    <dimen name="marginUnitX3">18dp</dimen>
+    <dimen name="marginUnitX4">24dp</dimen>
+
+    <dimen name="lineChartMinHeight">96dp</dimen>
 
 <!--    <dimen name="design_bottom_navigation_active_text_size">14sp</dimen>-->
 <!--    <dimen name="design_bottom_navigation_text_size">14dp</dimen>-->

@@ -5,7 +5,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:clickable="true"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:focusable="true">
 
     <android.support.constraint.Guideline
         android:id="@+id/light_manual_gl1"
@@ -29,7 +30,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="right"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="@dimen/marginUnit"
+        android:paddingLeft="@dimen/marginUnit"
+        android:paddingRight="@dimen/marginUnit"
         app:direction="horizontal"
         app:gradientEnd="@color/gradientWhite"
         app:gradientStart="@color/gradientYellow"
@@ -43,91 +46,16 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="?attr/selectableItemBackground"
+            android:textSize="@dimen/textSizeTiny"
             android:textOff="@string/presets"
             android:textOn="@string/back" />
     </com.inledco.exoterra.view.GradientCornerLinearLayout>
-
-    <!--    <LinearLayout-->
-<!--        android:id="@+id/linearLayout"-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:layout_marginBottom="8dp"-->
-<!--        android:gravity="center"-->
-<!--        android:orientation="horizontal"-->
-<!--        app:layout_constraintBottom_toBottomOf="parent"-->
-<!--        app:layout_constraintEnd_toEndOf="parent"-->
-<!--        app:layout_constraintHorizontal_bias="1.0"-->
-<!--        app:layout_constraintStart_toStartOf="parent">-->
-
-<!--        <com.inledco.exoterra.view.MultiCircleProgress-->
-<!--            android:id="@+id/light_manual_custom1"-->
-<!--            android:layout_width="0dp"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:layout_margin="8dp"-->
-<!--            android:layout_weight="1"-->
-<!--            android:background="?attr/selectableItemBackground"-->
-<!--            app:centerText="P1"-->
-<!--            app:centerTextSize="14sp"-->
-<!--            app:circleWidth="2dp"-->
-<!--            app:dividerWidth="0dp"-->
-<!--            app:max="100"-->
-<!--            app:progress="0"-->
-<!--            app:startAngle="-225"-->
-<!--            app:sweepAngle="270" />-->
-
-<!--        <com.inledco.exoterra.view.MultiCircleProgress-->
-<!--            android:id="@+id/light_manual_custom2"-->
-<!--            android:layout_width="0dp"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:layout_margin="8dp"-->
-<!--            android:layout_weight="1"-->
-<!--            android:background="?attr/selectableItemBackground"-->
-<!--            app:centerText="P2"-->
-<!--            app:centerTextSize="14sp"-->
-<!--            app:circleWidth="2dp"-->
-<!--            app:dividerWidth="0dp"-->
-<!--            app:max="100"-->
-<!--            app:progress="0"-->
-<!--            app:startAngle="-225"-->
-<!--            app:sweepAngle="270" />-->
-
-<!--        <com.inledco.exoterra.view.MultiCircleProgress-->
-<!--            android:id="@+id/light_manual_custom3"-->
-<!--            android:layout_width="0dp"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:layout_margin="8dp"-->
-<!--            android:layout_weight="1"-->
-<!--            android:background="?attr/selectableItemBackground"-->
-<!--            app:centerText="P3"-->
-<!--            app:centerTextSize="14sp"-->
-<!--            app:circleWidth="2dp"-->
-<!--            app:dividerWidth="0dp"-->
-<!--            app:max="100"-->
-<!--            app:progress="0"-->
-<!--            app:startAngle="-225"-->
-<!--            app:sweepAngle="270" />-->
-
-<!--        <com.inledco.exoterra.view.MultiCircleProgress-->
-<!--            android:id="@+id/light_manual_custom4"-->
-<!--            android:layout_width="0dp"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:layout_margin="8dp"-->
-<!--            android:layout_weight="1"-->
-<!--            android:background="?attr/selectableItemBackground"-->
-<!--            app:centerText="P4"-->
-<!--            app:centerTextSize="14sp"-->
-<!--            app:circleWidth="2dp"-->
-<!--            app:dividerWidth="0dp"-->
-<!--            app:max="100"-->
-<!--            app:progress="0"-->
-<!--            app:startAngle="-225"-->
-<!--            app:sweepAngle="270" />-->
-<!--    </LinearLayout>-->
 
     <FrameLayout
         android:id="@+id/linearLayout3"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:layout_marginTop="@dimen/marginUnit"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -144,9 +72,9 @@
             app:min="0"
             app:pointerDrawable="@drawable/ic_thumb"
             app:progressColor="@color/colorWhite"
-            app:progressWidth="8dp"
             app:seekable="true"
-            app:unreachedWidth="8dp"
+            app:progressWidth="6dp"
+            app:unreachedWidth="6dp"
             app:wheelDrawable="@drawable/ic_wheel">
 
             <CheckedTextView
@@ -167,8 +95,8 @@
             android:id="@+id/light_manual_presets_detail"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="8dp"
+            android:layout_marginTop="@dimen/marginUnit"
+            android:layout_marginBottom="@dimen/marginUnit"
             android:visibility="gone"
             layout="@layout/layout_light_presets"/>
     </FrameLayout>

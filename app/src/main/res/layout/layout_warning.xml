@@ -5,7 +5,7 @@
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:gravity="center_horizontal"
-    android:padding="8dp"
+    android:padding="@dimen/marginUnit"
     android:background="@drawable/shape_roundrect_gradient">
 
     <ImageView
@@ -16,7 +16,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="8dp"
+        android:layout_margin="@dimen/marginUnit"
         android:textColor="@android:color/black"
         android:textSize="@dimen/textSizeSubTitle"
         android:textAllCaps="true"
@@ -25,7 +25,7 @@
         android:id="@+id/warning_tv_msg"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="8dp"
+        android:layout_margin="@dimen/marginUnit"
         android:textAlignment="center"
         android:textColor="@android:color/black"
         android:textSize="@dimen/textSizePrimary"/>

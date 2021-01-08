@@ -13,11 +13,11 @@ public abstract class BaseClient {
     protected boolean mListening;
     protected final ExecutorService mExecutorService;
 
-    protected final Object mLock;
+    protected final byte[] mLock;
 
     public BaseClient() {
         mExecutorService = Executors.newCachedThreadPool();
-        mLock = new Object();
+        mLock = new byte[0];
     }
 
     public BaseClient(String remoteAddress, int remotePort) {
@@ -30,7 +30,7 @@ public abstract class BaseClient {
         mRemoteAddress = remoteAddress;
         mRemotePort = remotePort;
         mExecutorService = Executors.newCachedThreadPool();
-        mLock = new Object();
+        mLock = new byte[0];
     }
 
     public String getRemoteAddress() {

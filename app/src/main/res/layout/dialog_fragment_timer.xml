@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/ic_background"
+    android:clickable="true"
+    android:orientation="vertical">
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/socket_addtimer_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:theme="?attr/actionBarTheme"
+        android:gravity="center"
+        app:navigationIcon="@drawable/ic_clear_white_32dp">
+
+        <TextView
+            android:id="@+id/socket_addtimer_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="@string/turnoff"
+            android:textSize="@dimen/textSizeTitle"
+            android:textColor="@color/textColorPrimary"/>
+    </android.support.v7.widget.Toolbar>
+
+    <include
+        android:id="@+id/socket_addtimer_repeat"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/marginUnitX2"
+        layout="@layout/item_simple"/>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dividerWidth"
+        android:layout_marginHorizontal="@dimen/marginUnitX2"
+        android:layout_marginVertical="@dimen/marginUnit"
+        android:background="@color/colorDivider"/>
+
+    <include
+        android:id="@+id/socket_addtimer_start"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/marginUnitX2"
+        layout="@layout/item_simple"/>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dividerWidth"
+        android:layout_marginHorizontal="@dimen/marginUnitX2"
+        android:layout_marginVertical="@dimen/marginUnit"
+        android:background="@color/colorDivider"/>
+
+    <include
+        android:id="@+id/socket_addtimer_end"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/marginUnitX2"
+        android:visibility="gone"
+        layout="@layout/item_simple"/>
+
+</LinearLayout>

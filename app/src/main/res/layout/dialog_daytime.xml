@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:padding="8dp"
+    android:padding="@dimen/marginUnit"
     android:orientation="vertical"
     android:gravity="center_horizontal">
 
@@ -11,7 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="?attr/selectableItemBackground"
-        android:textSize="@dimen/textSizePrimary"
+        android:textSize="@dimen/textSizeSecondary"
         android:textColor="@color/textColorPrimary"
         android:text="@string/use_habitat_daytime"/>
 
@@ -28,16 +28,16 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:padding="8dp"
+                android:padding="@dimen/marginUnit"
                 android:textColor="@color/textColorPrimary"
-                android:textSize="@dimen/textSizePrimary"
+                android:textSize="@dimen/textSizeSecondary"
                 android:text="@string/sunrise"/>
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:padding="8dp"
+                android:padding="@dimen/marginUnit"
                 android:textColor="@color/textColorPrimary"
-                android:textSize="@dimen/textSizePrimary"
+                android:textSize="@dimen/textSizeSecondary"
                 android:text="@string/sunset"/>
         </LinearLayout>
         <RadioGroup
@@ -51,18 +51,20 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="?attr/selectableItemBackground"
-                android:padding="8dp"
+                android:padding="@dimen/marginUnit"
                 android:gravity="right"
                 android:button="@null"
+                android:textSize="@dimen/textSizeSecondary"
                 android:textColor="@color/selector_text"/>
             <RadioButton
                 android:id="@+id/dialog_daytime_end"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="?attr/selectableItemBackground"
-                android:padding="8dp"
+                android:padding="@dimen/marginUnit"
                 android:gravity="right"
                 android:button="@null"
+                android:textSize="@dimen/textSizeSecondary"
                 android:textColor="@color/selector_text"/>
         </RadioGroup>
     </LinearLayout>

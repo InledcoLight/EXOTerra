@@ -1,16 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="wrap_content"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_gravity="center"
-    android:orientation="vertical"
-    android:gravity="center">
+    android:orientation="vertical">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:layout_marginTop="@dimen/marginUnit">
 
         <FrameLayout
             android:layout_width="0dp"
@@ -23,9 +22,8 @@
                 android:foregroundGravity="center"
                 android:background="?attr/selectableItemBackground"
                 android:layout_gravity="center"
-                android:padding="8dp"
                 app:centerText="P1"
-                app:centerTextSize="14sp"
+                app:centerTextSize="@dimen/textSizeSecondary"
                 app:circleWidth="2dp"
                 app:dividerWidth="0dp"
                 app:max="1000"
@@ -43,9 +41,8 @@
                 android:layout_height="wrap_content"
                 android:background="?attr/selectableItemBackground"
                 android:layout_gravity="center"
-                android:padding="8dp"
                 app:centerText="P2"
-                app:centerTextSize="14sp"
+                app:centerTextSize="@dimen/textSizeSecondary"
                 app:circleWidth="2dp"
                 app:dividerWidth="0dp"
                 app:max="1000"
@@ -63,9 +60,8 @@
                 android:layout_height="wrap_content"
                 android:background="?attr/selectableItemBackground"
                 android:layout_gravity="center"
-                android:padding="8dp"
                 app:centerText="P3"
-                app:centerTextSize="14sp"
+                app:centerTextSize="@dimen/textSizeSecondary"
                 app:circleWidth="2dp"
                 app:dividerWidth="0dp"
                 app:max="1000"
@@ -83,9 +79,8 @@
                 android:layout_height="wrap_content"
                 android:background="?attr/selectableItemBackground"
                 android:layout_gravity="center"
-                android:padding="8dp"
                 app:centerText="P4"
-                app:centerTextSize="14sp"
+                app:centerTextSize="@dimen/textSizeSecondary"
                 app:circleWidth="2dp"
                 app:dividerWidth="0dp"
                 app:max="1000"
@@ -98,7 +93,8 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:layout_marginTop="@dimen/marginUnit">
 
         <CheckedTextView
             android:id="@+id/light_p5"
@@ -107,7 +103,6 @@
             android:layout_weight="1"
             android:background="?attr/selectableItemBackground"
             android:drawableTop="@drawable/selector_light_preset5"
-            android:padding="8dp"
             android:textSize="0sp"/>
         <CheckedTextView
             android:id="@+id/light_p6"
@@ -116,7 +111,6 @@
             android:layout_weight="1"
             android:background="?attr/selectableItemBackground"
             android:drawableTop="@drawable/selector_light_preset2"
-            android:padding="8dp"
             android:textSize="0sp"/>
         <CheckedTextView
             android:id="@+id/light_p7"
@@ -125,7 +119,6 @@
             android:layout_weight="1"
             android:background="?attr/selectableItemBackground"
             android:drawableTop="@drawable/selector_light_preset4"
-            android:padding="8dp"
             android:textSize="0sp"/>
         <CheckedTextView
             android:id="@+id/light_p8"
@@ -134,14 +127,14 @@
             android:layout_weight="1"
             android:background="?attr/selectableItemBackground"
             android:drawableTop="@drawable/selector_light_preset7"
-            android:padding="8dp"
             android:textSize="0sp"/>
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:layout_marginTop="@dimen/marginUnit">
 
         <CheckedTextView
             android:id="@+id/light_p9"
@@ -150,7 +143,6 @@
             android:layout_weight="1"
             android:background="?attr/selectableItemBackground"
             android:drawableTop="@drawable/selector_light_preset8"
-            android:padding="8dp"
             android:textSize="0sp"/>
         <CheckedTextView
             android:id="@+id/light_p10"
@@ -159,7 +151,6 @@
             android:layout_weight="1"
             android:background="?attr/selectableItemBackground"
             android:drawableTop="@drawable/selector_light_preset3"
-            android:padding="8dp"
             android:textSize="0sp"/>
         <CheckedTextView
             android:id="@+id/light_p11"
@@ -168,7 +159,6 @@
             android:layout_weight="1"
             android:background="?attr/selectableItemBackground"
             android:drawableTop="@drawable/selector_light_preset6"
-            android:padding="8dp"
             android:textSize="0sp"/>
         <CheckedTextView
             android:id="@+id/light_p12"
@@ -177,199 +167,7 @@
             android:layout_weight="1"
             android:background="?attr/selectableItemBackground"
             android:drawableTop="@drawable/selector_light_preset9"
-            android:padding="8dp"
             android:textSize="0sp"/>
     </LinearLayout>
 
 </LinearLayout>
-<!--<android.support.v7.widget.GridLayout xmlns:android="http://schemas.android.com/apk/res/android"-->
-<!--    xmlns:app="http://schemas.android.com/apk/res-auto"-->
-<!--    android:layout_width="match_parent"-->
-<!--    android:layout_height="wrap_content"-->
-<!--    app:orientation="horizontal"-->
-<!--    app:columnCount="4"-->
-<!--    app:rowCount="3">-->
-
-<!--    <com.inledco.exoterra.view.MultiCircleProgress-->
-<!--        android:id="@+id/light_p1"-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:foregroundGravity="center"-->
-<!--        android:background="?attr/selectableItemBackground"-->
-<!--        android:padding="8dp"-->
-<!--        app:layout_gravity="center"-->
-<!--        app:layout_rowWeight="1"-->
-<!--        app:layout_columnWeight="1"-->
-<!--        app:centerText="P1"-->
-<!--        app:centerTextSize="14sp"-->
-<!--        app:circleWidth="2dp"-->
-<!--        app:dividerWidth="0dp"-->
-<!--        app:max="100"-->
-<!--        app:progress="0"-->
-<!--        app:startAngle="-225"-->
-<!--        app:sweepAngle="270" />-->
-<!--    <com.inledco.exoterra.view.MultiCircleProgress-->
-<!--        android:id="@+id/light_p2"-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:background="?attr/selectableItemBackground"-->
-<!--        android:padding="8dp"-->
-<!--        app:layout_gravity="center"-->
-<!--        app:layout_rowWeight="1"-->
-<!--        app:layout_columnWeight="1"-->
-<!--        app:centerText="P2"-->
-<!--        app:centerTextSize="14sp"-->
-<!--        app:circleWidth="2dp"-->
-<!--        app:dividerWidth="0dp"-->
-<!--        app:max="100"-->
-<!--        app:progress="0"-->
-<!--        app:startAngle="-225"-->
-<!--        app:sweepAngle="270" />-->
-<!--    <com.inledco.exoterra.view.MultiCircleProgress-->
-<!--        android:id="@+id/light_p3"-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:background="?attr/selectableItemBackground"-->
-<!--        android:padding="8dp"-->
-<!--        app:layout_gravity="center"-->
-<!--        app:layout_rowWeight="1"-->
-<!--        app:layout_columnWeight="1"-->
-<!--        app:centerText="P3"-->
-<!--        app:centerTextSize="14sp"-->
-<!--        app:circleWidth="2dp"-->
-<!--        app:dividerWidth="0dp"-->
-<!--        app:max="100"-->
-<!--        app:progress="0"-->
-<!--        app:startAngle="-225"-->
-<!--        app:sweepAngle="270" />-->
-<!--    <com.inledco.exoterra.view.MultiCircleProgress-->
-<!--        android:id="@+id/light_p4"-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:background="?attr/selectableItemBackground"-->
-<!--        android:padding="8dp"-->
-<!--        app:layout_gravity="center"-->
-<!--        app:layout_rowWeight="1"-->
-<!--        app:layout_columnWeight="1"-->
-<!--        app:centerText="P4"-->
-<!--        app:centerTextSize="14sp"-->
-<!--        app:circleWidth="2dp"-->
-<!--        app:dividerWidth="0dp"-->
-<!--        app:max="100"-->
-<!--        app:progress="0"-->
-<!--        app:startAngle="-225"-->
-<!--        app:sweepAngle="270" />-->
-<!--    <CheckedTextView-->
-<!--        android:id="@+id/light_p5"-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:background="?attr/selectableItemBackground"-->
-<!--        android:drawableTop="@drawable/selector_light_preset5"-->
-<!--        android:padding="8dp"-->
-<!--        android:textOff=""-->
-<!--        android:textOn=""-->
-<!--        android:text=""-->
-<!--        android:textSize="0sp"-->
-<!--        app:layout_gravity="center"-->
-<!--        app:layout_rowWeight="1"-->
-<!--        app:layout_columnWeight="1"/>-->
-<!--    <CheckedTextView-->
-<!--        android:id="@+id/light_p6"-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:background="?attr/selectableItemBackground"-->
-<!--        android:drawableTop="@drawable/selector_light_preset2"-->
-<!--        android:padding="8dp"-->
-<!--        android:textOff=""-->
-<!--        android:textOn=""-->
-<!--        android:text=""-->
-<!--        android:textSize="0sp"-->
-<!--        app:layout_gravity="center"-->
-<!--        app:layout_rowWeight="1"-->
-<!--        app:layout_columnWeight="1"/>-->
-<!--    <CheckedTextView-->
-<!--        android:id="@+id/light_p7"-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:background="?attr/selectableItemBackground"-->
-<!--        android:drawableTop="@drawable/selector_light_preset4"-->
-<!--        android:padding="8dp"-->
-<!--        android:textOff=""-->
-<!--        android:textOn=""-->
-<!--        android:text=""-->
-<!--        android:textSize="0sp"-->
-<!--        app:layout_gravity="center"-->
-<!--        app:layout_rowWeight="1"-->
-<!--        app:layout_columnWeight="1"/>-->
-<!--    <CheckedTextView-->
-<!--        android:id="@+id/light_p8"-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:background="?attr/selectableItemBackground"-->
-<!--        android:drawableTop="@drawable/selector_light_preset7"-->
-<!--        android:padding="8dp"-->
-<!--        android:textOff=""-->
-<!--        android:textOn=""-->
-<!--        android:text=""-->
-<!--        android:textSize="0sp"-->
-<!--        app:layout_gravity="center"-->
-<!--        app:layout_rowWeight="1"-->
-<!--        app:layout_columnWeight="1"/>-->
-<!--    <CheckedTextView-->
-<!--        android:id="@+id/light_p9"-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:background="?attr/selectableItemBackground"-->
-<!--        android:drawableTop="@drawable/selector_light_preset8"-->
-<!--        android:padding="8dp"-->
-<!--        android:textOff=""-->
-<!--        android:textOn=""-->
-<!--        android:text=""-->
-<!--        android:textSize="0sp"-->
-<!--        app:layout_gravity="center"-->
-<!--        app:layout_rowWeight="1"-->
-<!--        app:layout_columnWeight="1"/>-->
-<!--    <CheckedTextView-->
-<!--        android:id="@+id/light_p10"-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:background="?attr/selectableItemBackground"-->
-<!--        android:drawableTop="@drawable/selector_light_preset3"-->
-<!--        android:padding="8dp"-->
-<!--        android:textOff=""-->
-<!--        android:textOn=""-->
-<!--        android:text=""-->
-<!--        android:textSize="0sp"-->
-<!--        app:layout_gravity="center"-->
-<!--        app:layout_rowWeight="1"-->
-<!--        app:layout_columnWeight="1"/>-->
-<!--    <CheckedTextView-->
-<!--        android:id="@+id/light_p11"-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:background="?attr/selectableItemBackground"-->
-<!--        android:drawableTop="@drawable/selector_light_preset6"-->
-<!--        android:padding="8dp"-->
-<!--        android:textOff=""-->
-<!--        android:textOn=""-->
-<!--        android:text=""-->
-<!--        android:textSize="0sp"-->
-<!--        app:layout_gravity="center"-->
-<!--        app:layout_rowWeight="1"-->
-<!--        app:layout_columnWeight="1"/>-->
-<!--    <CheckedTextView-->
-<!--        android:id="@+id/light_p12"-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:background="?attr/selectableItemBackground"-->
-<!--        android:drawableTop="@drawable/selector_light_preset9"-->
-<!--        android:padding="8dp"-->
-<!--        android:textOff=""-->
-<!--        android:textOn=""-->
-<!--        android:text=""-->
-<!--        android:textSize="0sp"-->
-<!--        app:layout_gravity="center"-->
-<!--        app:layout_rowWeight="1"-->
-<!--        app:layout_columnWeight="1"/>-->
-
-<!--</android.support.v7.widget.GridLayout>-->

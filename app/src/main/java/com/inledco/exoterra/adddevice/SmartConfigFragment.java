@@ -54,7 +54,7 @@ public class SmartConfigFragment extends BaseFragment {
             mConnectNetViewModel.postValue();
             if (mSubscribe) {
                 DeviceManager.getInstance().getSubscribedDevices();
-                getActivity().getSupportFragmentManager().popBackStack(null, 1);
+                getActivity().getSupportFragmentManager().popBackStackImmediate(null, 1);
                 replaceFragment(R.id.adddevice_fl, new ConfigDeviceFragment());
             } else {
                 showSmartConfigSuccessDialog();

@@ -18,8 +18,8 @@
         app:min="0"
         app:max="1000"
         app:pointerRadius="2dp"
-        app:progressWidth="4dp"
-        app:unreachedWidth="4dp"
+        app:progressWidth="2dp"
+        app:unreachedWidth="2dp"
         app:unreachedColor="@color/colorGray">
 
         <TextView
@@ -35,7 +35,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="4dp"
+        android:lines="1"
+        android:ellipsize="end"
         android:textColor="@color/textColorSencondary"
-        android:textSize="10sp"/>
+        android:textSize="@dimen/textSizeMicro"/>
 
 </LinearLayout>

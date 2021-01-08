@@ -2,6 +2,7 @@ package com.inledco.exoterra.aliot;
 
 import android.support.annotation.NonNull;
 import android.util.Base64;
+import android.util.Log;
 
 import com.alibaba.fastjson.JSON;
 import com.inledco.exoterra.AppConfig;
@@ -126,6 +127,9 @@ public class AliotServer {
     //  {productKey}
     private final String PUBLISH_TOPIC = "/product/%1$s/pub_topic";
 
+    //  {productKey}    {deviceName}    {serviceName}
+    private final String INVOKE_DEVICE_SERVICE = "/product/%1$s/device/%2$s/invoke_service/%3$s";
+
     private final String COMMON_ALIYUNCS_API = "/aliyuncs/common";
 
     //  {productKey} {deviceName} {startTime} {endTime} {asc} {pageSize} {identifiers}
@@ -133,8 +137,12 @@ public class AliotServer {
 
     private final String UPLOAD_FILE = "/file/upload/file";
 
+    private final String SVC_GET_DEVICE_TIME = "get_device_datetime";
+    private final String SVC_FOTA_UPGRADE = "fota_upgrade";
+
     private String mUserid;
     private String mToken;
+    private Headers mHeaders;
 
     private AliotServer() {
         APP_KEY = AppConfig.getString("appKey");
@@ -149,6 +157,9 @@ public class AliotServer {
     public void init(@NonNull final String userid, @NonNull final String token) {
         mUserid = userid;
         mToken = token;
+        mHeaders = new Headers.Builder().add(KEY_CONTENT_TYPE, CONTENT_TYPE_JSON)
+                                        .add(KEY_AUTH, AUTH_TYPE + mToken)
+                                        .build();
     }
 
     public void getEmailVerifycode(final String email, HttpCallback<UserApi.Response> callback) {
@@ -196,15 +207,9 @@ public class AliotServer {
         OKHttpManager.getInstance().post(url, headers, json, callback);
     }
 
-    public void logout(final String token, HttpCallback<UserApi.Response> callback) {
-        String url = API_SERVER + USER_LOGOUT;
-        Headers headers = new Headers.Builder().add(KEY_AUTH, AUTH_TYPE + token)
-                                               .build();
-        OKHttpManager.getInstance().post(url, headers, "", callback);
-    }
-
     public void logout(HttpCallback<UserApi.Response> callback) {
-        logout(mToken, callback);
+        String url = API_SERVER + USER_LOGOUT;
+        OKHttpManager.getInstance().post(url, mHeaders, "", callback);
     }
 
     public UserApi.GetUserInfoResponse getUserInfo(final String userid, final String token) {
@@ -212,19 +217,20 @@ public class AliotServer {
         Headers headers = new Headers.Builder().add(KEY_CONTENT_TYPE, CONTENT_TYPE_JSON)
                                                .add(KEY_AUTH, AUTH_TYPE + token)
                                                .build();
-        UserApi.GetUserInfoResponse response = OKHttpManager.getInstance().blockGet(url, headers, UserApi.GetUserInfoResponse.class);
-        return response;
+
+        return OKHttpManager.getInstance().blockGet(url, headers, UserApi.GetUserInfoResponse.class);
     }
 
     public UserApi.GetUserInfoResponse getUserInfo() {
         return getUserInfo(mUserid, mToken);
     }
 
-    public void getUserInfo(final String userid, final String token, HttpCallback<UserApi.GetUserInfoResponse> callback) {
+    public void getUserInfo(String userid, String token,  HttpCallback<UserApi.GetUserInfoResponse> callback) {
         String url = API_SERVER + String.format(GET_USER_INFO, userid);
         Headers headers = new Headers.Builder().add(KEY_CONTENT_TYPE, CONTENT_TYPE_JSON)
                                                .add(KEY_AUTH, AUTH_TYPE + token)
                                                .build();
+
         OKHttpManager.getInstance().get(url, headers, callback);
     }
 
@@ -232,49 +238,30 @@ public class AliotServer {
         getUserInfo(mUserid, mToken, callback);
     }
 
-
-    public void modifyUserNickname(final String userid, final String token, final String nickname, HttpCallback<UserApi.Response> callback) {
-        String url = API_SERVER + String.format(MODIFY_USER_INFO, userid);
-        Headers headers = new Headers.Builder().add(KEY_CONTENT_TYPE, CONTENT_TYPE_JSON)
-                                               .add(KEY_AUTH, AUTH_TYPE + token)
-                                               .build();
+    public void modifyUserNickname(final String nickname, HttpCallback<UserApi.Response> callback) {
+        String url = API_SERVER + String.format(MODIFY_USER_INFO, mUserid);
+        
         UserApi.SetUserInfoRequest request = new UserApi.SetUserInfoRequest();
         request.nickname = nickname;
         String json = JSON.toJSONString(request);
-        OKHttpManager.getInstance().put(url, headers, json, callback);
-    }
-
-    public void modifyUserNickname(final String nickname, HttpCallback<UserApi.Response> callback) {
-        modifyUserNickname(mUserid, mToken, nickname, callback);
-    }
-
-    public void modifyUserInfo(final String userid, final String token, final UserApi.SetUserInfoRequest request, HttpCallback<UserApi.Response> callback) {
-        String url = API_SERVER + String.format(MODIFY_USER_INFO, userid);
-        Headers headers = new Headers.Builder().add(KEY_CONTENT_TYPE, CONTENT_TYPE_JSON)
-                                               .add(KEY_AUTH, AUTH_TYPE + token)
-                                               .build();
-        String json = JSON.toJSONString(request);
-        OKHttpManager.getInstance().put(url, headers, json, callback);
+        OKHttpManager.getInstance().put(url, mHeaders, json, callback);
     }
 
     public void modifyUserInfo(final UserApi.SetUserInfoRequest request, HttpCallback<UserApi.Response> callback) {
-        modifyUserInfo(mUserid, mToken, request, callback);
+        String url = API_SERVER + String.format(MODIFY_USER_INFO, mUserid);
+        
+        String json = JSON.toJSONString(request);
+        OKHttpManager.getInstance().put(url, mHeaders, json, callback);
     }
 
-    public void modifyPassword(final String token, final String old_psw, final String new_psw, HttpCallback<UserApi.Response> callback) {
+    public void modifyPassword(final String old_psw, final String new_psw, HttpCallback<UserApi.Response> callback) {
         String url = API_SERVER + MODIFY_PASSWORD;
-        Headers headers = new Headers.Builder().add(KEY_CONTENT_TYPE, CONTENT_TYPE_JSON)
-                                               .add(KEY_AUTH, AUTH_TYPE + token)
-                                               .build();
+        
         UserApi.ModifyPasswordRequest request = new UserApi.ModifyPasswordRequest();
         request.old_password = old_psw;
         request.new_password = new_psw;
         String json = JSON.toJSONString(request);
-        OKHttpManager.getInstance().put(url, headers, json, callback);
-    }
-
-    public void modifyPassword(final String old_psw, final String new_psw, HttpCallback<UserApi.Response> callback) {
-        modifyPassword(mToken, old_psw, new_psw, callback);
+        OKHttpManager.getInstance().put(url, mHeaders, json, callback);
     }
 
     public void resetPassword(final String email, final String verifycode, final String new_psw, HttpCallback<UserApi.Response> callback) {
@@ -290,368 +277,210 @@ public class AliotServer {
         OKHttpManager.getInstance().put(url, headers, json, callback);
     }
 
-    public void getSubscribeDevices(final String userid, final String token, HttpCallback<UserApi.UserSubscribedDevicesResponse> callback) {
-        String url = API_SERVER + String.format(GET_SUB_DEVICES, userid);
-        Headers headers = new Headers.Builder().add(KEY_CONTENT_TYPE, CONTENT_TYPE_JSON)
-                                               .add(KEY_AUTH, AUTH_TYPE + token)
-                                               .build();
-        OKHttpManager.getInstance().get(url, headers, callback);
-    }
-
     public void getSubscribeDevices(HttpCallback<UserApi.UserSubscribedDevicesResponse> callback) {
-        getSubscribeDevices(mUserid, mToken, callback);
-    }
-
-    public void subscribeDevice(final String userid, final String token, final String pkey, final String dname, final String mac,
-                                HttpCallback<UserApi.SubscribeDeviceResponse> callback) {
-        String url = API_SERVER + String.format(SUBSCRIBE_DEVICE, userid);
-        Headers headers = new Headers.Builder().add(KEY_CONTENT_TYPE, CONTENT_TYPE_JSON)
-                                               .add(KEY_AUTH, AUTH_TYPE + token)
-                                               .build();
-        UserApi.SubscribeDeviceRequest request = new UserApi.SubscribeDeviceRequest();
-        request.product_key = pkey;
-        request.device_name = dname;
-        request.mac = mac;
-        String json = JSON.toJSONString(request);
-        OKHttpManager.getInstance().post(url, headers, json, callback);
+        String url = API_SERVER + String.format(GET_SUB_DEVICES, mUserid);
+        
+        OKHttpManager.getInstance().get(url, mHeaders, callback);
     }
 
     public void subscribeDevice(final String pkey, final String dname, final String mac, HttpCallback<UserApi.SubscribeDeviceResponse> callback) {
-        subscribeDevice(mUserid, mToken, pkey, dname, mac, callback);
-    }
-
-    public UserApi.SubscribeDeviceResponse subscribeDevice(final String userid, final String token, final String pkey, final String dname, final String mac) {
-        String url = API_SERVER + String.format(SUBSCRIBE_DEVICE, userid);
-        Headers headers = new Headers.Builder().add(KEY_CONTENT_TYPE, CONTENT_TYPE_JSON)
-                                               .add(KEY_AUTH, AUTH_TYPE + token)
-                                               .build();
+        String url = API_SERVER + String.format(SUBSCRIBE_DEVICE, mUserid);
+        
         UserApi.SubscribeDeviceRequest request = new UserApi.SubscribeDeviceRequest();
         request.product_key = pkey;
         request.device_name = dname;
         request.mac = mac;
         String json = JSON.toJSONString(request);
-        return OKHttpManager.getInstance().blockPost(url, headers, json, UserApi.SubscribeDeviceResponse.class);
+        OKHttpManager.getInstance().post(url, mHeaders, json, callback);
     }
 
     public UserApi.SubscribeDeviceResponse subscribeDevice(final String pkey, final String dname, final String mac) {
-        return subscribeDevice(mUserid, mToken, pkey, dname, mac);
+        String url = API_SERVER + String.format(SUBSCRIBE_DEVICE, mUserid);
+        
+        UserApi.SubscribeDeviceRequest request = new UserApi.SubscribeDeviceRequest();
+        request.product_key = pkey;
+        request.device_name = dname;
+        request.mac = mac;
+        String json = JSON.toJSONString(request);
+        return OKHttpManager.getInstance().blockPost(url, mHeaders, json, UserApi.SubscribeDeviceResponse.class);
     }
 
-    public void unsubscribeDevice(final String userid, final String token, final String pkey, final String dname, final HttpCallback<UserApi.Response> callback) {
-        String url = API_SERVER + String.format(UNSUBSCRIBE_DEVICE, userid);
-        Headers headers = new Headers.Builder().add(KEY_CONTENT_TYPE, CONTENT_TYPE_JSON)
-                                               .add(KEY_AUTH, AUTH_TYPE + token)
-                                               .build();
+    public void unsubscribeDevice(final String pkey, final String dname, final HttpCallback<UserApi.Response> callback) {
+        String url = API_SERVER + String.format(UNSUBSCRIBE_DEVICE, mUserid);
+        
         UserApi.UnsubscribeDeviceRequest request = new UserApi.UnsubscribeDeviceRequest();
         request.product_key = pkey;
         request.device_name = dname;
         String json = JSON.toJSONString(request);
-        OKHttpManager.getInstance().post(url, headers, json, callback);
-    }
-
-    public void unsubscribeDevice(final String pkey, final String dname, final HttpCallback<UserApi.Response> callback) {
-        unsubscribeDevice(mUserid, mToken, pkey, dname, callback);
-    }
-
-    public void modifyDeviceName(final String token, final String pkey, final String dname, final String name, HttpCallback<UserApi.Response> callback) {
-        String url = API_SERVER + String.format(MODIFY_DEVICE_INFO, pkey, dname);
-        Headers headers = new Headers.Builder().add(KEY_CONTENT_TYPE, CONTENT_TYPE_JSON)
-                                               .add(KEY_AUTH, AUTH_TYPE + token)
-                                               .build();
-        UserApi.ModifyDeviceInfoRequest request = new UserApi.ModifyDeviceInfoRequest();
-        request.name = name;
-        String json = JSON.toJSONString(request);
-        OKHttpManager.getInstance().put(url, headers, json, callback);
+        OKHttpManager.getInstance().post(url, mHeaders, json, callback);
     }
 
     public void modifyDeviceName(final String pkey, final String dname, final String name, HttpCallback<UserApi.Response> callback) {
-        modifyDeviceName(mToken, pkey, dname, name, callback);
-    }
-
-    public void modifyDeviceInfo(final String token, final String pkey, final String dname, final UserApi.ModifyDeviceInfoRequest request,
-                                 final HttpCallback<UserApi.Response> callback) {
         String url = API_SERVER + String.format(MODIFY_DEVICE_INFO, pkey, dname);
-        Headers headers = new Headers.Builder().add(KEY_CONTENT_TYPE, CONTENT_TYPE_JSON)
-                                               .add(KEY_AUTH, AUTH_TYPE + token)
-                                               .build();
+        
+        UserApi.ModifyDeviceInfoRequest request = new UserApi.ModifyDeviceInfoRequest();
+        request.name = name;
         String json = JSON.toJSONString(request);
-        OKHttpManager.getInstance().put(url, headers, json, callback);
+        OKHttpManager.getInstance().put(url, mHeaders, json, callback);
     }
 
     public void modifyDeviceInfo(final String pkey, final String dname, final UserApi.ModifyDeviceInfoRequest request, final HttpCallback<UserApi.Response> callback) {
-        modifyDeviceInfo(mToken, pkey, dname, request, callback);
-    }
-
-    public void getDeviceInfo(final String token, final String pkey, final String dname, HttpCallback<UserApi.DeviceInfoResponse> callback) {
-        String url = API_SERVER + String.format(GET_DEVICE_INFO, pkey, dname);
-        Headers headers = new Headers.Builder().add(KEY_CONTENT_TYPE, CONTENT_TYPE_JSON)
-                                               .add(KEY_AUTH, AUTH_TYPE + token)
-                                               .build();
-        OKHttpManager.getInstance().get(url, headers, callback);
+        String url = API_SERVER + String.format(MODIFY_DEVICE_INFO, pkey, dname);
+        
+        String json = JSON.toJSONString(request);
+        OKHttpManager.getInstance().put(url, mHeaders, json, callback);
     }
 
     public void getDeviceInfo(final String pkey, final String dname, HttpCallback<UserApi.DeviceInfoResponse> callback) {
-        getDeviceInfo(mToken, pkey, dname, callback);
-    }
-
-    public void createGroup(final String token, final String name, HttpCallback<UserApi.GroupResponse> callback) {
-        String url = API_SERVER + CREATE_GROUP;
-        Headers headers = new Headers.Builder().add(KEY_CONTENT_TYPE, CONTENT_TYPE_JSON)
-                                               .add(KEY_AUTH, AUTH_TYPE + token)
-                                               .build();
-        UserApi.GroupRequest request = new UserApi.GroupRequest();
-        request.name = name;
-        String json = JSON.toJSONString(request);
-        OKHttpManager.getInstance().post(url, headers, json, callback);
+        String url = API_SERVER + String.format(GET_DEVICE_INFO, pkey, dname);
+        
+        OKHttpManager.getInstance().get(url, mHeaders, callback);
     }
 
     public void createGroup(final String name, HttpCallback<UserApi.GroupResponse> callback) {
-        createGroup(mToken, name, callback);
-    }
-
-    public void createGroup(final String token, final UserApi.GroupRequest request, HttpCallback<UserApi.GroupResponse> callback) {
         String url = API_SERVER + CREATE_GROUP;
-        Headers headers = new Headers.Builder().add(KEY_CONTENT_TYPE, CONTENT_TYPE_JSON)
-                                               .add(KEY_AUTH, AUTH_TYPE + token)
-                                               .build();
-        String json = JSON.toJSONString(request);
-        OKHttpManager.getInstance().post(url, headers, json, callback);
-    }
-
-    public void createGroup(final UserApi.GroupRequest request, HttpCallback<UserApi.GroupResponse> callback) {
-        createGroup(mToken, request, callback);
-    }
-
-    public void modifyGroupName(final String token, final String groupid, final String name, HttpCallback<UserApi.GroupResponse> callback) {
-        String url = API_SERVER + String.format(MODIFY_GROUP_INFO, groupid);
-        Headers headers = new Headers.Builder().add(KEY_CONTENT_TYPE, CONTENT_TYPE_JSON)
-                                               .add(KEY_AUTH, AUTH_TYPE + token)
-                                               .build();
+        
         UserApi.GroupRequest request = new UserApi.GroupRequest();
         request.name = name;
         String json = JSON.toJSONString(request);
-        OKHttpManager.getInstance().put(url, headers, json, callback);
+        OKHttpManager.getInstance().post(url, mHeaders, json, callback);
+    }
+
+    public void createGroup(final UserApi.GroupRequest request, HttpCallback<UserApi.GroupResponse> callback) {
+        String url = API_SERVER + CREATE_GROUP;
+        
+        String json = JSON.toJSONString(request);
+        OKHttpManager.getInstance().post(url, mHeaders, json, callback);
     }
 
     public void modifyGroupName(final String groupid, final String name, HttpCallback<UserApi.GroupResponse> callback) {
-        modifyGroupName(mToken, groupid, name, callback);
-    }
-
-    public void modifyGroupInfo(final String token, final String groupid, final UserApi.GroupRequest request, HttpCallback<UserApi.GroupResponse> callback) {
         String url = API_SERVER + String.format(MODIFY_GROUP_INFO, groupid);
-        Headers headers = new Headers.Builder().add(KEY_CONTENT_TYPE, CONTENT_TYPE_JSON)
-                                               .add(KEY_AUTH, AUTH_TYPE + token)
-                                               .build();
+        
+        UserApi.GroupRequest request = new UserApi.GroupRequest();
+        request.name = name;
         String json = JSON.toJSONString(request);
-        OKHttpManager.getInstance().put(url, headers, json, callback);
+        OKHttpManager.getInstance().put(url, mHeaders, json, callback);
     }
 
     public void modifyGroupInfo(final String groupid, final UserApi.GroupRequest request, HttpCallback<UserApi.GroupResponse> callback) {
-        modifyGroupInfo(mToken, groupid, request, callback);
-    }
-
-    public void getGroupInfo(final String token, final String groupid, HttpCallback<UserApi.GroupResponse> callback) {
-        String url = API_SERVER + String.format(GET_GROUP_INFO, groupid);
-        Headers headers = new Headers.Builder().add(KEY_CONTENT_TYPE, CONTENT_TYPE_JSON)
-                                               .add(KEY_AUTH, AUTH_TYPE + token)
-                                               .build();
-        OKHttpManager.getInstance().get(url, headers, callback);
+        String url = API_SERVER + String.format(MODIFY_GROUP_INFO, groupid);
+        
+        String json = JSON.toJSONString(request);
+        OKHttpManager.getInstance().put(url, mHeaders, json, callback);
     }
 
     public void getGroupInfo(final String groupid, HttpCallback<UserApi.GroupResponse> callback) {
-        getGroupInfo(mToken, groupid, callback);
-    }
-
-    public void deleteGroup(final String token, final String groupid, HttpCallback<UserApi.Response> callback) {
-        String url = API_SERVER + String.format(DELETE_GROUP, groupid);
-        Headers headers = new Headers.Builder().add(KEY_CONTENT_TYPE, CONTENT_TYPE_JSON)
-                                               .add(KEY_AUTH, AUTH_TYPE + token)
-                                               .build();
-        OKHttpManager.getInstance().delete(url, headers, (String) null, callback);
+        String url = API_SERVER + String.format(GET_GROUP_INFO, groupid);
+        
+        OKHttpManager.getInstance().get(url, mHeaders, callback);
     }
 
     public void deleteGroup(final String groupid, HttpCallback<UserApi.Response> callback) {
-        deleteGroup(mToken, groupid, callback);
-    }
-
-    public void exitGroup(final String userid, final String token, final String groupid, final HttpCallback<UserApi.Response> callback) {
-        String url = API_SERVER + String.format(EXIT_GROUP, groupid, userid);
-        Headers headers = new Headers.Builder().add(KEY_CONTENT_TYPE, CONTENT_TYPE_JSON)
-                                               .add(KEY_AUTH, AUTH_TYPE + token)
-                                               .build();
-        OKHttpManager.getInstance().delete(url, headers, (String) null, callback);
+        String url = API_SERVER + String.format(DELETE_GROUP, groupid);
+        
+        OKHttpManager.getInstance().delete(url, mHeaders, (String) null, callback);
     }
 
     public void exitGroup(final String groupid, final HttpCallback<UserApi.Response> callback) {
-        exitGroup(mUserid, mToken, groupid, callback);
-    }
-
-    public void getGroups(final String userid, final String token, HttpCallback<UserApi.GroupsResponse> callback) {
-        String url = API_SERVER + String.format(GET_USER_GROUPS, userid);
-        Headers headers = new Headers.Builder().add(KEY_CONTENT_TYPE, CONTENT_TYPE_JSON)
-                                               .add(KEY_AUTH, AUTH_TYPE + token)
-                                               .build();
-        OKHttpManager.getInstance().get(url, headers, callback);
+        String url = API_SERVER + String.format(EXIT_GROUP, groupid, mUserid);
+        
+        OKHttpManager.getInstance().delete(url, mHeaders, (String) null, callback);
     }
 
     public void getGroups(HttpCallback<UserApi.GroupsResponse> callback) {
-        getGroups(mUserid, mToken, callback);
+        String url = API_SERVER + String.format(GET_USER_GROUPS, mUserid);
+        
+        OKHttpManager.getInstance().get(url, mHeaders, callback);
     }
 
-    public void addDeviceToGroup(final String token, final String groupid, final String pkey, final String dname, final HttpCallback<UserApi.Response> callback) {
+    public void addDeviceToGroup(final String groupid, final String pkey, final String dname, final HttpCallback<UserApi.Response> callback) {
         String url = API_SERVER + String.format(GROUP_ADD_DEVICE, groupid);
-        Headers headers = new Headers.Builder().add(KEY_CONTENT_TYPE, CONTENT_TYPE_JSON)
-                                               .add(KEY_AUTH, AUTH_TYPE + token)
-                                               .build();
+        
         UserApi.GroupAddDeviceRequest request = new UserApi.GroupAddDeviceRequest();
         request.product_key = pkey;
         request.device_name = dname;
         String json = JSON.toJSONString(request);
-        OKHttpManager.getInstance().post(url, headers, json, callback);
+        OKHttpManager.getInstance().post(url, mHeaders, json, callback);
     }
 
-    public void addDeviceToGroup(final String groupid, final String pkey, final String dname, final HttpCallback<UserApi.Response> callback) {
-        addDeviceToGroup(mToken, groupid, pkey, dname, callback);
-    }
-
-    public void removeDeviceFromGroup(final String token, final String groupid, final String pkey, final String dname, final HttpCallback<UserApi.Response> callback) {
+    public void removeDeviceFromGroup(final String groupid, final String pkey, final String dname, final HttpCallback<UserApi.Response> callback) {
         String url = API_SERVER + String.format(GROUP_REMOVE_DEVICE, groupid);
-        Headers headers = new Headers.Builder().add(KEY_CONTENT_TYPE, CONTENT_TYPE_JSON)
-                                               .add(KEY_AUTH, AUTH_TYPE + token)
-                                               .build();
+        
         UserApi.GroupRemoveDeviceRequest request = new UserApi.GroupRemoveDeviceRequest();
         request.product_key = pkey;
         request.device_name = dname;
         String json = JSON.toJSONString(request);
-        OKHttpManager.getInstance().delete(url, headers, json, callback);
-    }
-
-    public void removeDeviceFromGroup(final String groupid, final String pkey, final String dname, final HttpCallback<UserApi.Response> callback) {
-        removeDeviceFromGroup(mToken, groupid, pkey, dname, callback);
-    }
-
-    public void getGroupDevices(final String token, final String groupid, HttpCallback<UserApi.GroupDevicesResponse> callback) {
-        String url = API_SERVER + String.format(GET_GROUP_DEVICES, groupid);
-        Headers headers = new Headers.Builder().add(KEY_CONTENT_TYPE, CONTENT_TYPE_JSON)
-                                               .add(KEY_AUTH, AUTH_TYPE + token)
-                                               .build();
-        OKHttpManager.getInstance().get(url, headers, callback);
+        OKHttpManager.getInstance().delete(url, mHeaders, json, callback);
     }
 
     public void getGroupDevices(final String groupid, HttpCallback<UserApi.GroupDevicesResponse> callback) {
-        getGroupDevices(mToken, groupid, callback);
+        String url = API_SERVER + String.format(GET_GROUP_DEVICES, groupid);
+        
+        OKHttpManager.getInstance().get(url, mHeaders, callback);
     }
 
-    public void inviteUserToGroup(final String token, final String groupid, final String email, HttpCallback<UserApi.GroupInviteResponse> callback) {
+    public void inviteUserToGroup(final String groupid, final String email, HttpCallback<UserApi.GroupInviteResponse> callback) {
         String url = API_SERVER + String.format(GROUP_INVITE_USER, groupid);
-        Headers headers = new Headers.Builder().add(KEY_CONTENT_TYPE, CONTENT_TYPE_JSON)
-                                               .add(KEY_AUTH, AUTH_TYPE + token)
-                                               .build();
+        
         UserApi.GroupInviteRequest request = new UserApi.GroupInviteRequest();
         request.email = email;
         request.expire_time = 48;
         String json = JSON.toJSONString(request);
-        OKHttpManager.getInstance().post(url, headers, json, callback);
-    }
-
-    public void inviteUserToGroup(final String groupid, final String email, HttpCallback<UserApi.GroupInviteResponse> callback) {
-        inviteUserToGroup(mToken, groupid, email, callback);
-    }
-
-    public void removeUserFromGroup(final String token, final String groupid, final String userid, final HttpCallback<UserApi.Response> callback) {
-        String url = API_SERVER + String.format(GROUP_REMOVE_USER, groupid, userid);
-        Headers headers = new Headers.Builder().add(KEY_CONTENT_TYPE, CONTENT_TYPE_JSON)
-                                               .add(KEY_AUTH, AUTH_TYPE + token)
-                                               .build();
-        OKHttpManager.getInstance().delete(url, headers, (String) null, callback);
+        OKHttpManager.getInstance().post(url, mHeaders, json, callback);
     }
 
     public void removeUserFromGroup(final String groupid, final String userid, final HttpCallback<UserApi.Response> callback) {
-        removeUserFromGroup(mToken, groupid, userid, callback);
-    }
-
-    public void cancelInvite(final String token, final String groupid, final String invite_id, final HttpCallback<UserApi.Response> callback) {
-        String url = API_SERVER + String.format(GROUP_INVITE_CANCEL, groupid);
-        Headers headers = new Headers.Builder().add(KEY_CONTENT_TYPE, CONTENT_TYPE_JSON)
-                                               .add(KEY_AUTH, AUTH_TYPE + token)
-                                               .build();
-        UserApi.InviteActionRequest request = new UserApi.InviteActionRequest();
-        request.invite_id = invite_id;
-        String json = JSON.toJSONString(request);
-        OKHttpManager.getInstance().post(url, headers, json, callback);
+        String url = API_SERVER + String.format(GROUP_REMOVE_USER, groupid, userid);
+        
+        OKHttpManager.getInstance().delete(url, mHeaders, (String) null, callback);
     }
 
     public void cancelInvite(final String groupid, final String invite_id, final HttpCallback<UserApi.Response> callback) {
-        cancelInvite(mToken, groupid, invite_id, callback);
-    }
-
-    public void acceptInvite(final String token, final String groupid, final String invite_id, final HttpCallback<UserApi.Response> callback) {
-        String url = API_SERVER + String.format(GROUP_INVITE_ACCEPT, groupid);
-        Headers headers = new Headers.Builder().add(KEY_CONTENT_TYPE, CONTENT_TYPE_JSON)
-                                               .add(KEY_AUTH, AUTH_TYPE + token)
-                                               .build();
+        String url = API_SERVER + String.format(GROUP_INVITE_CANCEL, groupid);
+        
         UserApi.InviteActionRequest request = new UserApi.InviteActionRequest();
         request.invite_id = invite_id;
         String json = JSON.toJSONString(request);
-        OKHttpManager.getInstance().post(url, headers, json, callback);
+        OKHttpManager.getInstance().post(url, mHeaders, json, callback);
     }
 
     public void acceptInvite(final String groupid, final String invite_id, final HttpCallback<UserApi.Response> callback) {
-        acceptInvite(mToken, groupid, invite_id, callback);
-    }
-
-    public void denyInvite(final String token, final String groupid, final String invite_id, final HttpCallback<UserApi.Response> callback) {
-        String url = API_SERVER + String.format(GROUP_INVITE_DENY, groupid);
-        Headers headers = new Headers.Builder().add(KEY_CONTENT_TYPE, CONTENT_TYPE_JSON)
-                                               .add(KEY_AUTH, AUTH_TYPE + token)
-                                               .build();
+        String url = API_SERVER + String.format(GROUP_INVITE_ACCEPT, groupid);
+        
         UserApi.InviteActionRequest request = new UserApi.InviteActionRequest();
         request.invite_id = invite_id;
         String json = JSON.toJSONString(request);
-        OKHttpManager.getInstance().post(url, headers, json, callback);
+        OKHttpManager.getInstance().post(url, mHeaders, json, callback);
     }
 
     public void denyInvite(final String groupid, final String invite_id, final HttpCallback<UserApi.Response> callback) {
-        denyInvite(mToken, groupid, invite_id, callback);
-    }
-
-    public void getInviterList(final String userid, final String token, HttpCallback<UserApi.InviteListResponse> callback) {
-        String url = API_SERVER + String.format(INVITER_GET_LIST, userid);
-        Headers headers = new Headers.Builder().add(KEY_CONTENT_TYPE, CONTENT_TYPE_JSON)
-                                               .add(KEY_AUTH, AUTH_TYPE + token)
-                                               .build();
-        OKHttpManager.getInstance().get(url, headers, callback);
+        String url = API_SERVER + String.format(GROUP_INVITE_DENY, groupid);
+        
+        UserApi.InviteActionRequest request = new UserApi.InviteActionRequest();
+        request.invite_id = invite_id;
+        String json = JSON.toJSONString(request);
+        OKHttpManager.getInstance().post(url, mHeaders, json, callback);
     }
 
     public void getInviterList(HttpCallback<UserApi.InviteListResponse> callback) {
-        getInviterList(mUserid, mToken, callback);
-    }
-
-    public void getInviteeList(final String userid, final String token, HttpCallback<UserApi.InviteListResponse> callback) {
-        String url = API_SERVER + String.format(INVITEE_GET_LIST, userid);
-        Headers headers = new Headers.Builder().add(KEY_CONTENT_TYPE, CONTENT_TYPE_JSON)
-                                               .add(KEY_AUTH, AUTH_TYPE + token)
-                                               .build();
-        OKHttpManager.getInstance().get(url, headers, callback);
+        String url = API_SERVER + String.format(INVITER_GET_LIST, mUserid);
+        
+        OKHttpManager.getInstance().get(url, mHeaders, callback);
     }
 
     public void getInviteeList(HttpCallback<UserApi.InviteListResponse> callback) {
-        getInviteeList(mUserid, mToken, callback);
-    }
-
-    public void getFirmwareList(final String token, final String pkey, HttpCallback<UserApi.FirmwaresResponse> callback) {
-        String url = API_SERVER + String.format(GET_FIRMWARE_LIST, pkey);
-        Headers headers = new Headers.Builder().add(KEY_CONTENT_TYPE, CONTENT_TYPE_JSON)
-                                               .add(KEY_AUTH, AUTH_TYPE + token)
-                                               .build();
-        OKHttpManager.getInstance().get(url, headers, callback);
+        String url = API_SERVER + String.format(INVITEE_GET_LIST, mUserid);
+        
+        OKHttpManager.getInstance().get(url, mHeaders, callback);
     }
 
     public void getFirmwareList(final String pkey, HttpCallback<UserApi.FirmwaresResponse> callback) {
-        getFirmwareList(mToken, pkey, callback);
+        String url = API_SERVER + String.format(GET_FIRMWARE_LIST, pkey);
+        
+        OKHttpManager.getInstance().get(url, mHeaders, callback);
     }
 
-    public void queryDeviceHistoryProperties(final String token, final String pkey, final String dname, final UserApi.DeviceHistoryPropertiesRequest request,
+    public void queryDeviceHistoryProperties(final String pkey, final String dname, final UserApi.DeviceHistoryPropertiesRequest request,
                                              HttpCallback<UserApi.DeviceHistoryPropertiesResponse> callback) {
         final StringBuilder sb = new StringBuilder();
         if (request != null && request.identifiers != null) {
@@ -665,93 +494,119 @@ public class AliotServer {
         final String identifiers = new String(sb);
         String url = API_SERVER + String.format(QUERY_DEVICE_HISTORY_PROPERTY, pkey, dname,
                                                 request.startTime, request.endTime, request.asc, request.pageSize, identifiers);
-        Headers headers = new Headers.Builder().add(KEY_CONTENT_TYPE, CONTENT_TYPE_JSON)
-                                               .add(KEY_AUTH, AUTH_TYPE + token)
-                                               .build();
-        OKHttpManager.getInstance().get(url, headers, callback);
-    }
-
-    public void queryDeviceHistoryProperties(final String pkey, final String dname, final UserApi.DeviceHistoryPropertiesRequest request,
-                                             HttpCallback<UserApi.DeviceHistoryPropertiesResponse> callback) {
-        queryDeviceHistoryProperties(mToken, pkey, dname, request, callback);
-    }
-
-    public UserApi.GetDevicePropertiesResponse getDeviceProperties(final String token, final String pkey, final String dname) {
-        String url = API_SERVER + String.format(GET_DEVICE_PROPERTIES, pkey, dname);
-        Headers headers = new Headers.Builder().add(KEY_CONTENT_TYPE, CONTENT_TYPE_JSON)
-                                               .add(KEY_AUTH, AUTH_TYPE + token)
-                                               .build();
-        return OKHttpManager.getInstance().blockGet(url, headers, UserApi.GetDevicePropertiesResponse.class);
+        
+        OKHttpManager.getInstance().get(url, mHeaders, callback);
     }
 
     public UserApi.GetDevicePropertiesResponse getDeviceProperties(final String pkey, final String dname) {
         String url = API_SERVER + String.format(GET_DEVICE_PROPERTIES, pkey, dname);
-        Headers headers = new Headers.Builder().add(KEY_CONTENT_TYPE, CONTENT_TYPE_JSON)
-                                               .add(KEY_AUTH, AUTH_TYPE + mToken)
-                                               .build();
-        return OKHttpManager.getInstance().blockGet(url, headers, UserApi.GetDevicePropertiesResponse.class);
-    }
-
-    public void getDeviceProperties(final String token, final String pkey, final String dname, final HttpCallback<UserApi.GetDevicePropertiesResponse> callback) {
-        String url = API_SERVER + String.format(GET_DEVICE_PROPERTIES, pkey, dname);
-        Headers headers = new Headers.Builder().add(KEY_CONTENT_TYPE, CONTENT_TYPE_JSON)
-                                               .add(KEY_AUTH, AUTH_TYPE + token)
-                                               .build();
-        OKHttpManager.getInstance().get(url, headers, callback);
+        
+        return OKHttpManager.getInstance().blockGet(url, mHeaders, UserApi.GetDevicePropertiesResponse.class);
     }
 
     public void getDeviceProperties(final String pkey, final String dname, final HttpCallback<UserApi.GetDevicePropertiesResponse> callback) {
-        getDeviceProperties(mToken, pkey, dname, callback);
-    }
-
-    public void setDeviceProperties(final String token, final String pkey, final String dname, final String items, final HttpCallback<UserApi.SetDevicePropertiesResponse> callback) {
-        String url = API_SERVER + String.format(SET_DEVICE_PROPERTIES, pkey, dname);
-        Headers headers = new Headers.Builder().add(KEY_CONTENT_TYPE, CONTENT_TYPE_JSON)
-                                               .add(KEY_AUTH, AUTH_TYPE + token)
-                                               .build();
-        UserApi.SetDevicePropertiesRequest request = new UserApi.SetDevicePropertiesRequest();
-        request.items = items;
-        String json = JSON.toJSONString(request);
-        OKHttpManager.getInstance().post(url, headers, json, callback);
+        String url = API_SERVER + String.format(GET_DEVICE_PROPERTIES, pkey, dname);
+        
+        OKHttpManager.getInstance().get(url, mHeaders, callback);
     }
 
     public void setDeviceProperties(final String pkey, final String dname, final String items, final HttpCallback<UserApi.SetDevicePropertiesResponse> callback) {
-        setDeviceProperties(mToken, pkey, dname, items, callback);
+        String url = API_SERVER + String.format(SET_DEVICE_PROPERTIES, pkey, dname);
+        
+        UserApi.SetDevicePropertiesRequest request = new UserApi.SetDevicePropertiesRequest();
+        request.items = items;
+        String json = JSON.toJSONString(request);
+        OKHttpManager.getInstance().post(url, mHeaders, json, callback);
     }
 
-    public void publishTopic(String token, String pkey, String topic, String message, int qos, HttpCallback<UserApi.PublishTopicResponse> callback) {
+    public UserApi.InvokeDeviceServiceResponse invokeDeviceService(String pkey, String dname, String svcname, String params) {
+        String url = API_SERVER + String.format(INVOKE_DEVICE_SERVICE, pkey, dname, svcname);
+
+        UserApi.InvokeDeviceServiceRequest request = new UserApi.InvokeDeviceServiceRequest();
+        request.params = params;
+        String json = JSON.toJSONString(request);
+        return OKHttpManager.getInstance().blockPost(url, mHeaders, json, UserApi.InvokeDeviceServiceResponse.class);
+    }
+
+    public void invokeDeviceService(String pkey, String dname, String svcname, String params, HttpCallback<UserApi.InvokeDeviceServiceResponse> callback) {
+        String url = API_SERVER + String.format(INVOKE_DEVICE_SERVICE, pkey, dname, svcname);
+
+        UserApi.InvokeDeviceServiceRequest request = new UserApi.InvokeDeviceServiceRequest();
+        request.params = params;
+        String json = JSON.toJSONString(request);
+        Log.e(TAG, "invokeDeviceService: " + json);
+        OKHttpManager.getInstance().post(url, mHeaders, json, callback);
+    }
+
+    public void getDeviceDatetime(String pkey, String dname, HttpCallback<UserApi.GetDeviceTimeResponse> callback) {
+        invokeDeviceService(pkey, dname, SVC_GET_DEVICE_TIME, "{}", new HttpCallback<UserApi.InvokeDeviceServiceResponse>() {
+            @Override
+            public void onError(String error) {
+                if (callback != null) {
+                    callback.onError(error);
+                }
+            }
+
+            @Override
+            public void onSuccess(UserApi.InvokeDeviceServiceResponse response) {
+                if (callback != null) {
+                    String json = JSON.toJSONString(response.data.result);
+                    UserApi.GetDeviceTimeResult devtime = JSON.parseObject(json, UserApi.GetDeviceTimeResult.class);
+                    UserApi.GetDeviceTimeResponse result = new UserApi.GetDeviceTimeResponse();
+                    result.data = devtime;
+                    callback.onSuccess(result);
+                }
+            }
+        });
+    }
+
+//    public void upgradeFirmware(String pkey, String dname, int version, String url) {
+//        Map<String, Object> map = new HashMap<>();
+//        map.put("version", version);
+//        map.put("url", url);
+//        String json = JSON.toJSONString(map);
+//        invokeDeviceService(pkey, dname, json, SVC_FOTA_UPGRADE, new HttpCallback<UserApi.InvokeDeviceServiceResponse>() {
+//            @Override
+//            public void onError(String error) {
+//
+//            }
+//
+//            @Override
+//            public void onSuccess(UserApi.InvokeDeviceServiceResponse result) {
+//
+//            }
+//        });
+//    }
+
+    public void publishTopic(String pkey, String topic, String message, int qos, HttpCallback<UserApi.PublishTopicResponse> callback) {
         String url = API_SERVER + String.format(PUBLISH_TOPIC, pkey);
-        Headers headers = new Headers.Builder().add(KEY_CONTENT_TYPE, CONTENT_TYPE_JSON)
-                                               .add(KEY_AUTH, AUTH_TYPE + token)
-                                               .build();
+        
         UserApi.PublishTopicRequest request = new UserApi.PublishTopicRequest();
         request.topic = topic;
         request.message = Base64.encodeToString(message.getBytes(), Base64.DEFAULT);
         if (qos == 1) {
             request.qos = 1;
+        } else {
+            request.qos = 0;
         }
         String json = JSON.toJSONString(request);
-        OKHttpManager.getInstance().post(url, headers, json, callback);
+        OKHttpManager.getInstance().post(url, mHeaders, json, callback);
     }
 
-    public void publishTopic(String pkey, String topic, String message, int qos, HttpCallback<UserApi.PublishTopicResponse> callback) {
-        publishTopic(mToken, pkey, topic, message, qos, callback);
+    public void publishTopic(String pkey, String topic, String message, HttpCallback<UserApi.PublishTopicResponse> callback) {
+        publishTopic(pkey, topic, message, 0, callback);
     }
 
-    public void getDeviceProperties(String token, String pkey, String dname, HttpCallback<UserApi.PublishTopicResponse> callback, String... keys) {
+    public void getDeviceProperties(String pkey, String dname, HttpCallback<UserApi.PublishTopicResponse> callback, String... keys) {
         String topicFmt = "/%1$s/%2$s/user/get";
         String topic = String.format(topicFmt, pkey, dname);
         Map<String, Object> payload = new HashMap<>();
         payload.put("params", keys);
         String message = JSON.toJSONString(payload);
-        publishTopic(token, pkey, topic, message, 1, callback);
+        publishTopic(pkey, topic, message, callback);
     }
 
-    public void getDeviceProperties(String pkey, String dname, HttpCallback<UserApi.PublishTopicResponse> callback, String... keys) {
-        getDeviceProperties(mToken, pkey, dname, callback, keys);
-    }
-
-    public void upgradeFirmware(String token, String pkey, String dname, int version, String url, HttpCallback<UserApi.PublishTopicResponse> callback) {
+    public void upgradeFirmware(String pkey, String dname, int version, String url, HttpCallback<UserApi.PublishTopicResponse> callback) {
         String topicFmt = "/%1$s/%2$s/user/fota/upgrade";
         String topic = String.format(topicFmt, pkey, dname);
         UserApi.FirmwareInfo info = new UserApi.FirmwareInfo();
@@ -761,14 +616,10 @@ public class AliotServer {
         payload.put("message", "success");
         payload.put("data", info);
         String message = JSON.toJSONString(payload);
-        publishTopic(token, pkey, topic, message, 1, callback);
+        publishTopic(pkey, topic, message, 1, callback);
     }
 
-    public void upgradeFirmware(String pkey, String dname, int version, String url, HttpCallback<UserApi.PublishTopicResponse> callback) {
-        upgradeFirmware(mToken, pkey, dname, version, url, callback);
-    }
-
-    private void sendGroupMessage(String token, InviteAction action, String inviter, String invitee, String invite_id, String groupid, String groupname) {
+    private void sendGroupMessage(InviteAction action, String inviter, String invitee, String invite_id, String groupid, String groupname) {
         if (action == null) {
             return;
         }
@@ -797,7 +648,7 @@ public class AliotServer {
         message.setGroupid(groupid);
         message.setGroupname(groupname);
         String payload = JSON.toJSONString(message);
-        publishTopic(token, APP_KEY, topic, payload,0, new HttpCallback<UserApi.PublishTopicResponse>() {
+        publishTopic(APP_KEY, topic, payload,0, new HttpCallback<UserApi.PublishTopicResponse>() {
             @Override
             public void onError(String error) {
 
@@ -838,32 +689,14 @@ public class AliotServer {
         sendGroupMessage(InviteAction.DELETE, mUserid, invitee, null, groupid, groupname);
     }
 
-    private void sendGroupMessage(InviteAction action, String inviter, String invitee, String invite_id, String groupid, String groupname) {
-        sendGroupMessage(mToken, action, inviter, invitee, invite_id, groupid, groupname);
-    }
-
-    public void commonAliyuncsApi(final String token, final String action, final Map<String, String> params, final Callback callback) {
+    public void commonAliyuncsApi(final String action, final Map<String, String> params, final Callback callback) {
         String url = API_SERVER + COMMON_ALIYUNCS_API;
-        Headers headers = new Headers.Builder().add(KEY_CONTENT_TYPE, CONTENT_TYPE_JSON)
-                                               .add(KEY_AUTH, AUTH_TYPE + token)
-                                               .build();
+        
         UserApi.CommonAliyuncsRequest request = new UserApi.CommonAliyuncsRequest();
         request.action = action;
         request.params = params;
         String json = JSON.toJSONString(request);
-        OKHttpManager.getInstance().post(url, headers, json, callback);
-    }
-
-    public void commonAliyuncsApi(final String action, final Map<String, String> params, final Callback callback) {
-        commonAliyuncsApi(mToken, action, params, callback);
-    }
-
-    public void uploadFile(final String token, final String name, final String path, final HttpCallback<UserApi.FileUploadResponse> callback) {
-        String url = API_SERVER + UPLOAD_FILE;
-        Headers headers = new Headers.Builder().add(KEY_CONTENT_TYPE, CONTENT_TYPE_FORM)
-                                               .add(KEY_AUTH, AUTH_TYPE + token)
-                                               .build();
-        OKHttpManager.getInstance().upload(url, headers, name, path, callback);
+        OKHttpManager.getInstance().post(url, mHeaders, json, callback);
     }
 
     public void uploadFile(final String name, final String path, final HttpCallback<UserApi.FileUploadResponse> callback) {

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/colorBottomDialog"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:padding="@dimen/marginUnit">
+
+    <com.inledco.exoterra.view.TimePickerWithSecond
+        android:id="@+id/dialog_timepicker"
+        android:theme="@style/AppTheme"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical|right">
+
+        <Button
+            android:id="@+id/dialog_timepicker_cancel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="?attr/selectableItemBackground"
+            android:text="@string/cancel"/>
+
+        <Button
+            android:id="@+id/dialog_timepicker_ok"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="?attr/selectableItemBackground"
+            android:text="@string/ok"/>
+    </LinearLayout>
+
+</LinearLayout>

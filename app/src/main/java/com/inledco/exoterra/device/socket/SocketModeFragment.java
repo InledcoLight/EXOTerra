@@ -1,6 +1,5 @@
 package com.inledco.exoterra.device.socket;
 
-import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -51,50 +50,31 @@ public class SocketModeFragment extends BaseFragment {
     protected void initData() {
         mSocketViewModel = ViewModelProviders.of(getActivity()).get(SocketViewModel.class);
         mSocket = mSocketViewModel.getData();
-        mSocketViewModel.observe(this, new Observer<ExoSocket>() {
-            @Override
-            public void onChanged(@Nullable ExoSocket exoSocket) {
-                refreshData();
-            }
-        });
+        mSocketViewModel.observe(this, exoSocket -> refreshData());
         refreshData();
     }
 
     @Override
     protected void initEvent() {
-        socket_mode_timer.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (!socket_mode_timer.isChecked()) {
-                    mSocketViewModel.setMode(ExoSocket.MODE_TIMER);
-                }
+        socket_mode_timer.setOnClickListener(v -> {
+            if (!socket_mode_timer.isChecked()) {
+                mSocketViewModel.setMode(ExoSocket.MODE_TIMER);
             }
         });
 
-        socket_mode_thermostat.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (!socket_mode_thermostat.isChecked()) {
-                    mSocketViewModel.setMode(ExoSocket.MODE_SENSOR1);
-                }
+        socket_mode_thermostat.setOnClickListener(v -> {
+            if (!socket_mode_thermostat.isChecked()) {
+                mSocketViewModel.setMode(ExoSocket.MODE_SENSOR1);
             }
         });
 
-        socket_mode_hygrostat.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (!socket_mode_hygrostat.isChecked()) {
-                    mSocketViewModel.setMode(ExoSocket.MODE_SENSOR2);
-                }
+        socket_mode_hygrostat.setOnClickListener(v -> {
+            if (!socket_mode_hygrostat.isChecked()) {
+                mSocketViewModel.setMode(ExoSocket.MODE_SENSOR2);
             }
         });
 
-        socket_mode_power.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mSocketViewModel.setPower(!socket_mode_power.isChecked());
-            }
-        });
+        socket_mode_power.setOnClickListener(v -> mSocketViewModel.setPower(!socket_mode_power.isChecked()));
     }
 
     private void refreshData() {
@@ -120,5 +100,6 @@ public class SocketModeFragment extends BaseFragment {
         }
 
         socket_mode_power.setChecked(mSocket.getPower());
+        socket_mode_power.setText(mSocket.getPower() ? R.string.on : R.string.off);
     }
 }

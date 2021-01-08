@@ -11,14 +11,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
-import com.aliyun.alink.linksdk.tools.AError;
 import com.inledco.exoterra.R;
-import com.inledco.exoterra.aliot.AliotClient;
-import com.inledco.exoterra.aliot.ILinkListener;
 import com.inledco.exoterra.base.BaseFragment;
 import com.inledco.exoterra.common.SimpleAdapter;
 import com.inledco.exoterra.main.MainActivity;
-import com.inledco.exoterra.manager.UserManager;
+import com.inledco.exoterra.uvbbuddy.UvbMainActivity;
 import com.inledco.exoterra.view.HorizontalMatrixImageView;
 
 import java.util.ArrayList;
@@ -62,6 +59,12 @@ public class NewProductsFragment extends BaseFragment implements View.OnClickLis
         new_products_restore = view.findViewById(R.id.new_products_restore);
         new_products_pref = view.findViewById(R.id.new_products_pref);
 
+        new_products_home.setCompoundDrawablesRelativeWithIntrinsicBounds(0, R.drawable.ic_reptile, 0, 0);
+        new_products_microtope.setCompoundDrawablesRelativeWithIntrinsicBounds(0, R.drawable.ic_microtope, 0, 0);
+        new_products_uvb.setCompoundDrawablesRelativeWithIntrinsicBounds(0, R.drawable.ic_uvb, 0, 0);
+        new_products_restore.setCompoundDrawablesRelativeWithIntrinsicBounds(0, R.drawable.ic_resore_40dp, 0, 0);
+        new_products_pref.setCompoundDrawablesRelativeWithIntrinsicBounds(0, R.drawable.ic_prefs_white, 0, 0);
+
 //        new_products_icon1.setImageResource(R.drawable.ic_product_1);
 //        new_products_icon2.setImageResource(R.drawable.ic_product_2);
 //        new_products_icon3.setImageResource(R.drawable.ic_product_3);
@@ -93,34 +96,10 @@ public class NewProductsFragment extends BaseFragment implements View.OnClickLis
                 getActivity().getSupportFragmentManager().popBackStack();
                 break;
             case R.id.new_products_microtope:
-                if (UserManager.getInstance().isAuthorized()) {
-                    String userid = UserManager.getInstance().getUserid();
-                    String secret = UserManager.getInstance().getSecret();
-                    AliotClient.getInstance().start(getContext().getApplicationContext(), userid, secret, new ILinkListener() {
-
-                        @Override
-                        public void onStart() {
-                            showLoadDialog();
-                        }
-
-                        @Override
-                        public void onInitError(AError aError) {
-                            dismissLoadDialog();
-                            showToast(aError.getMsg());
-                        }
-
-                        @Override
-                        public void onInitDone() {
-                            dismissLoadDialog();
-                            startMainActivity();
-                        }
-                    });
-                } else {
-                    startMainActivity();
-                }
+                startMainActivity();
                 break;
             case R.id.new_products_uvb:
-
+                startUvbMainActivity();
                 break;
             case R.id.new_products_restore:
 
@@ -133,6 +112,11 @@ public class NewProductsFragment extends BaseFragment implements View.OnClickLis
 
     private void startMainActivity() {
         Intent intent = new Intent(getContext(), MainActivity.class);
+        startActivity(intent);
+    }
+
+    private void startUvbMainActivity() {
+        Intent intent = new Intent(getContext(), UvbMainActivity.class);
         startActivity(intent);
     }
 
